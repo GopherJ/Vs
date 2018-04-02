@@ -33,13 +33,16 @@
         },
         methods: {
             drawPie() {
-                // data
                 const data = this.data;
+                // no data
+                if (data.length === 0) {
+                    return;
+                }
 
                 const [w, h] = this.getElWidthHeight();
 
                 // width, height must exist
-                if (w === 0 || h === 0 || Number.isNaN(w) || Number.isNaN(h)) {
+                if (!w || !h) {
                     throw new Error('invalid width or height');
                 }
 
@@ -155,6 +158,7 @@
 </script>
 
 <style>
+
     .d3-tip {
         line-height: 1;
         font-weight: bold;

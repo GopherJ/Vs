@@ -4,8 +4,8 @@ import * as d3 from 'd3';
  *
  * @type {{ms: string, s: string, m: string, h: string, w: string, d: string, M: string, y: string}}
  */
-const INTERVAL = {
-    'ms' : "%H:%M:%S", // 8
+const INTERVAL = Object.freeze({
+    'ms' : "%H:%M:%S.%L", // 11
     's' : "%H:%M:%S", // 8
     'm' : "%H:%M", // 5
     'h' : "%Y-%m-%d %H:%M", // 16
@@ -13,7 +13,7 @@ const INTERVAL = {
     'd' : "%Y-%m-%d", // 10
     'M' : "%Y-%m-%d", // 10
     'y' : "%Y" // 4
-};
+});
 
 /**
  *

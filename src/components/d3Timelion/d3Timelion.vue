@@ -5,7 +5,7 @@
 <script>
     import * as d3 from 'd3';
     import d3Tip from 'd3-tip'
-    import formatTime from '../../util/time';
+    import formatTime from '../../util/formatTime';
     import getAxisXTicks from '../../util/getAxisXTicks';
     import getIntervalFromData from '../../util/getIntervalFromData';
     import mixins from '../../mixins';
@@ -21,75 +21,40 @@
         props: {
             data: {
                 type: Array,
-                default: () => []
+                required: true
             },
             options: {
                 type: Object,
                 default: () => ({
                     fill: 'rgb(110, 173, 193)',
                     stroke: 'rgb(110, 173, 193)',
-                    fontSize: 14
+                    fontSize: 14,
+                    labelY: 'count'
                 })
             }
         },
         methods: {
-            selectPaddingInnerOuter(width) {
-                let paddingInner, paddingOuter = 0.1;
-
-                // desktop or plus
-                if (width > 970) {
-                    paddingInner = 0.1;
-                }
-
-                // tablet
-                if (width >= 560 && width <= 970) {
-                    paddingInner = 0.3;
-                }
-
-                // mobile
-                if (width < 560) {
-                    paddingInner = 0.5;
-                }
-
-                return [paddingInner, paddingOuter];
-            },
-            selectTicksNumY(height) {
-                let ticksY;
-
-                if (height > 400) {
-                    ticksY = 10;
-                }
-
-                if (height > 200 && height <= 400) {
-                    ticksY = 5;
-                }
-
-                if (height <= 200 && height > 100) {
-                    ticksY = 3;
-                }
-
-                if (height <= 100) {
-                    ticksY = 2;
-                }
-
-                if (height <= 50) {
-                    ticksY = 1;
-                }
-
-                return ticksY;
-            },
             drawTimelion() {
-                const data = this.data;
-                // no data
-                if (!data.length) {
+                 // no data
+                if (this.data.length === 0) {
                     return;
                 }
 
-                const [w, h] = this.getElWidthHeight(),
-                      {left, top, right, bottom} = this.margin,
-                      {fill, stroke, fontSize} = this.options,
+                // sort data by timestamp asc
+                const data = this.data.sort((a, b) => a.key > b.key ? 1 : -1);
+
+                // get container width and height
+                const [w, h] = this.getElWidthHeight();
+                // container width, height must exist so that we can draw svg
+                if (!w || !h) {
+                    throw new Error('invalid width or height');
+                }
+
+                // constants
+                const {left, top, right, bottom} = this.margin,
+                      {fill, stroke, fontSize, labelY} = this.options,
                       ticksY = this.selectTicksNumY(h),
-                      [paddingInner, paddingOuter] = this.selectPaddingInnerOuter(w),
+                      [paddingInner, paddingOuter] = this.selectPaddingInnerOuterX(w),
                       g_w = w - left - right,
                       g_h = h - top - bottom,
                       tickSizeInner = 4,
@@ -111,36 +76,43 @@
                 // create axis - x,y scale
                 const x = d3.scaleBand().rangeRound([0, g_w]).paddingInner([paddingInner]).paddingOuter([paddingOuter]),
                       y = d3.scaleLinear().rangeRound([g_h, 0]);
-
-                // output of rangeRound need to be minus by g_h
+                // ticks in axis--x
+                x.domain(data.map(d => d.key));
+                // output of rangeRound need to be minus by g_h beacause we have inverse axis y so that human readable
                 y.domain([0, d3.max(data, d => d.value)]);
 
                 // calculate dateTimeStart, dateTimeEnd
                 const [dateTimeStart, dateTimeEnd] = d3.extent(data.map(el => new Date(el.key)));
-
                 // create time scale
                 const timeScale = d3.scaleTime()
                     // add time range
                     .domain([dateTimeStart, dateTimeEnd])
                     // map to graph
-                    .range([left, g_w + left]);
-                x.domain(getAxisXTicks(fontSize, g_w, interval, tickSizeInner).map(el => formatTime(timeScale.invert(el), interval)));
+                    .range([0, g_w]);
 
                 // axis--x
                 g.append('g')
                     .attr('class', 'axis axis--x')
                     .attr('transform', 'translate(0,' + g_h + ')')
-                    .call(d3.axisBottom(x))
+                    .call(
+                        d3.axisBottom(timeScale)
+                            .tickValues(getAxisXTicks(fontSize, g_w, interval, tickSizeInner).map(el => timeScale.invert(el)))
+                            .tickFormat(el => formatTime(el, interval))
+                    )
                     .attr('font-size', fontSize);
-
-                // ticks in axis--x   real data
-                x.domain(data.map(d => d.key));
 
                 // axis--y
                 g.append('g')
                     .attr('class', 'axis axis--y')
                     .call(d3.axisLeft(y).ticks(ticksY))
-                    .attr('font-size', fontSize);
+                    .attr('font-size', fontSize)
+                    .append('text')
+                    .attr('fill', '#000')
+                    .attr('transform', 'rotate(-90)')
+                    .attr('y', 6)
+                    .attr('dy', '0.71em')
+                    .attr('text-anchor', 'end')
+                    .text(labelY);
 
                 // brushed callback
                 const brushed = () => {
@@ -151,8 +123,8 @@
                 };
 
                 // brush
-                const b = svg.append("g")
-                    .attr("class", "brush");
+                const b = svg.append('g')
+                    .attr('class', 'brush');
                 const brushX = d3.brushX()
                     .extent([[left, top], [g_w + left, g_h + top]])
                     .on('end', brushed);
@@ -190,11 +162,12 @@
                         b.call(brushX);
                     });
 
-                // draw reference line to represente now
+                // draw reference line to represent now
                 let now = new Date();
                 if (dateTimeEnd >= now) {
                     g.append('line')
                         .attr('stroke', 'red')
+                        .attr('opacity', .3)
                         .attr('stroke-width', 2)
                         .attr('x1', timeScale(now))
                         .attr('y1', 0)

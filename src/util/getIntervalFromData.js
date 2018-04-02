@@ -30,39 +30,39 @@ const getIntervalFromData = (data, mapFunction) => {
     });
 
     // initialisation
-    let interval = dataSorted[1] - dataSorted[0];
+    let interval;
     dataSorted
-        .reduce((ite, cur) => {
-            interval = cur - ite < interval ? cur - ite : interval;
+        .reduce((ite, cur, curIdx) => {
+            interval = curIdx === 1 || cur - ite < interval  ? cur - ite : interval;
             return cur;
         });
 
 
-    if (interval >= ms && interval <= s) {
+    if (interval >= ms && interval < s) {
         return 'ms';
     }
 
-    if (interval > s && interval <= m) {
+    if (interval >= s && interval < m) {
         return 's';
     }
 
-    if (interval > m && interval <= h) {
+    if (interval >= m && interval < h) {
         return 'm';
     }
 
-    if (interval > h && interval <= d) {
+    if (interval >= h && interval < d) {
         return 'h';
     }
 
-    if (interval > d && interval <= w) {
+    if (interval >= d && interval < w) {
         return 'd';
     }
 
-    if (interval > w && interval <= M) {
+    if (interval >= w && interval < M) {
         return 'w';
     }
 
-    if (interval > M && interval < y) {
+    if (interval >= M && interval < y) {
         return 'M';
     }
 
