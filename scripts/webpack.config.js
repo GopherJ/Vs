@@ -10,14 +10,14 @@ config.context = path.resolve(__dirname, '..');
 
 // Client entry
 config.entry = {
-    vs: path.resolve(__dirname, '../src/main')
+    Vs: path.resolve(__dirname, '../src/main')
 };
 
 // Basic output config
 config.output = {
     path: path.resolve(__dirname, '../dist'),
     filename: '[name].js',
-    library: "vs",
+    library: "Vs",
     libraryTarget: "umd",
 };
 
@@ -62,11 +62,11 @@ config.module = {
                 loader: 'css-loader'
             }, {
                 loader: 'postcss-loader',
-                options: {           // 如果没有options这个选项将会报错 No PostCSS Config found
+                options: {     
                     plugins: (loader) => [
                         require('postcss-import')({root: loader.resourcePath}),
-                        require('autoprefixer')(), // CSS浏览器兼容
-                        require('cssnano')()  // 压缩css
+                        require('autoprefixer')(), // browser compatibility
+                        require('cssnano')()  // compress css
                     ]
                 }
             }]
@@ -88,7 +88,7 @@ config.module = {
 };
 process.traceDeprecation = true;
 if (process.env.NODE_ENV === 'production') {
-    config.output.filename = "vs.min.js"
+    config.output.filename = "Vs.min.js"
     config.devtool = '#source-map';
 
     // Pass build environment inside bundle

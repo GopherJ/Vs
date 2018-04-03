@@ -1,15 +1,15 @@
 {
-  "name": "vs",
+  "name": "Vs",
   "version": "0.0.1",
-  "description": "vue visualisation",
-  "main": "dist/vs.min.js",
+  "description": "d3 visualisation with vuejs",
+  "main": "dist/Vs.min.js",
   "scripts": {
     "build": "cd scripts && build.sh",
     "lint": "./node_modules/.bin/eslint --ext .js,.vue src --fix"
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/GopherJ/vs.git"
+    "url": "git://github.com/GopherJ/Vs.git"
   },
   "files": [
     "dist/",
@@ -62,7 +62,6 @@
     "vue-loader": "^11.1.4",
     "vue-style-loader": "^2.0.2",
     "vue-template-compiler": "^2.2.3",
-    "vue2-ace-editor": "0.0.8",
     "webpack": "^2.7.0"
   }
 }
