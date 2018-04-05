@@ -31,8 +31,13 @@ Vue.use(Vs);
 <d3-pie :data="data" :options="{
     innerRadius: 20,
     cornerRadius: 10,
-    padAngle: Math.PI/100
-}" width="100%" :height="400px"></d3-pie>
+    padAngle: 0.01
+}" width="100%" height="400px" :margin="{
+    left: 30,
+    top: 30,
+    right: 30,
+    bottom: 30
+}"></d3-pie>
 
 <d3-line :data="data" :options="{
     stroke: 'teal',
@@ -41,14 +46,25 @@ Vue.use(Vs);
     label: 'value',
     circleRadius: 10,
     circleColor: 'red'
-}" width="100%" height="400px"></d3-line>
+}" width="100%" height="400px" :margin="{
+    left: 30,
+    top: 30,
+    right: 30,
+    bottom: 30
+}"></d3-line>
 
 <d3-bar :data="data" :options="{
     fill: 'rgb(110, 173, 193)',
     stroke: 'rgb(110, 173, 193)',
     fontSize: 14,
     isVertical: false,
-    label: 'value'}" width="100%" height="400px"></d3-bar>
+    label: 'value'
+}" width="100%" height="400px" :margin="{
+    left: 30,
+    top: 30,
+    right: 30,
+    bottom: 30
+}"></d3-bar>
 
 <d3-sankey-circular :nodes="nodes" :links="links" :options="{
     nodeWidth = 20,
@@ -66,12 +82,12 @@ Vue.use(Vs);
     stroke: 'rgb(110, 173, 193)',
     fontSize: 14,
     labelY: 'count'
+}" :margin="{
+    left: 30,
+    top: 30,
+    right: 30,
+    bottom: 30
 }"></d3-timelion>
-```
-
-## DataSet
-```
-Vs support just array data which is `key-value`, to use `d3-timelion`, `key` must be timestamp
 ```
 
 
