@@ -3,6 +3,7 @@
 </template>
 
 <script>
+/* eslint-disable */
     import * as d3 from 'd3';
     import d3Tip from 'd3-tip';
     import mixins from '../../mixins';
@@ -25,9 +26,9 @@
                 default: () => ({
                     innerRadius: 20,
                     cornerRadius: 10,
-                    padAngle: Math.PI/100,
-                    valueFunc: (d) => d.value,
-                    keyFunc: (d) => d.data.key
+                    padAngle: 0.01,
+                    arcTitle: d => d.data.value,
+                    arcLabel: d => d.data.key
                 })
             }
         },
@@ -51,7 +52,7 @@
                      g_w = w - left - right,
                      g_h = h -top - bottom,
                      outerRadius = Math.min(g_w/2, g_h/2),
-                     {innerRadius, cornerRadius, padAngle, valueFunc, keyFunc} = this.options;
+                     {innerRadius, cornerRadius, padAngle, arcTitle, arcLabel} = this.options;
 
                 if (innerRadius > outerRadius) {
                     throw new Error('invalid innerRadius');
@@ -71,9 +72,8 @@
 
                  // tooltip
                 const tip = d3.tip()
-                    .attr('class', 'd3-tip')
-                    .offset([-10, 0]);
-                g.call(tip);
+                        .attr('class', 'd3-tip')
+                        .offset([-10, 0]);
 
                 // circle center where we will begin to draw our graph
                 const gc = g.append('g')
@@ -81,13 +81,13 @@
 
                 // create color set
                 const color = d3.scaleSequential()
-                    .domain(d3.extent(data.map(valueFunc)))
+                    .domain(d3.extent(data.map(d => d.value)))
                     .interpolator(d3.interpolateWarm);
 
                 // prepare data
                 const pie = d3.pie()
                     .sort(null)
-                    .value(valueFunc);
+                    .value(d => d.value);
 
                 // create arc
                 const path = d3.arc()
@@ -96,7 +96,7 @@
                     .cornerRadius(cornerRadius)
                     .padAngle(padAngle);
 
-                // crate label
+                // crate label which will be at middle of the innerRadius and outerRadius
                 const label = d3.arc()
                     .innerRadius((outerRadius + innerRadius) / 2)
                     .outerRadius((outerRadius + innerRadius) / 2);
@@ -112,47 +112,42 @@
                     .attr('d', path)
                     .attr('fill', (d, i) => color(d.data.value))
                     .on('mouseover', function(d, i){
-                        tip.html(() => d.data.value);
+                        g.call(tip);
+                        tip.html(arcTitle(d));
                         tip.show();
                     })
                     .on('mouseout', function(d, i) {
                         tip.hide();
+                        d3.selectAll('.d3-tip').remove();
                     });
 
                 arc.append('text')
+                    .attr('class', 'label')
+                    .attr('text-anchor', 'middle')
                     .attr('transform', (d, i) => `translate(${label.centroid(d)})`)
-                    .text(keyFunc);
+                    .text(arcLabel);
             },
-            safeDrawPie() {
+            safeDraw() {
                 this.ifExistsSvgThenRemove();
                 this.drawPie();
             },
             onResize() {
-               this.safeDrawPie();
+               this.safeDraw();
             }
         },
         watch: {
-            width: {
-                deep: false,
+            data: {
+                deep: true,
                 handler(n) {
-                    this.safeDrawPie();
-                }
-            },
-            height: {
-                deep: false,
-                handler(n) {
-                    this.safeDrawPie();
+                    this.safeDraw();
                 }
             },
             options: {
                 deep: true,
                 handler(n) {
-                    this.safeDrawPie();
+                    this.safeDraw();
                 }
             }
-        },
-        mounted() {
-            this.safeDrawPie();
         }
     }
 </script>
@@ -160,6 +155,7 @@
 <style>
 
     .d3-tip {
+        font-family: sans-serif;
         line-height: 1;
         font-weight: bold;
         padding: 12px;
@@ -187,4 +183,9 @@
         top: 100%;
         left: 0;
     }
+
+    .arc {
+        font-family: sans-serif;
+    }
+
 </style>
