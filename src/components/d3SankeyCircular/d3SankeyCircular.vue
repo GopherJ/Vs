@@ -3,14 +3,20 @@
 </template>
 
 <script>
-    /* eslint-disable */
+/* eslint-disable */
     import * as d3 from 'd3';
+    import d3Tip from 'd3-tip';
     import * as d3SankeyCircular from 'd3-sankey-circular';
     import pathArrows from './pathArrows';
     import _ from 'lodash';
 
     // Load the package d3SankeyCircular on d3
     Object.assign(d3, d3SankeyCircular);
+
+    // load d3-tip
+    Object.assign(d3, {
+        tip: d3Tip
+    });
 
     const highlightNodes = (node, name) => {
         let opacity = 0.3;
@@ -49,7 +55,16 @@
             },
             options: {
                 type: Object,
-                default: () => ({}),
+                default: () => ({
+                    nodeWidth : 20,
+                    nodeText : 'font-size: .8rem; font-weight: 600;',
+                    circularLinkGap : 4,
+                    circularLinkColor : 'red',
+                    linkColor : 'black',
+                    arrowLength : 10,
+                    gapLength : 150,
+                    arrowHeadSize : 4
+                }),
             },
             width: {
                 type: String,
@@ -57,15 +72,15 @@
             },
             height: {
                 type: String,
-                default: '600px'
+                default: '400px'
             },
             nodeTitle: {
                 type: Function,
-                default: d => `${d.name}\n${d.value}`,
+                default: d => `${d.name}<br>${d.value}`,
             },
             linkTitle: {
                 type: Function,
-                default: d => `${d.source.name} → ${d.target.name}\n${d.value}`,
+                default: d => `${d.source.name} → ${d.target.name}<br>${d.value}`,
             },
         },
         methods: {
@@ -133,22 +148,21 @@
 
                 // options by default
                 const {
-                    nodeWidth = 20,
-                    nodeText = 'font-size: .8rem; font-weight: 600;',
-                    circularLinkGap = 4,
-                    circularLinkColor = 'red',
-                    linkColor = 'black',
-                    arrowLength = 10,
-                    gapLength = 150,
-                    arrowHeadSize = 4
+                    nodeWidth,
+                    nodeText,
+                    circularLinkGap,
+                    circularLinkColor,
+                    linkColor,
+                    arrowLength,
+                    gapLength,
+                    arrowHeadSize
                 } = this.options;
 
                 // calculate width and height of chart container
                 const [c_w, c_h] = compute_w_h();
 
-                if (c_w === 0 || c_h === 0 || Number.isNaN(c_w) || Number.isNaN(c_h)) {
-                    throw new Error('please confirm that sankey container has correct width and height');
-                    return;
+                if (!c_w || !c_h) {
+                    throw new Error('invalid width or height');
                 }
 
                 const nodeTitle = this.nodeTitle;
@@ -174,6 +188,12 @@
                 // keep the reference of g so that we can align it after all the calcul
                 const g = svg
                     .append('g');
+
+
+                // tooltip
+                const tip = d3.tip()
+                    .attr('class', 'd3-tip')
+                    .offset([-10, 0]);
 
                 const linkG = g
                     .append('g')
@@ -218,6 +238,10 @@
                     .on('mouseover', (d) => {
                         const thisName = d.name;
 
+                        g.call(tip);
+                        tip.html(nodeTitle(d));
+                        tip.show();
+
                         node
                             .selectAll('rect')
                             .style('opacity', d => highlightNodes(d, thisName));
@@ -231,6 +255,10 @@
                             .style('opacity', d => highlightNodes(d, thisName));
                     })
                     .on('mouseout', (d) => {
+
+                        tip.hide();
+                        d3.selectAll('.d3-tip').remove();
+
                         d3
                             .selectAll('rect')
                             .style('opacity', 0.5);
@@ -254,9 +282,9 @@
                     .attr('style', nodeText)
                     .text(d => d.name);
 
-                node
-                    .append('title')
-                    .text(nodeTitle);
+                // node
+                //     .append('title')
+                //     .text(nodeTitle);
 
                 const link = linkG
                     .data(sankeyLinks)
@@ -269,11 +297,20 @@
                     .attr('d', link => link.path)
                     .style('stroke-width', d => Math.max(1, d.width))
                     .style('opacity', 0.7)
-                    .style('stroke', (link, i) => (link.circular ? circularLinkColor : linkColor));
+                    .style('stroke', (link, i) => (link.circular ? circularLinkColor : linkColor))
+                    .on('mouseover', function(d, i){
+                        g.call(tip);
+                        tip.html(linkTitle(d));
+                        tip.show();
+                    })
+                    .on('mouseout', function(d, i){
+                        tip.hide();
+                        d3.selectAll('.d3-tip').remove();
+                    });
 
-                link
-                    .append('title')
-                    .text(linkTitle);
+                // link
+                //     .append('title')
+                //     .text(linkTitle);
 
                 const arrows = pathArrows()
                     .arrowLength(arrowLength)
@@ -350,5 +387,35 @@
         /*make node rectangle edge more sharp*/
         /*https://developer.mozilla.org/zh-CN/docs/Web/SVG/Attribute/shape-rendering*/
         shape-rendering: crispEdges;
+    }
+
+    .d3-tip {
+        font-family: sans-serif;
+        line-height: 1;
+        font-weight: bold;
+        padding: 12px;
+        background-color: rgba(0, 0, 0, 0.8);
+        color: #fff;
+        border-radius: 2px;
+    }
+
+    /* Creates a small triangle extender for the tooltip */
+    .d3-tip:after {
+        box-sizing: border-box;
+        display: inline;
+        font-size: 10px;
+        width: 100%;
+        line-height: 1;
+        color: rgba(0, 0, 0, 0.8);
+        content: "\25BC";
+        position: absolute;
+        text-align: center;
+    }
+
+    /* Style northward tooltips differently */
+    .d3-tip.n:after {
+        margin: -1px 0 0 0;
+        top: 100%;
+        left: 0;
     }
 </style>
