@@ -127,5 +127,4 @@ function pathArrows() {
     return appendArrows;
 }
 
-
 export default pathArrows;
