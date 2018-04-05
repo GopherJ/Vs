@@ -1,4 +1,5 @@
 import * as d3 from 'd3';
+import _ from 'lodash';
 
 export default {
     props: {
@@ -154,12 +155,13 @@ export default {
         }
     },
     mounted() {
-        this._handleResize = (e) => {
+        this._handleResize = _.debounce((e) => {
             if (this.onResize) {
                 this.onResize();
             }
-        };
+        }, 500);
 
+        // initialisation
         if (this.safeDraw) {
             this.safeDraw();
         }
