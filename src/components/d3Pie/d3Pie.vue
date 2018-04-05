@@ -109,8 +109,12 @@
                     .attr('class', 'arc');
 
                 arc.append('path')
+                    .transition()
+                    .delay((d, i) => 100 * i)
                     .attr('d', path)
-                    .attr('fill', (d, i) => color(d.data.value))
+                    .attr('fill', (d, i) => color(d.data.value));
+
+                    arc
                     .on('mouseover', function(d, i){
                         g.call(tip);
                         tip.html(arcTitle(d));
@@ -124,7 +128,10 @@
                 arc.append('text')
                     .attr('class', 'label')
                     .attr('text-anchor', 'middle')
+                    .attr('opacity', '.5')
                     .attr('transform', (d, i) => `translate(${label.centroid(d)})`)
+                    .transition()
+                    .delay((d,i) => 100 * i)
                     .text(arcLabel);
             },
             safeDraw() {
