@@ -37,12 +37,12 @@ export default {
 
             // tablet
             if (width >= 560 && width <= 970) {
-                paddingInner = 0.3;
+                paddingInner = 0.15;
             }
 
             // mobile
             if (width < 560) {
-                paddingInner = 0.5;
+                paddingInner = 0.2;
             }
 
             return [paddingInner, paddingOuter];

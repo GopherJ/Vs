@@ -3,6 +3,7 @@
 </template>
 
 <script>
+/* eslint-disable */
     import * as d3 from 'd3';
     import d3Tip from 'd3-tip'
     import formatTime from '../../util/formatTime';
@@ -25,12 +26,7 @@
             },
             options: {
                 type: Object,
-                default: () => ({
-                    fill: 'rgb(110, 173, 193)',
-                    stroke: 'rgb(110, 173, 193)',
-                    fontSize: 14,
-                    labelY: 'count'
-                })
+                default: () => ({})
             }
         },
         methods: {
@@ -51,8 +47,13 @@
                 }
 
                 // constants
-                const {left, top, right, bottom} = this.margin,
-                      {fill, stroke, fontSize, labelY} = this.options,
+                const {left = 30, top = 30, right = 30, bottom = 30} = this.margin,
+                      {
+                          fill = 'rgb(110, 173, 193)',
+                          stroke = 'rgb(110, 173, 193)',
+                          fontSize = 14,
+                          labelY = 'count'
+                      } = this.options,
                       ticksY = this.selectTicksNumY(h),
                       [paddingInner, paddingOuter] = this.selectPaddingInnerOuterX(w),
                       g_w = w - left - right,

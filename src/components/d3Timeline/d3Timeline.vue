@@ -11,6 +11,18 @@
     Object.assign(d3, {
         tip: d3Tip
     });
+    // data set
+    // {
+    //     group: String,
+    //     from: Date,
+    //     to: Date,
+    //     label: String,
+    // }
+    // {
+    //     group: String,
+    //         at: Date,
+    //     title: String
+    // }
 
     export default {
         name: 'd3-timeline',
@@ -22,33 +34,34 @@
             },
             options: {
                 type: Object,
-                default: () => ({
-
-                })
+                default: () => ({})
             }
         },
         methods: {
-           drawTimeline() {
+            getGroups(data) {
 
-           },
-           safeDraw() {
-              this.ifExistsSvgThenRemove();
-              this.drawTimeline();
-           }
+            },
+            drawTimeline() {
+
+            },
+            safeDraw() {
+                this.ifExistsSvgThenRemove();
+                this.drawTimeline();
+            }
         },
         watch: {
-           data: {
-               deep: true,
-               handler(n) {
-                   this.safeDraw();
-               }
-           },
-           options: {
-               deep: true,
-               handler(n) {
-                   this.safeDraw();
-               }
-           }
+            data: {
+                deep: true,
+                handler(n) {
+                    this.safeDraw();
+                }
+            },
+            options: {
+                deep: true,
+                handler(n) {
+                    this.safeDraw();
+                }
+            }
         }
     }
 </script>

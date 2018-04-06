@@ -10,7 +10,6 @@ const install = (Vue, options = {}) => {
     if (options.store) {
         // register store
     }
-
     Vue.component(d3SankeyCircular.name, d3SankeyCircular);
     Vue.component(d3Timelion.name, d3Timelion);
     // Vue.component(d3Timeline.name, d3Timeline);

@@ -209,7 +209,7 @@
                         .append('text')
                         .attr('class', 'label label--y')
                         .attr('y', 0)
-                        .attr('x', -g_h/2)
+                        .attr('x', -(g_h + axisXLaneHeight)/2)
                         .attr('text-anchor', 'middle')
                         .attr('fill', '#000')
                         .attr('transform', 'rotate(-90)')

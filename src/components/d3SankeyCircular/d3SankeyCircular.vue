@@ -140,7 +140,7 @@
                 // options by default
                 const {
                     nodeWidth = 20,
-                    nodeText = 'font-size= .8rem; font-weight= 600;',
+                    nodeText = 'font-size:0.8rem; font-weight:600;font-family: sans-serif;',
                     circularLinkGap = 4,
                     circularLinkColor = 'red',
                     linkColor = 'black',
@@ -220,6 +220,7 @@
 
                 node
                     .append('rect')
+                    .attr('class', 'node')
                     .attr('x', d => d.x0)
                     .attr('y', d => d.y0)
                     .attr('height', d => d.y1 - d.y0)
@@ -234,16 +235,16 @@
                         tip.show();
 
                         node
-                            .selectAll('rect')
+                            .selectAll('.node')
                             .style('opacity', d => highlightNodes(d, thisName));
 
                         d3
                             .selectAll('.sankey-link')
                             .style('opacity', l => (l.source.name === thisName || l.target.name === thisName ? 1 : 0.3));
 
-                        node
-                            .selectAll('text')
-                            .style('opacity', d => highlightNodes(d, thisName));
+                        // node
+                        //     .selectAll('text')
+                        //     .style('opacity', d => highlightNodes(d, thisName));
                     })
                     .on('mouseout', (d) => {
 
@@ -251,16 +252,16 @@
                         d3.selectAll('.d3-tip').remove();
 
                         d3
-                            .selectAll('rect')
+                            .selectAll('.node')
                             .style('opacity', 0.5);
 
                         d3
                             .selectAll('.sankey-link')
                             .style('opacity', 0.7);
 
-                        d3
-                            .selectAll('text')
-                            .style('opacity', 1);
+                        // d3.select((this.$el))
+                        //     .selectAll('text')
+                        //     .style('opacity', 1);
                     });
 
 
@@ -272,10 +273,6 @@
                     .attr('text-anchor', 'middle')
                     .attr('style', nodeText)
                     .text(d => d.name);
-
-                // node
-                //     .append('title')
-                //     .text(nodeTitle);
 
                 const link = linkG
                     .data(sankeyLinks)

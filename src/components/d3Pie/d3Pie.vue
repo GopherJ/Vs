@@ -16,48 +16,30 @@
     export default {
         name: 'd3-pie',
         mixins: [mixins],
-        props: {
-            data: {
-                type: Array,
-                required: true
-            },
-            options: {
-                type: Object,
-                default: () => ({})
-            }
-        },
         methods: {
             drawPie() {
                 const data = this.data;
-                // no data
-                if (data.length === 0) {
-                    return;
-                }
-
                 const [w, h] = this.getElWidthHeight();
 
-                // width, height must exist
-                if (!w || !h) {
-                    throw new Error('invalid width or height');
-                }
-
-                // get all data
+                // constants
                 const {   left = 30,
-                          top = 30,
-                          right = 30,
-                          bottom = 30
-                      } = this.margin,
+                        top = 30,
+                        right = 30,
+                        bottom = 30
+                    } = this.margin,
 
-                      g_w = w - left - right,
-                      g_h = h -top - bottom,
-                      outerRadius = Math.min(g_w/2, g_h/2),
+                    {   innerRadius = 20,
+                        cornerRadius = 20,
+                        padAngle = 0.01,
+                        arcTitle = d => d.data.value,
+                        arcLabel = d => d.data.key,
+                        axisXLaneHeight = 30,
+                        axisXLabel = 'Key'
+                    } = this.options,
 
-                      {   innerRadius = 20,
-                          cornerRadius = 20,
-                          padAngle = 0.01,
-                          arcTitle = d => d.data.value,
-                          arcLabel = d => d.data.key
-                      } = this.options;
+                    g_w = w - left - right,
+                    g_h = h -top - bottom - axisXLaneHeight,
+                    outerRadius = Math.min(g_w/2, g_h/2);
 
                 if (innerRadius > outerRadius) {
                     throw new Error('invalid innerRadius');
@@ -74,6 +56,12 @@
                     .attr('width', `${g_w}`)
                     .attr('height', `${g_h}`)
                     .attr('transform', `translate(${left},${top})`);
+
+                const lane = svg
+                    .append('g')
+                    .attr('transform', `translate(${left}, ${top + g_h})`)
+                    .attr('width', g_w)
+                    .attr('height', axisXLaneHeight);
 
                  // tooltip
                 const tip = d3.tip()
@@ -131,13 +119,19 @@
                     });
 
                 arc.append('text')
-                    .attr('class', 'label')
                     .attr('text-anchor', 'middle')
                     .attr('opacity', '.5')
                     .attr('transform', (d, i) => `translate(${label.centroid(d)})`)
                     .transition()
                     .delay((d,i) => 100 * i)
                     .text(arcLabel);
+
+                lane.append('text')
+                    .attr('class', 'label label--x')
+                    .attr('x', g_w/2)
+                    .attr('y', axisXLaneHeight)
+                    .attr('text-anchor', 'middle')
+                    .text(axisXLabel)
             },
             safeDraw() {
                 this.ifExistsSvgThenRemove();
@@ -146,26 +140,11 @@
             onResize() {
                this.safeDraw();
             }
-        },
-        watch: {
-            data: {
-                deep: true,
-                handler(n) {
-                    this.safeDraw();
-                }
-            },
-            options: {
-                deep: true,
-                handler(n) {
-                    this.safeDraw();
-                }
-            }
         }
     }
 </script>
 
 <style>
-
     .d3-tip {
         font-family: sans-serif;
         line-height: 1;
@@ -200,4 +179,8 @@
         font-family: sans-serif;
     }
 
+    .label {
+        font-family: sans-serif;
+        font-weight: 600;
+    }
 </style>
