@@ -116,7 +116,7 @@
 
                     axisXLane
                         .append('text')
-                        .attr('class', 'lane lane--x')
+                        .attr('class', 'label label--x')
                         .attr('x', g_w/2)
                         .attr('y', axisXLaneHeight)
                         .attr('text-anchor', 'middle')
@@ -125,7 +125,7 @@
 
                     axisYLane
                         .append('text')
-                        .attr('class', 'lane lane--y')
+                        .attr('class', 'label label--y')
                         .attr('y', 0)
                         .attr('x', -g_h/2)
                         .attr('text-anchor', 'middle')
@@ -199,7 +199,7 @@
                     // draw label
                     axisXLane
                         .append('text')
-                        .attr('class', 'lane lane--x')
+                        .attr('class', 'label label--x')
                         .attr('x', g_w/2)
                         .attr('y', 0)
                         .attr('text-anchor', 'middle')
@@ -207,7 +207,7 @@
 
                     axisYLane
                         .append('text')
-                        .attr('class', 'lane lane--y')
+                        .attr('class', 'label label--y')
                         .attr('y', 0)
                         .attr('x', -g_h/2)
                         .attr('text-anchor', 'middle')
@@ -236,15 +236,6 @@
         -moz-user-select: none;
         -ms-user-select: none;
         user-select: none;
-    }
-
-    .axis--x path {
-        /*stroke-width: 2;*/
-        /*display: none;*/
-    }
-    .axis--y path {
-        /*stroke-width: 2;*/
-        /*display: none;*/
     }
 
     rect, .bar {
@@ -289,7 +280,7 @@
         cursor: pointer;
     }
 
-    .lane {
+    .label {
         font-weight: 600;
         font-family: sans-serif;
     }
