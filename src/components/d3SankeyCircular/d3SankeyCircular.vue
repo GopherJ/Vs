@@ -55,16 +55,7 @@
             },
             options: {
                 type: Object,
-                default: () => ({
-                    nodeWidth : 20,
-                    nodeText : 'font-size: .8rem; font-weight: 600;',
-                    circularLinkGap : 4,
-                    circularLinkColor : 'red',
-                    linkColor : 'black',
-                    arrowLength : 10,
-                    gapLength : 150,
-                    arrowHeadSize : 4
-                }),
+                default: () => ({}),
             },
             width: {
                 type: String,
@@ -148,14 +139,14 @@
 
                 // options by default
                 const {
-                    nodeWidth,
-                    nodeText,
-                    circularLinkGap,
-                    circularLinkColor,
-                    linkColor,
-                    arrowLength,
-                    gapLength,
-                    arrowHeadSize
+                    nodeWidth = 20,
+                    nodeText = 'font-size= .8rem; font-weight= 600;',
+                    circularLinkGap = 4,
+                    circularLinkColor = 'red',
+                    linkColor = 'black',
+                    arrowLength = 10,
+                    gapLength = 150,
+                    arrowHeadSize = 4
                 } = this.options;
 
                 // calculate width and height of chart container
