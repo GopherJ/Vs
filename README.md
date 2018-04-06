@@ -36,7 +36,9 @@ Vue.use(Vs);
     cornerRadius: 10,
     padAngle: 0.01,
     arcTitle: d => d.data.value,
-    arcLabel: d => d.data.key
+    arcLabel: d => d.data.key,
+    axisXLaneHeight = 30,
+    axisXLabel = 'Key'
 }" width="100%" height="400px" :margin="{
     left: 30,
     top: 30,
@@ -52,7 +54,11 @@ Vue.use(Vs);
     circleRadius: 5,
     circleColor: 'rgb(188, 82, 188)',
     circleTitle: d => d.value,
-    curve: 'curveCardinal'
+    curve: 'curveCardinal',
+    axisXLabel = 'Key',
+    axisYLabel = 'Value',
+    axisXLaneHeight = 30,
+    axisYLaneWidth = 30
 }" width="100%" height="400px" :margin="{
     left: 30,
     top: 30,
@@ -66,7 +72,11 @@ Vue.use(Vs);
     stroke: 'rgb(110, 173, 193)',
     fontSize: 14,
     isVertical: false,
-    barTitle : d => d.value
+    barTitle : d => d.value,
+    axisYLabel : 'Value',
+    axisXLabel : 'Key',
+    axisXLaneHeight: 30,
+    axisYLaneWidth: 30
 }" width="100%" height="400px" :margin="{
     left: 30,
     top: 30,
@@ -80,7 +90,11 @@ Vue.use(Vs);
     stroke: 'rgb(110, 173, 193)',
     fontSize: 14,
     isVertical: true,
-    barTitle : d => d.value
+    barTitle : d => d.value,
+    axisYLabel : 'Value',
+    axisXLabel : 'Key',
+    axisXLaneHeight: 30,
+    axisYLaneWidth: 30
 }" width="100%" height="400px" :margin="{
     left: 60,
     top: 30,
@@ -91,14 +105,14 @@ Vue.use(Vs);
 // sankey
 <d3-sankey-circular :nodes="nodes" :links="links" :options="{
     nodeWidth : 20,
-    nodeText : 'font-size: .8rem; font-weight: 600;',
+    nodeText : 'font-size: .8rem; font-weight: 600; font-family: sans-serif;',
     circularLinkGap : 4,
     circularLinkColor : 'red',
     linkColor : 'black',
     arrowLength : 10,
     gapLength : 150,
     arrowHeadSize : 4
-}" width="100%" height="400px" :nodeTitle="d => `${d.name}\n${d.value}`" :linkTitle="d => `${d.source.name} → ${d.target.name}\n${d.value}`"></d3-sankey-circular>
+}" width="100%" height="400px" :nodeTitle="d => `${d.name}<br>${d.value}`" :linkTitle="d => `${d.source.name} → ${d.target.name}<br>${d.value}`"></d3-sankey-circular>
 
 // timelion, need to use with other wrapper
 <d3-timelion :data="data" :options="{
