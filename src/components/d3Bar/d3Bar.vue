@@ -16,28 +16,10 @@
     export default {
         name: 'd3-bar',
         mixins: [mixins],
-        props: {
-            data: {
-                type: Array,
-                required: true
-            },
-            options: {
-                type: Object,
-                default: () => ({})
-            }
-        },
         methods: {
             drawBar() {
-                // no data
-                if (this.data.length === 0) {
-                    return;
-                }
-
                 // container width and height
                 const [w, h] = this.getElWidthHeight();
-                if (!w || !h) {
-                    throw new Error('invalid width or height');
-                }
 
                 // constants
                 const data = this.data,
@@ -45,25 +27,21 @@
                           stroke = 'rgb(110, 173, 193)',
                           fontSize = 14,
                           isVertical = false,
-                          barTitle = d => d.value
+                          barTitle = d => d.value,
+                          axisYLabel = 'Value',
+                          axisXLabel = 'Key',
+                          axisXLaneHeight = 30,
                       } = this.options,
+                      { axisYLaneWidth = isVertical ? 60 : 30 } = this.options,
                       {left = isVertical ? 60 : 30, right = 30, top = 30, bottom = 30} = this.margin,
-                      g_w = w - left - right,
-                      g_h = h - top - bottom;
-
+                      g_w = w - left - right - axisYLaneWidth,
+                      g_h = h - top - bottom - axisXLaneHeight;
 
                 // create svg
                 const svg = d3.select(this.$el)
                     .append('svg')
                     .attr('width', `${w}`)
                     .attr('height', `${h}`);
-
-                // create g to contain our graph
-                const g = svg
-                    .append('g')
-                    .attr('width', `${g_w}`)
-                    .attr('height', `${g_h}`)
-                    .attr('transform', `translate(${left}, ${top})`);
 
                 // tooltip
                 const tip = d3.tip()
@@ -81,6 +59,25 @@
                     y = d3.scaleLinear().rangeRound([g_h, 0]);
                     x.domain(data.map(d => d.key));
                     y.domain([0, d3.max(data, d => d.value)]);
+
+                    // create g to contain our graph
+                    const g = svg
+                        .append('g')
+                        .attr('transform', `translate(${left + axisYLaneWidth}, ${top})`)
+                        .attr('width', `${g_w}`)
+                        .attr('height', `${g_h}`);
+
+                    const axisXLane = svg
+                        .append('g')
+                        .attr('transform', `translate(${left + axisYLaneWidth}, ${h - bottom - axisXLaneHeight})`)
+                        .attr('width', g_w)
+                        .attr('height', axisXLaneHeight);
+
+                    const axisYLane = svg
+                        .append('g')
+                        .attr('transform', `translate(${left}, ${top})`)
+                        .attr('width', axisYLaneWidth)
+                        .attr('height', g_h);
 
                     // draw x
                     axisX = g.append('g')
@@ -116,16 +113,54 @@
                             tip.hide();
                             d3.selectAll('.d3-tip').remove();
                         });
+
+                    axisXLane
+                        .append('text')
+                        .attr('class', 'lane lane--x')
+                        .attr('x', g_w/2)
+                        .attr('y', axisXLaneHeight)
+                        .attr('text-anchor', 'middle')
+                        .attr('fill', '#000')
+                        .text(axisXLabel);
+
+                    axisYLane
+                        .append('text')
+                        .attr('class', 'lane lane--y')
+                        .attr('y', 0)
+                        .attr('x', -g_h/2)
+                        .attr('text-anchor', 'middle')
+                        .attr('fill', '#000')
+                        .attr('transform', 'rotate(-90)')
+                        .text(axisYLabel);
                 }
 
                 // vertical bar
                 else {
-                        ticks = this.selectTicksNumX(g_w);
-                        [paddingInner, paddingOuter] = this.selectPaddingInnerOuterY(g_h);
-                        y = d3.scaleBand().rangeRound([0, g_h]).paddingInner([paddingInner]).paddingOuter([paddingOuter]);
-                        x = d3.scaleLinear().rangeRound([0, g_w]);
-                        y.domain(data.map(el => el.key));
-                        x.domain([0, d3.max(data, el => el.value)]);
+                    ticks = this.selectTicksNumX(g_w);
+                    [paddingInner, paddingOuter] = this.selectPaddingInnerOuterY(g_h);
+                    y = d3.scaleBand().rangeRound([0, g_h]).paddingInner([paddingInner]).paddingOuter([paddingOuter]);
+                    x = d3.scaleLinear().rangeRound([0, g_w]);
+                    y.domain(data.map(el => el.key));
+                    x.domain([0, d3.max(data, el => el.value)]);
+
+                    // create g to contain our graph
+                    const g = svg
+                        .append('g')
+                        .attr('transform', `translate(${left + axisYLaneWidth}, ${top + axisXLaneHeight})`)
+                        .attr('width', `${g_w}`)
+                        .attr('height', `${g_h}`);
+
+                    const axisXLane = svg
+                        .append('g')
+                        .attr('transform', `translate(${left + axisYLaneWidth}, ${top})`)
+                        .attr('width', g_w)
+                        .attr('height', axisXLaneHeight);
+
+                    const axisYLane = svg
+                        .append('g')
+                        .attr('transform', `translate(${left}, ${top})`)
+                        .attr('width', axisYLaneWidth)
+                        .attr('height', g_h);
 
 
                     // draw x
@@ -160,6 +195,25 @@
                             tip.hide();
                             d3.selectAll('.d3-tip').remove();
                         });
+
+                    // draw label
+                    axisXLane
+                        .append('text')
+                        .attr('class', 'lane lane--x')
+                        .attr('x', g_w/2)
+                        .attr('y', 0)
+                        .attr('text-anchor', 'middle')
+                        .text(axisYLabel);
+
+                    axisYLane
+                        .append('text')
+                        .attr('class', 'lane lane--y')
+                        .attr('y', 0)
+                        .attr('x', -g_h/2)
+                        .attr('text-anchor', 'middle')
+                        .attr('fill', '#000')
+                        .attr('transform', 'rotate(-90)')
+                        .text(axisXLabel);
                 }
 
             },
@@ -233,5 +287,10 @@
 
     .bar:hover {
         cursor: pointer;
+    }
+
+    .lane {
+        font-weight: 600;
+        font-family: sans-serif;
     }
 </style>
