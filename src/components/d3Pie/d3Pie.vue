@@ -23,13 +23,7 @@
             },
             options: {
                 type: Object,
-                default: () => ({
-                    innerRadius: 20,
-                    cornerRadius: 10,
-                    padAngle: 0.01,
-                    arcTitle: d => d.data.value,
-                    arcLabel: d => d.data.key
-                })
+                default: () => ({})
             }
         },
         methods: {
@@ -48,11 +42,22 @@
                 }
 
                 // get all data
-                const {left, top, right, bottom} = this.margin,
-                     g_w = w - left - right,
-                     g_h = h -top - bottom,
-                     outerRadius = Math.min(g_w/2, g_h/2),
-                     {innerRadius, cornerRadius, padAngle, arcTitle, arcLabel} = this.options;
+                const {   left = 30,
+                          top = 30,
+                          right = 30,
+                          bottom = 30
+                      } = this.margin,
+
+                      g_w = w - left - right,
+                      g_h = h -top - bottom,
+                      outerRadius = Math.min(g_w/2, g_h/2),
+
+                      {   innerRadius = 20,
+                          cornerRadius = 20,
+                          padAngle = 0.01,
+                          arcTitle = d => d.data.value,
+                          arcLabel = d => d.data.key
+                      } = this.options;
 
                 if (innerRadius > outerRadius) {
                     throw new Error('invalid innerRadius');
