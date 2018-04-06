@@ -23,7 +23,7 @@
 
                 // constants
                 const data = this.data,
-                      {left = 30, top = 30, right = 30, bottom = 30} = this.margin,
+                      {left = 30, top = 10, right = 5, bottom = 0} = this.margin,
                       ticks = this.selectTicksNumY(g_h),
                       {
                           stroke = 'rgb(188, 82, 188)',
