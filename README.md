@@ -32,18 +32,18 @@ Vue.use(Vs);
 
 // pie or dongnut
 <d3-pie :data="data" :options="{
-    innerRadius: 20,
-    cornerRadius: 10,
+    innerRadius: 5,
+    cornerRadius: 5,
     padAngle: 0.01,
     arcTitle: d => d.data.value,
     arcLabel: d => d.data.key,
-    axisXLaneHeight = 30,
-    axisXLabel = 'Key'
+    axisXLaneHeight: 30,
+    axisXLabel: 'Key'
 }" width="100%" height="400px" :margin="{
-    left: 30,
-    top: 30,
-    right: 30,
-    bottom: 30
+    left: 0,
+    top: 0,
+    right: 0,
+    bottom: 0
 }"></d3-pie>
 
 // line
@@ -55,15 +55,15 @@ Vue.use(Vs);
     circleColor: 'rgb(188, 82, 188)',
     circleTitle: d => d.value,
     curve: 'curveCardinal',
-    axisXLabel = 'Key',
-    axisYLabel = 'Value',
-    axisXLaneHeight = 30,
-    axisYLaneWidth = 30
+    axisXLabel: 'Key',
+    axisYLabel: 'Value',
+    axisXLaneHeight: 30,
+    axisYLaneWidth: 30
 }" width="100%" height="400px" :margin="{
     left: 30,
-    top: 30,
-    right: 30,
-    bottom: 30
+    top: 10,
+    right: 5,
+    bottom: 0
 }"></d3-line>
 
 // horizontal bar
@@ -72,9 +72,9 @@ Vue.use(Vs);
     stroke: 'rgb(110, 173, 193)',
     fontSize: 14,
     isVertical: false,
-    barTitle : d => d.value,
-    axisYLabel : 'Value',
-    axisXLabel : 'Key',
+    barTitle: d => d.value,
+    axisYLabel: 'Value',
+    axisXLabel: 'Key',
     axisXLaneHeight: 30,
     axisYLaneWidth: 30
 }" width="100%" height="400px" :margin="{
