@@ -1,3 +1,4 @@
+/* eslint-disable */
 import * as d3 from 'd3';
 import _ from 'lodash';
 
@@ -13,12 +14,15 @@ export default {
         },
         margin: {
             type: Object,
-            default: () => ({
-                left: 30,
-                right: 30,
-                top: 30,
-                bottom: 30
-            })
+            default: () => ({})
+        },
+        data: {
+            type: Array,
+            required: true
+        },
+        options: {
+            type: Object,
+            default: () => ({})
         }
     },
     methods: {
@@ -152,19 +156,43 @@ export default {
                     this.safeDraw();
                 }
             }
+        },
+        data: {
+            deep: true,
+            handler(n) {
+                if(this.safeDraw) {
+                    this.safeDraw();
+                }
+            }
+        },
+        options: {
+            deep: true,
+            handler(n) {
+                if (this.safeDraw) {
+                    this.safeDraw();
+                }
+            }
         }
     },
     mounted() {
+        // initialisation
+        if (!this.safeDraw || !this.data.length === 0) {
+            return;
+        }
+
+        if (this.getElWidthHeight().some(el => !el)) {
+            throw new Error('Invalid width or height');
+        }
+
+
         this._handleResize = _.debounce((e) => {
             if (this.onResize) {
                 this.onResize();
             }
         }, 500);
 
-        // initialisation
-        if (this.safeDraw) {
-            this.safeDraw();
-        }
+
+        this.safeDraw();
 
         window.addEventListener('resize', this._handleResize);
     },
