@@ -3,6 +3,7 @@
 </template>
 
 <script>
+/* eslint-disable */
     import * as d3 from 'd3';
     import mixins from '../../mixins';
     import d3Tip from 'd3-tip';
@@ -22,15 +23,7 @@
             },
             options: {
                 type: Object,
-                default: () => ({
-                    fill: 'rgb(110, 173, 193)',
-                    stroke: 'rgb(110, 173, 193)',
-                    fontSize: 14,
-                    isVertical: false,
-                    valueFunc: d => d.value,
-                    keyFunc: d => d.key,
-                    label: 'value'
-                })
+                default: () => ({})
             }
         },
         methods: {
@@ -48,10 +41,16 @@
 
                 // constants
                 const data = this.data,
-                    {left, right, top, bottom} = this.margin,
-                    g_w = w - left - right,
-                    g_h = h - top - bottom,
-                    {fill, stroke, fontSize, isVertical, valueFunc, keyFunc, label} = this.options;
+                      {   fill = 'rgb(110, 173, 193)',
+                          stroke = 'rgb(110, 173, 193)',
+                          fontSize = 14,
+                          isVertical = false,
+                          barTitle = d => d.value
+                      } = this.options,
+                      {left = isVertical ? 60 : 30, right = 30, top = 30, bottom = 30} = this.margin,
+                      g_w = w - left - right,
+                      g_h = h - top - bottom;
+
 
                 // create svg
                 const svg = d3.select(this.$el)
@@ -70,7 +69,6 @@
                 const tip = d3.tip()
                     .attr('class', 'd3-tip')
                     .offset([-10, 0]);
-                g.call(tip);
 
                 // initialisation x, y scales
                 let x, y, axisX, axisY, ticks, paddingInner, paddingOuter;
@@ -81,8 +79,8 @@
                     [paddingInner, paddingOuter] = this.selectPaddingInnerOuterX(g_w);
                     x = d3.scaleBand().rangeRound([0, g_w]).paddingInner([paddingInner]).paddingOuter([paddingOuter]);
                     y = d3.scaleLinear().rangeRound([g_h, 0]);
-                    x.domain(data.map(keyFunc));
-                    y.domain([0, d3.max(data, valueFunc)]);
+                    x.domain(data.map(d => d.key));
+                    y.domain([0, d3.max(data, d => d.value)]);
 
                     // draw x
                     axisX = g.append('g')
@@ -94,13 +92,8 @@
                     axisY = g.append('g')
                         .attr('class', 'axis axis--y')
                         .call(d3.axisLeft(y).ticks(ticks))
-                        .attr('font-size', fontSize)
-                        .append('text')
-                        .attr('transform', 'rotate(-90)')
-                        .attr('y', 6)
-                        .attr('dy', '0.71em')
-                        .attr('text-anchor', 'end')
-                        .text(label);
+                        .attr('font-size', fontSize);
+
 
                     // start drawing
                     g.selectAll('.bar')
@@ -115,11 +108,13 @@
                         .attr('fill', fill)
                         .attr('stroke', stroke)
                         .on('mouseover', function(d, i) {
-                            tip.html(() => d.value);
+                            g.call(tip);
+                            tip.html(barTitle(d));
                             tip.show();
                         })
                         .on('mouseout', function(d, i) {
                             tip.hide();
+                            d3.selectAll('.d3-tip').remove();
                         });
                 }
 
@@ -137,11 +132,7 @@
                     axisX = g.append('g')
                         .attr('class', 'axis axis--x')
                         .call(d3.axisTop(x).ticks(ticks))
-                        .attr('font-size', fontSize)
-                        .append('text')
-                        .attr('x', g_w)
-                        .attr('text-anchor', 'end')
-                        .text(label);
+                        .attr('font-size', fontSize);
 
                     // draw y
                     axisY = g.append('g')
@@ -158,14 +149,16 @@
                         .attr('y', d => y(d.key))
                         .attr('height', y.bandwidth())
                         .attr('width', d => x(d.value))
-                        .attr('fill', 'rgb(110, 173, 193)')
-                        .attr('stroke', 'rgb(110, 173, 193)')
+                        .attr('fill', fill)
+                        .attr('stroke', stroke)
                         .on('mouseover', function(d, i) {
-                            tip.html(() => d.value);
+                            g.call(tip);
+                            tip.html(barTitle(d));
                             tip.show();
                         })
                         .on('mouseout', function(d, i) {
                             tip.hide();
+                            d3.selectAll('.d3-tip').remove();
                         });
                 }
 
