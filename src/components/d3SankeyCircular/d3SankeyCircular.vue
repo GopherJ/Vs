@@ -332,26 +332,36 @@
             nodes: {
                 deep: true,
                 handler(n, o) {
-                    this.safeDrawSankey();
+                    this.$nextTick(() => {
+                        this.safeDrawSankey();
+                    });
                 }
             },
             links: {
                 deep: true,
                 handler(n, o) {
-                    this.safeDrawSankey();
+                    this.$nextTick(() => {
+                        this.safeDrawSankey();
+                    });
                 }
             },
             options: {
                 deep: true,
                 handler(n, o) {
-                    this.safeDrawSankey();
+                    this.$nextTick(() => {
+                        this.safeDrawSankey();
+                    });
                 }
             },
             width(n) {
-                this.safeDrawSankey();
+                this.$nextTick(() => {
+                    this.safeDrawSankey();
+                });
             },
             height(n) {
-                this.safeDrawSankey();
+                this.$nextTick(() => {
+                    this.safeDrawSankey();
+                });
             }
         },
         mounted() {

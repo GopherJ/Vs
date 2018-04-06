@@ -136,16 +136,18 @@ export default {
         width: {
             deep: false,
             handler(n) {
-                if(this.safeDraw) {
+                this.$nextTick(() => {
                     this.safeDraw();
-                }
+                });
             }
         },
         height: {
             deep: false,
             handler(n) {
                 if(this.safeDraw) {
-                    this.safeDraw();
+                    this.$nextTick(() => {
+                        this.safeDraw();
+                    });
                 }
             }
         },
@@ -153,7 +155,9 @@ export default {
             deep: true,
             handler(n) {
                 if(this.safeDraw) {
-                    this.safeDraw();
+                    this.$nextTick(() => {
+                        this.safeDraw();
+                    });
                 }
             }
         },
@@ -161,7 +165,9 @@ export default {
             deep: true,
             handler(n) {
                 if(this.safeDraw) {
-                    this.safeDraw();
+                    this.$nextTick(() => {
+                        this.safeDraw();
+                    });
                 }
             }
         },
@@ -169,7 +175,9 @@ export default {
             deep: true,
             handler(n) {
                 if (this.safeDraw) {
-                    this.safeDraw();
+                    this.$nextTick(() => {
+                        this.safeDraw();
+                    });
                 }
             }
         }
