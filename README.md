@@ -129,6 +129,59 @@ Vue.use(Vs);
 ```
 
 
+## Examples
+
+```vue
+<template>
+  <div class="hello">
+    <d3-bar :data="data"></d3-bar>
+    <d3-pie :data="data"></d3-pie>
+    <d3-line :data="data"></d3-line>
+    <d3-bar :data="data" :options="{isVertical: true}"></d3-bar>
+    <d3-sankey-circular :nodes="nodes" :links="links"></d3-sankey-circular>
+  </div>
+</template>
+
+<script>
+export default {
+    data: () => {
+        return {
+            nodes: [
+             { name: 'a' },
+             { name: 'b' }
+            ],
+            links: [{
+                source: 'a',
+                target: 'b',
+                value: 10
+            }],
+            data: [
+              {key: 'jiang', value: 80},
+              {key: 'zeng', value: 30},
+              {key: 'ammar', value: 60},
+              {key: 'tu', value: 40},
+              {key: 'ttu', value: 35},
+              {key: 'tuu', value: 60},
+              {key: 'tuuu', value: 80},
+              {key: 'tuii', value: 25},
+            ]
+        }
+    }
+}
+</script>
+```
+
+![](./images/d3-bar-horizontal.PNG)
+
+![](./images/d3-pie.PNG)
+
+![](./images/d3-line.PNG)
+
+![](./images/d3-bar-vertical.PNG)
+
+![](./images/d3-sankey-circular.PNG)
+
+
 
 
 
