@@ -22,14 +22,14 @@
                 const [w, h] = this.getElWidthHeight();
 
                 // constants
-                const {   left = 30,
-                        top = 30,
-                        right = 30,
-                        bottom = 30
+                const {   left = 0,
+                        top = 0,
+                        right = 0,
+                        bottom = 0
                     } = this.margin,
 
-                    {   innerRadius = 20,
-                        cornerRadius = 20,
+                    {   innerRadius = 5,
+                        cornerRadius = 5,
                         padAngle = 0.01,
                         arcTitle = d => d.data.value,
                         arcLabel = d => d.data.key,
@@ -40,10 +40,6 @@
                     g_w = w - left - right,
                     g_h = h -top - bottom - axisXLaneHeight,
                     outerRadius = Math.min(g_w/2, g_h/2);
-
-                if (innerRadius > outerRadius) {
-                    throw new Error('invalid innerRadius');
-                }
 
                 // create svg
                 const svg = d3.select(this.$el)
