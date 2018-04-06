@@ -18,11 +18,13 @@
         mixins: [mixins],
         methods: {
             drawPie() {
+                // data and container width, height
                 const data = this.data;
                 const [w, h] = this.getElWidthHeight();
 
                 // constants
-                const {   left = 0,
+                const {
+                        left = 0,
                         top = 0,
                         right = 0,
                         bottom = 0
@@ -53,6 +55,7 @@
                     .attr('height', `${g_h}`)
                     .attr('transform', `translate(${left},${top})`);
 
+                // lane to hold label text
                 const lane = svg
                     .append('g')
                     .attr('transform', `translate(${left}, ${top + g_h})`)
@@ -103,7 +106,8 @@
                     .attr('d', path)
                     .attr('fill', (d, i) => color(d.data.value));
 
-                    arc
+                // listen to mouse enter, leave
+                arc
                     .on('mouseover', function(d, i){
                         g.call(tip);
                         tip.html(arcTitle(d));
@@ -124,10 +128,11 @@
 
                 lane.append('text')
                     .attr('class', 'label label--x')
+                    .attr('text-anchor', 'middle')
                     .attr('x', g_w/2)
                     .attr('y', axisXLaneHeight)
-                    .attr('text-anchor', 'middle')
-                    .text(axisXLabel)
+                    .attr('dy', '-0.35em')
+                    .text(axisXLabel);
             },
             safeDraw() {
                 this.ifExistsSvgThenRemove();
