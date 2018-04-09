@@ -62,7 +62,7 @@ config.module = {
                 loader: 'css-loader'
             }, {
                 loader: 'postcss-loader',
-                options: {     
+                options: {
                     plugins: (loader) => [
                         require('postcss-import')({root: loader.resourcePath}),
                         require('autoprefixer')(), // browser compatibility

@@ -5,7 +5,7 @@
 <script>
 /* eslint-disable */
     import * as d3 from 'd3';
-    import d3Tip from 'd3-tip'
+    import d3Tip from 'd3-tip';
     import formatTime from '../../util/formatTime';
     import getAxisXTicks from '../../util/getAxisXTicks';
     import getIntervalFromData from '../../util/getIntervalFromData';
@@ -19,45 +19,32 @@
     export default {
         name: 'd3-timelion',
         mixins: [mixins],
-        props: {
-            data: {
-                type: Array,
-                required: true
-            },
-            options: {
-                type: Object,
-                default: () => ({})
-            }
-        },
         methods: {
             drawTimelion() {
-                 // no data
-                if (this.data.length === 0) {
-                    return;
-                }
-
                 // sort data by timestamp asc
                 const data = this.data.sort((a, b) => a.key > b.key ? 1 : -1);
 
                 // get container width and height
                 const [w, h] = this.getElWidthHeight();
-                // container width, height must exist so that we can draw svg
-                if (!w || !h) {
-                    throw new Error('invalid width or height');
-                }
 
                 // constants
-                const {left = 30, top = 30, right = 30, bottom = 30} = this.margin,
+                const {left = 0, top = 20, right = 20, bottom = 0} = this.margin,
                       {
                           fill = 'rgb(110, 173, 193)',
                           stroke = 'rgb(110, 173, 193)',
                           fontSize = 14,
-                          labelY = 'count'
+                          axisXHeight = 25,
+                          axisYWidth = 35,
+                          axisXLabelHeight = 60,
+                          axisYLabelWidth = 60,
+                          axisXLabel = 'Key',
+                          axisYLabel = 'Value',
+                          barTitle = d => d.value
                       } = this.options,
                       ticksY = this.selectTicksNumY(h),
                       [paddingInner, paddingOuter] = this.selectPaddingInnerOuterX(w),
-                      g_w = w - left - right,
-                      g_h = h - top - bottom,
+                      g_w = w - left - right - axisYLabelWidth - axisYWidth,
+                      g_h = h - top - bottom - axisXHeight - axisXLabelHeight,
                       tickSizeInner = 4,
                       interval = getIntervalFromData(data, (el) => el.key);
 
@@ -69,18 +56,18 @@
 
                 // create g which will contain our graph
                 const g = svg.append('g')
+                    .attr('transform', `translate(${left + axisXLabelHeight + axisYWidth}, ${top})`)
                     .attr('width', g_w)
-                    .attr('height', g_h)
-                    // move g to the middle of svg
-                    .attr('transform', `translate(${left},${top})`);
+                    .attr('height', g_h);
 
                 // create axis - x,y scale
                 const x = d3.scaleBand().rangeRound([0, g_w]).paddingInner([paddingInner]).paddingOuter([paddingOuter]),
                       y = d3.scaleLinear().rangeRound([g_h, 0]);
+
                 // ticks in axis--x
                 x.domain(data.map(d => d.key));
-                // output of rangeRound need to be minus by g_h beacause we have inverse axis y so that human readable
-                y.domain([0, d3.max(data, d => d.value)]);
+                // output of rangeRound need to be minus by g_h because we have inverse axis y so that human readable
+                y.domain(d3.extent(data, d => d.value)).nice();
 
                 // calculate dateTimeStart, dateTimeEnd
                 const [dateTimeStart, dateTimeEnd] = d3.extent(data.map(el => new Date(el.key)));
@@ -92,9 +79,12 @@
                     .range([0, g_w]);
 
                 // axis--x
-                g.append('g')
+                svg.append('g')
+                    .attr('transform', `translate(${left + axisXLabelHeight + axisYWidth}, ${top + g_h})`)
+                    .attr('width', g_w)
+                    .attr('height', axisXHeight)
+                    .append('g')
                     .attr('class', 'axis axis--x')
-                    .attr('transform', 'translate(0,' + g_h + ')')
                     .call(
                         d3.axisBottom(timeScale)
                             .tickValues(getAxisXTicks(fontSize, g_w, interval, tickSizeInner).map(el => timeScale.invert(el)))
@@ -103,23 +93,21 @@
                     .attr('font-size', fontSize);
 
                 // axis--y
-                g.append('g')
+                svg.append('g')
+                    .attr('transform', `translate(${left + axisYLabelWidth}, ${top})`)
+                    .attr('width', axisYLabelWidth)
+                    .attr('height', g_h)
+                    .append('g')
                     .attr('class', 'axis axis--y')
+                    .attr('transform', `translate(${axisYWidth}, 0)`)
                     .call(d3.axisLeft(y).ticks(ticksY))
-                    .attr('font-size', fontSize)
-                    .append('text')
-                    .attr('fill', '#000')
-                    .attr('transform', 'rotate(-90)')
-                    .attr('y', 6)
-                    .attr('dy', '0.71em')
-                    .attr('text-anchor', 'end')
-                    .text(labelY);
+                    .attr('font-size', fontSize);
 
                 // brushed callback
                 const brushed = () => {
                     if (d3.event.selection) {
                         const [dateTimeStart, dateTimeEnd] = Array.prototype.map.call(d3.event.selection, el => timeScale.invert(el));
-                        this.$emit('timeRangeChange', dateTimeStart, dateTimeEnd);
+                        this.$emit('time-range-change', dateTimeStart, dateTimeEnd);
                     }
                 };
 
@@ -127,14 +115,13 @@
                 const b = svg.append('g')
                     .attr('class', 'brush');
                 const brushX = d3.brushX()
-                    .extent([[left, top], [g_w + left, g_h + top]])
+                    .extent([[left + axisYLabelWidth + axisYWidth, top], [w - right, g_h + top]])
                     .on('end', brushed);
 
                 // tooltip
                 const tip = d3.tip()
                     .attr('class', 'd3-tip')
                     .offset([-10, 0]);
-                g.call(tip);
 
                 // start drawing
                 g.selectAll('rect')
@@ -151,17 +138,51 @@
                     .attr('fill', fill)
                     .attr('stroke', stroke)
                     .on('mouseover', function(d, i) {
-                        tip.html(() => d.value);
+                        g.call(tip);
+                        tip.html(barTitle(d));
                         tip.show();
                     })
                     .on('mouseout', function(d, i) {
                         tip.hide();
+                        d3.selectAll('.d3-tip').remove();
                     });
 
-                g
-                    .on('mousedown', function(d, i) {
+                // listen to user click
+                g.on('mousedown', function(d, i) {
                         b.call(brushX);
                     });
+
+                // create the lane to hold the label of axis y
+                const axisYLabelLane = svg.append('g')
+                    .attr('transform', `translate(${left}, ${top})`)
+                    .attr('width', axisYLabelWidth)
+                    .attr('height', g_h);
+
+                // create the lane to hold the label of axis x
+                const axisXLabelLane = svg.append('g')
+                    .attr('transform', `translate(${left + axisYLabelWidth + axisYWidth}, ${top + g_h + axisXHeight})`)
+                    .attr('width', g_w)
+                    .attr('height', axisXLabelHeight);
+
+                // create the label of axis x
+                axisXLabelLane
+                    .append('text')
+                    .attr('x', g_w/2)
+                    .attr('y', axisXLabelHeight/2)
+                    .attr('text-anchor', 'middle')
+                    .attr('fill', '#000')
+                    .text(axisXLabel)
+                    .attr('font-weight', 600);
+
+                // create the label of axis y
+                axisYLabelLane
+                    .append('text')
+                    .attr('text-anchor', 'middle')
+                    .attr('transform', 'rotate(-90)')
+                    .attr('y', axisYLabelWidth/2)
+                    .attr('x', -g_h/2)
+                    .text(axisYLabel)
+                    .attr('font-weight', 600);
 
                 // draw reference line to represent now
                 let now = new Date();
@@ -173,39 +194,16 @@
                         .attr('x1', timeScale(now))
                         .attr('y1', 0)
                         .attr('x2', timeScale(now))
-                        .attr('y2', g_h)
+                        .attr('y2', g_h);
                 }
             },
-            safeDrawTimelion() {
+            safeDraw() {
                 this.ifExistsSvgThenRemove();
                 this.drawTimelion();
             },
             onResize() {
-                this.safeDrawTimelion();
+                this.safeDraw();
             }
-        },
-        watch: {
-           data: {
-               deep: true,
-               handler(n) {
-                   this.safeDrawTimelion();
-               }
-           },
-           width: {
-              deep: false,
-              handler(n) {
-                   this.safeDrawTimelion();
-              }
-           },
-           height: {
-              deep: false,
-              handler(n) {
-                   this.safeDrawTimelion();
-              }
-           }
-        },
-        mounted() {
-            this.safeDrawTimelion();
         }
     }
 </script>
@@ -213,20 +211,11 @@
 <style>
     .axis {
         font-family: sans-serif;
-        opacity: .5;
+        opacity: .75;
         -webkit-user-select: none;
         -moz-user-select: none;
         -ms-user-select: none;
         user-select: none;
-    }
-
-    .axis--x path {
-        /*stroke-width: 2;*/
-        /*display: none;*/
-    }
-    .axis--y path {
-        /*stroke-width: 2;*/
-        /*display: none;*/
     }
 
     rect, .bar {

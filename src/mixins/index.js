@@ -188,8 +188,9 @@ export default {
             return;
         }
 
+
         if (this.getElWidthHeight().some(el => !el)) {
-            throw new Error('Invalid width or height');
+            return;
         }
 
 

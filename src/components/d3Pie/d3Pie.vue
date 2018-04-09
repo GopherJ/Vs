@@ -35,12 +35,12 @@
                         padAngle = 0.01,
                         arcTitle = d => d.data.value,
                         arcLabel = d => d.data.key,
-                        axisXLaneHeight = 30,
+                        axisXLabelHeight = 30,
                         axisXLabel = 'Key'
                     } = this.options,
 
                     g_w = w - left - right,
-                    g_h = h -top - bottom - axisXLaneHeight,
+                    g_h = h -top - bottom - axisXLabelHeight,
                     _outerRadius = Math.min(g_w/2, g_h/2),
                     outerRadius = _outerRadius < innerRadius ? innerRadius : _outerRadius;
 
@@ -61,7 +61,7 @@
                     .append('g')
                     .attr('transform', `translate(${left}, ${top + g_h})`)
                     .attr('width', g_w)
-                    .attr('height', axisXLaneHeight);
+                    .attr('height', axisXLabelHeight);
 
                  // tooltip
                 const tip = d3.tip()
@@ -134,7 +134,7 @@
                     .attr('class', 'label label--x')
                     .attr('text-anchor', 'middle')
                     .attr('x', g_w/2)
-                    .attr('y', axisXLaneHeight/2)
+                    .attr('y', axisXLabelHeight/2)
                     .text(axisXLabel);
             },
             safeDraw() {

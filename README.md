@@ -59,7 +59,7 @@ Vue.use(Vs);
     axisYLabel: 'Value',
     axisXHeight: 25,
     axisYWidth: 35,
-    axisXLabelHeight: 20,
+    axisXLabelHeight: 30,
     axisYLabelWidth: 20
 }" width="100%" height="400px" :margin="{
     left: 0,

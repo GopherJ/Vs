@@ -36,7 +36,7 @@
                           axisYLabel = 'Value',
                           axisXHeight = 25,
                           axisYWidth = 35,
-                          axisXLabelHeight = 20,
+                          axisXLabelHeight = 30,
                           axisYLabelWidth = 20
                       } = this.options,
                       g_w = w - left - right - axisYLabelWidth - axisYWidth,

@@ -5,6 +5,8 @@ import d3Timelion from './components/d3Timelion';
 import d3Pie from './components/d3Pie';
 import d3Line from './components/d3Line';
 import d3Bar from './components/d3Bar';
+// import Buefy from 'buefy';
+// import 'buefy/lib/buefy.min.css';
 
 const install = (Vue, options = {}) => {
     if (options.store) {
