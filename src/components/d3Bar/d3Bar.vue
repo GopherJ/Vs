@@ -35,7 +35,7 @@
                           axisXLabelHeight = 20,
                           axisYLabelWidth = 20
                       } = this.options,
-                      {left = 0, right = 0, top = isVertical ? 0 : 20, bottom = 0} = this.margin,
+                      {left = isVertical ? 30 : 0, right = 0, top = isVertical ? 0 : 20, bottom = 0} = this.margin,
                       g_w = w - left - right - axisYLabelWidth - axisYWidth,
                       g_h = h - top - bottom - axisXHeight - axisXLabelHeight;
 
@@ -229,7 +229,7 @@
                         .attr('class', 'label label--x')
                         .attr('text-anchor', 'middle')
                         .attr('x', g_w/2)
-                        .attr('y', axisXHeight)
+                        .attr('y', axisXHeight/2)
                         .text(axisYLabel);
 
                     // draw the label of axis y
