@@ -77,13 +77,15 @@ Vue.use(Vs);
     barTitle: d => d.value,
     axisYLabel: 'Value',
     axisXLabel: 'Key',
-    axisXLaneHeight: 30,
-    axisYLaneWidth: 30
+    axisXHeight: 25,
+    axisYWidth: 35,
+    axisXLabelHeight: 20,
+    axisYLabelWidth: 20
 }" width="100%" height="400px" :margin="{
-    left: 30,
-    top: 30,
-    right: 30,
-    bottom: 30
+    left: 0,
+    top: 20,
+    right: 0,
+    bottom: 0
 }"></d3-bar>
 
 // vertical bar
@@ -95,13 +97,15 @@ Vue.use(Vs);
     barTitle : d => d.value,
     axisYLabel : 'Value',
     axisXLabel : 'Key',
-    axisXLaneHeight: 30,
-    axisYLaneWidth: 30
+    axisXLabelHeight: 20,
+    axisYLabelWidth: 20,
+    axisXHeight: 25,
+    axisYWidth: 35
 }" width="100%" height="400px" :margin="{
-    left: 60,
-    top: 30,
-    right: 30,
-    bottom: 30
+    left: 0,
+    top: 0,
+    right: 0,
+    bottom: 0
 }"></d3-bar>
 
 // sankey
