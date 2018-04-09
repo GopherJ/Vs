@@ -60,7 +60,7 @@
                     x = d3.scaleBand().rangeRound([0, g_w]).paddingInner([paddingInner]).paddingOuter([paddingOuter]);
                     y = d3.scaleLinear().rangeRound([g_h, 0]);
                     x.domain(data.map(d => d.key));
-                    y.domain(d3.extent(data, d => d.value));
+                    y.domain(d3.extent(data, d => d.value)).nice();
 
                     // create g to contain our graph
                     const g = svg
@@ -156,7 +156,7 @@
                     y = d3.scaleBand().rangeRound([0, g_h]).paddingInner([paddingInner]).paddingOuter([paddingOuter]);
                     x = d3.scaleLinear().rangeRound([0, g_w]);
                     y.domain(data.map(el => el.key));
-                    x.domain(d3.extent(data, d => d.value));
+                    x.domain(d3.extent(data, d => d.value)).nice();
 
                     // create g to contain our graph
                     const g = svg
