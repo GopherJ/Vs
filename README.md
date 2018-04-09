@@ -57,12 +57,14 @@ Vue.use(Vs);
     curve: 'curveCardinal',
     axisXLabel: 'Key',
     axisYLabel: 'Value',
-    axisXLaneHeight: 30,
-    axisYLaneWidth: 30
+    axisXHeight: 25,
+    axisYWidth: 35,
+    axisXLabelHeight: 20,
+    axisYLabelWidth: 20
 }" width="100%" height="400px" :margin="{
-    left: 30,
-    top: 10,
-    right: 5,
+    left: 0,
+    top: 20,
+    right: 20,
     bottom: 0
 }"></d3-line>
 
