@@ -41,7 +41,8 @@
 
                     g_w = w - left - right,
                     g_h = h -top - bottom - axisXLaneHeight,
-                    outerRadius = Math.min(g_w/2, g_h/2);
+                    _outerRadius = Math.min(g_w/2, g_h/2),
+                    outerRadius = _outerRadius < innerRadius ? innerRadius : _outerRadius;
 
                 // create svg
                 const svg = d3.select(this.$el)
@@ -76,12 +77,12 @@
                     .domain(d3.extent(data.map(d => d.value)))
                     .interpolator(d3.interpolateWarm);
 
-                // prepare data
+                // data pre treat
                 const pie = d3.pie()
                     .sort(null)
                     .value(d => d.value);
 
-                // create arc
+                // create arc function
                 const path = d3.arc()
                     .innerRadius(innerRadius)
                     .outerRadius(outerRadius)
@@ -100,6 +101,7 @@
                     .append('g')
                     .attr('class', 'arc');
 
+                // draw arc path
                 arc.append('path')
                     .transition()
                     .delay((d, i) => 100 * i)
@@ -118,6 +120,7 @@
                         d3.selectAll('.d3-tip').remove();
                     });
 
+                // append arc label
                 arc.append('text')
                     .attr('text-anchor', 'middle')
                     .attr('opacity', '.5')
@@ -126,12 +129,12 @@
                     .delay((d,i) => 100 * i)
                     .text(arcLabel);
 
+                // append label to the lane
                 lane.append('text')
                     .attr('class', 'label label--x')
                     .attr('text-anchor', 'middle')
                     .attr('x', g_w/2)
-                    .attr('y', axisXLaneHeight)
-                    .attr('dy', '-0.35em')
+                    .attr('y', axisXLaneHeight/2)
                     .text(axisXLabel);
             },
             safeDraw() {

@@ -18,13 +18,12 @@
         mixins: [mixins],
         methods: {
             drawLine() {
-                // constants
+                // container width and height
                 const [w, h] = this.getElWidthHeight();
 
                 // constants
                 const data = this.data,
-                      {left = 30, top = 10, right = 5, bottom = 0} = this.margin,
-                      ticks = this.selectTicksNumY(g_h),
+                      {left = 0, top = 20, right = 10, bottom = 0} = this.margin,
                       {
                           stroke = 'rgb(188, 82, 188)',
                           strokeWidth = 2,
@@ -35,11 +34,14 @@
                           curve = 'curveCardinal',
                           axisXLabel = 'Key',
                           axisYLabel = 'Value',
-                          axisXLaneHeight = 30,
-                          axisYLaneWidth = 30
+                          axisXHeight = 25,
+                          axisYWidth = 35,
+                          axisXLabelHeight = 20,
+                          axisYLabelWidth = 20
                       } = this.options,
-                      g_w = w - left - right - axisYLaneWidth,
-                      g_h = h - top - bottom - axisXLaneHeight;
+                      g_w = w - left - right - axisYLabelWidth - axisYWidth,
+                      g_h = h - top - bottom - axisXLabelHeight - axisXHeight,
+                      ticks = this.selectTicksNumY(g_h);
 
                 // create scale x
                 const x = d3.scalePoint()
@@ -48,7 +50,7 @@
 
                 // create scale y
                 const y = d3.scaleLinear()
-                    .domain([0, d3.max(data, d => d.value)])
+                    .domain(d3.extent(data, d => d.value))
                     .range([g_h, 0]);
 
                 // line generator
@@ -66,32 +68,43 @@
 
                 // create g to contain our graph
                 const g = svg.append('g')
-                    .attr('transform', `translate(${left + axisYLaneWidth}, ${top})`)
+                    .attr('transform', `translate(${left + axisYLabelWidth + axisYWidth}, ${top})`)
                     .attr('width', `${g_w}`)
                     .attr('height', `${g_h}`);
 
-                const axisXLane = svg.append('g')
-                    .attr('transform', `translate(${left + axisYLaneWidth}, ${top + g_h})`)
+                // create axis x
+                svg.append('g')
+                    .attr('transform', `translate(${left + axisYLabelWidth + axisYWidth}, ${top + g_h})`)
                     .attr('width', g_w)
-                    .attr('height', axisXLaneHeight);
-
-                const axisYLane = svg.append('g')
-                    .attr('transform', `translate(${left}, ${top})`)
-                    .attr('width', axisYLaneWidth)
-                    .attr('height', g_h);
-
-                // crate axis x
-                const axisX = g.append('g')
-                    .attr('transform', `translate(0, ${g_h})`)
+                    .attr('height', axisXHeight)
+                    .append('g')
                     .attr('class', 'axis axis--x')
                     .call(d3.axisBottom(x))
                     .attr('font-size', fontSize);
 
                 // create axis y
-                const axisY = g.append('g')
+                svg.append('g')
+                    .attr('transform', `translate(${left + axisYLabelWidth}, ${top})`)
+                    .attr('width', axisYWidth)
+                    .attr('height', g_h)
+                    .append('g')
+                    .attr('transform', `translate(${axisYWidth}, 0)`)
                     .attr('class', 'axis axis--y')
                     .call(d3.axisLeft(y).ticks(ticks))
                     .attr('font-size', fontSize);
+
+
+                // create lane to hold label for the axis of x
+                const axisXLabelLane = svg.append('g')
+                    .attr('transform', `translate(${left + axisYLabelWidth + axisYWidth}, ${top + g_h + axisXHeight})`)
+                    .attr('width', g_w)
+                    .attr('height', axisXLabelHeight);
+
+                // create lane to hold label for the axis of y
+                const axisYLabelLane = svg.append('g')
+                    .attr('transform', `translate(${left}, ${top})`)
+                    .attr('width', axisYLabelWidth)
+                    .attr('height', g_h);
 
                 // start drawing
                 g.append('path')
@@ -106,6 +119,7 @@
                     .attr('class', 'd3-tip')
                     .offset([-10, 0]);
 
+                // draw circles to show where is the point
                 g.selectAll('circle')
                     .data(data)
                     .enter()
@@ -124,20 +138,22 @@
                         d3.selectAll('.d3-tip').remove();
                     });
 
-                axisXLane
+                // draw the label of the axis of x
+                axisXLabelLane
                     .append('text')
                     .attr('class', 'label label--x')
                     .attr('text-anchor', 'middle')
                     .attr('x', g_w/2)
-                    .attr('y', axisXLaneHeight)
+                    .attr('y', axisXLabelHeight/2)
                     .text(axisXLabel);
 
-                axisYLane
+                // draw the label of the axis of y
+                axisYLabelLane
                     .append('text')
                     .attr('class', 'label label--y')
                     .attr('transform', 'rotate(-90)')
                     .attr('text-anchor', 'middle')
-                    .attr('y', 0)
+                    .attr('y', axisYLabelWidth)
                     .attr('x', -g_h/2)
                     .text(axisYLabel);
 
