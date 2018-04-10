@@ -142,6 +142,36 @@ Vue.use(Vs);
     right: 20,
     bottom: 0
 }" @time-range-change="(dateTimeStart, dateTimeEnd) => yourMethod(dateTimeStart, dateTimeEnd)"></d3-timelion>
+
+
+// ProgressArc
+<d3-progress-arc :data="[{
+  angle: Math.PI * 2,
+  text: 'key1',
+}, {
+  angle: Math.PI * 2 * 23/24,
+  text: 'key2',
+}, {
+  angle: Math.PI * 2 * 23/24 * 23/24,
+  text: 'key3'
+}, {
+  angle: Math.PI * 2 * 23/24 * 23/24 * 23/24,
+  text: 'key4'
+}, {
+  angle: Math.PI * 2 * 23/24 * 23/24 * 23/24 * 23/24,
+  text: 'key5'
+}, {
+  angle: Math.PI * 2 * 23/24 * 23/24 * 23/24 * 23/24 * 23/24,
+  text: 'key6'
+}].reverse()" width="100%" height="400px" :options="{
+  innerRadius : 40,
+  cornerRadius : 8,
+  circleRadius : 4,
+  textMarginLeft : 2,
+  textFontSize : 16,
+  animationDuration : 2000,
+  animationDelay : 50
+}"></d3-progress-arc>
 ```
 
 
@@ -155,27 +185,6 @@ Vue.use(Vs);
     <d3-line :data="data"></d3-line>
     <d3-bar :data="data" :options="{isVertical: true}"></d3-bar>
     <d3-sankey-circular :nodes="nodes" :links="links"></d3-sankey-circular>
-
-    <d3-progress-arc :data="[{
-        angle: Math.PI * 2,
-        text: 'key1',
-        }, {
-        angle: Math.PI * 2 * 23/24,
-        text: 'key2',
-        }, {
-        angle: Math.PI * 2 * 23/24 * 23/24,
-        text: 'key3'
-        }, {
-          angle: Math.PI * 2 * 23/24 * 23/24 * 23/24,
-          text: 'key4'
-        }, {
-          angle: Math.PI * 2 * 23/24 * 23/24 * 23/24 * 23/24,
-          text: 'key5'
-        }, {
-
-          angle: Math.PI * 2 * 23/24 * 23/24 * 23/24 * 23/24 * 23/24,
-          text: 'key6'
-        }].reverse()"></d3-progress-arc>
   </div>
 </template>
 
@@ -217,6 +226,8 @@ export default {
 ![](./images/d3-bar-vertical.PNG)
 
 ![](./images/d3-sankey-circular.PNG)
+
+![](./images/d3-progress-arc.gif)
 
 
 
