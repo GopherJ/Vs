@@ -38,7 +38,7 @@
                         axisXLabelHeight = 30,
                         axisXLabel = 'Key',
                         arcLabelFontSize = 10,
-                        animationDuration = 1000,
+                        animationDuration = 1000
                     } = this.options,
 
                     g_w = w - left - right,
@@ -109,12 +109,10 @@
                     .duration(animationDuration)
                     .delay((d, i) => 50 * i)
                     .attrTween('d', d => {
-                        let startAngle = d.startAngle;
-                        let interpolate = d3.interpolate({endAngle: startAngle}, d);
+                        const startAngle = d.startAngle;
+                        const interpolate = d3.interpolate({endAngle: startAngle}, d);
 
-                        return t => {
-                            return path(interpolate(t));
-                        };
+                        return t => path(interpolate(t));
                     })
                     .attr('fill', (d, i) => color(d.data.value));
 

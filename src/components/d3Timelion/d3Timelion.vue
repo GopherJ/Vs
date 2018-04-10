@@ -10,6 +10,7 @@
     import getAxisXTicks from '../../util/getAxisXTicks';
     import getIntervalFromData from '../../util/getIntervalFromData';
     import mixins from '../../mixins';
+    import _ from 'lodash';
     import moment from 'moment';
 
     // install d3-tip
@@ -21,15 +22,22 @@
         name: 'd3-timelion',
         mixins: [mixins],
         methods: {
+            updateTimeRangeLabel(dateTimeStart, dateTimeEnd) {
+                if (!d3.select(this.$el).select('.time-range-label').empty())  {
+                    d3.select(this.$el).select('.time-range-label').text(() => this.timeRangeLabel(dateTimeStart, dateTimeEnd));
+                }
+            },
             drawTimelion() {
                 // sort data by timestamp asc
-                const data = this.data.sort((a, b) => a.key > b.key ? 1 : -1);
+                // ***** here we must use clone deep because sort will change data, if data has been changed will rerun this function *****
+                // which cause a infinite loop
+                const data = _.cloneDeep(this.data).sort((a, b) => a.key > b.key ? 1 : -1);
 
                 // get container width and height
                 const [w, h] = this.getElWidthHeight();
 
                 // constants
-                const {left = 0, top = 20, right = 20, bottom = 0} = this.margin,
+                const {left = 0, top = 0, right = 20, bottom = 0} = this.margin,
                       {
                           fill = 'rgb(110, 173, 193)',
                           stroke = 'rgb(110, 173, 193)',
@@ -40,12 +48,14 @@
                           axisYLabelWidth = 60,
                           axisXLabel = 'Key',
                           axisYLabel = 'Value',
-                          barTitle = d => d.value
+                          timeRangeLabelHeight = 30,
+                          barTitle = d => d.value,
+                          animationDuration = 2000
                       } = this.options,
                       ticksY = this.selectTicksNumY(h),
                       [paddingInner, paddingOuter] = this.selectPaddingInnerOuterX(w),
                       g_w = w - left - right - axisYLabelWidth - axisYWidth,
-                      g_h = h - top - bottom - axisXHeight - axisXLabelHeight,
+                      g_h = h - top - bottom - axisXHeight - axisXLabelHeight - timeRangeLabelHeight,
                       tickSizeInner = 4,
                       interval = getIntervalFromData(data, (el) => el.key);
 
@@ -57,13 +67,13 @@
 
                 // create g which will contain our graph
                 const g = svg.append('g')
-                    .attr('transform', `translate(${left + axisXLabelHeight + axisYWidth}, ${top})`)
+                    .attr('transform', `translate(${left + axisXLabelHeight + axisYWidth}, ${top + timeRangeLabelHeight})`)
                     .attr('width', g_w)
                     .attr('height', g_h);
 
                 // create axis - x,y scale
-                const x = d3.scaleBand().rangeRound([0, g_w]).paddingInner([paddingInner]).paddingOuter([paddingOuter]),
-                      y = d3.scaleLinear().rangeRound([g_h, 0]);
+                const x = d3.scaleBand().range([0, g_w]).paddingInner([paddingInner]).paddingOuter([paddingOuter]),
+                      y = d3.scaleLinear().range([g_h, 0]);
 
                 // ticks in axis--x
                 x.domain(data.map(d => d.key));
@@ -81,21 +91,19 @@
 
                 // axis--x
                 svg.append('g')
-                    .attr('transform', `translate(${left + axisXLabelHeight + axisYWidth}, ${top + g_h})`)
+                    .attr('transform', `translate(${left + axisXLabelHeight + axisYWidth}, ${top + g_h + timeRangeLabelHeight})`)
                     .attr('width', g_w)
                     .attr('height', axisXHeight)
                     .append('g')
                     .attr('class', 'axis axis--x')
-                    .call(
-                        d3.axisBottom(timeScale)
+                    .call(d3.axisBottom(timeScale)
                             .tickValues(getAxisXTicks(fontSize, g_w, interval, tickSizeInner).map(el => timeScale.invert(el)))
-                            .tickFormat(el => formatTime(el, interval))
-                    )
+                            .tickFormat(el => formatTime(el, interval)))
                     .attr('font-size', fontSize);
 
                 // axis--y
                 svg.append('g')
-                    .attr('transform', `translate(${left + axisYLabelWidth}, ${top})`)
+                    .attr('transform', `translate(${left + axisYLabelWidth}, ${top + timeRangeLabelHeight})`)
                     .attr('width', axisYLabelWidth)
                     .attr('height', g_h)
                     .append('g')
@@ -112,11 +120,20 @@
                     }
                 };
 
+                // brush callback
+                const brush = () => {
+                    if (d3.event.selection) {
+                        const [dateTimeStart, dateTimeEnd] = Array.prototype.map.call(d3.event.selection, el => timeScale.invert(el));
+                        this.updateTimeRangeLabel(dateTimeStart, dateTimeEnd);
+                    }
+                };
+
                 // brush
                 const b = svg.append('g')
                     .attr('class', 'brush');
                 const brushX = d3.brushX()
-                    .extent([[left + axisYLabelWidth + axisYWidth, top], [w - right, g_h + top]])
+                    .extent([[left + axisYLabelWidth + axisYWidth, top + timeRangeLabelHeight], [w - right, g_h + top + timeRangeLabelHeight]])
+                    .on('brush', brush)
                     .on('end', brushed);
 
                 // tooltip
@@ -133,6 +150,13 @@
                     // transform d.key to distance
                     .attr('x', d => x(d.key))
                     .attr('y', d => y(d.value))
+                    // .transition()
+                    // .duration(animationDuration)
+                    // .attrTween('y', d => {
+                    //     const interpolate = d3.interpolate({value: g_h}, d);
+                    //
+                    //     return t => y(interpolate(t));
+                    // })
                     // calculate by scaleBand
                     .attr('width', x.bandwidth())
                     .attr('height', d => g_h - y(d.value))
@@ -155,13 +179,13 @@
 
                 // create the lane to hold the label of axis y
                 const axisYLabelLane = svg.append('g')
-                    .attr('transform', `translate(${left}, ${top})`)
+                    .attr('transform', `translate(${left}, ${top + timeRangeLabelHeight})`)
                     .attr('width', axisYLabelWidth)
                     .attr('height', g_h);
 
                 // create the lane to hold the label of axis x
                 const axisXLabelLane = svg.append('g')
-                    .attr('transform', `translate(${left + axisYLabelWidth + axisYWidth}, ${top + g_h + axisXHeight})`)
+                    .attr('transform', `translate(${left + axisYLabelWidth + axisYWidth}, ${top + g_h + axisXHeight + timeRangeLabelHeight})`)
                     .attr('width', g_w)
                     .attr('height', axisXLabelHeight);
 
@@ -185,6 +209,21 @@
                     .text(axisYLabel)
                     .attr('font-weight', 600);
 
+                // create time range label
+                svg.append('g')
+                    .attr('transform', `translate(${left + axisYLabelWidth + axisYWidth}, ${top})`)
+                    .attr('width', g_w)
+                    .attr('height', timeRangeLabelHeight)
+                    .append('text')
+                    .attr('class', 'time-range-label')
+                    .attr('x', g_w/2)
+                    .attr('y', timeRangeLabelHeight/2)
+                    .attr('fill', '#000')
+                    .attr('font-weight', 600)
+                    .attr('opacity', '0.5')
+                    .attr('text-anchor', 'middle')
+                    .text(() => this.timeRangeLabel(dateTimeStart, dateTimeEnd));
+
                 // draw reference line to represent now
                 let now = new Date();
                 if (dateTimeEnd >= now) {
@@ -197,6 +236,11 @@
                         .attr('x2', timeScale(now))
                         .attr('y2', g_h);
                 }
+            },
+            timeRangeLabel(dateTimeStart, dateTimeEnd) {
+                const FORMAT = 'YYYY-MM-DD HH:mm:ss';
+
+                return `From ${moment(dateTimeStart).format(FORMAT)} To ${moment(dateTimeEnd).format(FORMAT)}`;
             },
             safeDraw() {
                 this.ifExistsSvgThenRemove();
