@@ -37,7 +37,8 @@
                         arcLabel = d => d.data.key,
                         axisXLabelHeight = 30,
                         axisXLabel = 'Key',
-                        arcLabelFontSize = 14
+                        arcLabelFontSize = 10,
+                        animationDuration = 1000,
                     } = this.options,
 
                     g_w = w - left - right,
@@ -105,8 +106,16 @@
                 // draw arc path
                 arc.append('path')
                     .transition()
-                    .delay((d, i) => 100 * i)
-                    .attr('d', path)
+                    .duration(animationDuration)
+                    .delay((d, i) => 50 * i)
+                    .attrTween('d', d => {
+                        let startAngle = d.startAngle;
+                        let interpolate = d3.interpolate({endAngle: startAngle}, d);
+
+                        return t => {
+                            return path(interpolate(t));
+                        };
+                    })
                     .attr('fill', (d, i) => color(d.data.value));
 
                 // listen to mouse enter, leave
@@ -123,11 +132,13 @@
 
                 // append arc label
                 arc.append('text')
-                    .attr('text-anchor', 'middle')
-                    .attr('opacity', '.5')
                     .attr('transform', (d, i) => `translate(${label.centroid(d)})`)
+                    .attr('text-anchor', 'middle')
+                    .attr('opacity', '0')
                     .transition()
-                    .delay((d,i) => 100 * i)
+                    .duration(animationDuration)
+                    .delay((d,i) => 50 * i)
+                    .attr('opacity', '1')
                     .text(arcLabel)
                     .attr('font-size', arcLabelFontSize);
 
@@ -185,7 +196,7 @@
         font-family: sans-serif;
     }
 
-    .label {
+    .label.label--x {
         font-family: sans-serif;
         font-weight: 600;
     }
