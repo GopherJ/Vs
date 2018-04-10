@@ -36,7 +36,8 @@
                         arcTitle = d => d.data.value,
                         arcLabel = d => d.data.key,
                         axisXLabelHeight = 30,
-                        axisXLabel = 'Key'
+                        axisXLabel = 'Key',
+                        arcLabelFontSize = 14
                     } = this.options,
 
                     g_w = w - left - right,
@@ -57,7 +58,7 @@
                     .attr('transform', `translate(${left},${top})`);
 
                 // lane to hold label text
-                const lane = svg
+                const axisLabelLane = svg
                     .append('g')
                     .attr('transform', `translate(${left}, ${top + g_h})`)
                     .attr('width', g_w)
@@ -127,10 +128,11 @@
                     .attr('transform', (d, i) => `translate(${label.centroid(d)})`)
                     .transition()
                     .delay((d,i) => 100 * i)
-                    .text(arcLabel);
+                    .text(arcLabel)
+                    .attr('font-size', arcLabelFontSize);
 
                 // append label to the lane
-                lane.append('text')
+                axisLabelLane.append('text')
                     .attr('class', 'label label--x')
                     .attr('text-anchor', 'middle')
                     .attr('x', g_w/2)

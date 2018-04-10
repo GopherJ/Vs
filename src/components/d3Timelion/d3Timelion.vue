@@ -10,7 +10,6 @@
     import getAxisXTicks from '../../util/getAxisXTicks';
     import getIntervalFromData from '../../util/getIntervalFromData';
     import mixins from '../../mixins';
-    import { mapState } from 'vuex';
 
     // install d3-tip
     Object.assign(d3, {
@@ -205,13 +204,7 @@
             onResize() {
                 this.safeDraw();
             }
-        },
-        computed: {
-            ...mapState('TimeRange', [
-                'dateTimeStart',
-                'dateTimeEnd'
-            ])
-        },
+        }
     }
 </script>
 
