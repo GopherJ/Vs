@@ -2,7 +2,7 @@
   "name": "Vs",
   "version": "0.0.1",
   "description": "d3 visualisation with vuejs",
-  "main": "dist/vs.min.js",
+  "main": "dist/Vs.min.js",
   "scripts": {
     "build": "cd scripts && build.sh",
     "lint": "./node_modules/.bin/eslint --ext .js,.vue src --fix"
