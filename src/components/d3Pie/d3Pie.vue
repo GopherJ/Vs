@@ -138,7 +138,7 @@
                     .transition()
                     .duration(animationDuration)
                     .delay((d,i) => 50 * i)
-                    .attr('opacity', '1')
+                    .attr('opacity', '0.75')
                     .text(arcLabel)
                     .attr('font-size', arcLabelFontSize);
 
