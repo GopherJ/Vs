@@ -151,6 +151,27 @@ Vue.use(Vs);
     <d3-line :data="data"></d3-line>
     <d3-bar :data="data" :options="{isVertical: true}"></d3-bar>
     <d3-sankey-circular :nodes="nodes" :links="links"></d3-sankey-circular>
+
+    <d3-progress-arc :data="[{
+        angle: Math.PI * 2,
+        text: 'key1',
+        }, {
+        angle: Math.PI * 2 * 23/24,
+        text: 'key2',
+        }, {
+        angle: Math.PI * 2 * 23/24 * 23/24,
+        text: 'key3'
+        }, {
+          angle: Math.PI * 2 * 23/24 * 23/24 * 23/24,
+          text: 'key4'
+        }, {
+          angle: Math.PI * 2 * 23/24 * 23/24 * 23/24 * 23/24,
+          text: 'key5'
+        }, {
+
+          angle: Math.PI * 2 * 23/24 * 23/24 * 23/24 * 23/24 * 23/24,
+          text: 'key6'
+        }].reverse()"></d3-progress-arc>
   </div>
 </template>
 
