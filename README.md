@@ -136,10 +136,10 @@ Vue.use(Vs);
       axisXLabel : 'Key',
       axisYLabel : 'Value',
       barTitle : d => d.value
-}" :margin="{
+}" width="100%" height="400px" :margin="{
     left: 0,
     top: 20,
-    right: 0,
+    right: 20,
     bottom: 0
 }" @time-range-change="(dateTimeStart, dateTimeEnd) => yourMethod(dateTimeStart, dateTimeEnd)"></d3-timelion>
 ```
