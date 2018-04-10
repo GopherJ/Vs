@@ -10,6 +10,7 @@
     import getAxisXTicks from '../../util/getAxisXTicks';
     import getIntervalFromData from '../../util/getIntervalFromData';
     import mixins from '../../mixins';
+    import moment from 'moment';
 
     // install d3-tip
     Object.assign(d3, {

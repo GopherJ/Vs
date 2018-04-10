@@ -15,6 +15,7 @@ npm i -S GopherJ/Vs
 - `d3Line`
 - `d3Pie`
 - `d3Timelion`
+- `d3ProgressArc`
 
 
 ## Usage
@@ -28,7 +29,8 @@ Vue.use(Vs);
 
 `template`
 ```vue
-// I write options, margin and just to show the value by default, If you dont need to change it, just omit!
+// I write options, margin, height and width just to show the value by default
+// If you don't need to change it, just omit it simply add data
 
 // pie or dongnut
 <d3-pie :data="data" :options="{
@@ -38,7 +40,9 @@ Vue.use(Vs);
     arcTitle: d => d.data.value,
     arcLabel: d => d.data.key,
     axisXLaneHeight: 30,
-    axisXLabel: 'Key'
+    axisXLabel: 'Key',
+    arcLabelFontSize: 10,
+    animationDuration: 1000
 }" width="100%" height="400px" :margin="{
     left: 0,
     top: 0,
@@ -132,10 +136,10 @@ Vue.use(Vs);
       axisXLabel : 'Key',
       axisYLabel : 'Value',
       barTitle : d => d.value
-}" :margin="{
+}" width="100%" height="400px" :margin="{
     left: 0,
     top: 20,
-    right: 0,
+    right: 20,
     bottom: 0
 }" @time-range-change="(dateTimeStart, dateTimeEnd) => yourMethod(dateTimeStart, dateTimeEnd)"></d3-timelion>
 ```

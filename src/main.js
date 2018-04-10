@@ -7,7 +7,7 @@ import d3Line from './components/d3Line';
 import d3Bar from './components/d3Bar';
 import d3ProgressArc from './components/d3ProgressArc';
 // import Buefy from 'buefy';
-// import 'buefy/lib/buefy.min.css';
+import 'buefy/lib/buefy.min.css';
 
 const install = (Vue, options = {}) => {
     if (options.store) {
