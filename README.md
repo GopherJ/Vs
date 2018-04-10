@@ -219,7 +219,7 @@ export default {
 
 ![](./images/d3-bar-horizontal.PNG)
 
-![](./images/d3-pie.PNG)
+<img src="./images/d3-pie.PNG" width="1000px" height="400px">
 
 ![](./images/d3-line.PNG)
 
