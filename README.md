@@ -122,16 +122,22 @@ Vue.use(Vs);
 
 // timelion, need to use with other wrapper
 <d3-timelion :data="data" :options="{
-    fill: 'rgb(110, 173, 193)',
-    stroke: 'rgb(110, 173, 193)',
-    fontSize: 14,
-    labelY: 'count'
+      fill : 'rgb(110, 173, 193)',
+      stroke : 'rgb(110, 173, 193)',
+      fontSize : 14,
+      axisXHeight : 25,
+      axisYWidth : 35,
+      axisXLabelHeight : 60,
+      axisYLabelWidth : 60,
+      axisXLabel : 'Key',
+      axisYLabel : 'Value',
+      barTitle : d => d.value
 }" :margin="{
-    left: 30,
-    top: 30,
-    right: 30,
-    bottom: 30
-}"></d3-timelion>
+    left: 0,
+    top: 20,
+    right: 0,
+    bottom: 0
+}" @time-range-change="(dateTimeStart, dateTimeEnd) => yourMethod(dateTimeStart, dateTimeEnd)"></d3-timelion>
 ```
 
 
