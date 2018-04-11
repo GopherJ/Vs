@@ -183,24 +183,30 @@ export default {
         }
     },
     mounted() {
-        // initialisation
+        // need safeDraw exists
+        // need data exists
         if (!this.safeDraw || this.data.length === 0) {
             return;
         }
 
 
+        // container must have width and height
         if (this.getElWidthHeight().some(el => !el)) {
             return;
         }
 
 
+        // debounce to avoid continue resize
         this._handleResize = _.debounce((e) => {
+            // if onResize exists then use it
             if (this.onResize) {
                 this.onResize();
             }
         }, 500);
 
 
+        // check if svg exists in current component
+        // if exists then remove it and draw the graph
         this.safeDraw();
 
         window.addEventListener('resize', this._handleResize);

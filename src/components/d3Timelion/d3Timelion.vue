@@ -12,6 +12,8 @@
     import mixins from '../../mixins';
     import _ from 'lodash';
     import moment from 'moment';
+    import interval from './interval';
+    import Vue from 'vue';
 
     // install d3-tip
     Object.assign(d3, {
@@ -128,10 +130,7 @@
                 // brushed callback
                 const brushed = () => {
                     if (d3.event.selection) {
-                        let [x1, x2] = d3.event.selection;
-                        x1 = x1 - left - axisYWidth - axisYLabelWidth;
-                        x2 = x2 - axisYWidth - axisYLabelWidth;
-                        const [dateTimeStart, dateTimeEnd] = [x1, x2].map(el => timeScale.invert(el));
+                        const [dateTimeStart, dateTimeEnd] = Array.prototype.map.call(d3.event.selection, el => timeScale.invert(el - left - axisYWidth - axisYLabelWidth));
                         this.$emit('time-range-change', dateTimeStart, dateTimeEnd);
                     }
                 };
@@ -139,10 +138,7 @@
                 // brush callback
                 const brushing = () => {
                     if (d3.event.selection) {
-                        let [x1, x2] = d3.event.selection;
-                        x1 = x1 - left - axisYWidth - axisYLabelWidth;
-                        x2 = x2 - axisYWidth - axisYLabelWidth;
-                        const [dateTimeStart, dateTimeEnd] = [x1, x2].map(el => timeScale.invert(el));
+                        const [dateTimeStart, dateTimeEnd] = Array.prototype.map.call(d3.event.selection, el => timeScale.invert(el - left - axisYWidth - axisYLabelWidth));
                         this.updateTimeRangeLabel(dateTimeStart, dateTimeEnd);
                     }
                 };
@@ -237,12 +233,15 @@
                     .attr('font-weight', 600);
 
 
-                // create time range label
-                svg.append('g')
+                // create time range label lane
+                const timeRangeLabelLane = svg.append('g')
                     .attr('transform', `translate(${left + axisYLabelWidth + axisYWidth}, ${top})`)
                     .attr('width', g_w)
                     .attr('height', timeRangeLabelHeight)
-                    .append('text')
+
+
+                // create time range label
+                const timeRangeLabel = timeRangeLabelLane.append('text')
                     .attr('class', 'label label--time')
                     .attr('x', g_w/2)
                     .attr('y', timeRangeLabelHeight/2)
@@ -252,6 +251,17 @@
                     .attr('text-anchor', 'middle')
                     .text(() => this.getTimeRangeLabel(dateTimeStart, dateTimeEnd));
 
+                // timeRangeLabel pos
+                const timeRangeLabelPos = timeRangeLabel.node().getBBox();
+
+
+                // draw interval select
+                timeRangeLabelLane.append('foreignObject')
+                    .attr('transform', `translate(${timeRangeLabelPos.x + timeRangeLabelPos.width}, ${timeRangeLabelPos.y})`)
+                    .attr('width', '200px')
+                    .attr('height', '400px')
+                    .append('xhtml:div')
+                    .attr('id', 'interval');
 
                 // draw reference line to represent now
                 let now = new Date();
@@ -278,6 +288,15 @@
             onResize() {
                 this.safeDraw();
             }
+        },
+        components: {
+            interval
+        },
+        mounted() {
+            new Vue({
+                el: '#interval',
+                components: {interval}
+            })
         }
     }
 </script>

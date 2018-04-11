@@ -1,3 +1,8 @@
+/**
+ * constants for time interval
+ *
+ * @type {number}
+ */
 const ms = 1,
       s = 1000 * ms,
       m = 60 * s,
@@ -15,7 +20,7 @@ const ms = 1,
  */
 const getIntervalFromData = (data, mapFunction) => {
     if (!Array.isArray(data)) {
-        throw new Error('data must be an array');
+        throw new Error('Invalid data');
     }
 
     if (data.length <= 1) {
