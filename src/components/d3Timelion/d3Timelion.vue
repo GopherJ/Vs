@@ -49,8 +49,7 @@
                           axisXLabel = 'Key',
                           axisYLabel = 'Value',
                           timeRangeLabelHeight = 30,
-                          barTitle = d => d.value,
-                          animationDuration = 2000
+                          barTitle = d => d.value
                       } = this.options,
                       ticksY = this.selectTicksNumY(h),
                       [paddingInner, paddingOuter] = this.selectPaddingInnerOuterX(w),

@@ -184,7 +184,7 @@ export default {
     },
     mounted() {
         // initialisation
-        if (!this.safeDraw || !this.data.length === 0) {
+        if (!this.safeDraw || this.data.length === 0) {
             return;
         }
 
