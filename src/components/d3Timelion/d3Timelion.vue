@@ -23,8 +23,10 @@
         mixins: [mixins],
         methods: {
             updateTimeRangeLabel(dateTimeStart, dateTimeEnd) {
-                if (!d3.select(this.$el).select('.time-range-label').empty())  {
-                    d3.select(this.$el).select('.time-range-label').text(() => this.timeRangeLabel(dateTimeStart, dateTimeEnd));
+                if (!d3.select(this.$el).select('.label.label--time').empty())  {
+                    d3.select(this.$el)
+                        .select('.label.label--time')
+                        .text(() => this.getTimeRangeLabel(dateTimeStart, dateTimeEnd));
                 }
             },
             drawTimelion() {
@@ -76,15 +78,19 @@
 
                 // ticks in axis--x
                 x.domain(data.map(d => d.key));
+
                 // output of rangeRound need to be minus by g_h because we have inverse axis y so that human readable
-                y.domain(d3.extent(data, d => d.value)).nice();
+                // forget the situation that we have minus data
+                y.domain([0, d3.max(data, d => d.value)]).nice();
 
                 // calculate dateTimeStart, dateTimeEnd
                 const [dateTimeStart, dateTimeEnd] = d3.extent(data.map(el => new Date(el.key)));
+
                 // create time scale
                 const timeScale = d3.scaleTime()
                     // add time range
                     .domain([dateTimeStart, dateTimeEnd])
+
                     // map to graph
                     .range([0, g_w]);
 
@@ -120,7 +126,7 @@
                 };
 
                 // brush callback
-                const brush = () => {
+                const brushing = () => {
                     if (d3.event.selection) {
                         const [dateTimeStart, dateTimeEnd] = Array.prototype.map.call(d3.event.selection, el => timeScale.invert(el));
                         this.updateTimeRangeLabel(dateTimeStart, dateTimeEnd);
@@ -132,7 +138,7 @@
                     .attr('class', 'brush');
                 const brushX = d3.brushX()
                     .extent([[left + axisYLabelWidth + axisYWidth, top + timeRangeLabelHeight], [w - right, g_h + top + timeRangeLabelHeight]])
-                    .on('brush', brush)
+                    .on('brush', brushing)
                     .on('end', brushed);
 
                 // tooltip
@@ -146,6 +152,7 @@
                     .enter()
                     .append('rect')
                     .attr('class', 'bar')
+
                     // transform d.key to distance
                     .attr('x', d => x(d.key))
                     .attr('y', d => y(d.value))
@@ -172,7 +179,7 @@
                     });
 
                 // listen to user click
-                g.on('mousedown', function(d, i) {
+                svg.on('mousedown', function(d, i) {
                         b.call(brushX);
                     });
 
@@ -208,20 +215,22 @@
                     .text(axisYLabel)
                     .attr('font-weight', 600);
 
+
                 // create time range label
                 svg.append('g')
                     .attr('transform', `translate(${left + axisYLabelWidth + axisYWidth}, ${top})`)
                     .attr('width', g_w)
                     .attr('height', timeRangeLabelHeight)
                     .append('text')
-                    .attr('class', 'time-range-label')
+                    .attr('class', 'label label--time')
                     .attr('x', g_w/2)
                     .attr('y', timeRangeLabelHeight/2)
                     .attr('fill', '#000')
                     .attr('font-weight', 600)
                     .attr('opacity', '0.5')
                     .attr('text-anchor', 'middle')
-                    .text(() => this.timeRangeLabel(dateTimeStart, dateTimeEnd));
+                    .text(() => this.getTimeRangeLabel(dateTimeStart, dateTimeEnd));
+
 
                 // draw reference line to represent now
                 let now = new Date();
@@ -236,7 +245,7 @@
                         .attr('y2', g_h);
                 }
             },
-            timeRangeLabel(dateTimeStart, dateTimeEnd) {
+            getTimeRangeLabel(dateTimeStart, dateTimeEnd) {
                 const FORMAT = 'YYYY-MM-DD HH:mm:ss';
 
                 return `From ${moment(dateTimeStart).format(FORMAT)} To ${moment(dateTimeEnd).format(FORMAT)}`;
