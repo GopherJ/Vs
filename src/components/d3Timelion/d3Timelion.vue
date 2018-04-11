@@ -51,13 +51,15 @@
                           axisXLabel = 'Key',
                           axisYLabel = 'Value',
                           timeRangeLabelHeight = 30,
+                          animationDuration = 500,
                           barTitle = d => d.value
                       } = this.options,
                       ticksY = this.selectTicksNumY(h),
                       [paddingInner, paddingOuter] = this.selectPaddingInnerOuterX(w),
                       g_w = w - left - right - axisYLabelWidth - axisYWidth,
                       g_h = h - top - bottom - axisXHeight - axisXLabelHeight - timeRangeLabelHeight,
-                      tickSizeInner = 4,
+                      tickSizeInner = 2,
+                      tickSizeOuter = 16,
                       interval = getIntervalFromData(data, (el) => el.key);
 
                 // create svg
@@ -101,10 +103,16 @@
                     .attr('height', axisXHeight)
                     .append('g')
                     .attr('class', 'axis axis--x')
+                    // .call(d3.axisBottom(timeScale))
                     .call(d3.axisBottom(timeScale)
-                            .tickValues(getAxisXTicks(fontSize, g_w, interval, tickSizeInner).map(el => timeScale.invert(el)))
+                            .tickValues(getAxisXTicks(fontSize, g_w, interval, tickSizeInner, tickSizeOuter).map(el => timeScale.invert(el)))
                             .tickFormat(el => formatTime(el, interval)))
                     .attr('font-size', fontSize);
+
+                // set middle point as center
+                d3.select('.axis.axis--x')
+                    .selectAll('.tick')
+                    .attr('text-anchor', 'middle');
 
                 // axis--y
                 svg.append('g')
@@ -120,7 +128,10 @@
                 // brushed callback
                 const brushed = () => {
                     if (d3.event.selection) {
-                        const [dateTimeStart, dateTimeEnd] = Array.prototype.map.call(d3.event.selection, el => timeScale.invert(el));
+                        let [x1, x2] = d3.event.selection;
+                        x1 = x1 - left - axisYWidth - axisYLabelWidth;
+                        x2 = x2 - axisYWidth - axisYLabelWidth;
+                        const [dateTimeStart, dateTimeEnd] = [x1, x2].map(el => timeScale.invert(el));
                         this.$emit('time-range-change', dateTimeStart, dateTimeEnd);
                     }
                 };
@@ -128,7 +139,10 @@
                 // brush callback
                 const brushing = () => {
                     if (d3.event.selection) {
-                        const [dateTimeStart, dateTimeEnd] = Array.prototype.map.call(d3.event.selection, el => timeScale.invert(el));
+                        let [x1, x2] = d3.event.selection;
+                        x1 = x1 - left - axisYWidth - axisYLabelWidth;
+                        x2 = x2 - axisYWidth - axisYLabelWidth;
+                        const [dateTimeStart, dateTimeEnd] = [x1, x2].map(el => timeScale.invert(el));
                         this.updateTimeRangeLabel(dateTimeStart, dateTimeEnd);
                     }
                 };
@@ -156,13 +170,7 @@
                     // transform d.key to distance
                     .attr('x', d => x(d.key))
                     .attr('y', d => y(d.value))
-                    // .transition()
-                    // .duration(animationDuration)
-                    // .attrTween('y', d => {
-                    //     const interpolate = d3.interpolate({value: g_h}, d);
-                    //
-                    //     return t => y(interpolate(t));
-                    // })
+
                     // calculate by scaleBand
                     .attr('width', x.bandwidth())
                     .attr('height', d => g_h - y(d.value))
@@ -177,6 +185,19 @@
                         tip.hide();
                         d3.selectAll('.d3-tip').remove();
                     });
+
+                // when cursor is out of rect.bar, then set the cursor to crosshair
+                svg.on('mousemove', function(d, i){
+                    const [cx, cy] = d3.mouse(g.node());
+
+                    if ( cx >= 0 && cx <= g_w && cy >=0 && cy <= g_h && d3.event.target.nodeName === 'svg') {
+                        svg.attr('cursor', 'crosshair');
+                    }
+
+                    else {
+                        svg.attr('cursor', 'auto');
+                    }
+                });
 
                 // listen to user click
                 svg.on('mousedown', function(d, i) {
