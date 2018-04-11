@@ -24,7 +24,7 @@ const getIntervalFromData = (data, mapFunction) => {
     }
 
     if (data.length <= 1) {
-        return 'h';
+        return 'Hour';
     }
 
     let dataSorted = data.map(mapFunction).sort((a, b) => {
@@ -44,34 +44,34 @@ const getIntervalFromData = (data, mapFunction) => {
 
 
     if (interval >= ms && interval < s) {
-        return 'ms';
+        return 'Millisecond';
     }
 
     if (interval >= s && interval < m) {
-        return 's';
+        return 'Second';
     }
 
     if (interval >= m && interval < h) {
-        return 'm';
+        return 'Minute';
     }
 
     if (interval >= h && interval < d) {
-        return 'h';
+        return 'Hour';
     }
 
     if (interval >= d && interval < w) {
-        return 'd';
+        return 'Day';
     }
 
     if (interval >= w && interval < M) {
-        return 'w';
+        return 'Week';
     }
 
     if (interval >= M && interval < y) {
-        return 'M';
+        return 'Month';
     }
 
-    return 'y';
+    return 'Year';
 };
 
 export default getIntervalFromData;

@@ -5,14 +5,14 @@
  * @type {{ms: number, s: number, m: number, h: number, w: number, d: number, M: number, y: number}}
  */
 const Maps = {
-    'ms': 8,
-    's': 6,
-    'm': 4,
-    'h': 9,
-    'd': 6,
-    'w': 6,
-    'M': 6,
-    'y': 4
+    'Millisecond': 8,
+    'Second': 6,
+    'Minute': 4,
+    'Hour': 9,
+    'Day': 6,
+    'Week': 6,
+    'Month': 6,
+    'Year': 4
 };
 
 /**

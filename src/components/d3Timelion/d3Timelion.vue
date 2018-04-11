@@ -1,33 +1,72 @@
 <template>
-    <div :style="{ 'width' : width, 'height' : height }"></div>
+    <div :style="{ 'width' : width, 'height' : height }" class="d3-time-lion"></div>
 </template>
 
 <script>
 /* eslint-disable */
     import * as d3 from 'd3';
-    import d3Tip from 'd3-tip';
+    import * as tip from 'd3-tip';
     import formatTime from '../../util/formatTime';
     import getAxisXTicks from '../../util/getAxisXTicks';
     import getIntervalFromData from '../../util/getIntervalFromData';
     import mixins from '../../mixins';
     import _ from 'lodash';
     import moment from 'moment';
-    import interval from './interval';
-    import Vue from 'vue';
 
-    // install d3-tip
-    Object.assign(d3, {
-        tip: d3Tip
+    const INTERVAL = Object.freeze({
+        Millisecond : 1,
+        Second : 1000 * 1,
+        Minute: 60 * 1000,
+        Hour : 60 * 60 * 1000,
+        Day : 24 * 60 * 60 * 1000,
+        Week : 7 * 24 * 60 * 60 * 1000,
+        Month : 30 * 24 * 60 * 60 * 1000,
+        Year : 365 * 24 * 60 * 60 * 1000
     });
 
     export default {
         name: 'd3-timelion',
         mixins: [mixins],
         methods: {
+            selectInterval(dateTimeStart, dateTimeEnd) {
+                const n = dateTimeEnd - dateTimeStart;
+
+                if (n >= INTERVAL.Millisecond && n <= INTERVAL.Second) {
+                    return INTERVAL.Millisecond;
+                }
+
+                if (n > INTERVAL.Second && n <= INTERVAL.Minute) {
+                    return INTERVAL.Second;
+                }
+
+                if (n > INTERVAL.Minute && n <= INTERVAL.Hour) {
+                    return INTERVAL.Minute;
+                }
+
+                if (n > INTERVAL.Hour && n <= INTERVAL.Day) {
+                    return INTERVAL.Hour;
+                }
+
+                if (n > INTERVAL.Day && n <= INTERVAL.Week) {
+                    return INTERVAL.Day;
+                }
+
+                if (n > INTERVAL.Week && n <= INTERVAL.Month) {
+                    return INTERVAL.Week;
+                }
+
+                if (n > INTERVAL.Month && n < INTERVAL.Year) {
+                    return INTERVAL.Month;
+                }
+
+                if (n >= INTERVAL.Year) {
+                    return INTERVAL.Year;
+                }
+            },
             updateTimeRangeLabel(dateTimeStart, dateTimeEnd) {
-                if (!d3.select(this.$el).select('.label.label--time').empty())  {
+                if (!d3.select(this.$el).select('.label--time').empty())  {
                     d3.select(this.$el)
-                        .select('.label.label--time')
+                        .select('.label--time')
                         .text(() => this.getTimeRangeLabel(dateTimeStart, dateTimeEnd));
                 }
             },
@@ -43,17 +82,31 @@
                 // constants
                 const {left = 0, top = 0, right = 20, bottom = 0} = this.margin,
                       {
-                          fill = 'rgb(110, 173, 193)',
-                          stroke = 'rgb(110, 173, 193)',
-                          fontSize = 14,
+                          // bar config
+                          fill = '#6eadc1',
+                          stroke = '#6eadc1',
+                          fillOpacity = 0.6,
+                          strokeOpacity = 1,
+
+                          // axis config
                           axisXHeight = 25,
                           axisYWidth = 35,
-                          axisXLabelHeight = 60,
-                          axisYLabelWidth = 60,
+
+                          // axis label config
                           axisXLabel = 'Key',
                           axisYLabel = 'Value',
+                          axisFontSize = 10,
+                          axisLabelOpacity = 0.5,
+                          axisLabelFontWeight = 600,
+                          axisXLabelHeight = 60,
+                          axisYLabelWidth = 60,
+
+                          // time label config
                           timeRangeLabelHeight = 30,
-                          animationDuration = 500,
+                          timeRangeLabelOpacity = 0.5,
+                          timeRangeLabelFontWeight = 400,
+
+                          // tooltip config
                           barTitle = d => d.value
                       } = this.options,
                       ticksY = this.selectTicksNumY(h),
@@ -69,6 +122,14 @@
                     .append('svg')
                     .attr('width', `${w}`)
                     .attr('height', `${h}`);
+
+                // clipPath
+                svg.append('clipPath')
+                    .attr('id', 'clip-lion')
+                    .attr('transform', `translate(${left + axisXLabelHeight + axisYWidth}, ${top})`)
+                    .append('rect')
+                    .attr('width', g_w)
+                    .attr('height', g_h + timeRangeLabelHeight);
 
                 // create g which will contain our graph
                 const g = svg.append('g')
@@ -107,9 +168,9 @@
                     .attr('class', 'axis axis--x')
                     // .call(d3.axisBottom(timeScale))
                     .call(d3.axisBottom(timeScale)
-                            .tickValues(getAxisXTicks(fontSize, g_w, interval, tickSizeInner, tickSizeOuter).map(el => timeScale.invert(el)))
+                            .tickValues(getAxisXTicks(axisFontSize, g_w, interval, tickSizeInner, tickSizeOuter).map(el => timeScale.invert(el)))
                             .tickFormat(el => formatTime(el, interval)))
-                    .attr('font-size', fontSize);
+                    .attr('font-size', axisFontSize);
 
                 // set middle point as center
                 d3.select('.axis.axis--x')
@@ -125,13 +186,13 @@
                     .attr('class', 'axis axis--y')
                     .attr('transform', `translate(${axisYWidth}, 0)`)
                     .call(d3.axisLeft(y).ticks(ticksY))
-                    .attr('font-size', fontSize);
+                    .attr('font-size', axisFontSize);
 
                 // brushed callback
                 const brushed = () => {
                     if (d3.event.selection) {
                         const [dateTimeStart, dateTimeEnd] = Array.prototype.map.call(d3.event.selection, el => timeScale.invert(el - left - axisYWidth - axisYLabelWidth));
-                        this.$emit('time-range-change', dateTimeStart, dateTimeEnd);
+                        this.$emit('range-updated', dateTimeStart, dateTimeEnd, d3.select('#interval').node().value);
                     }
                 };
 
@@ -171,7 +232,9 @@
                     .attr('width', x.bandwidth())
                     .attr('height', d => g_h - y(d.value))
                     .attr('fill', fill)
+                    .attr('fill-opacity', fillOpacity)
                     .attr('stroke', stroke)
+                    .attr('stroke-opacity', strokeOpacity)
                     .on('mouseover', function(d, i) {
                         g.call(tip);
                         tip.html(barTitle(d));
@@ -220,7 +283,8 @@
                     .attr('text-anchor', 'middle')
                     .attr('fill', '#000')
                     .text(axisXLabel)
-                    .attr('font-weight', 600);
+                    .attr('opacity', axisLabelOpacity)
+                    .attr('font-weight', axisLabelFontWeight);
 
                 // create the label of axis y
                 axisYLabelLane
@@ -230,24 +294,25 @@
                     .attr('y', axisYLabelWidth/2)
                     .attr('x', -g_h/2)
                     .text(axisYLabel)
-                    .attr('font-weight', 600);
+                    .attr('opacity', axisLabelOpacity)
+                    .attr('font-weight', axisLabelFontWeight);
 
 
                 // create time range label lane
                 const timeRangeLabelLane = svg.append('g')
                     .attr('transform', `translate(${left + axisYLabelWidth + axisYWidth}, ${top})`)
                     .attr('width', g_w)
-                    .attr('height', timeRangeLabelHeight)
+                    .attr('height', timeRangeLabelHeight);
 
 
                 // create time range label
                 const timeRangeLabel = timeRangeLabelLane.append('text')
-                    .attr('class', 'label label--time')
+                    .attr('class', 'label--time')
                     .attr('x', g_w/2)
                     .attr('y', timeRangeLabelHeight/2)
                     .attr('fill', '#000')
-                    .attr('font-weight', 600)
-                    .attr('opacity', '0.5')
+                    .attr('font-weight', timeRangeLabelFontWeight)
+                    .attr('opacity', timeRangeLabelOpacity)
                     .attr('text-anchor', 'middle')
                     .text(() => this.getTimeRangeLabel(dateTimeStart, dateTimeEnd));
 
@@ -260,8 +325,24 @@
                     .attr('transform', `translate(${timeRangeLabelPos.x + timeRangeLabelPos.width}, ${timeRangeLabelPos.y})`)
                     .attr('width', '200px')
                     .attr('height', '400px')
-                    .append('xhtml:div')
-                    .attr('id', 'interval');
+                    .append('xhtml:select')
+                    .attr('id', 'interval')
+                    .on('change', () => {
+                        this.$emit('interval-updated', Number.parseInt(d3.event.target.value, 10)||"Auto");
+                    })
+                    .html(`
+                        <option value="Auto">Auto</option>
+                        <option value="${INTERVAL.Millisecond}">Millisecond</option>
+                        <option value="${INTERVAL.Second}">Second</option>
+                        <option value="${INTERVAL.Minute}">Minute</option>
+                        <option value="${INTERVAL.Hour}">Hourly</option>
+                        <option value="${INTERVAL.Day}">Daily</option>
+                        <option value="${INTERVAL.Week}">Weekly</option>
+                        <option value="${INTERVAL.Month}">Monthly</option>
+                        <option value="${INTERVAL.Year}">Yearly</option>`)
+                    .property('value', INTERVAL[interval]||"Auto");
+
+
 
                 // draw reference line to represent now
                 let now = new Date();
@@ -277,9 +358,9 @@
                 }
             },
             getTimeRangeLabel(dateTimeStart, dateTimeEnd) {
-                const FORMAT = 'YYYY-MM-DD HH:mm:ss';
+                const FORMAT = 'YYYY-MM-DD HH:mm:ss.SSS';
 
-                return `From ${moment(dateTimeStart).format(FORMAT)} To ${moment(dateTimeEnd).format(FORMAT)}`;
+                return `From ${moment(dateTimeStart).format(FORMAT)} To ${moment(dateTimeEnd).format(FORMAT)}-`;
             },
             safeDraw() {
                 this.ifExistsSvgThenRemove();
@@ -288,23 +369,14 @@
             onResize() {
                 this.safeDraw();
             }
-        },
-        components: {
-            interval
-        },
-        mounted() {
-            new Vue({
-                el: '#interval',
-                components: {interval}
-            })
         }
     }
 </script>
 
 <style>
     .axis {
-        font-family: sans-serif;
-        opacity: .75;
+        font-family: BlinkMacSystemFont,-apple-system,Segoe UI,Roboto,Oxygen,Ubuntu,Cantarell,Fira Sans,Droid Sans,Helvetica Neue,Helvetica,Arial,sans-serif;
+        opacity: 0.5;
         -webkit-user-select: none;
         -moz-user-select: none;
         -ms-user-select: none;
@@ -351,5 +423,9 @@
 
     .bar:hover {
         cursor: pointer;
+    }
+
+    .label--time {
+        font-family: BlinkMacSystemFont,-apple-system,Segoe UI,Roboto,Oxygen,Ubuntu,Cantarell,Fira Sans,Droid Sans,Helvetica Neue,Helvetica,Arial,sans-serif;
     }
 </style>

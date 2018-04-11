@@ -5,14 +5,14 @@ import * as d3 from 'd3';
  * @type {{ms: string, s: string, m: string, h: string, w: string, d: string, M: string, y: string}}
  */
 const INTERVAL = Object.freeze({
-    'ms' : "%H:%M:%S.%L", // 11
-    's' : "%H:%M:%S", // 8
-    'm' : "%H:%M", // 5
-    'h' : "%Y-%m-%d %H:%M", // 16
-    'w' : "%Y-%m-%d", // 10
-    'd' : "%Y-%m-%d", // 10
-    'M' : "%Y-%m-%d", // 10
-    'y' : "%Y" // 4
+    'Millisecond' : "%H:%M:%S.%L", // 11
+    'Second' : "%H:%M:%S", // 8
+    'Minute' : "%H:%M", // 5
+    'Hour' : "%Y-%m-%d %H:%M", // 16
+    'Week' : "%Y-%m-%d", // 10
+    'Day' : "%Y-%m-%d", // 10
+    'Month' : "%Y-%m-%d", // 10
+    'Year' : "%Y" // 4
 });
 
 /**
