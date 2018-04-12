@@ -13,6 +13,9 @@
     import _ from 'lodash';
     import moment from 'moment';
 
+    /**
+     * constants intervals
+     **/
     const INTERVAL = Object.freeze({
         Millisecond : 1,
         Second : 1000 * 1,
@@ -28,41 +31,6 @@
         name: 'd3-timelion',
         mixins: [mixins],
         methods: {
-            selectInterval(dateTimeStart, dateTimeEnd) {
-                const n = dateTimeEnd - dateTimeStart;
-
-                if (n >= INTERVAL.Millisecond && n <= INTERVAL.Second) {
-                    return INTERVAL.Millisecond;
-                }
-
-                if (n > INTERVAL.Second && n <= INTERVAL.Minute) {
-                    return INTERVAL.Second;
-                }
-
-                if (n > INTERVAL.Minute && n <= INTERVAL.Hour) {
-                    return INTERVAL.Minute;
-                }
-
-                if (n > INTERVAL.Hour && n <= INTERVAL.Day) {
-                    return INTERVAL.Hour;
-                }
-
-                if (n > INTERVAL.Day && n <= INTERVAL.Week) {
-                    return INTERVAL.Day;
-                }
-
-                if (n > INTERVAL.Week && n <= INTERVAL.Month) {
-                    return INTERVAL.Week;
-                }
-
-                if (n > INTERVAL.Month && n < INTERVAL.Year) {
-                    return INTERVAL.Month;
-                }
-
-                if (n >= INTERVAL.Year) {
-                    return INTERVAL.Year;
-                }
-            },
             updateTimeRangeLabel(dateTimeStart, dateTimeEnd) {
                 if (!d3.select(this.$el).select('.label--time').empty())  {
                     d3.select(this.$el)
@@ -77,7 +45,8 @@
                 const data = _.cloneDeep(this.data).sort((a, b) => a.key > b.key ? 1 : -1);
 
                 // get container width and height
-                const [w, h] = this.getElWidthHeight();
+                const [w, h] = this.getElWidthHeight(),
+                interval = getIntervalFromData(data, (el) => el.key);
 
                 // constants
                 const {left = 0, top = 0, right = 20, bottom = 0} = this.margin,
@@ -103,19 +72,19 @@
 
                           // time label config
                           timeRangeLabelHeight = 30,
+                          timeRangeLabelFontSize = 14,
                           timeRangeLabelOpacity = 0.5,
                           timeRangeLabelFontWeight = 400,
 
                           // tooltip config
-                          barTitle = d => d.value
+                          barTitle = d => `${new Date(d.key)} Per ${interval}<br>${d.value}`
                       } = this.options,
                       ticksY = this.selectTicksNumY(h),
                       [paddingInner, paddingOuter] = this.selectPaddingInnerOuterX(w),
                       g_w = w - left - right - axisYLabelWidth - axisYWidth,
                       g_h = h - top - bottom - axisXHeight - axisXLabelHeight - timeRangeLabelHeight,
                       tickSizeInner = 2,
-                      tickSizeOuter = 16,
-                      interval = getIntervalFromData(data, (el) => el.key);
+                      tickSizeOuter = 16;
 
                 // create svg
                 const svg = d3.select(this.$el)
@@ -249,6 +218,7 @@
                 svg.on('mousemove', function(d, i){
                     const [cx, cy] = d3.mouse(g.node());
 
+                    // check if cursor is in g and check if cursor is moving on svg
                     if ( cx >= 0 && cx <= g_w && cy >=0 && cy <= g_h && d3.event.target.nodeName === 'svg') {
                         svg.attr('cursor', 'crosshair');
                     }
@@ -260,8 +230,13 @@
 
                 // listen to user click
                 svg.on('mousedown', function(d, i) {
+                    const [cx, cy] = d3.mouse(g.node());
+
+                    // check if cursor is in g
+                    if ( cx >= 0 && cx <= g_w && cy >= 0 && cy <= g_h) {
                         b.call(brushX);
-                    });
+                    }
+                });
 
                 // create the lane to hold the label of axis y
                 const axisYLabelLane = svg.append('g')
@@ -311,9 +286,11 @@
                     .attr('x', g_w/2)
                     .attr('y', timeRangeLabelHeight/2)
                     .attr('fill', '#000')
+                    .attr('font-size', timeRangeLabelFontSize)
                     .attr('font-weight', timeRangeLabelFontWeight)
                     .attr('opacity', timeRangeLabelOpacity)
                     .attr('text-anchor', 'middle')
+                    .attr('clip-path', 'url(#clip-lion)')
                     .text(() => this.getTimeRangeLabel(dateTimeStart, dateTimeEnd));
 
                 // timeRangeLabel pos
@@ -323,23 +300,23 @@
                 // draw interval select
                 timeRangeLabelLane.append('foreignObject')
                     .attr('transform', `translate(${timeRangeLabelPos.x + timeRangeLabelPos.width}, ${timeRangeLabelPos.y})`)
-                    .attr('width', '200px')
-                    .attr('height', '400px')
+                    .attr('width', g_w - timeRangeLabelPos.x - timeRangeLabelPos.width)
+                    .attr('height', timeRangeLabelHeight)
                     .append('xhtml:select')
                     .attr('id', 'interval')
                     .on('change', () => {
                         this.$emit('interval-updated', Number.parseInt(d3.event.target.value, 10)||"Auto");
                     })
                     .html(`
-                        <option value="Auto">Auto</option>
-                        <option value="${INTERVAL.Millisecond}">Millisecond</option>
-                        <option value="${INTERVAL.Second}">Second</option>
-                        <option value="${INTERVAL.Minute}">Minute</option>
-                        <option value="${INTERVAL.Hour}">Hourly</option>
-                        <option value="${INTERVAL.Day}">Daily</option>
-                        <option value="${INTERVAL.Week}">Weekly</option>
-                        <option value="${INTERVAL.Month}">Monthly</option>
-                        <option value="${INTERVAL.Year}">Yearly</option>`)
+                            <option value="Auto">Auto</option>
+                            <option value="${INTERVAL.Millisecond}">Millisecond</option>
+                            <option value="${INTERVAL.Second}">Second</option>
+                            <option value="${INTERVAL.Minute}">Minute</option>
+                            <option value="${INTERVAL.Hour}">Hourly</option>
+                            <option value="${INTERVAL.Day}">Daily</option>
+                            <option value="${INTERVAL.Week}">Weekly</option>
+                            <option value="${INTERVAL.Month}">Monthly</option>
+                            <option value="${INTERVAL.Year}">Yearly</option>`)
                     .property('value', INTERVAL[interval]||"Auto");
 
 
