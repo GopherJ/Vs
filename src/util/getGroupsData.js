@@ -42,11 +42,11 @@ const classifyDataByGroup = (data) => {
        const { group, from, to, label, at, title } = data[i];
        if (results[group]) {
            // Interval
-           if (from && to && label) {
+           if ((from > 0) && (to > 0) && label) {
                results[group].push(new Interval(group, from, to, label));
            }
            // Point
-           else if (at && title) {
+           else if ((at > 0) && title) {
                results[group].push(new Point(group, at, title));
            }
        } else {
@@ -99,27 +99,74 @@ const existCollisonInArray = (arr, e) => {
 
 /**
  *
+ * @param data
+ * @returns {*}
+ */
+const sortDataByTimestamp = (data) => {
+    return data.sort((a,b) => {
+        if (a instanceof Point && b instanceof Interval) {
+            return a.at > b.from ? 1 : -1;
+        }
+
+        else if (a instanceof Interval && b instanceof Point) {
+            return a.from > b.at ? 1 : -1;
+        }
+
+        else if (a instanceof Interval && b instanceof Interval) {
+            return a.from > b.from ? 1 : -1;
+        }
+
+        else if (a instanceof Point && b instanceof Point) {
+            return a.at > b.at ? 1 : -1;
+        }
+    });
+};
+
+/**
+ *
  * data is the array of time line entries
  *
  * @param data
  */
 const chunkGroupData = (data) => {
-    const results = [[]];
+    const results = [
+        // to place the data of every lane
+        []
+    ];
+
+    // sort change the data
+    sortDataByTimestamp(data);
 
     for (let i = 0, l = data.length; i < l; i += 1) {
         const entry = data[i];
 
         for (let j = 0, L = results.length; j < L; j += 1) {
-            if (!existCollisonInArray(results[j], entry)) {
+            // no data in current lane
+            // add it directly
+            if (results[j].length === 0) {
+                results.push(entry);
+                break;
+            }
+
+            // last item in current lane
+            const lastItem = results[results.length - 1];
+
+            // doesn't collide
+            if (!isCollided(lastItem, entry)) {
                 results[j].push(entry);
                 break;
             }
 
-            if (j === L - 1) {
-                results.push([]);
+            // collide
+            else {
+                // no other lane, so create a need lane
+                if (j === results.length - 1) {
+                    results.push([entry]);
+                } else {
+                    continue;
+                }
             }
         }
-
     }
 
     return results;
