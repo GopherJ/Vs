@@ -8,6 +8,7 @@
     border-radius: 2px;
 }
 
+
 /* Creates a small triangle extender for the tooltip */
 .d3-tip:after {
     box-sizing: border-box;
@@ -21,9 +22,57 @@
     text-align: center;
 }
 
+
 /* Style northward tooltips differently */
 .d3-tip.n:after {
     margin: -1px 0 0 0;
     top: 100%;
     left: 0;
+}
+
+
+.extent {
+    fill-opacity: .125;
+    shape-rendering: crispEdges;
+}
+
+
+rect, .bar {
+    cursor: pointer;
+    shape-rendering: crispEdges;
+}
+
+
+text {
+    font-family: BlinkMacSystemFont,-apple-system,Segoe UI,Roboto,Oxygen,Ubuntu,Cantarell,Fira Sans,Droid Sans,Helvetica Neue,Helvetica,Arial,sans-serif;
+}
+
+
+.axis {
+    opacity: 0.5;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+
+.form-control {
+    height: 32px;
+    padding: 5px 15px;
+    background-color: #fff;
+    background-image: none;
+    border: 1px solid #ecf0f1;
+    border-top-width: 2px;
+    border-right-width: 2px;
+    border-bottom-width: 2px;
+    border-left-width: 2px;
+    border-radius: 4px;
+    box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+    transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+}
+
+
+.form-control:focus {
+    border: 2px solid #ccc;
 }
