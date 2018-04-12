@@ -126,32 +126,33 @@ Vue.use(Vs);
 
 // timelion, need to use with other wrapper
 <d3-timelion :data="data" :options="{
-      // bar config
-      fill : '#6eadc1',
-      stroke : '#6eadc1',
-      fillOpacity : 0.6,
-      strokeOpacity : 1,
+    // bar config
+    fill : '#6eadc1',
+    stroke : '#6eadc1',
+    fillOpacity : 0.6,
+    strokeOpacity : 1,
 
-      // axis config
-      axisXHeight : 25,
-      axisYWidth : 35,
+    // axis config
+    axisXHeight : 25,
+    axisYWidth : 35,
 
-      // axis label config
-      axisXLabel : 'Key',
-      axisYLabel : 'Value',
-      axisFontSize : 10,
-      axisLabelOpacity : 0.5,
-      axisLabelFontWeight : 600,
-      axisXLabelHeight : 60,
-      axisYLabelWidth : 60,
+    // axis label config
+    axisXLabel : 'Key',
+    axisYLabel : 'Value',
+    axisFontSize : 10,
+    axisLabelOpacity : 0.5,
+    axisLabelFontWeight : 600,
+    axisXLabelHeight : 60,
+    axisYLabelWidth : 60,
 
-      // time label config
-      timeRangeLabelHeight : 30,
-      timeRangeLabelOpacity : 0.5,
-      timeRangeLabelFontWeight : 400,
+    // time label config
+    timeRangeLabelHeight : 30,
+    timeRangeLabelFontSize : 14,
+    timeRangeLabelOpacity : 0.5,
+    timeRangeLabelFontWeight : 400,
 
-      // tooltip config
-      barTitle : d => d.value
+    // tooltip config
+    barTitle : d => `${new Date(d.key)} Per ${interval}<br>${d.value}`
 }" width="100%" height="400px" :margin="{
     left: 0,
     top: 0,

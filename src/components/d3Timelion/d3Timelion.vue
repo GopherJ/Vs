@@ -71,13 +71,13 @@
                           axisYLabelWidth = 60,
 
                           // time label config
-                          timeRangeLabelHeight = 30,
+                          timeRangeLabelHeight = 32,
                           timeRangeLabelFontSize = 14,
                           timeRangeLabelOpacity = 0.5,
                           timeRangeLabelFontWeight = 400,
 
                           // tooltip config
-                          barTitle = d => `${new Date(d.key)} Per ${interval}<br>${d.value}`
+                          barTitle = d => `${new Date(d.key)}<br>${d.value}`
                       } = this.options,
                       ticksY = this.selectTicksNumY(h),
                       [paddingInner, paddingOuter] = this.selectPaddingInnerOuterX(w),
@@ -285,6 +285,7 @@
                     .attr('class', 'label--time')
                     .attr('x', g_w/2)
                     .attr('y', timeRangeLabelHeight/2)
+                    .attr('dy', '0.35em')
                     .attr('fill', '#000')
                     .attr('font-size', timeRangeLabelFontSize)
                     .attr('font-weight', timeRangeLabelFontWeight)
@@ -299,10 +300,11 @@
 
                 // draw interval select
                 timeRangeLabelLane.append('foreignObject')
-                    .attr('transform', `translate(${timeRangeLabelPos.x + timeRangeLabelPos.width}, ${timeRangeLabelPos.y})`)
+                    .attr('transform', `translate(${timeRangeLabelPos.x + timeRangeLabelPos.width}, ${top})`)
                     .attr('width', g_w - timeRangeLabelPos.x - timeRangeLabelPos.width)
                     .attr('height', timeRangeLabelHeight)
                     .append('xhtml:select')
+                    .attr('class', 'form-control')
                     .attr('id', 'interval')
                     .on('change', () => {
                         this.$emit('interval-updated', Number.parseInt(d3.event.target.value, 10)||"Auto");
@@ -319,19 +321,29 @@
                             <option value="${INTERVAL.Year}">Yearly</option>`)
                     .property('value', INTERVAL[interval]||"Auto");
 
-
+                // TODO: make timeRangeLabelLane at the middle
 
                 // draw reference line to represent now
                 let now = new Date();
                 if (dateTimeEnd >= now) {
+                    // draw reference
                     g.append('line')
-                        .attr('stroke', 'red')
+                        .attr('stroke', '#c80000')
                         .attr('opacity', .3)
                         .attr('stroke-width', 2)
                         .attr('x1', timeScale(now))
                         .attr('y1', 0)
                         .attr('x2', timeScale(now))
                         .attr('y2', g_h);
+
+                    // draw rect
+                    g.append('rect')
+                        .attr('transform', `translate(${timeScale(now)},0)`)
+                        .attr('width', g_w - timeScale(now))
+                        .attr('height', g_h)
+                        .attr('fill', '#000')
+                        .attr('fill-opacity', .05)
+                        .attr('pointer-events', 'none');
                 }
             },
             getTimeRangeLabel(dateTimeStart, dateTimeEnd) {
@@ -351,58 +363,5 @@
 </script>
 
 <style>
-    .axis {
-        font-family: BlinkMacSystemFont,-apple-system,Segoe UI,Roboto,Oxygen,Ubuntu,Cantarell,Fira Sans,Droid Sans,Helvetica Neue,Helvetica,Arial,sans-serif;
-        opacity: 0.5;
-        -webkit-user-select: none;
-        -moz-user-select: none;
-        -ms-user-select: none;
-        user-select: none;
-    }
-
-    rect, .bar {
-        shape-rendering: crispEdges;
-    }
-
-    .extent {
-        fill-opacity: .125;
-        shape-rendering: crispEdges;
-    }
-
-    .d3-tip {
-        line-height: 1;
-        font-weight: bold;
-        padding: 12px;
-        background-color: rgba(0, 0, 0, 0.8);
-        color: #fff;
-        border-radius: 2px;
-    }
-
-    /* Creates a small triangle extender for the tooltip */
-    .d3-tip:after {
-        box-sizing: border-box;
-        display: inline;
-        font-size: 10px;
-        width: 100%;
-        line-height: 1;
-        color: rgba(0, 0, 0, 0.8);
-        content: "\25BC";
-        position: absolute;
-        text-align: center;
-    }
-
-    /* Style northward tooltips differently */
-    .d3-tip.n:after {
-        margin: -1px 0 0 0;
-        top: 100%;
-        left: 0;
-    }
-
-    .bar:hover {
-        cursor: pointer;
-    }
-
-    .label--time {
-        font-family: BlinkMacSystemFont,-apple-system,Segoe UI,Roboto,Oxygen,Ubuntu,Cantarell,Fira Sans,Droid Sans,Helvetica Neue,Helvetica,Arial,sans-serif;
-    }
+    @import url(../../css/index.css);
 </style>
