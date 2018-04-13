@@ -36,6 +36,7 @@ function Interval(group, from, to, label) {
  */
 const classifyDataByGroup = (data) => {
    const results = {};
+   let dateTimeStart, dateTimeEnd;
 
    for (let i = 0, l = data.length; i < l; i += 1) {
        // try to spread all props
@@ -44,17 +45,39 @@ const classifyDataByGroup = (data) => {
            // Interval
            if ((from > 0) && (to > 0) && label) {
                results[group].push(new Interval(group, from, to, label));
+
+               // dateTimeStart, dateTimeEnd
+               if (i === 0) {
+                   dateTimeStart = from;
+                   dateTimeEnd = to;
+               } else {
+                   dateTimeStart = dateTimeStart > from ? from : dateTimeStart;
+                   dateTimeEnd = dateTimeEnd < to ? to : dateTimeEnd;
+               }
            }
            // Point
            else if ((at > 0) && title) {
                results[group].push(new Point(group, at, title));
+
+               // dateTimeStart, dateTimeEnd
+               if (i === 0) {
+                   dateTimeStart = at;
+                   dateTimeEnd = at;
+               } else {
+                   dateTimeStart = dateTimeStart > at ? at : dateTimeStart;
+                   dateTimeEnd = dateTimeEnd < at ? at : dateTimeEnd;
+               }
            }
        } else {
            results[group] = [];
        }
    }
 
-   return results;
+   return  {
+       dateTimeStart,
+       dateTimeEnd,
+       results
+   };
 };
 
 
@@ -178,13 +201,23 @@ const chunkGroupData = (data) => {
  * @param data
  */
 const getGroupsData = (data) => {
-    const results = classifyDataByGroup(data);
+    const { results, dateTimeStart, dateTimeEnd } = classifyDataByGroup(data);
 
-    Object.keys(results).reduce((ite, cur) => {
-        ite[cur] = chunkGroupData(results[cur]);
+    return Object.keys(results).reduce((ite, cur) => {
+        ite['data'][cur] = chunkGroupData(results[cur]);
         return ite;
-    }, {});
+    }, {
+        dateTimeStart,
+        dateTimeEnd,
+        data: {
+        },
+        groups: Object.keys(results)
+    });
 };
 
 
-export default getGroupsData;
+export {
+    Point,
+    Interval,
+    getGroupsData
+};

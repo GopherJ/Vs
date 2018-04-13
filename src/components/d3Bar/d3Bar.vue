@@ -6,12 +6,8 @@
 /* eslint-disable */
     import * as d3 from 'd3';
     import mixins from '../../mixins';
-    import d3Tip from 'd3-tip';
-
-    // load d3-tip
-    Object.assign(d3, {
-        tip: d3Tip
-    });
+    import * as tip from 'd3-tip';
+    import wrap from '../../util/wrapLongLabel';
 
     export default {
         name: 'd3-bar',
@@ -77,7 +73,9 @@
                         .append('g')
                         .attr('class', 'axis axis--x')
                         .call(d3.axisBottom(x))
-                        .attr('font-size', fontSize);
+                        .attr('font-size', fontSize)
+                        .selectAll('.tick text')
+                        .call(wrap, x.bandwidth());
 
                     axisY = svg.append('g')
                         .attr('transform', `translate(${left + axisYLabelWidth}, ${top})`)

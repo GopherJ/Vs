@@ -72,7 +72,7 @@
 
                           // time label config
                           timeRangeLabelHeight = 32,
-                          timeRangeLabelFontSize = 14,
+                          timeRangeLabelFontSize = 10,
                           timeRangeLabelOpacity = 0.5,
                           timeRangeLabelFontWeight = 400,
 
@@ -83,6 +83,7 @@
                       [paddingInner, paddingOuter] = this.selectPaddingInnerOuterX(w),
                       g_w = w - left - right - axisYLabelWidth - axisYWidth,
                       g_h = h - top - bottom - axisXHeight - axisXLabelHeight - timeRangeLabelHeight,
+                      isMobile = g_w <= 560 ,
                       tickSizeInner = 2,
                       tickSizeOuter = 16;
 
@@ -95,10 +96,9 @@
                 // clipPath
                 svg.append('clipPath')
                     .attr('id', 'clip-lion')
-                    .attr('transform', `translate(${left + axisXLabelHeight + axisYWidth}, ${top})`)
                     .append('rect')
-                    .attr('width', g_w)
-                    .attr('height', g_h + timeRangeLabelHeight);
+                    .attr('width', w)
+                    .attr('height', h);
 
                 // create g which will contain our graph
                 const g = svg.append('g')
@@ -169,7 +169,7 @@
                 const brushing = () => {
                     if (d3.event.selection) {
                         const [dateTimeStart, dateTimeEnd] = Array.prototype.map.call(d3.event.selection, el => timeScale.invert(el - left - axisYWidth - axisYLabelWidth));
-                        this.updateTimeRangeLabel(dateTimeStart, dateTimeEnd);
+                        this.updateTimeRangeLabel(dateTimeStart, dateTimeEnd, isMobile);
                     }
                 };
 
@@ -298,19 +298,24 @@
                 const timeRangeLabelPos = timeRangeLabel.node().getBBox();
 
 
-                // draw interval select
-                timeRangeLabelLane.append('foreignObject')
-                    .attr('transform', `translate(${timeRangeLabelPos.x + timeRangeLabelPos.width}, ${top})`)
-                    .attr('width', g_w - timeRangeLabelPos.x - timeRangeLabelPos.width)
-                    .attr('height', timeRangeLabelHeight)
-                    .append('xhtml:select')
-                    .attr('class', 'form-control')
-                    .attr('id', 'interval')
-                    .on('change', () => {
-                        this.$emit('interval-updated', Number.parseInt(d3.event.target.value, 10)||"Auto");
-                    })
-                    .html(`
-                            <option value="Auto">Auto</option>
+                if (!isMobile) {
+                    // not mobile
+                    // draw interval select
+                    timeRangeLabelLane.append('foreignObject')
+                        .attr('transform', `translate(${timeRangeLabelPos.x + timeRangeLabelPos.width}, ${top})`)
+                        .attr('width', g_w - timeRangeLabelPos.x - timeRangeLabelPos.width)
+                        .attr('height', timeRangeLabelHeight)
+                        .append('xhtml:select')
+                        .attr('class', 'form-control')
+                        .attr('id', 'interval')
+                        .on('change', () => {
+                            const value = isNaN(parseInt(d3.event.target.value, 10))
+                                ? 'Auto'
+                                : parseInt(d3.event.target.value, 10);
+                            this.$emit('interval-updated', value);
+                        })
+                        .html(`
+                            <option value='Auto'>Auto</option>
                             <option value="${INTERVAL.Millisecond}">Millisecond</option>
                             <option value="${INTERVAL.Second}">Second</option>
                             <option value="${INTERVAL.Minute}">Minute</option>
@@ -319,9 +324,37 @@
                             <option value="${INTERVAL.Week}">Weekly</option>
                             <option value="${INTERVAL.Month}">Monthly</option>
                             <option value="${INTERVAL.Year}">Yearly</option>`)
-                    .property('value', INTERVAL[interval]||"Auto");
+                        .property('value', INTERVAL[interval]||'Auto');
+                }
 
-                // TODO: make timeRangeLabelLane at the middle
+                else {
+                    // mobile
+                    // draw interval select
+                    timeRangeLabelLane.append('foreignObject')
+                        .attr('transform', `translate(${timeRangeLabelPos.x + timeRangeLabelPos.width/2}, ${top + timeRangeLabelHeight})`)
+                        .attr('width', g_w - timeRangeLabelPos.x - timeRangeLabelPos.width/2)
+                        .attr('height', timeRangeLabelHeight)
+                        .append('xhtml:select')
+                        .attr('class', 'form-control')
+                        .attr('id', 'interval')
+                        .on('change', () => {
+                            const value = isNaN(parseInt(d3.event.target.value, 10))
+                                ? 'Auto'
+                                : parseInt(d3.event.target.value, 10);
+                            this.$emit('interval-updated', value);
+                        })
+                        .html(`
+                            <option value='Auto'>Auto</option>
+                            <option value="${INTERVAL.Millisecond}">Millisecond</option>
+                            <option value="${INTERVAL.Second}">Second</option>
+                            <option value="${INTERVAL.Minute}">Minute</option>
+                            <option value="${INTERVAL.Hour}">Hourly</option>
+                            <option value="${INTERVAL.Day}">Daily</option>
+                            <option value="${INTERVAL.Week}">Weekly</option>
+                            <option value="${INTERVAL.Month}">Monthly</option>
+                            <option value="${INTERVAL.Year}">Yearly</option>`)
+                        .property('value', INTERVAL[interval]||'Auto');
+                }
 
                 // draw reference line to represent now
                 let now = new Date();
@@ -346,10 +379,10 @@
                         .attr('pointer-events', 'none');
                 }
             },
-            getTimeRangeLabel(dateTimeStart, dateTimeEnd) {
+            getTimeRangeLabel(dateTimeStart, dateTimeEnd, isMobile) {
                 const FORMAT = 'YYYY-MM-DD HH:mm:ss.SSS';
 
-                return `From ${moment(dateTimeStart).format(FORMAT)} To ${moment(dateTimeEnd).format(FORMAT)}-`;
+                return `From ${moment(dateTimeStart).format(FORMAT)} To ${moment(dateTimeEnd).format(FORMAT)}`;
             },
             safeDraw() {
                 this.ifExistsSvgThenRemove();
