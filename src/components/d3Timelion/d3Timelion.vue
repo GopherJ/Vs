@@ -43,6 +43,7 @@
                 // ***** here we must use clone deep because sort will change data, if data has been changed will rerun this function *****
                 // which cause a infinite loop
                 const data = _.cloneDeep(this.data).sort((a, b) => a.key > b.key ? 1 : -1);
+                const self = this;
 
                 // get container width and height
                 const [w, h] = this.getElWidthHeight(),
@@ -157,22 +158,6 @@
                     .call(d3.axisLeft(y).ticks(ticksY))
                     .attr('font-size', axisFontSize);
 
-                // brushed callback
-                const brushed = () => {
-                    if (d3.event.selection) {
-                        const [dateTimeStart, dateTimeEnd] = Array.prototype.map.call(d3.event.selection, el => timeScale.invert(el - left - axisYWidth - axisYLabelWidth));
-                        this.$emit('range-updated', dateTimeStart, dateTimeEnd, d3.select('#interval').node().value);
-                    }
-                };
-
-                // brush callback
-                const brushing = () => {
-                    if (d3.event.selection) {
-                        const [dateTimeStart, dateTimeEnd] = Array.prototype.map.call(d3.event.selection, el => timeScale.invert(el - left - axisYWidth - axisYLabelWidth));
-                        this.updateTimeRangeLabel(dateTimeStart, dateTimeEnd, isMobile);
-                    }
-                };
-
                 // brush
                 const b = svg.append('g')
                     .attr('class', 'brush');
@@ -180,6 +165,30 @@
                     .extent([[left + axisYLabelWidth + axisYWidth, top + timeRangeLabelHeight], [w - right, g_h + top + timeRangeLabelHeight]])
                     .on('brush', brushing)
                     .on('end', brushed);
+
+                // brushed callback
+                function brushed() {
+                    if (d3.event.selection) {
+                        const [dateTimeStart, dateTimeEnd] = Array.prototype.map.call(d3.event.selection, el => timeScale.invert(el - left - axisYWidth - axisYLabelWidth));
+                        self.$emit('range-updated', dateTimeStart, dateTimeEnd, d3.select('#interval').node().value);
+
+                        // restore brush dom tree
+                        d3.select('.d3-time-lion .brush').selectAll('*').remove();
+                        d3.select('.d3-time-lion .brush').attr('fill', null).attr('pointer-events', null);
+                        // https://github.com/d3/d3-brush/issues/10
+                        // clear brush state, d3v4 state also brush on selection
+                        brushX.move(b, null);
+                    }
+                }
+
+                // brush callback
+                function brushing() {
+                    if (d3.event.selection) {
+                        // selection is b so that the selection.x and selection.y is cordinates in svg
+                        const [dateTimeStart, dateTimeEnd] = Array.prototype.map.call(d3.event.selection, el => timeScale.invert(el - left - axisYWidth - axisYLabelWidth));
+                        self.updateTimeRangeLabel(dateTimeStart, dateTimeEnd);
+                    }
+                }
 
                 // tooltip
                 const tip = d3.tip()
@@ -219,6 +228,7 @@
                     const [cx, cy] = d3.mouse(g.node());
 
                     // check if cursor is in g and check if cursor is moving on svg
+                    // if cursor is moving in g and not on bar<rect> then set cursor style as crosshair
                     if ( cx >= 0 && cx <= g_w && cy >=0 && cy <= g_h && d3.event.target.nodeName === 'svg') {
                         svg.attr('cursor', 'crosshair');
                     }
