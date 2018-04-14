@@ -95,7 +95,8 @@
                     .attr('height', `${h}`);
 
                 // clipPath
-                svg.append('clipPath')
+                svg.append('defs')
+                    .append('clipPath')
                     .attr('id', 'clip-lion')
                     .append('rect')
                     .attr('width', w)
