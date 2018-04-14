@@ -41,9 +41,11 @@ const classifyDataByGroup = (data) => {
    for (let i = 0, l = data.length; i < l; i += 1) {
        // try to spread all props
        const { group, from, to, label, at, title } = data[i];
+
        if (results[group]) {
            // Interval
            if ((from > 0) && (to > 0) && label) {
+               // console.log(title)
                results[group].push(new Interval(group, from, to, label));
 
                // dateTimeStart, dateTimeEnd
@@ -69,7 +71,31 @@ const classifyDataByGroup = (data) => {
                }
            }
        } else {
-           results[group] = [];
+           if ((from > 0) && (to > 0) && label) {
+               results[group] = [new Interval(group, from, to, label)];
+
+               // dateTimeStart, dateTimeEnd
+               if (i === 0) {
+                   dateTimeStart = from;
+                   dateTimeEnd = to;
+               } else {
+                   dateTimeStart = dateTimeStart > from ? from : dateTimeStart;
+                   dateTimeEnd = dateTimeEnd < to ? to : dateTimeEnd;
+               }
+           }
+
+           else if ((at > 0) && title) {
+               results[group] = [new Point(group, at, title)];
+
+                // dateTimeStart, dateTimeEnd
+               if (i === 0) {
+                   dateTimeStart = at;
+                   dateTimeEnd = at;
+               } else {
+                   dateTimeStart = dateTimeStart > at ? at : dateTimeStart;
+                   dateTimeEnd = dateTimeEnd < at ? at : dateTimeEnd;
+               }
+           }
        }
    }
 
@@ -167,12 +193,12 @@ const chunkGroupData = (data) => {
             // no data in current lane
             // add it directly
             if (results[j].length === 0) {
-                results.push(entry);
+                results[j].push(entry);
                 break;
             }
 
             // last item in current lane
-            const lastItem = results[results.length - 1];
+            const lastItem = results[j][results[j].length - 1];
 
             // doesn't collide
             if (!isCollided(lastItem, entry)) {
@@ -201,6 +227,7 @@ const chunkGroupData = (data) => {
  * @param data
  */
 const getGroupsData = (data) => {
+    // console.log(JSON.stringify(data, null, 4))
     const { results, dateTimeStart, dateTimeEnd } = classifyDataByGroup(data);
 
     return Object.keys(results).reduce((ite, cur) => {

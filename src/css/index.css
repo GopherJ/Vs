@@ -37,8 +37,16 @@
 }
 
 
-rect, .bar {
+.bar {
     cursor: pointer;
+    shape-rendering: crispEdges;
+}
+
+rect {
+    shape-rendering: crispEdges;
+}
+
+path {
     shape-rendering: crispEdges;
 }
 
