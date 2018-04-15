@@ -5,18 +5,13 @@
 <script>
 /* eslint-disable */
     import * as d3 from 'd3';
-    import d3Tip from 'd3-tip';
+    import * as tip from 'd3-tip';
     import * as d3SankeyCircular from 'd3-sankey-circular';
     import pathArrows from './pathArrows';
     import _ from 'lodash';
 
     // Load the package d3SankeyCircular on d3
     Object.assign(d3, d3SankeyCircular);
-
-    // load d3-tip
-    Object.assign(d3, {
-        tip: d3Tip
-    });
 
     const highlightNodes = (node, name) => {
         let opacity = 0.3;
@@ -76,6 +71,7 @@
         },
         methods: {
             drawSankey() {
+                // nodes and links must both exist
                 if (this.nodes.length === 0 || this.links.length === 0) {
                     return;
                 }
@@ -92,6 +88,7 @@
 
                 /**
                  * compute offsetLeft of g
+                 * @param selection
                  */
                 const compute_selection_offset_left = (selection) => {
                     // https://stackoverflow.com/questions/21990857/d3-js-how-to-get-the-computed-width-and-height-for-an-arbitrary-element
@@ -132,15 +129,15 @@
                 };
 
                 // start to calculate, to draw
-                const data = {
+                const data = _.cloneDeep({
                     nodes: this.nodes,
                     links: this.links,
-                };
+                });
 
                 // options by default
                 const {
                     nodeWidth = 20,
-                    nodeText = 'font-size:0.8rem; font-weight:600;font-family: sans-serif;',
+                    nodeTextStyle = 'font-size:0.8rem; font-weight:600; font-family:sans-serif;',
                     circularLinkGap = 4,
                     circularLinkColor = 'red',
                     linkColor = 'black',
@@ -206,7 +203,6 @@
                 const sankeyLinks = sankeyData.links;
 
                 // const [link_value_min, link_value_max] = linkValueRange(data.links);
-
                 // const depthExtent = d3.extent(sankeyNodes, d => d.depth);
 
                 const nodeColour = d3
@@ -239,12 +235,8 @@
                             .style('opacity', d => highlightNodes(d, thisName));
 
                         d3
-                            .selectAll('.sankey-link')
+                            .selectAll('.link')
                             .style('opacity', l => (l.source.name === thisName || l.target.name === thisName ? 1 : 0.3));
-
-                        // node
-                        //     .selectAll('text')
-                        //     .style('opacity', d => highlightNodes(d, thisName));
                     })
                     .on('mouseout', (d) => {
 
@@ -256,12 +248,8 @@
                             .style('opacity', 0.5);
 
                         d3
-                            .selectAll('.sankey-link')
+                            .selectAll('.link')
                             .style('opacity', 0.7);
-
-                        // d3.select((this.$el))
-                        //     .selectAll('text')
-                        //     .style('opacity', 1);
                     });
 
 
@@ -271,7 +259,7 @@
                     .attr('y', d => d.y0 - 12)
                     .attr('dy', '0.35em')
                     .attr('text-anchor', 'middle')
-                    .attr('style', nodeText)
+                    .attr('style', nodeTextStyle)
                     .text(d => d.name);
 
                 const link = linkG
@@ -281,7 +269,7 @@
 
                 link
                     .append('path')
-                    .attr('class', 'sankey-link')
+                    .attr('class', 'link')
                     .attr('d', link => link.path)
                     .style('stroke-width', d => Math.max(1, d.width))
                     .style('opacity', 0.7)
@@ -295,10 +283,6 @@
                         tip.hide();
                         d3.selectAll('.d3-tip').remove();
                     });
-
-                // link
-                //     .append('title')
-                //     .text(linkTitle);
 
                 const arrows = pathArrows()
                     .arrowLength(arrowLength)
@@ -380,40 +364,14 @@
     };
 </script>
 
-<style scoped>
-    rect {
-        /*make node rectangle edge more sharp*/
-        /*https://developer.mozilla.org/zh-CN/docs/Web/SVG/Attribute/shape-rendering*/
-        shape-rendering: crispEdges;
+<style>
+    @import url(../../css/index.css);
+
+    .nodes .node {
+        cursor: pointer;
     }
 
-    .d3-tip {
-        font-family: sans-serif;
-        line-height: 1;
-        font-weight: bold;
-        padding: 12px;
-        background-color: rgba(0, 0, 0, 0.8);
-        color: #fff;
-        border-radius: 2px;
-    }
-
-    /* Creates a small triangle extender for the tooltip */
-    .d3-tip:after {
-        box-sizing: border-box;
-        display: inline;
-        font-size: 10px;
-        width: 100%;
-        line-height: 1;
-        color: rgba(0, 0, 0, 0.8);
-        content: "\25BC";
-        position: absolute;
-        text-align: center;
-    }
-
-    /* Style northward tooltips differently */
-    .d3-tip.n:after {
-        margin: -1px 0 0 0;
-        top: 100%;
-        left: 0;
+    .links .link {
+        cursor: pointer;
     }
 </style>

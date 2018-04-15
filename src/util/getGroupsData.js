@@ -227,7 +227,6 @@ const chunkGroupData = (data) => {
  * @param data
  */
 const getGroupsData = (data) => {
-    // console.log(JSON.stringify(data, null, 4))
     const { results, dateTimeStart, dateTimeEnd } = classifyDataByGroup(data);
 
     return Object.keys(results).reduce((ite, cur) => {
