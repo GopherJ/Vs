@@ -8,6 +8,11 @@ npm i -S GopherJ/Vs
 ```
 
 
+## Demo
+[Vs](https://gopherj.github.io/Vs/#/)
+
+
+
 ## Lists
 
 - `d3Bar`
@@ -256,10 +261,6 @@ Vue.use(Vs);
   animationDelay : 50
 }"></d3-progress-arc>
 ```
-
-
-## Demo
-[Vs](https://gopherj.github.io/Vs/#/)
 
 
 ## Examples
