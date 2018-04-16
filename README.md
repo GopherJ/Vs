@@ -259,7 +259,7 @@ Vue.use(Vs);
 
 
 ## Demo
-![Vs](https://gopherj.github.io/Vs/#/)
+[Vs](https://gopherj.github.io/Vs/#/)
 
 
 ## Examples
