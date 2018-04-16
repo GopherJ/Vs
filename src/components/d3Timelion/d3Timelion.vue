@@ -65,15 +65,15 @@
                           // axis label config
                           axisXLabel = 'Key',
                           axisYLabel = 'Value',
-                          axisFontSize = 10,
+                          axisFontSize = 12,
                           axisLabelOpacity = 0.5,
                           axisLabelFontWeight = 600,
                           axisXLabelHeight = 60,
                           axisYLabelWidth = 60,
 
                           // time label config
-                          timeRangeLabelHeight = 32,
-                          timeRangeLabelFontSize = 10,
+                          timeRangeLabelHeight = 40,
+                          timeRangeLabelFontSize = 12,
                           timeRangeLabelOpacity = 0.5,
                           timeRangeLabelFontWeight = 400,
 
@@ -296,7 +296,7 @@
                     .attr('class', 'label--time')
                     .attr('x', g_w/2)
                     .attr('y', timeRangeLabelHeight/2)
-                    .attr('dy', '0.35em')
+                    // .attr('dy', '0.35em')
                     .attr('fill', '#000')
                     .attr('font-size', timeRangeLabelFontSize)
                     .attr('font-weight', timeRangeLabelFontWeight)
@@ -408,4 +408,12 @@
 
 <style>
     @import url(../../css/index.css);
+
+    #interval {
+        outline: none;
+    }
+
+    .bar:hover {
+        cursor: pointer;
+    }
 </style>

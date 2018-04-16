@@ -255,53 +255,7 @@
 </script>
 
 <style>
-    .axis {
-        font-family: sans-serif;
-        opacity: .5;
-        -webkit-user-select: none;
-        -moz-user-select: none;
-        -ms-user-select: none;
-        user-select: none;
-    }
-
-    rect, .bar {
-        shape-rendering: crispEdges;
-    }
-
-    .extent {
-        fill-opacity: .125;
-        shape-rendering: crispEdges;
-    }
-
-    .d3-tip {
-        line-height: 1;
-        font-weight: bold;
-        padding: 12px;
-        background-color: rgba(0, 0, 0, 0.8);
-        color: #fff;
-        border-radius: 2px;
-    }
-
-    /* Creates a small triangle extender for the tooltip */
-    .d3-tip:after {
-        box-sizing: border-box;
-        display: inline;
-        font-size: 10px;
-        width: 100%;
-        line-height: 1;
-        color: rgba(0, 0, 0, 0.8);
-        content: "\25BC";
-        position: absolute;
-        text-align: center;
-    }
-
-    /* Style northward tooltips differently */
-    .d3-tip.n:after {
-        margin: -1px 0 0 0;
-        top: 100%;
-        left: 0;
-    }
-
+    @import url(../../css/index.css);
     .bar:hover {
         cursor: pointer;
     }

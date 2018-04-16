@@ -6,12 +6,14 @@
  * @param group
  * @param at
  * @param title
+ * @param className
  * @constructor
  */
-function Point(group, at, title) {
+function Point(group, at, title, className) {
     this.group = group;
     this.at = at;
     this.title = title;
+    this.className = className;
 }
 
 /**
@@ -21,13 +23,15 @@ function Point(group, at, title) {
  * @param from
  * @param to
  * @param label
+ * @param className
  * @constructor
  */
-function Interval(group, from, to, label) {
+function Interval(group, from, to, label, className) {
     this.group = group;
     this.from = from;
     this.to = to;
     this.label = label;
+    this.className = className;
 }
 
 /**
@@ -40,13 +44,12 @@ const classifyDataByGroup = (data) => {
 
    for (let i = 0, l = data.length; i < l; i += 1) {
        // try to spread all props
-       const { group, from, to, label, at, title } = data[i];
+       const { group, from, to, label, at, title, className } = data[i];
 
        if (results[group]) {
            // Interval
            if ((from > 0) && (to > 0) && label) {
-               // console.log(title)
-               results[group].push(new Interval(group, from, to, label));
+               results[group].push(new Interval(group, from, to, label, className));
 
                // dateTimeStart, dateTimeEnd
                if (i === 0) {
@@ -59,7 +62,7 @@ const classifyDataByGroup = (data) => {
            }
            // Point
            else if ((at > 0) && title) {
-               results[group].push(new Point(group, at, title));
+               results[group].push(new Point(group, at, title, className));
 
                // dateTimeStart, dateTimeEnd
                if (i === 0) {
@@ -72,7 +75,7 @@ const classifyDataByGroup = (data) => {
            }
        } else {
            if ((from > 0) && (to > 0) && label) {
-               results[group] = [new Interval(group, from, to, label)];
+               results[group] = [new Interval(group, from, to, label, className)];
 
                // dateTimeStart, dateTimeEnd
                if (i === 0) {
@@ -85,7 +88,7 @@ const classifyDataByGroup = (data) => {
            }
 
            else if ((at > 0) && title) {
-               results[group] = [new Point(group, at, title)];
+               results[group] = [new Point(group, at, title, className)];
 
                 // dateTimeStart, dateTimeEnd
                if (i === 0) {

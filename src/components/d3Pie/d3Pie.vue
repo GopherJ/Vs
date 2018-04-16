@@ -5,13 +5,8 @@
 <script>
 /* eslint-disable */
     import * as d3 from 'd3';
-    import d3Tip from 'd3-tip';
+    import * as tip from 'd3-tip';
     import mixins from '../../mixins';
-
-    // install d3-tip
-    Object.assign(d3, {
-        tip: d3Tip
-    });
 
     export default {
         name: 'd3-pie',
@@ -100,11 +95,11 @@
                 const arc = gc.selectAll('.arc')
                     .data(pie(data))
                     .enter()
-                    .append('g')
-                    .attr('class', 'arc');
+                    .append('g');
 
                 // draw arc path
                 arc.append('path')
+                    .attr('class', 'arc')
                     .transition()
                     .duration(animationDuration)
                     .delay((d, i) => 50 * i)
@@ -160,38 +155,14 @@
 </script>
 
 <style>
-    .d3-tip {
-        font-family: sans-serif;
-        line-height: 1;
-        font-weight: bold;
-        padding: 12px;
-        background-color: rgba(0, 0, 0, 0.8);
-        color: #fff;
-        border-radius: 2px;
-    }
-
-    /* Creates a small triangle extender for the tooltip */
-    .d3-tip:after {
-        box-sizing: border-box;
-        display: inline;
-        font-size: 10px;
-        width: 100%;
-        line-height: 1;
-        color: rgba(0, 0, 0, 0.8);
-        content: "\25BC";
-        position: absolute;
-        text-align: center;
-    }
-
-    /* Style northward tooltips differently */
-    .d3-tip.n:after {
-        margin: -1px 0 0 0;
-        top: 100%;
-        left: 0;
-    }
+    @import url(../../css/index.css);
 
     .arc {
-        font-family: sans-serif;
+        shape-rendering: crispEdges;
+    }
+
+    .arc:hover {
+        cursor: pointer;
     }
 
     .label.label--x {
