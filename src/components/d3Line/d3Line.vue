@@ -7,6 +7,7 @@
     import * as d3 from 'd3';
     import tip from 'd3-tip';
     import mixins from '../../mixins';
+    import _ from 'lodash';
 
     // load tip
     Object.assign(d3, {
@@ -22,7 +23,7 @@
                 const [w, h] = this.getElWidthHeight();
 
                 // constants
-                const data = this.data,
+                const data = _.cloneDeep(this.data),
                       {left = 0, top = 20, right = 10, bottom = 0} = this.margin,
                       {
                           // line config

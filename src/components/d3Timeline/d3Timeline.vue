@@ -94,6 +94,11 @@
                     groupHeight = g_h / groups.length,
                     [paddingInner, paddingOuter] = selectPaddingInnerOuterY(groupHeight);
 
+                // no groups
+                if (groups.length === 0) {
+                    return;
+                }
+
                 // draw svg
                 const svg = d3.select(this.$el)
                     .append('svg')
