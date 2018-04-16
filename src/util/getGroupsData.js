@@ -23,14 +23,16 @@ function Point(group, at, title, className) {
  * @param from
  * @param to
  * @param label
+ * @param title
  * @param className
  * @constructor
  */
-function Interval(group, from, to, label, className) {
+function Interval(group, from, to, label, title, className) {
     this.group = group;
     this.from = from;
     this.to = to;
     this.label = label;
+    this.title = title;
     this.className = className;
 }
 
@@ -49,7 +51,7 @@ const classifyDataByGroup = (data) => {
        if (results[group]) {
            // Interval
            if ((from > 0) && (to > 0) && label) {
-               results[group].push(new Interval(group, from, to, label, className));
+               results[group].push(new Interval(group, from, to, label, title, className));
 
                // dateTimeStart, dateTimeEnd
                if (i === 0) {
@@ -75,7 +77,7 @@ const classifyDataByGroup = (data) => {
            }
        } else {
            if ((from > 0) && (to > 0) && label) {
-               results[group] = [new Interval(group, from, to, label, className)];
+               results[group] = [new Interval(group, from, to, label, title, className)];
 
                // dateTimeStart, dateTimeEnd
                if (i === 0) {

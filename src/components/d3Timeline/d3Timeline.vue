@@ -44,6 +44,8 @@
         mixins: [mixins],
         methods: {
             drawTimeline() {
+                // reference
+                const self = this;
                 // constants
                 const [w, h] = this.getElWidthHeight(),
                     { dateTimeStart, dateTimeEnd, data, groups } = getGroupsData(_.cloneDeep(this.data)),
@@ -82,6 +84,10 @@
                         // lines config
                         boundingLineWidth = 2,
                         boundingLineColor = '#ccc',
+
+                        // current time line reference
+                        currentTimeLineWidth = 2,
+                        currentTimeLineColor = 'red'
                     } = this.options,
                     g_w = w - left - right - groupLaneWidth,
                     g_h = h - top - bottom - axisXHeight - axisXLabelHeight,
@@ -205,9 +211,23 @@
                 function zooming () {
                     const t = d3.event.transform.rescaleX(timeScale);
                     axisXLane.call(axisX.scale(t));
-                    d3.selectAll('.entry').remove();
-                    d3.selectAll('.line--tick').remove();
 
+                    // if (!d3.selectAll('.entry').empty()) {
+                    //     d3.selectAll('.entry').remove();
+                    // }
+                    //
+                    // if (!d3.selectAll('.line--tick').empty()) {
+                    //     d3.selectAll('.line--tick').remove();
+                    // }
+                    //
+                    // if (!d3.select('.line--reference').empty()) {
+                    //     d3.select('.line-reference').remove();
+                    // }
+                        d3.selectAll('.entry').remove();
+                        d3.selectAll('.line--tick').remove();
+                        d3.selectAll('.line--tick').remove();
+
+                    drawReference(t);
                     drawTickLines(t);
                     drawEntries(t);
                 }
@@ -218,14 +238,14 @@
                     .on('zoom', zooming);
 
                 // zoomable domain
-                const zoomRect = svg.append('g')
-                    .attr('transform', `translate(${left + groupLaneWidth}, ${top})`)
-                    .append('rect')
-                    .attr('width', g_w)
-                    .attr('height', g_h)
-                    .attr('fill', 'none')
-                    .attr('pointer-events', 'all')
-                    .call(zoom);
+                // const zoomRect = svg.append('g')
+                //     .attr('transform', `translate(${left + groupLaneWidth}, ${top})`)
+                //     .append('rect')
+                //     .attr('width', g_w)
+                //     .attr('height', g_h)
+                //     .attr('fill', 'none')
+                //     .attr('pointer-events', 'all')
+                svg.call(zoom);
 
                 // create tooltip
                 const tip = d3.tip()
@@ -245,6 +265,7 @@
                     .append('text')
                     .attr('x', groupLaneWidth / 2)
                     .attr('y', groupHeight/2)
+                    .attr('dy', '0.35em')
                     .attr('text-anchor', 'middle')
                     .attr('font-size', groupLabelFontSize)
                     .attr('font-weight', groupLabelFontWeight)
@@ -253,12 +274,29 @@
 
 
                 /**
+                 * draw current time reference
+                 **/
+                function drawReference(timeScale) {
+                    const date = new Date().valueOf();
+                    entryLaneContainer
+                        .append('line')
+                        .attr('class', 'line-reference')
+                        .attr('x1', timeScale(date))
+                        .attr('x2', timeScale(date))
+                        .attr('y1', 0)
+                        .attr('y2', g_h)
+                        .attr('stroke', currentTimeLineColor)
+                        .attr('stroke-width', currentTimeLineWidth);
+                }
+
+
+                /**
                  * @param timeScale
                  *
                  **/
                 function drawTickLines(timeScale) {
                     const ticks = timeScale.ticks().map(el => el.valueOf());
-                    g.selectAll('.line--tick')
+                    entryLaneContainer.selectAll('.line--tick')
                         .data(ticks)
                         .enter()
                         .append('line')
@@ -305,7 +343,6 @@
 
                                    point
                                        .on('mouseover', () => {
-                                           d3.event.stopImmediatePropagation();
                                            g.call(tip);
                                            tip.html(() => `${entry.title}`);
                                            tip.show();
@@ -327,16 +364,33 @@
                                     const interval = G.append('path')
                                         .attr('class', `${entry.className === undefined ? 'entry--interval' : entry.className}`)
                                         .attr('d', roundedRect(X, Y, W, H, intervalCornerRadius, true, true, true, true))
-                                        .attr('clip-path', 'url(#clip-line)');
+                                        .attr('clip-path', 'url(#clip-line)')
 
-                                    G.append('text')
+                                        if (entry.title) {
+                                            interval
+                                            .on('mouseover', () => {
+                                                g.call(tip);
+                                                tip.html(() => `${entry.title}`);
+                                                tip.show();
+                                            })
+                                            .on('mouseout', () => {
+                                                tip.hide();
+                                                d3.selectAll('.d3-tip').remove();
+                                            });
+                                        }
+
+                                    const text = G.append('text')
                                         .attr('class', 'entry entry--label')
                                         .attr('text-anchor', 'middle')
                                         .attr('x', (X + W/2))
                                         .attr('y', (Y + H/2))
                                         .text(entry.label)
                                         .attr('dy', '0.35em')
-                                        .attr('clip-path', 'url(#clip-line)')
+                                        .attr('clip-path', 'url(#clip-line)');
+
+                                    if (text.node().getComputedTextLength() > W) {
+                                        text.remove();
+                                    }
                                 }
                             }
                         }
@@ -344,8 +398,12 @@
                 }
 
                 // initialisation
-                drawTickLines(timeScale);
-                drawEntries(timeScale);
+                // async
+                setTimeout(() => {
+                   drawReference(timeScale);
+                   drawTickLines(timeScale);
+                   drawEntries(timeScale);
+                }, 16);
             },
             safeDraw() {
                 this.ifExistsSvgThenRemove();
@@ -368,7 +426,7 @@
     .d3-time-line .entry--point {
         fill: #6eadc1;
         stroke: #6eadc1;
-        fill-opacity: 0.6;
+        fill-opacity: 0.125;
         stroke-opacity: 1;
         cursor: pointer;
     }
@@ -376,7 +434,7 @@
     .d3-time-line .entry--interval {
         fill: #6eadc1;
         stroke: #6eadc1;
-        fill-opacity: 0.6;
+        fill-opacity: 0.125;
         stroke-opacity: 1;
         cursor: pointer;
     }
@@ -386,5 +444,6 @@
         fill-opacity: 1;
         font-size: 12px;
         font-weight: 400;
+        cursor: pointer;
     }
 </style>
