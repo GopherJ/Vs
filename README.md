@@ -258,6 +258,10 @@ Vue.use(Vs);
 ```
 
 
+## Demo
+![Vs](https://gopherj.github.io/Vs/#/)
+
+
 ## Examples
 
 ```vue
@@ -270,8 +274,8 @@ Vue.use(Vs);
 
     <d3-sankey-circular v-bind="dataSankey"></d3-sankey-circular>
 
-    <d3-time-line :data="dataTimeline"></d3-time-line>
-    <d3-time-lion :data="dataTimelion"></d3-time-lion>
+    <d3-timeline :data="dataTimeline"></d3-timeline>
+    <d3-timelion :data="dataTimelion"></d3-timelion>
 
 
     <d3-progress-arc :data="[{
