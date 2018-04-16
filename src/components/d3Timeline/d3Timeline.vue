@@ -212,20 +212,17 @@
                     const t = d3.event.transform.rescaleX(timeScale);
                     axisXLane.call(axisX.scale(t));
 
-                    // if (!d3.selectAll('.entry').empty()) {
-                    //     d3.selectAll('.entry').remove();
-                    // }
-                    //
-                    // if (!d3.selectAll('.line--tick').empty()) {
-                    //     d3.selectAll('.line--tick').remove();
-                    // }
-                    //
-                    // if (!d3.select('.line--reference').empty()) {
-                    //     d3.select('.line-reference').remove();
-                    // }
+                    if (!d3.selectAll('.entry').empty()) {
                         d3.selectAll('.entry').remove();
+                    }
+
+                    if (!d3.selectAll('.line--tick').empty()) {
                         d3.selectAll('.line--tick').remove();
-                        d3.selectAll('.line--tick').remove();
+                    }
+
+                    if (!d3.select('.line--reference').empty()) {
+                        d3.select('.line--reference').remove();
+                    }
 
                     drawReference(t);
                     drawTickLines(t);
@@ -280,7 +277,7 @@
                     const date = new Date().valueOf();
                     entryLaneContainer
                         .append('line')
-                        .attr('class', 'line-reference')
+                        .attr('class', 'line--reference')
                         .attr('x1', timeScale(date))
                         .attr('x2', timeScale(date))
                         .attr('y1', 0)
