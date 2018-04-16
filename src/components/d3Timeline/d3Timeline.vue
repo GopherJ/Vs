@@ -4,11 +4,17 @@
 
 <script>
     import * as d3 from 'd3';
-    import * as tip from 'd3-tip';
+    import tip from 'd3-tip';
     import mixins from '../../mixins';
     import { Point, Interval, getGroupsData } from '../../util/getGroupsData';
     import roundedRect from '../../util/roundedRect';
     import _ from 'lodash';
+
+    // load tip
+    Object.assign(d3, {
+        tip
+    });
+
 
     // select paddingOuter, paddingInner
     const selectPaddingInnerOuterY = (height) => {

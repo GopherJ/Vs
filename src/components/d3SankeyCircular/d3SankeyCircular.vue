@@ -5,13 +5,15 @@
 <script>
 /* eslint-disable */
     import * as d3 from 'd3';
-    import * as tip from 'd3-tip';
+    import tip from 'd3-tip';
     import * as d3SankeyCircular from 'd3-sankey-circular';
     import pathArrows from './pathArrows';
     import _ from 'lodash';
 
-    // Load the package d3SankeyCircular on d3
-    Object.assign(d3, d3SankeyCircular);
+    // Load the package d3SankeyCircular and tip on d3
+    Object.assign(d3, d3SankeyCircular, {
+        tip
+    });
 
     const highlightNodes = (node, name) => {
         let opacity = 0.3;

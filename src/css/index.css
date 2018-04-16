@@ -40,11 +40,8 @@
 rect {
     shape-rendering: crispEdges;
 }
-/* path rendering method */
-path {
-    shape-rendering: crispEdges;
-}
-/* general font */
+
+/* use buefy font setting */
 text {
     font-family: BlinkMacSystemFont,-apple-system,Segoe UI,Roboto,Oxygen,Ubuntu,Cantarell,Fira Sans,Droid Sans,Helvetica Neue,Helvetica,Arial,sans-serif;
 }

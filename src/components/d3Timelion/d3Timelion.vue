@@ -5,13 +5,18 @@
 <script>
 /* eslint-disable */
     import * as d3 from 'd3';
-    import * as tip from 'd3-tip';
+    import tip from 'd3-tip';
     import formatTime from '../../util/formatTime';
     import getAxisXTicks from '../../util/getAxisXTicks';
     import getIntervalFromData from '../../util/getIntervalFromData';
     import mixins from '../../mixins';
     import _ from 'lodash';
     import moment from 'moment';
+
+    // load tip
+    Object.assign(d3, {
+        tip
+    });
 
     /**
      * constants intervals

@@ -35,15 +35,32 @@ Vue.use(Vs);
 
 // pie or dongnut
 <d3-pie :data="data" :options="{
-    innerRadius: 5,
-    cornerRadius: 5,
-    padAngle: 0.01,
-    arcTitle: d => d.data.value,
-    arcLabel: d => d.data.key,
-    axisXLaneHeight: 30,
-    axisXLabel: 'Key',
-    arcLabelFontSize: 10,
-    animationDuration: 1000
+    // pie size config
+    innerRadius : 5,
+    cornerRadius : 5,
+
+    // gap between arcs config
+    padAngle : 0.01,
+
+    // tooltip config
+    arcTitle : d => d.data.value,
+
+    // arc label
+    arcLabel : d => d.data.key,
+
+    // axisX label config
+    axisXLabelHeight : 30,
+    axisXLabel : 'Key',
+    axisXLabelFontSize : 12,
+    axisXLabelFontWeight : 400,
+    axisXLabelFontOpacity : 0.5,
+
+    // arc label config
+    arcLabelFontSize : 10,
+    arcLabelFontOpacity : 0.5,
+
+    // animation config
+    animationDuration : 1000
 }" width="100%" height="400px" :margin="{
     left: 0,
     top: 0,
@@ -53,39 +70,69 @@ Vue.use(Vs);
 
 // line
 <d3-line :data="data" :options="{
-    stroke: 'rgb(188, 82, 188)',
-    strokeWidth: 2,
-    fontSize: 14,
-    circleRadius: 5,
-    circleColor: 'rgb(188, 82, 188)',
-    circleTitle: d => d.value,
-    curve: 'curveCardinal',
-    axisXLabel: 'Key',
-    axisYLabel: 'Value',
-    axisXHeight: 25,
-    axisYWidth: 35,
-    axisXLabelHeight: 30,
-    axisYLabelWidth: 20
+    // line config
+    stroke : 'rgb(188, 82, 188)',
+    strokeWidth : 2,
+
+    // axis config
+    axisXHeight : 25,
+    axisYWidth : 35,
+    axisFontSize : 14,
+
+    // circle config
+    circleRadius : 5,
+    circleColor : 'rgb(188, 82, 188)',
+
+    // tooltip config
+    circleTitle : d  => d.value,
+
+    // curve config
+    curve : 'curveCardinal',
+
+    // axis label config
+    axisXLabel : 'Key',
+    axisYLabel : 'Value',
+    axisXLabelHeight : 30,
+    axisYLabelWidth : 20,
+    axisLabelFontSize : 12,
+    axisLabelFontWeight : 400,
+    axisLabelFontOpacity : 0.5
 }" width="100%" height="400px" :margin="{
     left: 0,
     top: 20,
-    right: 20,
+    right: 10,
     bottom: 0
 }"></d3-line>
 
 // horizontal bar
 <d3-bar :data="data" :options="{
-    fill: 'rgb(110, 173, 193)',
-    stroke: 'rgb(110, 173, 193)',
-    fontSize: 14,
-    isVertical: false,
-    barTitle: d => d.value,
-    axisYLabel: 'Value',
-    axisXLabel: 'Key',
-    axisXHeight: 25,
-    axisYWidth: 35,
-    axisXLabelHeight: 20,
-    axisYLabelWidth: 20
+    // bar config
+    fill : '#6eadc1',
+    stroke : '#6eadc1',
+    fillOpacity : 0.6,
+    strokeOpacity : 1,
+    barTitle : d => d.value,
+
+    // axis font config
+    axisFontSize : 12,
+    axisFontWeight : 400,
+
+    // axis label config
+    axisYLabel : 'Value',
+    axisXLabel : 'Key',
+    axisXLabelHeight : 20,
+    axisYLabelWidth : 20,
+
+    // axis label font config
+    axisLabelFontSize : 12,
+    axisLabelFontWeight : 400,
+    axisLabelFontOpacity : 0.5,
+
+    // axis lane config
+    axisXHeight : 25,
+    axisYWidth : 35,
+
+    isVertical : false,
 }" width="100%" height="400px" :margin="{
     left: 0,
     top: 20,
@@ -95,17 +142,33 @@ Vue.use(Vs);
 
 // vertical bar
 <d3-bar :data="data" :options="{
-    fill: 'rgb(110, 173, 193)',
-    stroke: 'rgb(110, 173, 193)',
-    fontSize: 14,
-    isVertical: true,
+    // bar config
+    fill : '#6eadc1',
+    stroke : '#6eadc1',
+    fillOpacity : 0.6,
+    strokeOpacity : 1,
     barTitle : d => d.value,
+
+    // axis font config
+    axisFontSize : 12,
+    axisFontWeight : 400,
+
+    // axis label config
     axisYLabel : 'Value',
     axisXLabel : 'Key',
-    axisXLabelHeight: 20,
-    axisYLabelWidth: 20,
-    axisXHeight: 25,
-    axisYWidth: 35
+    axisXLabelHeight : 20,
+    axisYLabelWidth : 20,
+
+    // axis label font config
+    axisLabelFontSize : 12,
+    axisLabelFontWeight : 400,
+    axisLabelFontOpacity : 0.5,
+
+    // axis lane config
+    axisXHeight : 25,
+    axisYWidth : 35,
+
+    isVertical : true,
 }" width="100%" height="400px" :margin="{
     left: 30,
     top: 0,
@@ -140,26 +203,26 @@ Vue.use(Vs);
     // axis label config
     axisXLabel : 'Key',
     axisYLabel : 'Value',
-    axisFontSize : 10,
+    axisFontSize : 12,
     axisLabelOpacity : 0.5,
     axisLabelFontWeight : 600,
     axisXLabelHeight : 60,
     axisYLabelWidth : 60,
 
     // time label config
-    timeRangeLabelHeight : 30,
-    timeRangeLabelFontSize : 14,
+    timeRangeLabelHeight : 40,
+    timeRangeLabelFontSize : 12,
     timeRangeLabelOpacity : 0.5,
     timeRangeLabelFontWeight : 400,
 
     // tooltip config
-    barTitle : d => `${new Date(d.key)} Per ${interval}<br>${d.value}`
+    barTitle : d => `${new Date(d.key)}<br>${d.value}`
 }" width="100%" height="400px" :margin="{
     left: 0,
     top: 0,
     right: 20,
     bottom: 0
-}" @range-updated="(dateTimeStart, dateTimeEnd, interval) => fetchDataAutoSetInterval(dateTimeStart, dateTimeEnd, interval)"
+}" @range-updated="(dateTimeStart, dateTimeEnd, interval) => fetchDataWithCurrentInterval(dateTimeStart, dateTimeEnd, interval)"
    @interval-updated="interval => fetchDataWithInterval(interval)">
 </d3-timelion>
 
