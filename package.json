@@ -1,5 +1,5 @@
 {
-  "name": "Vs",
+  "name": "d3-vs",
   "version": "0.0.9",
   "description": "d3 visualisation with vuejs",
   "main": "dist/Vs.min.js",

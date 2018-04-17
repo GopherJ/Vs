@@ -48,8 +48,14 @@
                 const self = this;
                 // constants
                 const [w, h] = this.getElWidthHeight(),
-                    { dateTimeStart, dateTimeEnd, data, groups } = getGroupsData(_.cloneDeep(this.data)),
-                    {left = 0, top = 0, right = 0, bottom = 0} = this.margin,
+                    { dateTimeStart, dateTimeEnd, data, groups } = getGroupsData(_.cloneDeep(this.data));
+
+                // no groups, return
+                if (groups.length === 0) {
+                    return;
+                }
+
+                const {left = 0, top = 0, right = 0, bottom = 0} = this.margin,
                     {
                         // interval config
                         intervalCornerRadius = 4,
@@ -94,11 +100,6 @@
                     groupHeight = g_h / groups.length,
                     [paddingInner, paddingOuter] = selectPaddingInnerOuterY(groupHeight);
 
-                // no groups
-                if (groups.length === 0) {
-                    return;
-                }
-
                 // draw svg
                 const svg = d3.select(this.$el)
                     .append('svg')
@@ -125,9 +126,10 @@
 
                 // draw clip-path
                 const clipPath = svg.append('defs').append('clipPath')
-                    .attr('transform', `translate(${left + groupLaneWidth}, ${top})`)
                     .attr('id', 'clip-line')
                     .append('rect')
+                    .attr('x', groupLaneWidth)
+                    .attr('y', top)
                     .attr('width', g_w)
                     .attr('height', g_h + axisXHeight);
 
@@ -165,9 +167,7 @@
 
                 // draw lane to hold axisX
                 const axisXLane = svg.append('g')
-                    .attr('transform', `translate(${left + groupLaneWidth}, ${top + g_h})`)
-                    .attr('width', g_w)
-                    .attr('height', axisXHeight);
+                    .attr('transform', `translate(${left + groupLaneWidth}, ${top + g_h})`);
 
                 // create timescale
                 const timeScale = d3.scaleTime()
@@ -177,8 +177,7 @@
                 // create axis X
                 const axisX = d3.axisBottom(timeScale);
                 axisXLane
-                    .append('g')
-                    .call(d3.axisBottom(timeScale))
+                    .call(axisX)
                     .attr('class', 'axis axis--x')
                     .attr('font-size', axisXFontSize)
                     .attr('font-weight', axisXFontWeight);
@@ -195,6 +194,7 @@
                     .attr('x', (g_w + groupLaneWidth) / 2)
                     .attr('y', axisXLabelHeight / 2)
                     .attr('fill', '#000')
+                    .attr('dy', '0.35em')
                     .attr('text-anchor', 'middle')
                     .text(axisXLabel)
                     .attr('font-size', axisXLabelFontSize)
@@ -215,7 +215,17 @@
                  */
                 function zooming () {
                     const t = d3.event.transform.rescaleX(timeScale);
-                    axisXLane.call(axisX.scale(t));
+
+                    if (!axisXLane.selectAll('*').empty()) {
+                        axisXLane.selectAll('*').remove();
+                    }
+
+                    axisXLane
+                        .call(axisX.scale(t))
+                        .attr('class', 'axis axis--x')
+                        .attr('font-size', axisXFontSize)
+                        .attr('font-weight', axisXFontWeight);
+
 
                     if (!d3.selectAll('.entry').empty()) {
                         d3.selectAll('.entry').remove();
@@ -309,7 +319,7 @@
                         .attr('y1', d => 0)
                         .attr('y2', g_h)
                         .attr('stroke', boundingLineColor)
-                        .attr('stroke-width', boundingLineColor);
+                        .attr('stroke-width', boundingLineWidth);
                 }
 
                 /**
@@ -337,7 +347,7 @@
                                         .attr('class', 'entry');
 
                                    const point = G.append('circle')
-                                       .attr('class', `${entry.className === undefined ? 'entry--point' : entry.className}`)
+                                        .attr('class', `${entry.className === undefined ? 'entry--point' : entry.className}`)
                                         .attr('cx', timeScale(entry.at))
                                         .attr('cy', Y + H/2)
                                         .attr('r', circleRadius)
@@ -366,7 +376,7 @@
                                     const interval = G.append('path')
                                         .attr('class', `${entry.className === undefined ? 'entry--interval' : entry.className}`)
                                         .attr('d', roundedRect(X, Y, W, H, intervalCornerRadius, true, true, true, true))
-                                        .attr('clip-path', 'url(#clip-line)')
+                                        .attr('clip-path', 'url(#clip-line)');
 
                                         if (entry.title) {
                                             interval
@@ -399,13 +409,11 @@
                     }
                 }
 
-                // initialisation
-                // async
-                setTimeout(() => {
-                   drawReference(timeScale);
-                   drawTickLines(timeScale);
-                   drawEntries(timeScale);
-                }, 16);
+               // initialisation
+               // async
+               drawReference(timeScale);
+               drawTickLines(timeScale);
+               drawEntries(timeScale);
             },
             safeDraw() {
                 this.ifExistsSvgThenRemove();

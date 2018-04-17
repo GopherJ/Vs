@@ -6,8 +6,8 @@
 /* eslint-disable */
     import * as d3 from 'd3';
     import tip from 'd3-tip';
-    import formatTime from '../../util/formatTime';
-    import getAxisXTicks from '../../util/getAxisXTicks';
+    // import formatTime from '../../util/formatTime';
+    // import getAxisXTicks from '../../util/getAxisXTicks';
     import getIntervalFromData from '../../util/getIntervalFromData';
     import mixins from '../../mixins';
     import _ from 'lodash';
@@ -142,10 +142,10 @@
                     .attr('height', axisXHeight)
                     .append('g')
                     .attr('class', 'axis axis--x')
-                    // .call(d3.axisBottom(timeScale))
-                    .call(d3.axisBottom(timeScale)
-                            .tickValues(getAxisXTicks(axisFontSize, g_w, interval, tickSizeInner, tickSizeOuter).map(el => timeScale.invert(el)))
-                            .tickFormat(el => formatTime(el, interval)))
+                    .call(d3.axisBottom(timeScale))
+                    // .call(d3.axisBottom(timeScale)
+                    //         .tickValues(getAxisXTicks(axisFontSize, g_w, interval, tickSizeInner, tickSizeOuter).map(el => timeScale.invert(el)))
+                    //         .tickFormat(el => formatTime(el, interval)))
                     .attr('font-size', axisFontSize);
 
                 // set middle point as center
