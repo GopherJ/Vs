@@ -184,7 +184,7 @@ Vue.use(Vs);
 // sankey
 <d3-sankey-circular :nodes="nodes" :links="links" :options="{
     nodeWidth : 20,
-    nodeText : 'font-size: .8rem; font-weight: 600; font-family: sans-serif;',
+    nodeTextStyle : 'font-size: .8rem; font-weight: 600; font-family: sans-serif;',
     circularLinkGap : 4,
     circularLinkColor : 'red',
     linkColor : 'black',
@@ -193,7 +193,7 @@ Vue.use(Vs);
     arrowHeadSize : 4
 }" width="100%" height="400px" :nodeTitle="d => `${d.name}<br>${d.value}`" :linkTitle="d => `${d.source.name} → ${d.target.name}<br>${d.value}`"></d3-sankey-circular>
 
-// timelion, need to use with other wrapper
+// timelion
 <d3-timelion :data="data" :options="{
     // bar config
     fill : '#6eadc1',
@@ -230,6 +230,51 @@ Vue.use(Vs);
 }" @range-updated="(dateTimeStart, dateTimeEnd, interval) => fetchDataWithCurrentInterval(dateTimeStart, dateTimeEnd, interval)"
    @interval-updated="interval => fetchDataWithInterval(interval)">
 </d3-timelion>
+
+<d3-timeline :data="data" :options="{
+    // interval config
+    intervalCornerRadius : 4,
+
+    // circle config
+    circleRadius : 8,
+
+    // group config
+    groupLabelFontSize : 14,
+    groupLabelFontWeight : 400,
+
+    // group label config
+    groupLaneWidth : 80,
+
+    // axisX config
+    axisXHeight : 30,
+    axisXFontSize : 12,
+    axisXFontWeight : 400,
+
+    // axisX Label config
+    axisXLabel : 'Key',
+    axisXLabelHeight : 30,
+    axisXLabelFontSize : 14,
+    axisXLabelFontWeight : 600,
+
+    // background config
+    backgroundColor : 'rgba(192, 192, 192, 0.125)',
+    borderRadius : 10,
+    borderWidth : 2,
+    borderColor : '#ccc',
+
+    // lines config
+    boundingLineWidth : 2,
+    boundingLineColor : '#ccc',
+
+    // current time line reference
+    currentTimeLineWidth : 2,
+    currentTimeLineColor : 'red'" width="100%" height="400px" margin="{
+        left: 0,
+        top: 0,
+        right: 0,
+        bottom: 0
+    }">
+</d3-timeline>
 
 
 // ProgressArc
