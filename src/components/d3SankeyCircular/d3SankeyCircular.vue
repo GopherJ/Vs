@@ -1,5 +1,5 @@
 <template>
-    <div :style="{ 'width' : width, 'height' : height }"></div>
+    <div :style="{ 'width' : width, 'height' : height }" class="d3-sankey-circular"></div>
 </template>
 
 <script>
