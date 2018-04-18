@@ -235,8 +235,8 @@ Vue.use(Vs);
     // interval config
     intervalCornerRadius : 4,
 
-    // circle config
-    circleRadius : 8,
+    // symbol config
+    symbolSize : 200,
 
     // group config
     groupLabelFontSize : 14,

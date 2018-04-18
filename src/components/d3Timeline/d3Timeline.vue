@@ -60,8 +60,8 @@
                         // interval config
                         intervalCornerRadius = 4,
 
-                        // circle config
-                        circleRadius = 8,
+                        // symbol config
+                        symbolSize = 200,
 
                         // group config
                         groupLabelFontSize = 14,
@@ -221,6 +221,7 @@
                     }
 
                     axisXLane
+                        // .transition(svg.transition().duration(750))
                         .call(axisX.scale(t))
                         .attr('class', 'axis axis--x')
                         .attr('font-size', axisXFontSize)
@@ -344,16 +345,25 @@
                                 if (entry instanceof Point) {
                                    const G = entryLaneContainer
                                         .append('g')
-                                        .attr('class', 'entry');
-
-                                   const point = G.append('circle')
-                                        .attr('class', `${entry.className === undefined ? 'entry--point' : entry.className}`)
-                                        .attr('cx', timeScale(entry.at))
-                                        .attr('cy', Y + H/2)
-                                        .attr('r', circleRadius)
+                                        .attr('class', 'entry')
                                         .attr('clip-path', 'url(#clip-line)');
 
-                                   point
+                                   const symbolGen = d3.symbol().size(symbolSize);
+
+                                   // const point = G.append('circle')
+                                   //      .attr('class', `${entry.className === undefined ? 'entry--point' : entry.className}`)
+                                   //      .attr('cx', timeScale(entry.at))
+                                   //      .attr('cy', Y + H/2)
+                                   //      .attr('r', circleRadius)
+                                   //      .attr('clip-path', 'url(#clip-line)');
+
+                                   const symbol = G.append('path')
+                                         .attr('transform', `translate(${timeScale(entry.at)}, ${Y + H/2})`)
+                                         .attr('class', `${entry.className ? entry.className : 'entry--point'}`)
+                                         .attr('d', symbolGen.type(d3[entry.symbol] || d3['symbolCircle'])());
+                                       // .attr('clip-path', 'url(#clip-line)');
+
+                                   symbol
                                        .on('mouseover', () => {
                                            g.call(tip);
                                            tip.html(() => `${entry.title}`);
@@ -374,7 +384,7 @@
                                         .attr('class', 'entry');
 
                                     const interval = G.append('path')
-                                        .attr('class', `${entry.className === undefined ? 'entry--interval' : entry.className}`)
+                                        .attr('class', `${entry.className ? entry.className : 'entry--interval'}`)
                                         .attr('d', roundedRect(X, Y, W, H, intervalCornerRadius, true, true, true, true))
                                         .attr('clip-path', 'url(#clip-line)');
 

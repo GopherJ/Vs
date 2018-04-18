@@ -6,13 +6,15 @@
  * @param group
  * @param at
  * @param title
+ * @param symbol
  * @param className
  * @constructor
  */
-function Point(group, at, title, className) {
+function Point(group, at, title, symbol, className) {
     this.group = group;
     this.at = at;
     this.title = title;
+    this.symbol = symbol;
     this.className = className;
 }
 
@@ -46,7 +48,7 @@ const classifyDataByGroup = (data) => {
 
    for (let i = 0, l = data.length; i < l; i += 1) {
        // try to spread all props
-       const { group, from, to, label, at, title, className } = data[i];
+       const { group, from, to, label, at, title, className, symbol } = data[i];
 
        if (results[group]) {
            // Interval
@@ -64,7 +66,7 @@ const classifyDataByGroup = (data) => {
            }
            // Point
            else if ((at > 0) && title) {
-               results[group].push(new Point(group, at, title, className));
+               results[group].push(new Point(group, at, title, symbol, className));
 
                // dateTimeStart, dateTimeEnd
                if (i === 0) {
@@ -90,7 +92,7 @@ const classifyDataByGroup = (data) => {
            }
 
            else if ((at > 0) && title) {
-               results[group] = [new Point(group, at, title, className)];
+               results[group] = [new Point(group, at, title, symbol, className)];
 
                 // dateTimeStart, dateTimeEnd
                if (i === 0) {
