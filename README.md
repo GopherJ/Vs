@@ -268,7 +268,8 @@ Vue.use(Vs);
 
     // current time line reference
     currentTimeLineWidth : 2,
-    currentTimeLineColor : 'red'" width="100%" height="400px" margin="{
+    currentTimeLineColor : 'red'
+    }" width="100%" height="400px" margin="{
         left: 0,
         top: 0,
         right: 0,
