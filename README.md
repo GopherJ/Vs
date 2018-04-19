@@ -1,10 +1,14 @@
 # Vs
-Vue Visualisation Package with d3.
+Vue Visualisation Package With `d3.js`.
 
 
 ## Installation
 ```javascript
+// github
 npm i -S GopherJ/Vs
+
+// npm
+npm i -S d3-vs
 ```
 
 
@@ -28,7 +32,11 @@ npm i -S GopherJ/Vs
 
 `main.js`
 ```
+// github
 import Vs from 'Vs';
+
+// npm
+import Vs from 'd3-vs';
 
 Vue.use(Vs);
 ```
@@ -40,31 +48,31 @@ Vue.use(Vs);
 
 // pie or dongnut
 <d3-pie :data="data" :options="{
-    // pie size config
+    // pie size
     innerRadius : 5,
     cornerRadius : 5,
 
-    // gap between arcs config
+    // gap between arcs
     padAngle : 0.01,
 
-    // tooltip config
+    // tooltip
     arcTitle : d => d.data.value,
 
     // arc label
     arcLabel : d => d.data.key,
 
-    // axisX label config
+    // axisX label
     axisXLabelHeight : 30,
     axisXLabel : 'Key',
     axisXLabelFontSize : 12,
     axisXLabelFontWeight : 400,
     axisXLabelFontOpacity : 0.5,
 
-    // arc label config
+    // arc label
     arcLabelFontSize : 10,
     arcLabelFontOpacity : 0.5,
 
-    // animation config
+    // animation duration
     animationDuration : 1000
 }" width="100%" height="400px" :margin="{
     left: 0,
