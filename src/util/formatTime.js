@@ -4,7 +4,7 @@ import * as d3 from 'd3';
  *
  * @type {{ms: string, s: string, m: string, h: string, w: string, d: string, M: string, y: string}}
  */
-const INTERVAL = Object.freeze({
+const FORMAT_MAP = Object.freeze({
     'Millisecond' : "%H:%M:%S.%L", // 11
     'Second' : "%H:%M:%S", // 8
     'Minute' : "%H:%M", // 5
@@ -18,10 +18,10 @@ const INTERVAL = Object.freeze({
 /**
  *
  * @param date
- * @param interval
+ * @param interval_string
  */
-const formatTime = (date, interval) => {
-    return d3.timeFormat(INTERVAL[interval])(typeof date === 'number' ? new Date(date) : date);
+const formatTime = (date, interval_string) => {
+    return d3.timeFormat(FORMAT_MAP[interval_string])(typeof date === 'number' ? new Date(date) : date);
 };
 
 export default formatTime;

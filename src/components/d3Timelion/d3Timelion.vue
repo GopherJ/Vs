@@ -3,95 +3,96 @@
 </template>
 
 <script>
-/* eslint-disable */
+    /* eslint-disable */
     import * as d3 from 'd3';
     import tip from 'd3-tip';
-    // import formatTime from '../../util/formatTime';
-    // import getAxisXTicks from '../../util/getAxisXTicks';
-    import getIntervalFromData from '../../util/getIntervalFromData';
+    import formatTime from '../../util/formatTime';
+    import getAxisXTicks from '../../util/getAxisXTicks';
+    import getIntervalAndSortedData from '../../util/getIntervalAndSortedData';
+    import getIntervalString from '../../util/getIntervalString';
     import mixins from '../../mixins';
     import _ from 'lodash';
     import moment from 'moment';
+    import INTERVAL from '../../util/interval';
 
     // load tip
     Object.assign(d3, {
         tip
     });
 
-    /**
-     * constants intervals
-     **/
-    const INTERVAL = Object.freeze({
-        Millisecond : 1,
-        Second : 1000 * 1,
-        Minute: 60 * 1000,
-        Hour : 60 * 60 * 1000,
-        Day : 24 * 60 * 60 * 1000,
-        Week : 7 * 24 * 60 * 60 * 1000,
-        Month : 30 * 24 * 60 * 60 * 1000,
-        Year : 365 * 24 * 60 * 60 * 1000
-    });
+    // template
+    const tpl = `
+                <option value='Auto'>Auto</option>
+                <option value="${INTERVAL.Millisecond}">Millisecond</option>
+                <option value="${INTERVAL.Second}">Second</option>
+                <option value="${INTERVAL.Minute}">Minute</option>
+                <option value="${INTERVAL.Hour}">Hourly</option>
+                <option value="${INTERVAL.Day}">Daily</option>
+                <option value="${INTERVAL.Week}">Weekly</option>
+                <option value="${INTERVAL.Month}">Monthly</option>
+                <option value="${INTERVAL.Year}">Yearly</option>`;
 
     export default {
         name: 'd3-timelion',
+        data() {
+            return {
+                interval: 'Auto'
+            }
+        },
         mixins: [mixins],
         methods: {
             updateTimeRangeLabel(dateTimeStart, dateTimeEnd) {
-                if (!d3.select(this.$el).select('.label--time').empty())  {
-                    d3.select(this.$el)
-                        .select('.label--time')
-                        .text(() => this.getTimeRangeLabel(dateTimeStart, dateTimeEnd));
-                }
+                d3.select(this.$el)
+                    .select('.label--time')
+                    .text(() => this.getTimeRangeLabel(dateTimeStart, dateTimeEnd));
             },
             drawTimelion() {
                 // sort data by timestamp asc
                 // ***** here we must use clone deep because sort will change data, if data has been changed will rerun this function *****
-                // which cause a infinite loop
-                const data = _.cloneDeep(this.data).sort((a, b) => a.key > b.key ? 1 : -1);
+                // which cause an infinite loop
+                const {interval, data} = getIntervalAndSortedData(_.cloneDeep(this.data));
+                const interval_string = getIntervalString(interval);
                 const self = this;
 
                 // get container width and height
                 const [w, h] = this.getElWidthHeight(),
-                interval = getIntervalFromData(data, (el) => el.key);
+                    {left = 0, top = 0, right = 20, bottom = 0} = this.margin,
+                    {
+                        // bar config
+                        fill = '#6eadc1',
+                        stroke = '#6eadc1',
+                        fillOpacity = 0.6,
+                        strokeOpacity = 1,
 
-                // constants
-                const {left = 0, top = 0, right = 20, bottom = 0} = this.margin,
-                      {
-                          // bar config
-                          fill = '#6eadc1',
-                          stroke = '#6eadc1',
-                          fillOpacity = 0.6,
-                          strokeOpacity = 1,
+                        // axis config
+                        axisXHeight = 25,
+                        axisYWidth = 35,
 
-                          // axis config
-                          axisXHeight = 25,
-                          axisYWidth = 35,
+                        // axis label config
+                        axisXLabel = 'Key',
+                        axisYLabel = 'Value',
+                        axisFontSize = 12,
+                        axisLabelOpacity = 1,
+                        axisLabelFontWeight = 600,
+                        axisXLabelHeight = 60,
+                        axisYLabelWidth = 60,
 
-                          // axis label config
-                          axisXLabel = 'Key',
-                          axisYLabel = 'Value',
-                          axisFontSize = 12,
-                          axisLabelOpacity = 0.5,
-                          axisLabelFontWeight = 600,
-                          axisXLabelHeight = 60,
-                          axisYLabelWidth = 60,
+                        // time label config
+                        timeRangeLabelHeight = 40,
+                        timeRangeLabelFontSize = 12,
+                        timeRangeLabelOpacity = 0.5,
+                        timeRangeLabelFontWeight = 400,
 
-                          // time label config
-                          timeRangeLabelHeight = 40,
-                          timeRangeLabelFontSize = 12,
-                          timeRangeLabelOpacity = 0.5,
-                          timeRangeLabelFontWeight = 400,
-
-                          // tooltip config
-                          barTitle = d => `${new Date(d.key)}<br>${d.value}`
-                      } = this.options,
-                      ticksY = this.selectTicksNumY(h),
-                      [paddingInner, paddingOuter] = this.selectPaddingInnerOuterX(w),
-                      g_w = w - left - right - axisYLabelWidth - axisYWidth,
-                      g_h = h - top - bottom - axisXHeight - axisXLabelHeight - timeRangeLabelHeight,
-                      isMobile = g_w <= 560 ,
-                      tickSizeInner = 2,
-                      tickSizeOuter = 16;
+                        // tooltip config
+                        barTitle = d => `${new Date(d.key)}<br>${d.value}`
+                    } = this.options,
+                    ticksY = this.selectTicksNumY(h),
+                    [paddingInner, paddingOuter] = this.selectPaddingInnerOuterX(w),
+                    g_w = w - left - right - axisYLabelWidth - axisYWidth,
+                    g_h = h - top - bottom - axisXHeight - axisXLabelHeight - timeRangeLabelHeight,
+                    isMobile = g_w <= 560,
+                    tickSizeInner = 2,
+                    tickSizeOuter = 16;
 
                 // create svg
                 const svg = d3.select(this.$el)
@@ -129,29 +130,31 @@
 
                 // create time scale
                 const timeScale = d3.scaleTime()
-                    // add time range
+                // add time range
                     .domain([dateTimeStart, dateTimeEnd])
-
                     // map to graph
                     .range([0, g_w]);
 
                 // axis--x
-                svg.append('g')
+                const axisX = svg.append('g')
                     .attr('transform', `translate(${left + axisXLabelHeight + axisYWidth}, ${top + g_h + timeRangeLabelHeight})`)
                     .attr('width', g_w)
                     .attr('height', axisXHeight)
                     .append('g')
-                    .attr('class', 'axis axis--x')
-                    .call(d3.axisBottom(timeScale))
-                    // .call(d3.axisBottom(timeScale)
-                    //         .tickValues(getAxisXTicks(axisFontSize, g_w, interval, tickSizeInner, tickSizeOuter).map(el => timeScale.invert(el)))
-                    //         .tickFormat(el => formatTime(el, interval)))
-                    .attr('font-size', axisFontSize);
+                    .attr('class', 'axis axis--x');
 
-                // set middle point as center
-                d3.select('.axis.axis--x')
-                    .selectAll('.tick')
-                    .attr('text-anchor', 'middle');
+                if (data.length === 1) {
+                    axisX.call(d3.axisBottom(x)
+                        .tickFormat(el => formatTime(el, interval_string)))
+                        .attr('font-size', axisFontSize);
+                } else {
+                    axisX
+                        // .call(d3.axisBottom(timeScale))
+                        .call(d3.axisBottom(timeScale)
+                            .tickValues(getAxisXTicks(axisFontSize, g_w, interval_string, tickSizeInner, tickSizeOuter).map(el => timeScale.invert(el)))
+                            .tickFormat(el => formatTime(el, interval_string)))
+                        .attr('font-size', axisFontSize);
+                }
 
                 // axis--y
                 svg.append('g')
@@ -176,11 +179,12 @@
                 function brushed() {
                     if (d3.event.selection) {
                         const [dateTimeStart, dateTimeEnd] = Array.prototype.map.call(d3.event.selection, el => timeScale.invert(el - left - axisYWidth - axisYLabelWidth));
-                        self.$emit('range-updated', dateTimeStart, dateTimeEnd, d3.select('#interval').node().value);
+                        self.$emit('range-updated', dateTimeStart, dateTimeEnd);
 
                         // restore brush dom tree
                         d3.select('.d3-time-lion .brush').selectAll('*').remove();
                         d3.select('.d3-time-lion .brush').attr('fill', null).attr('pointer-events', null);
+
                         // https://github.com/d3/d3-brush/issues/10
                         // clear brush state, d3v4 state also brush on selection
                         brushX.move(b, null);
@@ -190,7 +194,7 @@
                 // brush callback
                 function brushing() {
                     if (d3.event.selection) {
-                        // selection is b so that the selection.x and selection.y is cordinates in svg
+                        // selection is b so that the selection.x and selection.y is coordinates in svg
                         const [dateTimeStart, dateTimeEnd] = Array.prototype.map.call(d3.event.selection, el => timeScale.invert(el - left - axisYWidth - axisYLabelWidth));
                         self.updateTimeRangeLabel(dateTimeStart, dateTimeEnd);
                     }
@@ -219,23 +223,23 @@
                     .attr('fill-opacity', fillOpacity)
                     .attr('stroke', stroke)
                     .attr('stroke-opacity', strokeOpacity)
-                    .on('mouseover', function(d, i) {
+                    .on('mouseover', function (d, i) {
                         g.call(tip);
                         tip.html(barTitle(d));
                         tip.show();
                     })
-                    .on('mouseout', function(d, i) {
+                    .on('mouseout', function (d, i) {
                         tip.hide();
                         d3.selectAll('.d3-tip').remove();
                     });
 
                 // when cursor is out of rect.bar, then set the cursor to crosshair
-                svg.on('mousemove', function(d, i){
+                svg.on('mousemove', function (d, i) {
                     const [cx, cy] = d3.mouse(g.node());
 
                     // check if cursor is in g and check if cursor is moving on svg
                     // if cursor is moving in g and not on bar<rect> then set cursor style as crosshair
-                    if ( cx >= 0 && cx <= g_w && cy >=0 && cy <= g_h && d3.event.target.nodeName === 'svg') {
+                    if (cx >= 0 && cx <= g_w && cy >= 0 && cy <= g_h && d3.event.target.nodeName === 'svg') {
                         svg.attr('cursor', 'crosshair');
                     }
 
@@ -245,11 +249,11 @@
                 });
 
                 // listen to user click
-                svg.on('mousedown', function(d, i) {
+                svg.on('mousedown', function (d, i) {
                     const [cx, cy] = d3.mouse(g.node());
 
                     // check if cursor is in g
-                    if ( cx >= 0 && cx <= g_w && cy >= 0 && cy <= g_h) {
+                    if (cx >= 0 && cx <= g_w && cy >= 0 && cy <= g_h) {
                         b.call(brushX);
                     }
                 });
@@ -269,8 +273,8 @@
                 // create the label of axis x
                 axisXLabelLane
                     .append('text')
-                    .attr('x', g_w/2)
-                    .attr('y', axisXLabelHeight/2)
+                    .attr('x', g_w / 2)
+                    .attr('y', axisXLabelHeight / 2)
                     .attr('text-anchor', 'middle')
                     .attr('fill', '#000')
                     .text(axisXLabel)
@@ -282,8 +286,8 @@
                     .append('text')
                     .attr('text-anchor', 'middle')
                     .attr('transform', 'rotate(-90)')
-                    .attr('y', axisYLabelWidth/2)
-                    .attr('x', -g_h/2)
+                    .attr('y', axisYLabelWidth / 2)
+                    .attr('x', -g_h / 2)
                     .text(axisYLabel)
                     .attr('opacity', axisLabelOpacity)
                     .attr('font-weight', axisLabelFontWeight);
@@ -299,8 +303,8 @@
                 // create time range label
                 const timeRangeLabel = timeRangeLabelLane.append('text')
                     .attr('class', 'label--time')
-                    .attr('x', g_w/2)
-                    .attr('y', timeRangeLabelHeight/2)
+                    .attr('x', g_w / 2)
+                    .attr('y', timeRangeLabelHeight / 2)
                     // .attr('dy', '0.35em')
                     .attr('fill', '#000')
                     .attr('font-size', timeRangeLabelFontSize)
@@ -313,67 +317,43 @@
                 // timeRangeLabel pos
                 const timeRangeLabelPos = timeRangeLabel.node().getBBox();
 
+                const FOREIGN_OBJECT = timeRangeLabelLane
+                    .append('foreignObject');
 
                 if (!isMobile) {
                     // not mobile
                     // draw interval select
-                    timeRangeLabelLane.append('foreignObject')
+                    FOREIGN_OBJECT
                         .attr('transform', `translate(${timeRangeLabelPos.x + timeRangeLabelPos.width}, ${top})`)
-                        .attr('width', g_w - timeRangeLabelPos.x - timeRangeLabelPos.width)
-                        .attr('height', timeRangeLabelHeight)
-                        .append('xhtml:select')
-                        .attr('class', 'form-control')
-                        .attr('id', 'interval')
-                        .on('change', () => {
-                            const value = isNaN(parseInt(d3.event.target.value, 10))
-                                ? 'Auto'
-                                : parseInt(d3.event.target.value, 10);
-                            this.$emit('interval-updated', value);
-                        })
-                        .html(`
-                            <option value='Auto'>Auto</option>
-                            <option value="${INTERVAL.Millisecond}">Millisecond</option>
-                            <option value="${INTERVAL.Second}">Second</option>
-                            <option value="${INTERVAL.Minute}">Minute</option>
-                            <option value="${INTERVAL.Hour}">Hourly</option>
-                            <option value="${INTERVAL.Day}">Daily</option>
-                            <option value="${INTERVAL.Week}">Weekly</option>
-                            <option value="${INTERVAL.Month}">Monthly</option>
-                            <option value="${INTERVAL.Year}">Yearly</option>`)
-                        .property('value', INTERVAL[interval]||'Auto');
+                        .attr('width', g_w - timeRangeLabelPos.x - timeRangeLabelPos.width);
+
+                } else {
+                    // mobile
+                    FOREIGN_OBJECT
+                        .attr('transform', `translate(${timeRangeLabelPos.x + timeRangeLabelPos.width / 2}, ${top + timeRangeLabelHeight})`)
+                        .attr('width', g_w - timeRangeLabelPos.x - timeRangeLabelPos.width / 2);
+
                 }
 
-                else {
-                    // mobile
-                    // draw interval select
-                    timeRangeLabelLane.append('foreignObject')
-                        .attr('transform', `translate(${timeRangeLabelPos.x + timeRangeLabelPos.width/2}, ${top + timeRangeLabelHeight})`)
-                        .attr('width', g_w - timeRangeLabelPos.x - timeRangeLabelPos.width/2)
+                // draw select box
+                FOREIGN_OBJECT
                         .attr('height', timeRangeLabelHeight)
                         .append('xhtml:select')
                         .attr('class', 'form-control')
                         .attr('id', 'interval')
                         .on('change', () => {
-                            const value = isNaN(parseInt(d3.event.target.value, 10))
-                                ? 'Auto'
-                                : parseInt(d3.event.target.value, 10);
-                            this.$emit('interval-updated', value);
+                            const targetVal = d3.event.target.value,
+                                  val = targetVal === 'Auto' ? targetVal : Number.parseInt(targetVal, 10);
+
+                            this.interval = val;
+
+                            this.$emit('interval-updated', val);
                         })
-                        .html(`
-                            <option value='Auto'>Auto</option>
-                            <option value="${INTERVAL.Millisecond}">Millisecond</option>
-                            <option value="${INTERVAL.Second}">Second</option>
-                            <option value="${INTERVAL.Minute}">Minute</option>
-                            <option value="${INTERVAL.Hour}">Hourly</option>
-                            <option value="${INTERVAL.Day}">Daily</option>
-                            <option value="${INTERVAL.Week}">Weekly</option>
-                            <option value="${INTERVAL.Month}">Monthly</option>
-                            <option value="${INTERVAL.Year}">Yearly</option>`)
-                        .property('value', INTERVAL[interval]||'Auto');
-                }
+                        .html(tpl)
+                        .property('value', this.interval);
 
                 // draw reference line to represent now
-                let now = new Date();
+                const now = new Date();
                 if (dateTimeEnd >= now) {
                     // draw reference
                     g.append('line')
