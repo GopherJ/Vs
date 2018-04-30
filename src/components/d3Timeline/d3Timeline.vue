@@ -3,6 +3,7 @@
 </template>
 
 <script>
+/* eslint-disable */
     import * as d3 from 'd3';
     import tip from 'd3-tip';
     import mixins from '../../mixins';
@@ -227,17 +228,22 @@
                         .attr('font-size', axisXFontSize)
                         .attr('font-weight', axisXFontWeight);
 
+                    const ENTRY = entryLaneContainer.selectAll('.entry'),
+                          LineTick = entryLaneContainer.selectAll('.line--tick'),
+                          LineReference = entryLaneContainer.select('.line--reference');
 
-                    if (!d3.selectAll('.entry').empty()) {
-                        d3.selectAll('.entry').remove();
+
+
+                    if (!ENTRY.empty()) {
+                        ENTRY.remove();
                     }
 
-                    if (!d3.selectAll('.line--tick').empty()) {
-                        d3.selectAll('.line--tick').remove();
+                    if (!LineTick.empty()) {
+                        LineTick.remove();
                     }
 
-                    if (!d3.select('.line--reference').empty()) {
-                        d3.select('.line--reference').remove();
+                    if (LineReference.empty()) {
+                        LineReference.remove();
                     }
 
                     drawReference(t);
@@ -350,18 +356,10 @@
 
                                    const symbolGen = d3.symbol().size(symbolSize);
 
-                                   // const point = G.append('circle')
-                                   //      .attr('class', `${entry.className === undefined ? 'entry--point' : entry.className}`)
-                                   //      .attr('cx', timeScale(entry.at))
-                                   //      .attr('cy', Y + H/2)
-                                   //      .attr('r', circleRadius)
-                                   //      .attr('clip-path', 'url(#clip-line)');
-
                                    const symbol = G.append('path')
                                          .attr('transform', `translate(${timeScale(entry.at)}, ${Y + H/2})`)
-                                         .attr('class', `${entry.className ? entry.className : 'entry--point'}`)
+                                         .attr('class', `${entry.className ? entry.className : 'entry--point--default'}`)
                                          .attr('d', symbolGen.type(d3[entry.symbol] || d3['symbolCircle'])());
-                                       // .attr('clip-path', 'url(#clip-line)');
 
                                    symbol
                                        .on('mouseover', () => {
@@ -384,7 +382,7 @@
                                         .attr('class', 'entry');
 
                                     const interval = G.append('path')
-                                        .attr('class', `${entry.className ? entry.className : 'entry--interval'}`)
+                                        .attr('class', `${entry.className ? entry.className : 'entry--interval--default'}`)
                                         .attr('d', roundedRect(X, Y, W, H, intervalCornerRadius, true, true, true, true))
                                         .attr('clip-path', 'url(#clip-line)');
 
@@ -443,22 +441,6 @@
         display: none;
     }
 
-    .d3-time-line .entry--point {
-        fill: #6eadc1;
-        stroke: #6eadc1;
-        fill-opacity: 0.125;
-        stroke-opacity: 1;
-        cursor: pointer;
-    }
-
-    .d3-time-line .entry--interval {
-        fill: #6eadc1;
-        stroke: #6eadc1;
-        fill-opacity: 0.125;
-        stroke-opacity: 1;
-        cursor: pointer;
-    }
-
     .d3-time-line .entry--label {
         fill: #000;
         fill-opacity: 1;
@@ -466,4 +448,85 @@
         font-weight: 400;
         cursor: pointer;
     }
+
+    .d3-time-line .entry--interval--default {
+    fill: #6eadc1;
+    stroke: #6eadc1;
+    fill-opacity: 0.125;
+    stroke-opacity: 1;
+    cursor: pointer;
+}
+
+.d3-time-line .entry--point--default {
+    fill: #6eadc1;
+    stroke: #6eadc1;
+    fill-opacity: 0.125;
+    stroke-opacity: 1;
+    cursor: pointer;
+}
+
+.d3-time-line .entry--interval--error {
+    fill: #ff3860;;
+    stroke: #ff3860;
+    fill-opacity: 0.125;
+    stroke-opacity: 1;
+    cursor: pointer;
+}
+
+.d3-time-line .entry--point--error {
+    fill: #ff3860;;
+    stroke: #ff3860;
+    fill-opacity: 0.125;
+    stroke-opacity: 1;
+    cursor: pointer;
+}
+
+.d3-time-line .entry--interval--success {
+    fill: #23d160;;
+    stroke: #23d160;
+    fill-opacity: 0.125;
+    stroke-opacity: 1;
+    cursor: pointer;
+}
+
+
+.d3-time-line .entry--point--success {
+    fill: #23d160;;
+    stroke: #23d160;
+    fill-opacity: 0.125;
+    stroke-opacity: 1;
+    cursor: pointer;
+}
+
+.d3-time-line .entry--interval--info {
+    fill: #167df0;;
+    stroke: #167df0;
+    fill-opacity: 0.125;
+    stroke-opacity: 1;
+    cursor: pointer;
+}
+
+.d3-time-line .entry--point--info {
+    fill: #167df0;;
+    stroke: #167df0;
+    fill-opacity: 0.125;
+    stroke-opacity: 1;
+    cursor: pointer;
+}
+
+.d3-time-line .entry--interval--warn {
+    fill: #ffdd57;;
+    stroke: #ffdd57;
+    fill-opacity: 0.125;
+    stroke-opacity: 1;
+    cursor: pointer;
+}
+
+.d3-time-line .entry--point--warn {
+    fill: #ffdd57;;
+    stroke: #ffdd57;
+    fill-opacity: 0.125;
+    stroke-opacity: 1;
+    cursor: pointer;
+}
 </style>
