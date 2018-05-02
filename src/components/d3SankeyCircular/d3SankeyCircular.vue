@@ -9,6 +9,7 @@
     import * as d3SankeyCircular from 'd3-sankey-circular';
     import pathArrows from './pathArrows';
     import _ from 'lodash';
+    import offset from 'document-offset';
 
     // Load the package d3SankeyCircular and tip on d3
     Object.assign(d3, d3SankeyCircular, {
@@ -225,12 +226,17 @@
                     .attr('width', d => d.x1 - d.x0)
                     .style('fill', d => nodeColour(d.x0))
                     .style('opacity', 0.5)
-                    .on('mouseover', (d) => {
+                    .on('mouseover', function(d) {
                         const thisName = d.name;
 
                         g.call(tip);
                         tip.html(nodeTitle(d));
                         tip.show();
+
+
+                        const tipSelection = d3.select('.d3-tip');
+                        tipSelection.style('top', `${offset(this).top - tipSelection.node().getBoundingClientRect().height - 10}px`);
+                        tipSelection.style('left', `${offset(this).left + this.getBBox().width/2 - tipSelection.node().getBoundingClientRect().width/2}px`);
 
                         node
                             .selectAll('.node')
@@ -280,9 +286,14 @@
                         g.call(tip);
                         tip.html(linkTitle(d));
                         tip.show();
+
+
+                        const tipSelection = d3.select('.d3-tip');
+                        tipSelection.style('top', `${offset(this).top - tipSelection.node().getBoundingClientRect().height}px`);
+                        tipSelection.style('left', `${offset(this).left + this.getBBox().width/2 - tipSelection.node().getBoundingClientRect().width/2}px`);
                     })
                     .on('mouseout', function(d, i){
-                        tip.hide();
+                        // tip.hide();
                         d3.selectAll('.d3-tip').remove();
                     });
 
@@ -309,7 +320,7 @@
                 }
                 d3.select(this.$el).select('svg').remove();
             },
-            safeDrawSankey() {
+            safeDraw() {
                 this.ifExistsSvgThenRemove();
                 this.drawSankey();
             }
@@ -319,7 +330,7 @@
                 deep: true,
                 handler(n, o) {
                     this.$nextTick(() => {
-                        this.safeDrawSankey();
+                        this.safeDraw();
                     });
                 }
             },
@@ -327,7 +338,7 @@
                 deep: true,
                 handler(n, o) {
                     this.$nextTick(() => {
-                        this.safeDrawSankey();
+                        this.safeDraw();
                     });
                 }
             },
@@ -335,27 +346,27 @@
                 deep: true,
                 handler(n, o) {
                     this.$nextTick(() => {
-                        this.safeDrawSankey();
+                        this.safeDraw();
                     });
                 }
             },
             width(n) {
                 this.$nextTick(() => {
-                    this.safeDrawSankey();
+                    this.safeDraw();
                 });
             },
             height(n) {
                 this.$nextTick(() => {
-                    this.safeDrawSankey();
+                    this.safeDraw();
                 });
             }
         },
         mounted() {
             // initialisation
-            this.safeDrawSankey();
+            this.safeDraw();
 
             this.listener = _.debounce(() => {
-                this.safeDrawSankey();
+                this.safeDraw();
             }, 500);
 
             window.addEventListener('resize', this.listener);

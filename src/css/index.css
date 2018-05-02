@@ -33,9 +33,6 @@
 
 
 
-
-
-
 /* rect rendering method */
 rect {
     shape-rendering: crispEdges;
@@ -59,6 +56,7 @@ text {
     -ms-user-select: none;
     user-select: none;
 }
+
 
 
 

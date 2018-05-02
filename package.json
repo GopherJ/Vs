@@ -28,6 +28,8 @@
     "d3-queue": "^3.0.7",
     "d3-sankey-circular": "^0.23.0",
     "d3-tip": "^0.7.1",
+    "d3-tipy": "^1.2.3",
+    "document-offset": "^1.0.4",
     "lodash": "^4.17.5",
     "moment": "^2.22.0",
     "vue": "^2.5.13"

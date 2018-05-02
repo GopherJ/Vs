@@ -3,13 +3,14 @@
 </template>
 
 <script>
-    /* eslint-disable */
+/* eslint-disable */
     import * as d3 from 'd3';
     import tip from 'd3-tip';
     import mixins from '../../mixins';
     import {Point, Interval, getGroupsData} from '../../util/getGroupsData';
     import roundedRect from '../../util/roundedRect';
     import _ from 'lodash';
+    import offset from 'document-offset';
 
     // load tip
     Object.assign(d3, {
@@ -363,13 +364,17 @@
                                         .attr('d', symbolGen.type(d3[entry.symbol] || d3['symbolCircle'])());
 
                                     symbol
-                                        .on('mouseover', () => {
+                                        .on('mouseover', function () {
                                             g.call(tip);
                                             tip.html(() => `${entry.title}`);
                                             tip.show();
+
+                                            const tipSelection = d3.select('.d3-tip');
+                                            tipSelection.style('top', `${offset(this).top - tipSelection.node().getBoundingClientRect().height - 10}px`);
+                                            tipSelection.style('left', `${offset(this).left + this.getBBox().width/2 - tipSelection.node().getBoundingClientRect().width/2}px`);
                                         })
                                         .on('mouseout', () => {
-                                            tip.hide();
+                                            // tip.hide();
                                             d3.selectAll('.d3-tip').remove();
                                         })
                                 }
@@ -389,13 +394,18 @@
 
                                     if (entry.title) {
                                         interval
-                                            .on('mouseover', () => {
+                                            .on('mouseover', function() {
                                                 g.call(tip);
                                                 tip.html(() => `${entry.title}`);
                                                 tip.show();
+
+                                                const tipSelection = d3.select('.d3-tip');
+                                                tipSelection.style('top', `${offset(this).top - tipSelection.node().getBoundingClientRect().height - 10}px`);
+                                                tipSelection.style('left', `${offset(this).left + this.getBBox().width/2 - tipSelection.node().getBoundingClientRect().width/2}px`);
+
                                             })
                                             .on('mouseout', () => {
-                                                tip.hide();
+                                                // tip.hide();
                                                 d3.selectAll('.d3-tip').remove();
                                             });
                                     }

@@ -14,6 +14,7 @@
     import _ from 'lodash';
     import moment from 'moment';
     import INTERVAL from '../../util/interval';
+    import offset from 'document-offset';
 
     // load tip
     Object.assign(d3, {
@@ -227,9 +228,13 @@
                         g.call(tip);
                         tip.html(barTitle(d));
                         tip.show();
+
+                        const tipSelection = d3.select('.d3-tip');
+                        tipSelection.style('top', `${offset(this).top - tipSelection.node().getBoundingClientRect().height - 10}px`);
+                        tipSelection.style('left', `${offset(this).left + this.getBBox().width/2 - tipSelection.node().getBoundingClientRect().width/2}px`);
                     })
                     .on('mouseout', function (d, i) {
-                        tip.hide();
+                        // tip.hide();
                         d3.selectAll('.d3-tip').remove();
                     });
 
