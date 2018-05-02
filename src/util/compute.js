@@ -46,7 +46,7 @@ const compute_selection_w_h = (selection) => {
 
 
 
-export default {
+export {
     compute_selection_w_h,
     compute_html_element_w_h,
     compute_selection_offset

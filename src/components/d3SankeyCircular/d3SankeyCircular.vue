@@ -3,18 +3,35 @@
 </template>
 
 <script>
-/* eslint-disable */
+    /* eslint-disable */
     import * as d3 from 'd3';
     import tip from 'd3-tip';
     import * as d3SankeyCircular from 'd3-sankey-circular';
     import pathArrows from './pathArrows';
     import _ from 'lodash';
     import offset from 'document-offset';
+    import {compute_selection_offset, compute_html_element_w_h, compute_selection_w_h} from '../../util/compute';
 
     // Load the package d3SankeyCircular and tip on d3
     Object.assign(d3, d3SankeyCircular, {
         tip
     });
+
+    // template
+    const tpl = `
+            <option value="5000">5 seconds</option>
+            <option value="10000">10 seconds</option>
+            <option value="30000">30 seconds</option>
+            <option value="60000">1 minute</option>
+            <option value="300000">5 minute</option>
+            <option value="900000">15 minute</option>
+            <option value="1800000">30 minute</option>
+            <option value="3600000">1 hour</option>
+            <option value="10800000">3 hour</option>
+            <option value="21600000">6 hour</option>
+            <option value="43200000">12 hour</option>
+            <option value="86400000">24 hour</option>
+    `;
 
     const highlightNodes = (node, name) => {
         let opacity = 0.3;
@@ -40,6 +57,11 @@
 
     export default {
         name: 'd3-sankey-circular',
+        data: () => {
+            return {
+                maxPeriod: 30000
+            }
+        },
         props: {
             nodes: {
                 type: Array,
@@ -78,58 +100,6 @@
                 if (this.nodes.length === 0 || this.links.length === 0) {
                     return;
                 }
-                // how to make svg respond to window
-                // https://bl.ocks.org/curran/3a68b0c81991e2e94b19
-
-                /**
-                 * compute width and height of chart
-                 */
-                const compute_w_h = () => {
-                    return [this.$el.clientWidth, this.$el.clientHeight];
-                };
-
-
-                /**
-                 * compute offsetLeft of g
-                 * @param selection
-                 */
-                const compute_selection_offset_left = (selection) => {
-                    // https://stackoverflow.com/questions/21990857/d3-js-how-to-get-the-computed-width-and-height-for-an-arbitrary-element
-
-                    // for svg elements we can only use selection.node().getBBox()
-                    // {
-                    //     height: 5,
-                    //         width: 5,
-                    //     y: 50,
-                    //     x: 20
-                    // }
-                    return selection.node().getBBox().x;
-
-                    // for html elements we can use selection.node().getBoundingClientRect()
-                    // left, right
-                    // top, bottom
-                    // height, width
-                };
-
-
-                /**
-                 * compute offsetTop of g
-                 */
-                const compute_selection_offset_top = (selection) => {
-                    return selection.node().getBBox().y;
-                };
-
-
-                /**
-                 * calculate d3.selection's width and height
-                 *
-                 * https://stackoverflow.com/questions/21990857/d3-js-how-to-get-the-computed-width-and-height-for-an-arbitrary-element/42247372
-                 * @param selection
-                 */
-                const compute_selection_w_h = (selection) => {
-                    return [selection.node().getBBox().width,
-                        selection.node().getBBox().height];
-                };
 
                 // start to calculate, to draw
                 const data = _.cloneDeep({
@@ -146,14 +116,30 @@
                     linkColor = 'black',
                     arrowLength = 10,
                     gapLength = 150,
-                    arrowHeadSize = 4
+                    arrowHeadSize = 4,
+
+                    axisXSelectBoxLabel = 'Max interval among same trajectory',
+                    axisXSelectBoxLabelFontSize = 12,
+                    axisXSelectBoxLabelFontWeight = 400,
+                    axisXSelectBoxLabelFontOpacity = 0.5,
+                    axisXSelectBoxLaneHeight = 40,
+
+                    axisXLabel = 'Key',
+                    axisXLabelLaneHeight = 30,
+                    axisXLabelFontSize = 12,
+                    axisXLabelFontWeight = 400,
+                    axisXLabelFontOpacity = 0.5,
                 } = this.options;
 
                 // calculate width and height of chart container
-                const [c_w, c_h] = compute_w_h();
+                const [w, h] = this.getElWidthHeight(),
+                    g_w = w,
+                    g_h = h - axisXLabelLaneHeight - axisXSelectBoxLaneHeight,
+                    isMobile = g_w <= 560;
 
-                if (!c_w || !c_h) {
-                    throw new Error('invalid width or height');
+                // invalid width and height
+                if (g_w <= 0 || g_h <= 0) {
+                    return;
                 }
 
                 const nodeTitle = this.nodeTitle;
@@ -162,7 +148,7 @@
                 const sankey = d3.sankeyCircular()
                     .nodeWidth(nodeWidth)
                     .nodePaddingRatio(0.5)
-                    .size([c_w, c_h])
+                    .size([g_w, g_h])
                     .nodeId(d => d.name)
                     .nodeAlign(d3.sankeyJustify)
                     .iterations(32)
@@ -173,18 +159,99 @@
                     .append('svg')
                     // .attr("viewBox", `0 0 ${width} ${height}`)
                     // .attr("preserveAspectRatio", "xMinYMax meet")
-                    .attr('width', c_w)
-                    .attr('height', c_h);
+                    .attr('width', w)
+                    .attr('height', h);
 
-                // keep the reference of g so that we can align it after all the calcul
+                // select box lane
+                const axisXSelectBoxLane = svg
+                    .append('g')
+                    .attr('width', g_w)
+                    .attr('height', axisXSelectBoxLaneHeight);
+
+                // label lane
+                const axisXLabelLane = svg
+                    .append('g')
+                    .attr('transform', `translate(0, ${axisXSelectBoxLaneHeight + g_h})`)
+                    .attr('width', g_w)
+                    .attr('height', axisXLabelLaneHeight);
+
+                // main g that contain our graph
                 const g = svg
-                    .append('g');
+                    .append('g')
+                    .attr('transform', `translate(0, ${axisXSelectBoxLaneHeight})`);
 
+                // create select box label
+                const SelectBoxLabel = axisXSelectBoxLane.append('text')
+                    .attr('text-anchor', 'middle')
+                    .attr('x', g_w / 2)
+                    .attr('y', axisXSelectBoxLaneHeight / 2)
+                    .text(axisXSelectBoxLabel)
+                    .attr('fill', '#000')
+                    .attr('font-size', axisXSelectBoxLabelFontSize)
+                    .attr('font-weight', axisXSelectBoxLabelFontWeight)
+                    .attr('fill-opacity', axisXSelectBoxLabelFontOpacity);
+
+                // pos
+                const SelectBoxLabelPos = SelectBoxLabel.node().getBBox();
+
+                // create foreign object
+                const FOREIGN_OBJECT = axisXSelectBoxLane.append('foreignObject');
+
+                if (!isMobile) {
+                    FOREIGN_OBJECT
+                        .attr('transform', `translate(${SelectBoxLabelPos.x + SelectBoxLabelPos.width}, 0)`)
+                        .attr('width', g_w - SelectBoxLabelPos.x - SelectBoxLabelPos.width);
+                }
+
+                else {
+                    FOREIGN_OBJECT
+                        .attr('transform', `translate(${SelectBoxLabelPos.x + SelectBoxLabelPos.width / 2}, ${SelectBoxLabelPos.y + SelectBoxLabelPos.height})`)
+                        .attr('width', g_w - SelectBoxLabelPos.x - SelectBoxLabelPos.width / 2);
+                }
+
+                FOREIGN_OBJECT
+                    .attr('height', axisXSelectBoxLaneHeight)
+                    .append('xhtml:select')
+                    .attr('class', 'form-control')
+                    .attr('id', 'max-period')
+                    .on('change', () => {
+                        const targetVal = d3.event.target.value,
+                            val = Number.parseInt(targetVal, 10);
+
+                        this.maxPeriod = val;
+                        this.$emit('max-period-updated', this.maxPeriod);
+
+                        if (this.$root) {
+                            // design for https://github.com/GopherJ/LayoutGrid
+                            if (this.$parent.i) {
+                                this.$root.$emit('max-period-updated', {
+                                    i: this.$parent.i,
+                                    payload: val
+                                });
+                            } else {
+                                this.$root.$emit('max-period-updated', val);
+                            }
+                        }
+                    })
+                    .html(tpl)
+                    .property('value', this.maxPeriod);
+
+                // create label
+                axisXLabelLane.append('text')
+                    .attr('text-anchor', 'middle')
+                    .attr('x', g_w / 2)
+                    .attr('y', axisXLabelLaneHeight / 2)
+                    .attr('dy', '0.35em')
+                    .text(axisXLabel)
+                    .attr('fill', '#000')
+                    .attr('fill-opacity', axisXLabelFontOpacity)
+                    .attr('font-size', axisXLabelFontSize)
+                    .attr('font-weight', axisXLabelFontWeight);
 
                 // tooltip
                 const tip = d3.tip()
                     .attr('class', 'd3-tip')
-                    .offset([-10, 0]);
+                    .offset([0, 0]);
 
                 const linkG = g
                     .append('g')
@@ -210,7 +277,7 @@
 
                 const nodeColour = d3
                     .scaleSequential(d3.interpolateCool)
-                    .domain([0, c_w]);
+                    .domain([0, g_w]);
 
                 const node = nodeG
                     .data(sankeyNodes)
@@ -226,7 +293,7 @@
                     .attr('width', d => d.x1 - d.x0)
                     .style('fill', d => nodeColour(d.x0))
                     .style('opacity', 0.5)
-                    .on('mouseover', function(d) {
+                    .on('mouseover', function (d) {
                         const thisName = d.name;
 
                         g.call(tip);
@@ -236,7 +303,7 @@
 
                         const tipSelection = d3.select('.d3-tip');
                         tipSelection.style('top', `${offset(this).top - tipSelection.node().getBoundingClientRect().height - 10}px`);
-                        tipSelection.style('left', `${offset(this).left + this.getBBox().width/2 - tipSelection.node().getBoundingClientRect().width/2}px`);
+                        tipSelection.style('left', `${offset(this).left + this.getBBox().width / 2 - tipSelection.node().getBoundingClientRect().width / 2}px`);
 
                         node
                             .selectAll('.node')
@@ -248,7 +315,7 @@
                     })
                     .on('mouseout', (d) => {
 
-                        tip.hide();
+                        // tip.hide();
                         d3.selectAll('.d3-tip').remove();
 
                         d3
@@ -282,17 +349,17 @@
                     .style('stroke-width', d => Math.max(1, d.width))
                     .style('opacity', 0.7)
                     .style('stroke', (link, i) => (link.circular ? circularLinkColor : linkColor))
-                    .on('mouseover', function(d, i){
+                    .on('mouseover', function (d, i) {
                         g.call(tip);
                         tip.html(linkTitle(d));
                         tip.show();
 
 
                         const tipSelection = d3.select('.d3-tip');
-                        tipSelection.style('top', `${offset(this).top - tipSelection.node().getBoundingClientRect().height}px`);
-                        tipSelection.style('left', `${offset(this).left + this.getBBox().width/2 - tipSelection.node().getBoundingClientRect().width/2}px`);
+                        tipSelection.style('top', `${offset(this).top - tipSelection.node().getBoundingClientRect().height - 10}px`);
+                        tipSelection.style('left', `${offset(this).left + this.getBBox().width / 2 - tipSelection.node().getBoundingClientRect().width / 2}px`);
                     })
-                    .on('mouseout', function(d, i){
+                    .on('mouseout', function (d, i) {
                         // tip.hide();
                         d3.selectAll('.d3-tip').remove();
                     });
@@ -311,8 +378,11 @@
 
                 // calculate g's width and height
                 // align g at the middle of chart
-                const [g_w, g_h] = compute_selection_w_h(g);
-                g.attr('transform', `translate(${(c_w - g_w) / 2 - compute_selection_offset_left(g)}, ${(c_h - g_h) / 2 - compute_selection_offset_top(g)})`);
+                const [g_real_w, g_real_h] = compute_selection_w_h(g);
+                g.attr('transform', `translate(${(g_w - g_real_w) / 2 - compute_selection_offset(g).x}, ${(g_h - g_real_h) / 2 - compute_selection_offset(g).y})`);
+            },
+            getElWidthHeight() {
+                return [this.$el.clientWidth, this.$el.clientHeight];
             },
             ifExistsSvgThenRemove() {
                 if (d3.select(this.$el).select('svg').empty()) {

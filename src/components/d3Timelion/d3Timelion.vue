@@ -182,6 +182,19 @@
                         const [dateTimeStart, dateTimeEnd] = Array.prototype.map.call(d3.event.selection, el => timeScale.invert(el - left - axisYWidth - axisYLabelWidth));
                         self.$emit('range-updated', dateTimeStart, dateTimeEnd);
 
+                        if (self.$root) {
+                            // design for https://github.com/GopherJ/LayoutGrid
+                            if (self.$parent.i) {
+                                self.$root.$emit('range-updated', {
+                                    i: self.$parent.i,
+                                    payload: [dateTimeStart, dateTimeEnd]
+                                });
+                            }
+                            else {
+                                self.$root.$emit('range-updated', dateTimeStart, dateTimeEnd);
+                            }
+                        }
+
                         // restore brush dom tree
                         d3.select('.d3-time-lion .brush').selectAll('*').remove();
                         d3.select('.d3-time-lion .brush').attr('fill', null).attr('pointer-events', null);
@@ -353,6 +366,18 @@
                             this.interval = val;
 
                             this.$emit('interval-updated', val);
+
+                            if (this.$root) {
+                                // design for https://github.com/GopherJ/LayoutGrid
+                                if (this.$parent.i) {
+                                    this.$root.$emit('interval-updated', {
+                                        i: this.$parent.i,
+                                        payload: val
+                                    });
+                                } else {
+                                    this.$root.$emit('interval-updated', val);
+                                }
+                            }
                         })
                         .html(tpl)
                         .property('value', this.interval);
