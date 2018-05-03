@@ -10,7 +10,7 @@
     import pathArrows from './pathArrows';
     import _ from 'lodash';
     import offset from 'document-offset';
-    import {compute_selection_offset, compute_html_element_w_h, compute_selection_w_h} from '../../util/compute';
+    import {compute_selection_offset, compute_selection_w_h} from '../../util/compute';
 
     // Load the package d3SankeyCircular and tip on d3
     Object.assign(d3, d3SankeyCircular, {
@@ -354,7 +354,6 @@
                         tip.html(linkTitle(d));
                         tip.show();
 
-
                         const tipSelection = d3.select('.d3-tip');
                         tipSelection.style('top', `${offset(this).top - tipSelection.node().getBoundingClientRect().height - 10}px`);
                         tipSelection.style('left', `${offset(this).left + this.getBBox().width / 2 - tipSelection.node().getBoundingClientRect().width / 2}px`);
@@ -378,8 +377,10 @@
 
                 // calculate g's width and height
                 // align g at the middle of chart
-                const [g_real_w, g_real_h] = compute_selection_w_h(g);
-                g.attr('transform', `translate(${(g_w - g_real_w) / 2 - compute_selection_offset(g).x}, ${(g_h - g_real_h) / 2 - compute_selection_offset(g).y})`);
+                const [g_real_w, g_real_h] = compute_selection_w_h(g),
+                      [offsetX, offsetY] = compute_selection_offset(g);
+
+                g.attr('transform', `translate(${(g_w - g_real_w) / 2 - offsetX}, ${(g_h - g_real_h) / 2 - offsetY + axisXSelectBoxLaneHeight})`);
             },
             getElWidthHeight() {
                 return [this.$el.clientWidth, this.$el.clientHeight];
