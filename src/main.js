@@ -7,6 +7,7 @@ import d3Line from './components/d3Line';
 import d3Bar from './components/d3Bar';
 import d3ProgressArc from './components/d3ProgressArc';
 import d3Metric from './components/d3Metric';
+import d3MultiLine from './components/d3MultiLine';
 
 const install = (Vue, options = {}) => {
     if (options.store) {
@@ -20,6 +21,7 @@ const install = (Vue, options = {}) => {
     Vue.component(d3Line.name, d3Line);
     Vue.component(d3Bar.name, d3Bar);
     Vue.component(d3Metric.name, d3Metric);
+    Vue.component(d3MultiLine.name, d3MultiLine);
 };
 
 export default {
@@ -36,6 +38,7 @@ export {
     d3Pie,
     d3Line,
     d3Bar,
-    d3Metric
+    d3Metric,
+    d3MultiLine
 };
 
