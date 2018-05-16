@@ -42,33 +42,42 @@
                 return [this.$el.clientWidth, this.$el.clientHeight];
             },
             ifExistsSvgThenRemove() {
-                if (d3.select(this.$el).select('svg').empty()) {
+                const svgSelection = d3.select(this.$el).select('svg');
+
+                if (svgSelection.empty()) {
                     return;
                 }
-                d3.select(this.$el).select('svg').remove();
+
+                svgSelection.remove();
             },
             drawMetric() {
                 // constants
                 const data = this.data,
                     {
-                        axisXLabelLaneHeight = 30,
-                        axisXLabel = 'Key',
-                        axisXLabelFontSize = 12,
-                        axisXLabelFontWeight = 400,
-                        axisXLabelFontOpacity = 0.5,
+                        axisXLabel = 'key',
+                        axisLabelFontSize = 12,
+                        axisLabelFontWeight = 400,
+                        axisLabelFontOpacity = 0.5,
 
-                        metricLabelColor = '#000',
+                        metricLabelColor = 'black',
                         metricLabelFontSize = 120,
-                        metricLabelFontWeight = 1000,
+                        metricLabelFontWeight = 900,
                         metricLabelFontOpacity = 0.5,
 
                         metricTitle = d => `${d}`
+                    } = this.options,
+                    {
+                        axisXLabelLaneHeight = _.isNull(axisXLabel) ? 0 : 30
                     } = this.options;
 
                 const [w, h] = this.getElWidthHeight(),
-                    { left = 0, top = 0, right = 0, bottom = 0 } = this.margin,
+                    {left = 0, top = 0, right = 0, bottom = 0} = this.margin,
                     g_w = w - left - right,
                     g_h = h - top - bottom - axisXLabelLaneHeight;
+
+                if (![g_w, g_h].every(el => el > 0)) {
+                    return;
+                }
 
                 const svg = d3.select(this.$el)
                     .append('svg')
@@ -94,20 +103,20 @@
                 axisXLabelLane
                     .append('text')
                     .attr('text-anchor', 'middle')
-                    .attr('x', g_w/2)
-                    .attr('y', axisXLabelLaneHeight/2)
+                    .attr('x', g_w / 2)
+                    .attr('y', axisXLabelLaneHeight / 2)
                     .attr('dy', '0.35em')
                     .text(axisXLabel)
                     .attr('fill', '#000')
-                    .attr('fill-opacity', axisXLabelFontOpacity)
-                    .attr('font-size', axisXLabelFontSize)
-                    .attr('font-weight', axisXLabelFontWeight);
+                    .attr('fill-opacity', axisLabelFontOpacity)
+                    .attr('font-size', axisLabelFontSize)
+                    .attr('font-weight', axisLabelFontWeight);
 
                 g.append('text')
                     .datum(data)
                     .attr('text-anchor', 'middle')
-                    .attr('x', g_w/2)
-                    .attr('y', g_h/2)
+                    .attr('x', g_w / 2)
+                    .attr('y', g_h / 2)
                     .attr('dy', '0.35em')
                     .text(typeof data === 'number' ? d3.format(',')(data).toString() : data)
                     .attr('fill', metricLabelColor)
@@ -121,9 +130,9 @@
 
                         const tipSelection = d3.select('.d3-tip');
                         tipSelection.style('top', `${offset(this).top - tipSelection.node().getBoundingClientRect().height - 10}px`);
-                        tipSelection.style('left', `${offset(this).left + this.getBBox().width/2 - tipSelection.node().getBoundingClientRect().width/2}px`);
+                        tipSelection.style('left', `${offset(this).left + this.getBBox().width / 2 - tipSelection.node().getBoundingClientRect().width / 2}px`);
                     })
-                    .on('mouseout', (d) => {
+                    .on('mouseout', (_) => {
                         d3.selectAll('.d3-tip').remove();
                     });
             },
@@ -187,7 +196,7 @@
         },
         mounted() {
             // container must have width and height
-            if (this.getElWidthHeight().some(el => !el)) {
+            if (!this.getElWidthHeight().every(el => el > 0)) {
                 return;
             }
 
@@ -208,6 +217,13 @@
     }
 </script>
 
-<style scoped>
-@import url(../../css/index.css);
+<style>
+    @import url(../../css/index.css);
+
+    .d3-metric text {
+        cursor: pointer;
+
+        /*https://stackoverflow.com/questions/3949103/css-font-weight-thicker-than-900*/
+        text-shadow: 1px 0;
+    }
 </style>
