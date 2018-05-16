@@ -224,6 +224,6 @@
         cursor: pointer;
 
         /*https://stackoverflow.com/questions/3949103/css-font-weight-thicker-than-900*/
-        text-shadow: 1px 0;
+        /*text-shadow: 1px 0;*/
     }
 </style>

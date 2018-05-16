@@ -217,7 +217,7 @@
                 // tooltip
                 const tip = d3.tip()
                     .attr('class', 'd3-tip')
-                    .offset([-10, 0]);
+                    .offset([0, 0]);
 
                 // start drawing
                 g.selectAll('rect')
@@ -405,7 +405,7 @@
                         .attr('pointer-events', 'none');
                 }
             },
-            getTimeRangeLabel(dateTimeStart, dateTimeEnd, isMobile) {
+            getTimeRangeLabel(dateTimeStart, dateTimeEnd) {
                 const FORMAT = 'YYYY-MM-DD HH:mm:ss.SSS';
 
                 return `From ${moment(dateTimeStart).format(FORMAT)} To ${moment(dateTimeEnd).format(FORMAT)}`;

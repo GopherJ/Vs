@@ -10,31 +10,67 @@
     import _ from 'lodash';
     import offset from 'document-offset';
 
-    // load tip
     Object.assign(d3, {
         tip
     });
 
-    // all keys
     const GetAllKeys = (data) => [...new Set(data.map(d => d.key))];
 
+    const ToggleCross = function(container, rect, stroke, strokeWidth) {
+        const selection = container.selectAll('line');
+        if (!selection.empty()) {
+            selection.remove();
+            return;
+        }
+
+        const pos = rect.node().getBBox();
+
+        const x1 = pos.x,
+            y1 = pos.y,
+            x2 = pos.x + pos.width,
+            y2 = pos.y + pos.height;
+
+        container.append('line')
+            .attr('x1', x1)
+            .attr('y1', y1)
+            .attr('x2', x2)
+            .attr('y2', y2)
+            .attr('stroke', stroke)
+            .attr('stroke-width', strokeWidth)
+            .attr('pointer-events', 'none');
+
+        container.append('line')
+            .attr('x1', x2)
+            .attr('y1', y1)
+            .attr('x2', x1)
+            .attr('y2', y2)
+            .attr('stroke', stroke)
+            .attr('stroke-width', strokeWidth)
+            .attr('pointer-events', 'none');
+    };
+
     export default {
-        name: 'd3-multi-Line',
+        name: 'd3-multi-line',
         mixins: [mixins],
         methods: {
             drawMultiLine() {
-                // constants
                 const _data = _.cloneDeep(this.data),
                     data = classifyGroup(_data, 'group'),
-                    groups = Object.keys(data),
-                    {left = 0, top = 0, right = 0, bottom = 0} = this.margin,
+                    groups = Object.keys(data);
+
+                if (groups.length === 0) {
+                    return;
+                }
+
+                const {left = 0, top = 0, right = 0, bottom = 0} = this.margin,
                     {
                         strokeWidth = 2,
+
                         circleRadius = 5,
                         circleTitle = d => `${d.value}`,
 
-                        axisXLabelLaneHeight = 30,
-                        axisYLabelLaneWidth = 30,
+                        crossWidth = 2,
+                        crossColor = 'white',
 
                         axisXLabel = 'key',
                         axisYLabel = 'Value',
@@ -43,6 +79,7 @@
                         axisXGroupLabelWidth = 15,
                         axisXGroupLabelFillColorOpacity = 1,
                         axisXGroupLabelBorderColorOpacity = 0.6,
+                        axisXGroupLabelGap = 10,
 
                         axisLabelFontSize = 12,
                         axisLabelFontWeight = 400,
@@ -57,13 +94,26 @@
 
                         isAxisXTime = false,
 
+                        dashedGroups = groups,
+                        strokeDashArray = 5,
+
                         curve = 'curveCardinal',
+
+                        isAxisXTextHorizontal = false
+                    } = this.options,
+                    {
+                        axisXLabelLaneHeight = _.isNull(axisXLabel) ? 0 : 30,
+                        axisYLabelLaneWidth = _.isNull(axisYLabel) ? 0 : 30,
                     } = this.options;
 
 
                 const [w, h] = this.getElWidthHeight(),
                     g_w = w - left - right - axisYLabelLaneWidth - axisYLaneWidth,
                     g_h = h - top - bottom - axisXLabelLaneHeight - axisXLaneHeight - axisXGroupLabelLaneHeight;
+
+                if (![g_w, g_h].every(el => el > 0)) {
+                    return;
+                }
 
                 const svg = d3.select(this.$el)
                     .append('svg')
@@ -108,7 +158,14 @@
                     .attr('width', g_w)
                     .attr('height', g_h);
 
-                // draw groups
+                svg.append('defs').append('clipPath')
+                    .attr('id', 'clip-multi-line')
+                    .append('rect')
+                    .attr('x', 0)
+                    .attr('y', 0)
+                    .attr('width', g_w)
+                    .attr('height', g_h);
+
                 const GroupLabelContainer = axisXGroupLabelLane
                     .append('g');
 
@@ -128,11 +185,23 @@
                             .attr('fill', d => schemeCategory20(d))
                             .attr('fill-opacity', axisXGroupLabelFillColorOpacity)
                             .attr('stroke', d => schemeCategory20(d))
-                            .attr('stroke-opacity', axisXGroupLabelBorderColorOpacity);
+                            .attr('stroke-opacity', axisXGroupLabelBorderColorOpacity)
+                            .on('click', function (d) {
+                                ToggleCross(_g, d3.select(this), crossColor, crossWidth);
+
+                                d3.selectAll(`.d3-multi-line-${d}`)
+                                    .each(function (_d) {
+                                        const selection = d3.select(this),
+                                            display = selection.style('display');
+
+                                        selection.style('display', display === 'inline' ? 'none' : 'inline');
+                                    });
+                            });
 
                         const labelPos = label.node().getBBox();
 
                         _g.append('text')
+                            .attr('class', 'label label--group')
                             .attr('text-anchor', 'start')
                             .attr('x', labelPos.x + labelPos.width)
                             .attr('y', axisXGroupLabelLaneHeight / 2)
@@ -140,19 +209,19 @@
                             .text(d);
 
                         if (i !== 0) {
-                            _g.attr('transform', `translate(${previousPos.x + previousPos.width}, 0)`);
+                            _g.attr('transform', `translate(${previousPos.x + previousPos.width + axisXGroupLabelGap}, 0)`);
                         }
 
                         previousPos = _g.node().getBBox();
                     });
 
-                // align
                 const GroupLabelContainerPos = GroupLabelContainer.node().getBBox();
                 GroupLabelContainer
-                    .attr('transform', `translate(${(g_w - GroupLabelContainerPos.width) / 2}, 0})`);
+                    .attr('transform', `translate(${(g_w - GroupLabelContainerPos.width) / 2}, 0)`);
 
                 axisXLabelLane
                     .append('text')
+                    .attr('class', 'label label--x')
                     .attr('text-anchor', 'middle')
                     .attr('x', g_w / 2)
                     .attr('y', axisXLabelLaneHeight / 2 )
@@ -165,6 +234,7 @@
 
                 axisYLabelLane
                     .append('text')
+                    .attr('class', 'label label--y')
                     .attr('text-anchor', 'middle')
                     .attr('transform', 'rotate(-90)')
                     .attr('y', axisYLabelLaneWidth / 2)
@@ -175,15 +245,14 @@
                     .attr('font-size', axisLabelFontSize)
                     .attr('font-weight', axisLabelFontWeight);
 
-                // scales
                 const scaleY = d3.scaleLinear()
-                    .domain(d3.extent(d3.map(_data, d => d.value)))
+                    .domain([0, d3.max(_data.map(d => d.value))])
                     .range([g_h, 0]);
 
                 let scaleX;
                 if (_data.length !== 1) {
                     scaleX = isAxisXTime
-                        ? d3.scaleTime().domain(d3.extent(d3.map(_data, d => typeof d === 'number' ? new Date(d.key) : d.key))).range([0, g_w])
+                        ? d3.scaleTime().domain(d3.extent(_data.map(d => typeof d === 'number' ? new Date(d.key) : d.key))).range([0, g_w])
                         : d3.scalePoint().domain(GetAllKeys(_data)).range([0, g_w]);
                 }
 
@@ -192,18 +261,48 @@
                 }
 
                 axisYLane
-                    .call(d3.axisLeft(scaleY))
-                    .attr('fill', '#000')
+                    .append('g')
+                    .attr('transform', `translate(${axisYLaneWidth}, 0)`)
+                    .attr('class', 'axis axis--y')
+                    .call(d3.axisLeft(scaleY).ticks(this.selectTicksNumY(g_h)))
                     .attr('fill-opacity', axisFontOpacity)
                     .attr('font-size', axisFontSize)
                     .attr('font-weight', axisFontWeight);
 
-                axisXLane
+                const axisX = axisXLane
+                    .append('g')
+                    .attr('class', 'axis axis--x')
                     .call(d3.axisBottom(scaleX))
-                    .attr('fill', '#000')
                     .attr('fill-opacity', axisFontOpacity)
                     .attr('font-size', axisFontSize)
                     .attr('font-weight', axisFontWeight);
+
+                if (!isAxisXTextHorizontal) {
+                    const texts = axisX.selectAll('text');
+
+                    texts
+                        .each(function (d, i) {
+                            const text = d3.select(this);
+
+                            const y = text.attr('y');
+
+                            text
+                                .attr('text-anchor', 'start')
+                                .attr('transform', `rotate(90)`)
+                                .attr('y', null)
+                                .attr('x', y);
+
+                            if ( i !== texts.size() - 1) {
+                                text
+                                    .attr('dy', null);
+                            }
+                        });
+                }
+
+                else {
+                    svg.select('.axis.axis--x .tick:last-child text')
+                        .attr('text-anchor', 'end');
+                }
 
                 const lineGen = d3.line()
                     .x(d => scaleX(isAxisXTime ? (typeof d === 'number' ? new Date(d.key) : d.key) : d.key))
@@ -211,25 +310,28 @@
                     .defined(d => d !== null && d !== undefined)
                     .curve(d3[curve]);
 
-
                     g.selectAll('path')
                         .data(groups)
                         .enter()
                         .append('path')
+                        .attr('class', d => `d3-multi-line-${d}`)
                         .attr('d', d => lineGen(data[d]))
+                        .attr('stroke-dasharray', d => dashedGroups.some(el => el === d) ? strokeDashArray : 0)
                         .attr('fill', '#fff')
-                        .attr('stroke', schemeCategory20(group))
+                        .attr('stroke', d => schemeCategory20(d))
                         .attr('stroke-width', strokeWidth);
 
                     g.selectAll('circle')
                         .data(_data)
                         .enter()
                         .append('circle')
-                        .attr('cx', d => scaleX(d.key))
+                        .attr('class', d => `d3-multi-line-${d.group}`)
+                        .attr('clip-path', 'url(#clip-multi-line)')
+                        .attr('cx', d => scaleX(isAxisXTime ? (typeof d === 'number' ? new Date(d.key) : d.key) : d.key))
                         .attr('cy', d => scaleY(d.value))
                         .attr('r', circleRadius)
                         .attr('fill', d => schemeCategory20(d.group))
-                        .on('mouseover', (d) => {
+                        .on('mouseover', function(d) {
                             g.call(tip);
                             tip.html(circleTitle(d));
                             tip.show();
@@ -253,6 +355,17 @@
     }
 </script>
 
-<style scoped>
+<style>
     @import url(../../css/index.css);
+
+    .d3-multi-line circle:hover, .d3-multi-line rect:hover, .d3-multi-line text:hover {
+        cursor: pointer;
+    }
+
+    .d3-multi-line .label {
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+    }
 </style>

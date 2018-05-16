@@ -111,10 +111,13 @@ export default {
             return ticksX;
         },
         ifExistsSvgThenRemove() {
-            if (d3.select(this.$el).select('svg').empty()) {
+            const svgSelection = d3.select(this.$el).select('svg');
+
+            if (svgSelection.empty()) {
                 return;
             }
-            d3.select(this.$el).select('svg').remove();
+
+            svgSelection.remove();
         },
         getElWidthHeight() {
             return [this.$el.clientWidth, this.$el.clientHeight];
@@ -190,7 +193,7 @@ export default {
         }
 
         // container must have width and height
-        if (this.getElWidthHeight().some(el => !el)) {
+        if (!this.getElWidthHeight().every(el => el > 0)) {
             return;
         }
 
