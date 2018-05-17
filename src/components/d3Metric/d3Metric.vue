@@ -8,7 +8,6 @@
     import tip from 'd3-tip';
     import offset from 'document-offset';
 
-    // load d3-tip
     Object.assign(d3, {
         tip
     });
@@ -51,7 +50,6 @@
                 svgSelection.remove();
             },
             drawMetric() {
-                // constants
                 const data = this.data,
                     {
                         axisXLabel = 'key',
@@ -123,7 +121,7 @@
                     .attr('fill-opacity', metricLabelFontOpacity)
                     .attr('font-size', metricLabelFontSize)
                     .attr('font-weight', metricLabelFontWeight)
-                    .on('mouseover', (d) => {
+                    .on('mouseover', function(d) {
                         g.call(tip);
                         tip.html(metricTitle(d));
                         tip.show();
@@ -195,18 +193,14 @@
             }
         },
         mounted() {
-            // container must have width and height
             if (!this.getElWidthHeight().every(el => el > 0)) {
                 return;
             }
 
-            // debounce to avoid continue resize
             this._handleResize = _.debounce((e) => {
                 this.onResize();
             }, 500);
 
-            // check if svg exists in current component
-            // if exists then remove it and draw the graph
             this.safeDraw();
 
             window.addEventListener('resize', this._handleResize);
@@ -222,8 +216,5 @@
 
     .d3-metric text {
         cursor: pointer;
-
-        /*https://stackoverflow.com/questions/3949103/css-font-weight-thicker-than-900*/
-        /*text-shadow: 1px 0;*/
     }
 </style>

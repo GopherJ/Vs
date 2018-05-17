@@ -16,7 +16,27 @@
 
     const GetAllKeys = (data) => [...new Set(data.map(d => d.key))];
 
-    const ToggleCross = function(container, rect, stroke, strokeWidth) {
+    const TransformAxisToVertical = function (texts) {
+        texts
+            .each(function (d, i) {
+                const text = d3.select(this);
+
+                const y = text.attr('y');
+
+                text
+                    .attr('text-anchor', 'start')
+                    .attr('transform', `rotate(90)`)
+                    .attr('y', null)
+                    .attr('x', y);
+
+                if (i !== texts.size() - 1) {
+                    text
+                        .attr('dy', null);
+                }
+            });
+    };
+
+    const ToggleCross = function (container, rect, stroke, strokeWidth) {
         const selection = container.selectAll('line');
         if (!selection.empty()) {
             selection.remove();
@@ -47,6 +67,19 @@
             .attr('stroke', stroke)
             .attr('stroke-width', strokeWidth)
             .attr('pointer-events', 'none');
+    };
+
+    const calculateRealBBox = (g) => {
+        const pos = g.node().getBBox(),
+            transform = g.attr('transform'),
+            [translateX, translateY] = transform !== null ? transform.split(/\(|\)|\,/).slice(1, 3).map(x => parseFloat(x)) : [0, 0];
+
+        return {
+            x: pos.x + translateX,
+            y: pos.y + translateY,
+            width: pos.width,
+            height: pos.height
+        };
     };
 
     export default {
@@ -99,13 +132,14 @@
 
                         curve = 'curveCardinal',
 
-                        isAxisXTextHorizontal = false
+                        isAxisXTextHorizontal = true,
+
+                        screenAdaptive = true
                     } = this.options,
                     {
                         axisXLabelLaneHeight = _.isNull(axisXLabel) ? 0 : 30,
                         axisYLabelLaneWidth = _.isNull(axisYLabel) ? 0 : 30,
                     } = this.options;
-
 
                 const [w, h] = this.getElWidthHeight(),
                     g_w = w - left - right - axisYLabelLaneWidth - axisYLaneWidth,
@@ -158,8 +192,9 @@
                     .attr('width', g_w)
                     .attr('height', g_h);
 
-                svg.append('defs').append('clipPath')
-                    .attr('id', 'clip-multi-line')
+                svg.append('defs')
+                    .append('clipPath')
+                    .attr('id', 'clip-multi-line-g')
                     .append('rect')
                     .attr('x', 0)
                     .attr('y', 0)
@@ -189,7 +224,7 @@
                             .on('click', function (d) {
                                 ToggleCross(_g, d3.select(this), crossColor, crossWidth);
 
-                                d3.selectAll(`.d3-multi-line-${d}`)
+                                svg.selectAll(`.d3-multi-line-${d}`)
                                     .each(function (_d) {
                                         const selection = d3.select(this),
                                             display = selection.style('display');
@@ -212,7 +247,7 @@
                             _g.attr('transform', `translate(${previousPos.x + previousPos.width + axisXGroupLabelGap}, 0)`);
                         }
 
-                        previousPos = _g.node().getBBox();
+                        previousPos = calculateRealBBox(_g);
                     });
 
                 const GroupLabelContainerPos = GroupLabelContainer.node().getBBox();
@@ -224,7 +259,7 @@
                     .attr('class', 'label label--x')
                     .attr('text-anchor', 'middle')
                     .attr('x', g_w / 2)
-                    .attr('y', axisXLabelLaneHeight / 2 )
+                    .attr('y', axisXLabelLaneHeight / 2)
                     .attr('dy', '0.35em')
                     .text(axisXLabel)
                     .attr('fill', '#000')
@@ -280,69 +315,85 @@
                 if (!isAxisXTextHorizontal) {
                     const texts = axisX.selectAll('text');
 
-                    texts
-                        .each(function (d, i) {
-                            const text = d3.select(this);
-
-                            const y = text.attr('y');
-
-                            text
-                                .attr('text-anchor', 'start')
-                                .attr('transform', `rotate(90)`)
-                                .attr('y', null)
-                                .attr('x', y);
-
-                            if ( i !== texts.size() - 1) {
-                                text
-                                    .attr('dy', null);
-                            }
-                        });
+                    TransformAxisToVertical(texts);
                 }
 
                 else {
                     svg.select('.axis.axis--x .tick:last-child text')
                         .attr('text-anchor', 'end');
+
+                    svg.select('.axis.axis--x .tick:first-of-type text')
+                        .attr('text-anchor', 'start');
+                }
+
+                if (isAxisXTextHorizontal && screenAdaptive) {
+                    const ticks = axisX.selectAll('.tick'),
+                        texts = axisX.selectAll('text');
+
+                    let previousTickEndX,
+                        textLengthSum = 0;
+
+                    ticks.each(function (d, i) {
+                        const tick = d3.select(this),
+                            textLength = tick.select('text').node().getComputedTextLength(),
+                            tickPos = tick.node().getBBox(),
+                            tickTranslateX = parseFloat(tick.attr('transform').split(/\(|\)|\,/).slice(1, 2)),
+                            startX = tickTranslateX + tickPos.x,
+                            endX = startX + tickPos.width;
+
+                        textLengthSum += textLength;
+
+                        if ((i !== 0 && startX < previousTickEndX) || (i === ticks.size() - 1 && (textLengthSum > g_w))) {
+                            TransformAxisToVertical(texts);
+                        }
+
+                        previousTickEndX = endX;
+                    });
                 }
 
                 const lineGen = d3.line()
                     .x(d => scaleX(isAxisXTime ? (typeof d === 'number' ? new Date(d.key) : d.key) : d.key))
                     .y(d => scaleY(d.value))
-                    .defined(d => d !== null && d !== undefined)
-                    .curve(d3[curve]);
+                    .defined(d => d !== null && d !== undefined);
 
-                    g.selectAll('path')
-                        .data(groups)
-                        .enter()
-                        .append('path')
-                        .attr('class', d => `d3-multi-line-${d}`)
-                        .attr('d', d => lineGen(data[d]))
-                        .attr('stroke-dasharray', d => dashedGroups.some(el => el === d) ? strokeDashArray : 0)
-                        .attr('fill', '#fff')
-                        .attr('stroke', d => schemeCategory20(d))
-                        .attr('stroke-width', strokeWidth);
+                if (curve !== null && d3[curve] !== undefined) {
+                    lineGen
+                        .curve(d3[curve]);
+                }
 
-                    g.selectAll('circle')
-                        .data(_data)
-                        .enter()
-                        .append('circle')
-                        .attr('class', d => `d3-multi-line-${d.group}`)
-                        .attr('clip-path', 'url(#clip-multi-line)')
-                        .attr('cx', d => scaleX(isAxisXTime ? (typeof d === 'number' ? new Date(d.key) : d.key) : d.key))
-                        .attr('cy', d => scaleY(d.value))
-                        .attr('r', circleRadius)
-                        .attr('fill', d => schemeCategory20(d.group))
-                        .on('mouseover', function(d) {
-                            g.call(tip);
-                            tip.html(circleTitle(d));
-                            tip.show();
+                g.selectAll('path')
+                    .data(groups)
+                    .enter()
+                    .append('path')
+                    .attr('class', d => `d3-multi-line-${d}`)
+                    .attr('d', d => lineGen(data[d]))
+                    .attr('stroke-dasharray', d => dashedGroups.some(el => el === d) ? strokeDashArray : 0)
+                    .attr('fill', 'transparent')
+                    .attr('stroke', d => schemeCategory20(d))
+                    .attr('stroke-width', strokeWidth);
 
-                            const tipSelection = d3.select('.d3-tip');
-                            tipSelection.style('top', `${offset(this).top - tipSelection.node().getBoundingClientRect().height - 10}px`);
-                            tipSelection.style('left', `${offset(this).left + this.getBBox().width/2 - tipSelection.node().getBoundingClientRect().width/2}px`);
-                        })
-                        .on('mouseout', (d) => {
-                            d3.selectAll('.d3-tip').remove();
-                        });
+                g.selectAll('circle')
+                    .data(_data)
+                    .enter()
+                    .append('circle')
+                    .attr('class', d => `d3-multi-line-${d.group}`)
+                    .attr('clip-path', 'url(#clip-multi-line-g)')
+                    .attr('cx', d => scaleX(isAxisXTime ? (typeof d === 'number' ? new Date(d.key) : d.key) : d.key))
+                    .attr('cy', d => scaleY(d.value))
+                    .attr('r', circleRadius)
+                    .attr('fill', d => schemeCategory20(d.group))
+                    .on('mouseover', function (d) {
+                        g.call(tip);
+                        tip.html(circleTitle(d));
+                        tip.show();
+
+                        const tipSelection = d3.select('.d3-tip');
+                        tipSelection.style('top', `${offset(this).top - tipSelection.node().getBoundingClientRect().height - 10}px`);
+                        tipSelection.style('left', `${offset(this).left + this.getBBox().width / 2 - tipSelection.node().getBoundingClientRect().width / 2}px`);
+                    })
+                    .on('mouseout', (d) => {
+                        d3.selectAll('.d3-tip').remove();
+                    });
             },
             safeDraw() {
                 this.ifExistsSvgThenRemove();

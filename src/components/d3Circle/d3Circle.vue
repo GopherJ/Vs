@@ -8,7 +8,6 @@
     import offset from 'document-offset';
     import _ from 'lodash';
 
-    // load d3-tip
     Object.assign(d3, {
         tip
     });
@@ -29,8 +28,9 @@
                 default: () => ({})
             },
             data: {
-                type: [Number, String],
-                required: true
+                type: Number,
+                required: true,
+                validator: val => val >= 0 && val <= 1
             },
             options: {
                 type: Object,
@@ -51,23 +51,112 @@
                 svgSelection.remove();
             },
             drawCircle() {
-                const data = _.cloneDeep(this.data),
-                    { left = 0, top = 0, right = 0, bottom = 0 } = this.margin,
+                const data = this.data,
+                    {left = 0, top = 0, right = 0, bottom = 0} = this.margin,
                     [w, h] = this.getElWidthHeight(),
                     g_w = w - left - right,
-                    g_h = h - top - bottom,
-                    outerRadius = Math.min(g_w, g_h) / 2,
+                    g_h = h - top - bottom;
+
+                if (![g_w, g_h].every(el => el > 0)) {
+                    return;
+                }
+
+                const outerRadius = Math.min(g_w, g_h) / 2,
                     {
                         innerRadiusRatio = 0.8,
-                        circleForeground = 'rgb(230, 237, 244)',
-                        circleBackground = 'rgb(0, 181, 241)',
-                        label = '',
+                        circleBackground = 'rgb(230, 237, 244)',
+                        circleForeground = 'rgb(0, 181, 241)',
                         labelColor = 'rgb(0, 181, 241)',
-                        labelFontSize = 18,
-                        labelFontWeight = ,
-                        labelFontOpacity = 0.1
+                        labelFontSize = 50,
+                        labelFontWeight = 900,
+                        labelFontOpacity = 0.5,
+                        precision = 2,
+
+                        animationDuration = 500,
+                        circleTitle = `${data}`
                     } = this.options,
+                    label = d3.format(`.${precision}%`)(data),
                     innerRadius = innerRadiusRatio * outerRadius;
+
+                const svg = d3.select(this.$el)
+                    .append('svg')
+                    .attr('width', w)
+                    .attr('height', h);
+
+                const g = svg.append('g')
+                    .attr('transform', `translate(${left}, ${top})`)
+                    .attr('width', g_w)
+                    .attr('height', g_h);
+
+                const o = g.append('g')
+                    .attr('transform', `translate(${g_w / 2}, ${g_h / 2})`);
+
+                const arcGen = d3.arc()
+                    .innerRadius(innerRadius)
+                    .outerRadius(outerRadius);
+
+                const interpolateStart = {
+                    startAngle: 0,
+                    endAngle: 0
+                };
+
+                const interpolateEnd = {
+                    startAngle: 0,
+                    endAngle: 2 * Math.PI * data
+                };
+
+                const arcBackgroundPath = arcGen({
+                    startAngle: 0,
+                    endAngle: 2 * Math.PI
+                });
+
+                const tip = d3.tip()
+                    .attr('class', 'd3-tip')
+                    .offset([0, 0]);
+
+                o.append('text')
+                    .attr('text-anchor', 'middle')
+                    .attr('x', 0)
+                    .attr('y', 0)
+                    .attr('dy', '0.35em')
+                    .text(label)
+                    .attr('fill', labelColor)
+                    .attr('fill-opacity', labelFontOpacity)
+                    .attr('font-size', labelFontSize)
+                    .attr('font-weight', labelFontWeight)
+                    .on('mouseover', function () {
+                        g.call(tip);
+                        tip.html(circleTitle);
+                        tip.show();
+
+                        const tipSelection = d3.select('.d3-tip');
+                        tipSelection.style('top', `${offset(this).top - tipSelection.node().getBoundingClientRect().height - 10}px`);
+                        tipSelection.style('left', `${offset(this).left + this.getBBox().width / 2 - tipSelection.node().getBoundingClientRect().width / 2}px`);
+                    })
+                    .on('mouseout', function () {
+                        d3.selectAll('.d3-tip').remove();
+                    });
+
+                o.append('g')
+                    .append('path')
+                    .attr('class', 'arc arc--background')
+                    .attr('d', arcBackgroundPath)
+                    .attr('fill', circleBackground);
+
+
+                o.append('g')
+                    .append('path')
+                    .attr('class', 'arc arc--foreground')
+                    .attr('fill', circleForeground)
+                    .transition()
+                    .duration(animationDuration)
+                    .attrTween('d', function () {
+                        const interpolator = d3.interpolate( interpolateStart, interpolateEnd);
+
+                        return t => arcGen(interpolator(t));
+                    });
+
+                o.attr('cursor', 'pointer');
             },
             safeDraw() {
                 this.ifExistsSvgThenRemove();
@@ -128,18 +217,14 @@
             }
         },
         mounted() {
-            // container must have width and height
-            if (this.getElWidthHeight().some(el => !el)) {
+            if (!this.getElWidthHeight().every(el => el > 0)) {
                 return;
             }
 
-            // debounce to avoid continue resize
             this._handleResize = _.debounce((e) => {
                 this.onResize();
             }, 500);
 
-            // check if svg exists in current component
-            // if exists then remove it and draw the graph
             this.safeDraw();
 
             window.addEventListener('resize', this._handleResize);
@@ -150,5 +235,14 @@
     }
 </script>
 
-<style scoped>
+<style>
+    @import url(../../css/index.css);
+
+    .d3-circle text {
+        cursor: pointer;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+    }
 </style>
