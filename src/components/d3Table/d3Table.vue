@@ -13,20 +13,33 @@
         tip
     });
 
-    const GetAllKeys = (data) => [...new Set(data.map(d => d.key))];
+    const GetAllKeys = (data) => data.reduce((ite, cur) => {
+        const keys = Object.keys(cur);
+
+        for (let i = 0, l = keys.length; i < l; i += 1) {
+            ite.add(keys[i]);
+        }
+
+        return ite;
+    }, new Set);
 
     export default {
         name: 'd3-table',
         mixins: [mixins],
         data() {
             return {
-                curPage: 1,
+                curPage: 1
             }
         },
         methods: {
             drawTable() {
                 const data = _.cloneDeep(this.data),
-                    keys = GetAllKeys(data);
+                    keys = GetAllKeys(data),
+                    totalPage = data.length;
+
+                const {left = 0, right = 0, top = 0, bottom = 0} = this.margin,
+
+
 
 
             },
