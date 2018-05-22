@@ -66,7 +66,8 @@
                     {left = 0, right = 0, top = 0, bottom = 0} = this.margin,
                     offsetRight = 10,
                     g_w = w - left - right - axisYLabelLaneWidth - axisYLaneWidth - offsetRight,
-                    g_h = h - top - bottom - axisXLaneHeight - axisXLabelLaneHeight;
+                    g_h = h - top - bottom - axisXLaneHeight - axisXLabelLaneHeight,
+                    self = this;
 
                 if (![g_w, g_h].every(el => el > 0)) {
                     return;
@@ -89,7 +90,7 @@
                     data.sort((a, b) => a.key > b.key ? 1 : -1);
                 }
 
-                 const xScale = d3.scaleLinear()
+                const xScale = d3.scaleLinear()
                     .range([0, g_w])
                     .domain([0, d3.max(data, d => d.value)]);
 
@@ -103,6 +104,46 @@
                     .append('svg')
                     .attr('width', `${w}`)
                     .attr('height', `${h}`);
+
+                if (isAxisYTime) {
+                    const b = svg.append('g')
+                        .attr('class', 'brush');
+
+                    const extent = [
+                        [left + axisYLabelLaneWidth + axisYLaneWidth, top + axisXLaneHeight + axisXLabelLaneHeight],
+                        [w - right - offsetRight, h - bottom]
+                    ];
+
+                    const brushX = d3.brushY()
+                        .extent(extent)
+                        .on('end', brushed);
+
+                    b.call(brushX);
+
+                    function brushed() {
+                        if (d3.event && d3.event.selection) {
+                            const [x1, x2] = Array.prototype.map
+                                .call(d3.event.selection, el => el - extent[0][1]);
+
+                            const bisecLeft = d3.bisector((d, x) => yScale(d.key) + yScale.bandwidth() - x).left;
+
+                            let idx1 = bisecLeft(data, x1),
+                                idx2 = bisecLeft(data, x2);
+
+                            if (idx2 > data.length - 1) {
+                                idx2 -= 1;
+                            }
+
+                            const dateTimeStart = _.isNumber(data[idx1].key) ? new Date(data[idx1].key) : data[idx1].key,
+                                dateTimeEnd = _.isNumber(data[idx2].key) ? new Date(data[idx2].key) : data[idx2].key;
+                            console.log(dateTimeStart, dateTimeEnd)
+
+                            emit(self, 'range-updated', dateTimeStart, dateTimeEnd);
+
+                            brushX.move(b, null);
+                        }
+                    }
+                }
 
                 const g = svg
                     .append('g')

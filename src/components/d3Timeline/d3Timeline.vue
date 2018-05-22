@@ -26,7 +26,7 @@
                 const {
                         intervalCornerRadius = 4,
 
-                        symbolSize = 200,
+                        symbolSize = 400,
 
                         groupLabelFontSize = 14,
                         groupLabelFontWeight = 400,
@@ -259,6 +259,7 @@
                         .attr('y2', g_h)
                         .attr('stroke', currentTimeLineColor)
                         .attr('stroke-width', currentTimeLineWidth)
+                        .attr('clip-path', 'url(#clip-timeline)')
                         .attr('pointer-events', 'none');
                 }
 
@@ -288,7 +289,7 @@
                         .attr('clip-path', 'url(#clip-timeline)')
                         .attr('x1', d => xScale(d))
                         .attr('x2', d => xScale(d))
-                        .attr('y1', d => 0)
+                        .attr('y1', 0)
                         .attr('y2', g_h)
                         .attr('stroke', boundingLineColor)
                         .attr('stroke-width', boundingLineWidth)
