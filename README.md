@@ -19,13 +19,32 @@ npm i -S d3-vs
 
 ## Lists
 
-- `d3Bar`
+- `d3HorizontalBar`
+- `d3VerticalBar`
 - `d3Line`
 - `d3Pie`
 - `d3ProgressArc`
+- `d3Metric`
+- `d3MultiLine`
+- `d3Circle`
 - `d3SankeyCircular`
 - `d3Timelion`
 - `d3Timeline`
+
+## ToDo
+
+- `d3Area`
+- `d3ColorPicker`
+- `d3Gantt`
+- `d3Gauge`
+- `d3Goal`
+- `d3HeatMap`
+- `d3RadialBar`
+- `d3RadialSector`
+- `d3ScatterPlot`
+- `d3Table`
+- `d3WordCount`
+- `d3Markdown`
 
 
 ## Usage
