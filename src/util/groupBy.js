@@ -3,7 +3,7 @@
  * @param data
  * @param key
  */
-const classifyGroup = (data, key) => {
+const groupBy = (data, key) => {
     const results = {};
     for (let i = 0, l = data.length; i < l; i += 1) {
         const item = data[i];
@@ -20,4 +20,4 @@ const classifyGroup = (data, key) => {
     return results;
 };
 
-export default classifyGroup;
+export default groupBy;

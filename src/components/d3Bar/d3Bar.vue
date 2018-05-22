@@ -3,7 +3,6 @@
 </template>
 
 <script>
-/* eslint-disable */
     import * as d3 from 'd3';
     import tip from 'd3-tip';
     import mixins from '../../mixins';
@@ -11,7 +10,6 @@
     import _ from 'lodash';
     import offset from 'document-offset';
 
-    // load tip
     Object.assign(d3, {
         tip
     });
@@ -21,43 +19,42 @@
         mixins: [mixins],
         methods: {
             drawBar() {
-                // container width and height
                 const [w, h] = this.getElWidthHeight();
 
-                // constants
                 const data = _.cloneDeep(this.data),
-                      {
-                          // bar config
-                          fill = '#6eadc1',
-                          stroke = '#6eadc1',
-                          fillOpacity = 0.6,
-                          strokeOpacity = 1,
-                          barTitle = d => d.value,
+                    {
+                        fill = '#6eadc1',
+                        stroke = '#6eadc1',
+                        fillOpacity = 0.6,
+                        strokeOpacity = 1,
 
-                          // axis font config
-                          axisFontSize = 12,
-                          axisFontWeight = 400,
+                        barTitle = d => d.value,
 
-                          // axis label config
-                          axisYLabel = 'Value',
-                          axisXLabel = 'Key',
-                          axisXLabelHeight = 20,
-                          axisYLabelWidth = 20,
+                        axisFontSize = 12,
+                        axisFontWeight = 400,
+                        axisFontOpacity = 1,
 
-                          // axis label font config
-                          axisLabelFontSize = 12,
-                          axisLabelFontWeight = 400,
-                          axisLabelFontOpacity = 0.5,
+                        axisYLabel = 'Value',
+                        axisXLabel = 'Key',
 
-                          // axis lane config
-                          axisXHeight = 25,
-                          axisYWidth = 35,
+                        axisLabelFontSize = 12,
+                        axisLabelFontWeight = 400,
+                        axisLabelFontOpacity = 0.5,
 
-                          isVertical = false,
-                      } = this.options,
-                      {left = isVertical ? 30 : 0, right = 0, top = isVertical ? 0 : 20, bottom = 0} = this.margin,
-                      g_w = w - left - right - axisYLabelWidth - axisYWidth,
-                      g_h = h - top - bottom - axisXHeight - axisXLabelHeight;
+                        axisXLaneHeight = 60,
+                        axisYLaneWidth = 35,
+
+                        isAxisXTime = false,
+
+                        isVertical = false,
+                    } = this.options,
+                    {
+                        axisXLabelLaneHeight = _.isNull(axisXLabel) ? 0 : 30,
+                        axisYLabelLaneWidth = _.isNull(axisYLabel) ? 0 : 30,
+                    } = this.options,
+                    {left = isVertical ? 30 : 0, right = 0, top = isVertical ? 0 : 20, bottom = 0} = this.margin,
+                    g_w = w - left - right - axisYLabelLaneWidth - axisYLaneWidth,
+                    g_h = h - top - bottom - axisXLaneHeight - axisXLabelLaneHeight;
 
                 // create svg
                 const svg = d3.select(this.$el)
@@ -86,15 +83,15 @@
                     // create g to contain our graph
                     const g = svg
                         .append('g')
-                        .attr('transform', `translate(${left + axisXLabelHeight + axisYWidth}, ${top})`)
+                        .attr('transform', `translate(${left + axisXLabelLaneHeight + axisYLaneWidth}, ${top})`)
                         .attr('width', `${g_w}`)
                         .attr('height', `${g_h}`);
 
                     // draw x
                     axisX = svg.append('g')
-                        .attr('transform', `translate(${left + axisYLabelWidth + axisYWidth},${top + g_h})`)
+                        .attr('transform', `translate(${left + axisYLabelLaneWidth + axisYLaneWidth},${top + g_h})`)
                         .attr('width', g_w)
-                        .attr('height', axisXHeight)
+                        .attr('height', axisXLaneHeight)
                         .append('g')
                         .attr('class', 'axis axis--x')
                         .call(d3.axisBottom(x))
@@ -106,12 +103,12 @@
 
                     // draw y
                     axisY = svg.append('g')
-                        .attr('transform', `translate(${left + axisYLabelWidth}, ${top})`)
-                        .attr('width', axisYLabelWidth)
+                        .attr('transform', `translate(${left + axisYLabelLaneWidth}, ${top})`)
+                        .attr('width', axisYLabelLaneWidth)
                         .attr('height', g_h)
                         .append('g')
                         .attr('class', 'axis axis--y')
-                        .attr('transform', `translate(${axisYWidth}, 0)`)
+                        .attr('transform', `translate(${axisYLaneWidth}, 0)`)
                         .call(d3.axisLeft(y).ticks(ticks))
                         .attr('font-size', axisFontSize)
                         .attr('font-weight', axisFontWeight);
@@ -120,15 +117,15 @@
                     // create lane to hold the label of axis x
                     const axisXLabelLane = svg
                         .append('g')
-                        .attr('transform', `translate(${left + axisYLabelWidth + axisYWidth}, ${top + g_h + axisXHeight})`)
+                        .attr('transform', `translate(${left + axisYLabelLaneWidth + axisYLaneWidth}, ${top + g_h + axisXLaneHeight})`)
                         .attr('width', g_w)
-                        .attr('height', axisXHeight);
+                        .attr('height', axisXLaneHeight);
 
                     // create lane to hold the label of axis y
                     const axisYLabelLane = svg
                         .append('g')
                         .attr('transform', `translate(${left}, ${top})`)
-                        .attr('width', axisYLabelWidth)
+                        .attr('width', axisYLabelLaneWidth)
                         .attr('height', g_h);
 
 
@@ -146,16 +143,16 @@
                         .attr('stroke', stroke)
                         .attr('fill-opacity', fillOpacity)
                         .attr('stroke-opacity', strokeOpacity)
-                        .on('mouseover', function(d, i) {
+                        .on('mouseover', function (d, i) {
                             g.call(tip);
                             tip.html(barTitle(d));
                             tip.show();
 
                             const tipSelection = d3.select('.d3-tip');
                             tipSelection.style('top', `${offset(this).top - tipSelection.node().getBoundingClientRect().height - 10}px`);
-                            tipSelection.style('left', `${offset(this).left + this.getBBox().width/2 - tipSelection.node().getBoundingClientRect().width/2}px`);
+                            tipSelection.style('left', `${offset(this).left + this.getBBox().width / 2 - tipSelection.node().getBoundingClientRect().width / 2}px`);
                         })
-                        .on('mouseout', function(d, i) {
+                        .on('mouseout', function (d, i) {
                             // tip.hide();
                             d3.selectAll('.d3-tip').remove();
                         });
@@ -164,8 +161,8 @@
                     axisXLabelLane
                         .append('text')
                         .attr('class', 'label--x')
-                        .attr('x', g_w/2)
-                        .attr('y', axisXLabelHeight/2)
+                        .attr('x', g_w / 2)
+                        .attr('y', axisXLabelLaneHeight / 2)
                         .attr('text-anchor', 'middle')
                         .attr('fill', '#000')
                         .attr('fill-opacity', axisLabelFontOpacity)
@@ -178,8 +175,8 @@
                         .append('text')
                         .attr('class', 'label--y')
                         .attr('transform', 'rotate(-90)')
-                        .attr('y', axisYLabelWidth)
-                        .attr('x', -g_h/2)
+                        .attr('y', axisYLabelLaneWidth)
+                        .attr('x', -g_h / 2)
                         .attr('text-anchor', 'middle')
                         .attr('fill', '#000')
                         .attr('fill-opacity', axisLabelFontOpacity)
@@ -201,30 +198,30 @@
                     // create g to contain our graph
                     const g = svg
                         .append('g')
-                        .attr('transform', `translate(${left + axisYLabelWidth + axisYWidth}, ${top + axisXHeight + axisXLabelHeight})`)
+                        .attr('transform', `translate(${left + axisYLabelLaneWidth + axisYLaneWidth}, ${top + axisXLaneHeight + axisXLabelLaneHeight})`)
                         .attr('width', `${g_w}`)
                         .attr('height', `${g_h}`);
 
                     // draw x
                     axisX = svg.append('g')
-                        .attr('transform', `translate(${left + axisYLabelWidth + axisYWidth}, ${top + axisXLabelHeight})`)
+                        .attr('transform', `translate(${left + axisYLabelLaneWidth + axisYLaneWidth}, ${top + axisXLabelLaneHeight})`)
                         .attr('width', g_w)
-                        .attr('height', axisXHeight)
+                        .attr('height', axisXLaneHeight)
                         .append('g')
                         .attr('class', 'axis axis--x')
-                        .attr('transform', `translate(0, ${axisXHeight})`)
+                        .attr('transform', `translate(0, ${axisXLaneHeight})`)
                         .call(d3.axisTop(x).ticks(ticks))
                         .attr('font-size', axisFontSize)
                         .attr('font-weight', axisFontWeight);
 
                     // draw y
                     axisY = svg.append('g')
-                        .attr('transform',  `translate(${left + axisYLabelWidth}, ${top + axisXHeight + axisXLabelHeight})`)
-                        .attr('width', axisYLabelWidth)
+                        .attr('transform', `translate(${left + axisYLabelLaneWidth}, ${top + axisXLaneHeight + axisXLabelLaneHeight})`)
+                        .attr('width', axisYLabelLaneWidth)
                         .attr('height', g_h)
                         .append('g')
                         .attr('class', 'axis axis--y')
-                        .attr('transform', `translate(${axisYWidth}, 0)`)
+                        .attr('transform', `translate(${axisYLaneWidth}, 0)`)
                         .call(d3.axisLeft(y))
                         .attr('font-size', axisFontSize)
                         .attr('font-weight', axisFontWeight);
@@ -232,15 +229,15 @@
                     // create the lane to hold the label of axis x
                     const axisXLabelLane = svg
                         .append('g')
-                        .attr('transform', `translate(${left + axisYLabelWidth + axisYWidth}, ${top})`)
+                        .attr('transform', `translate(${left + axisYLabelLaneWidth + axisYLaneWidth}, ${top})`)
                         .attr('width', g_w)
-                        .attr('height', axisXLabelHeight);
+                        .attr('height', axisXLabelLaneHeight);
 
                     // create the lane to hold the label of axis y
                     const axisYLabelLane = svg
                         .append('g')
-                        .attr('transform', `translate(${left}, ${top + axisXHeight + axisXLabelHeight})`)
-                        .attr('width', axisYLabelWidth)
+                        .attr('transform', `translate(${left}, ${top + axisXLaneHeight + axisXLabelLaneHeight})`)
+                        .attr('width', axisYLabelLaneWidth)
                         .attr('height', g_h);
 
 
@@ -257,7 +254,7 @@
                         .attr('stroke', stroke)
                         .attr('fill-opacity', fillOpacity)
                         .attr('stroke-opacity', strokeOpacity)
-                        .on('mouseover', function(d, i) {
+                        .on('mouseover', function (d, i) {
                             g.call(tip);
                             tip.html(barTitle(d));
                             tip.show();
@@ -265,9 +262,9 @@
 
                             const tipSelection = d3.select('.d3-tip');
                             tipSelection.style('top', `${offset(this).top - tipSelection.node().getBoundingClientRect().height - 10}px`);
-                            tipSelection.style('left', `${offset(this).left + this.getBBox().width/2 - tipSelection.node().getBoundingClientRect().width/2}px`);
+                            tipSelection.style('left', `${offset(this).left + this.getBBox().width / 2 - tipSelection.node().getBoundingClientRect().width / 2}px`);
                         })
-                        .on('mouseout', function(d, i) {
+                        .on('mouseout', function (d, i) {
                             // tip.hide();
                             d3.selectAll('.d3-tip').remove();
                         });
@@ -277,8 +274,8 @@
                         .append('text')
                         .attr('class', 'label--x')
                         .attr('text-anchor', 'middle')
-                        .attr('x', g_w/2)
-                        .attr('y', axisXHeight/2)
+                        .attr('x', g_w / 2)
+                        .attr('y', axisXLaneHeight / 2)
                         .attr('fill', '#000')
                         .attr('fill-opacity', axisLabelFontOpacity)
                         .text(axisYLabel)
@@ -294,7 +291,7 @@
                         .attr('fill', '#000')
                         .attr('fill-opacity', axisLabelFontOpacity)
                         .attr('y', 0)
-                        .attr('x', -g_h/2)
+                        .attr('x', -g_h / 2)
                         .text(axisXLabel)
                         .attr('font-size', axisLabelFontSize)
                         .attr('font-weight', axisLabelFontWeight);
@@ -316,6 +313,14 @@
     @import url(../../css/index.css);
 
     .d3-bar .bar:hover {
+        cursor: pointer;
+    }
+
+    .d3-bar text {
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
         cursor: pointer;
     }
 </style>

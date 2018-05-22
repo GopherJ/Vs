@@ -1,3 +1,22 @@
+@keyframes show {
+  from {
+    opacity: 0;
+    transform: translateY(0px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(-10px);
+  }
+}
+
+.d3-tip.show {
+  animation-name: show;
+  animation-duration: 300ms;
+  animation-fill-mode: forwards;
+  animation-timing-function: cubic-bezier(0.215, 0.610, 0.355, 1.000);
+}
+
 /* d3-tip style */
 .d3-tip {
     font-family: sans-serif;
@@ -7,30 +26,26 @@
     background-color: rgba(0, 0, 0, 0.8);
     color: #fff;
     border-radius: 2px;
+    pointer-events: none;
 }
+
 /* Creates a small triangle extender for the tooltip */
-.d3-tip:after {
+.d3-tip::after {
     box-sizing: border-box;
-    display: inline;
+    position: absolute;
     font-size: 10px;
-    width: 100%;
     line-height: 1;
     color: rgba(0, 0, 0, 0.8);
     content: "\25BC";
-    position: absolute;
-    text-align: center;
-}
-/* Style northward tooltips differently */
-.d3-tip.n:after {
-    margin: -1px 0 0 0;
+    left: 50%;
     top: 100%;
-    left: 0;
+    -webkit-transform: translate(-50%, 0);
+    -moz-transform: translate(-50%, 0);
+    -ms-transform: translate(-50%, 0);
+    -o-transform: translate(-50%, 0);
+    transform: translate(-50%, 0);
+    pointer-events: none;
 }
-.extent {
-    fill-opacity: .125;
-    shape-rendering: crispEdges;
-}
-
 
 
 /* rect rendering method */
@@ -40,13 +55,8 @@ rect {
 
 /* use buefy font setting */
 text {
-    font-family: BlinkMacSystemFont,-apple-system,Segoe UI,Roboto,Oxygen,Ubuntu,Cantarell,Fira Sans,Droid Sans,Helvetica Neue,Helvetica,Arial,sans-serif;
+    font-family: BlinkMacSystemFont, -apple-system, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, Helvetica, Arial, sans-serif;
 }
-
-
-
-
-
 
 /* axis */
 .axis {
@@ -54,13 +64,8 @@ text {
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
+    cursor: pointer;
 }
-
-
-
-
-
-
 
 /* form control, style kibana */
 .form-control {
@@ -74,106 +79,101 @@ text {
     border-bottom-width: 2px;
     border-left-width: 2px;
     border-radius: 4px;
-    box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
-    transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+    box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);
+    transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
 }
+
 .form-control:focus {
     border: 2px solid #ccc;
 }
-
-
-
 
 /* clear firefox dotted style */
 select:-moz-focusring {
     color: transparent;
     text-shadow: 0 0 0 #000;
 }
+
 option:not(:checked) {
     color: black; /* prevent <option>s from becoming transparent as well */
 }
 
-
-
-
-
 /* d3-timeline classes */
-  .d3-time-line .entry--interval--default {
-        fill: #6eadc1;
-        stroke: #6eadc1;
-        fill-opacity: 0.125;
-        stroke-opacity: 1;
-        cursor: pointer;
-    }
+.d3-time-line .entry--interval--default {
+    fill: #6eadc1;
+    stroke: #6eadc1;
+    fill-opacity: 0.125;
+    stroke-opacity: 1;
+    cursor: pointer;
+}
 
-    .d3-time-line .entry--point--default {
-        fill: #6eadc1;
-        stroke: #6eadc1;
-        fill-opacity: 0.125;
-        stroke-opacity: 1;
-        cursor: pointer;
-    }
+.d3-time-line .entry--point--default {
+    fill: #6eadc1;
+    stroke: #6eadc1;
+    fill-opacity: 0.125;
+    stroke-opacity: 1;
+    cursor: pointer;
+}
 
-    .d3-time-line .entry--interval--error {
-        fill: #ff3860;;
-        stroke: #ff3860;
-        fill-opacity: 0.125;
-        stroke-opacity: 1;
-        cursor: pointer;
-    }
+.d3-time-line .entry--interval--error {
+    fill: #ff3860;;
+    stroke: #ff3860;
+    fill-opacity: 0.125;
+    stroke-opacity: 1;
+    cursor: pointer;
+}
 
-    .d3-time-line .entry--point--error {
-        fill: #ff3860;;
-        stroke: #ff3860;
-        fill-opacity: 0.125;
-        stroke-opacity: 1;
-        cursor: pointer;
-    }
+.d3-time-line .entry--point--error {
+    fill: #ff3860;;
+    stroke: #ff3860;
+    fill-opacity: 0.125;
+    stroke-opacity: 1;
+    cursor: pointer;
+}
 
-    .d3-time-line .entry--interval--success {
-        fill: #23d160;;
-        stroke: #23d160;
-        fill-opacity: 0.125;
-        stroke-opacity: 1;
-        cursor: pointer;
-    }
+.d3-time-line .entry--interval--success {
+    fill: #23d160;;
+    stroke: #23d160;
+    fill-opacity: 0.125;
+    stroke-opacity: 1;
+    cursor: pointer;
+}
 
-    .d3-time-line .entry--point--success {
-        fill: #23d160;;
-        stroke: #23d160;
-        fill-opacity: 0.125;
-        stroke-opacity: 1;
-        cursor: pointer;
-    }
+.d3-time-line .entry--point--success {
+    fill: #23d160;;
+    stroke: #23d160;
+    fill-opacity: 0.125;
+    stroke-opacity: 1;
+    cursor: pointer;
+}
 
-    .d3-time-line .entry--interval--info {
-        fill: #167df0;;
-        stroke: #167df0;
-        fill-opacity: 0.125;
-        stroke-opacity: 1;
-        cursor: pointer;
-    }
+.d3-time-line .entry--interval--info {
+    fill: #167df0;;
+    stroke: #167df0;
+    fill-opacity: 0.125;
+    stroke-opacity: 1;
+    cursor: pointer;
+}
 
-    .d3-time-line .entry--point--info {
-        fill: #167df0;;
-        stroke: #167df0;
-        fill-opacity: 0.125;
-        stroke-opacity: 1;
-        cursor: pointer;
-    }
+.d3-time-line .entry--point--info {
+    fill: #167df0;;
+    stroke: #167df0;
+    fill-opacity: 0.125;
+    stroke-opacity: 1;
+    cursor: pointer;
+}
 
-    .d3-time-line .entry--interval--warn {
-        fill: #ffdd57;;
-        stroke: #ffdd57;
-        fill-opacity: 0.125;
-        stroke-opacity: 1;
-        cursor: pointer;
-    }
+.d3-time-line .entry--interval--warn {
+    fill: #ffdd57;;
+    stroke: #ffdd57;
+    fill-opacity: 0.125;
+    stroke-opacity: 1;
+    cursor: pointer;
+}
 
-    .d3-time-line .entry--point--warn {
-        fill: #ffdd57;;
-        stroke: #ffdd57;
-        fill-opacity: 0.125;
-        stroke-opacity: 1;
-        cursor: pointer;
-    }
+.d3-time-line .entry--point--warn {
+    fill: #ffdd57;;
+    stroke: #ffdd57;
+    fill-opacity: 0.125;
+    stroke-opacity: 1;
+    cursor: pointer;
+}

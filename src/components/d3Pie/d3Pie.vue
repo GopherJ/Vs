@@ -3,181 +3,146 @@
 </template>
 
 <script>
-/* eslint-disable */
     import * as d3 from 'd3';
-    import tip from 'd3-tip';
+    import {showTip, hideTip} from '../../util/tooltip';
     import mixins from '../../mixins';
     import _ from 'lodash';
-    import offset from 'document-offset';
-
-    // load tip
-    Object.assign(d3, {
-        tip
-    });
 
     export default {
         name: 'd3-pie',
         mixins: [mixins],
         methods: {
             drawPie() {
-                // data and container width, height
                 const data = _.cloneDeep(this.data);
                 const [w, h] = this.getElWidthHeight();
-
-                // constants
                 const {
                         left = 0,
                         top = 0,
                         right = 0,
                         bottom = 0
                     } = this.margin,
-
                     {
-                        // pie size config
-                        innerRadius = 5,
-                        cornerRadius = 5,
+                        innerRadius = 50,
+                        cornerRadius = 0,
 
-                        // gap(percent) between arcs config
                         padAngle = 0.01,
 
-                        // tooltip config
-                        arcTitle = d => d.data.value,
+                        arcTitle = d => `${d.data.key}<br>${d.data.value}`,
 
-                        // arc label
-                        arcLabel = d => d.data.key,
+                        arcLabel = _ => null,
 
-                        // axisX label config
-                        axisXLabelHeight = 30,
-                        axisXLabel = 'Key',
-                        axisXLabelFontSize = 12,
-                        axisXLabelFontWeight = 400,
-                        axisXLabelFontOpacity = 0.5,
 
-                        // arc label config
+                        axisXLabel = null,
+                        axisLabelFontSize = 12,
+                        axisLabelFontWeight = 400,
+                        axisLabelFontOpacity = 0.5,
+
                         arcLabelFontSize = 10,
+                        arcLabelFontWeight = 400,
                         arcLabelFontOpacity = 0.5,
 
-                        // animation config
-                        animationDuration = 1000
+                        animationDuration = 1000,
+                        delay = 50,
+
+                        colorDefault = 'rgb(175, 240, 91)'
                     } = this.options,
-
+                    {
+                        axisXLabelHeight = _.isNull(axisXLabel) ? 0 : 30,
+                    } = this.options,
                     g_w = w - left - right,
-                    g_h = h -top - bottom - axisXLabelHeight,
-                    _outerRadius = Math.min(g_w/2, g_h/2),
-                    outerRadius = _outerRadius < innerRadius ? innerRadius : _outerRadius;
+                    g_h = h - top - bottom - axisXLabelHeight,
+                    outerRadius = Math.min(g_w / 2, g_h / 2);
 
-                // create svg
+                if (![g_w, g_h].every(el => el > 0) || outerRadius <= innerRadius) {
+                    return;
+                }
+
                 const svg = d3.select(this.$el)
                     .append('svg')
                     .attr('width', `${w}`)
                     .attr('height', `${h}`);
 
-                // circle center where we will begin to draw our graph
-                const g = svg.append('g')
+                const g = svg
+                    .append('g')
+                    .attr('transform', `translate(${left},${top})`)
                     .attr('width', `${g_w}`)
                     .attr('height', `${g_h}`)
-                    .attr('transform', `translate(${left},${top})`)
                     .append('g')
-                    .attr('transform', `translate(${g_w/2},${g_h/2})`);
+                    .attr('transform', `translate(${g_w / 2},${g_h / 2})`);
 
-                // lane to hold label text
                 const axisLabelLane = svg
                     .append('g')
                     .attr('transform', `translate(${left}, ${top + g_h})`)
                     .attr('width', g_w)
                     .attr('height', axisXLabelHeight);
 
-                 // tooltip
-                const tip = d3.tip()
-                        .attr('class', 'd3-tip')
-                        .offset([0, 0]);
-
-                // create color set
                 const interpolateWarm = d3.scaleSequential()
                     .domain(d3.extent(data.map(d => d.value)))
                     .interpolator(d3.interpolateWarm);
 
-                // data pie treat
                 const pie = d3.pie()
                     .sort(null)
                     .value(d => d.value);
 
-                // create arc function
                 const pathGen = d3.arc()
                     .innerRadius(innerRadius)
                     .outerRadius(outerRadius)
                     .cornerRadius(cornerRadius)
                     .padAngle(padAngle);
 
-                // crate label which will be at middle of the innerRadius and outerRadius
                 const arcLabelLane = d3.arc()
                     .innerRadius((outerRadius + innerRadius) / 2)
                     .outerRadius((outerRadius + innerRadius) / 2);
 
-                // start drawing
-                const arcContainer = g.selectAll('.arc')
+                const enter = g
+                    .selectAll('path')
                     .data(pie(data))
-                    .enter()
-                    .append('g');
+                    .enter();
 
-                // draw arc path
-                arcContainer.append('path')
-                    .attr('class', 'arc')
+                const paths = enter.append('path');
+
+                paths
                     .transition()
                     .duration(animationDuration)
-                    .delay((d, i) => 50 * i)
+                    .delay((d, i) => delay * i)
                     .attrTween('d', d => {
                         const startAngle = d.startAngle,
                               interpolate = d3.interpolate({endAngle: startAngle}, d);
+
                         return t => pathGen(interpolate(t));
                     })
-                    .attr('fill', (d, i) => {
-                        if (data.length > 1) {
-                            return interpolateWarm(d.data.value);
-                        } else {
-                            return 'rgb(175, 240, 91)';
-                        }
-                    });
+                    .attr('fill', d =>  data.length > 1 ? interpolateWarm(d.data.value) : colorDefault);
 
-                // listen to mouse enter, leave
-                arcContainer
-                    .on('mouseover', function(d, i){
-                        g.call(tip);
-                        tip.html(arcTitle(d));
-                        tip.show();
-
-                        const tipSelection = d3.select('.d3-tip');
-                        tipSelection.style('top', `${offset(this).top - tipSelection.node().getBoundingClientRect().height - 10}px`);
-                        tipSelection.style('left', `${offset(this).left + this.getBBox().width/2 - tipSelection.node().getBoundingClientRect().width/2}px`);
+                paths
+                    .on('mouseover', (d) => {
+                        showTip(arcTitle(d));
                     })
-                    .on('mouseout', function(d, i) {
-                        // tip.hide();
-                        d3.selectAll('.d3-tip').remove();
-                    });
+                    .on('mouseout', hideTip);
 
-                // append arc label
-                arcContainer.append('text')
-                    .attr('transform', (d, i) => `translate(${arcLabelLane.centroid(d)})`)
-                    .attr('cursor', 'pointer')
+                enter
+                    .append('text')
+                    .attr('transform', d => `translate(${arcLabelLane.centroid(d)})`)
                     .attr('text-anchor', 'middle')
                     .attr('fill-opacity', 0)
                     .transition()
                     .duration(animationDuration)
-                    .delay((d,i) => 50 * i)
+                    .delay((d,i) => delay * i)
                     .attr('fill-opacity', arcLabelFontOpacity)
                     .text(arcLabel)
-                    .attr('font-size', arcLabelFontSize);
+                    .attr('font-size', arcLabelFontSize)
+                    .attr('font-weight', arcLabelFontWeight);
 
-                // append label to the lane
-                axisLabelLane.append('text')
-                    .attr('class', 'label--x')
+                axisLabelLane
+                    .append('text')
+                    .attr('class', 'label label--x')
                     .attr('text-anchor', 'middle')
-                    .attr('x', g_w/2)
-                    .attr('y', axisXLabelHeight/2)
+                    .attr('x', g_w / 2)
+                    .attr('y', axisXLabelHeight / 2)
+                    .attr('dy', '0.32em')
                     .text(axisXLabel)
-                    .attr('font-size', axisXLabelFontSize)
-                    .attr('font-weight', axisXLabelFontWeight)
-                    .attr('fill-opacity', axisXLabelFontOpacity);
+                    .attr('font-size', axisLabelFontSize)
+                    .attr('font-weight', axisLabelFontWeight)
+                    .attr('fill-opacity', axisLabelFontOpacity);
             },
             safeDraw() {
                 this.ifExistsSvgThenRemove();
@@ -193,11 +158,15 @@
 <style>
     @import url(../../css/index.css);
 
-    .d3-pie .arc:hover {
+    .d3-pie path:hover {
         cursor: pointer;
     }
 
-    .d3-pie .label--x {
+    .d3-pie text {
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
         cursor: pointer;
     }
 </style>

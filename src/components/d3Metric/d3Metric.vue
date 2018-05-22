@@ -5,12 +5,8 @@
 <script>
     import * as d3 from 'd3';
     import _ from 'lodash';
-    import tip from 'd3-tip';
-    import offset from 'document-offset';
+    import {showTip, hideTip} from '../../util/tooltip';
 
-    Object.assign(d3, {
-        tip
-    });
 
     export default {
         name: 'd3-metric',
@@ -52,7 +48,7 @@
             drawMetric() {
                 const data = this.data,
                     {
-                        axisXLabel = 'key',
+                        axisXLabel = null,
                         axisLabelFontSize = 12,
                         axisLabelFontWeight = 400,
                         axisLabelFontOpacity = 0.5,
@@ -62,7 +58,9 @@
                         metricLabelFontWeight = 900,
                         metricLabelFontOpacity = 0.5,
 
-                        metricTitle = d => `${d}`
+                        metricTitle = d => `${d}`,
+
+                        metricPrecision = 2
                     } = this.options,
                     {
                         axisXLabelLaneHeight = _.isNull(axisXLabel) ? 0 : 30
@@ -94,10 +92,6 @@
                     .attr('width', g_w)
                     .attr('height', g_h);
 
-                const tip = d3.tip()
-                    .attr('class', 'd3-tip')
-                    .offset([0, 0]);
-
                 axisXLabelLane
                     .append('text')
                     .attr('text-anchor', 'middle')
@@ -116,23 +110,15 @@
                     .attr('x', g_w / 2)
                     .attr('y', g_h / 2)
                     .attr('dy', '0.35em')
-                    .text(typeof data === 'number' ? d3.format(',')(data).toString() : data)
+                    .text(typeof data === 'number' ? d3.format(',')(data.toFixed(metricPrecision)).toString() : data)
                     .attr('fill', metricLabelColor)
                     .attr('fill-opacity', metricLabelFontOpacity)
                     .attr('font-size', metricLabelFontSize)
                     .attr('font-weight', metricLabelFontWeight)
-                    .on('mouseover', function(d) {
-                        g.call(tip);
-                        tip.html(metricTitle(d));
-                        tip.show();
-
-                        const tipSelection = d3.select('.d3-tip');
-                        tipSelection.style('top', `${offset(this).top - tipSelection.node().getBoundingClientRect().height - 10}px`);
-                        tipSelection.style('left', `${offset(this).left + this.getBBox().width / 2 - tipSelection.node().getBoundingClientRect().width / 2}px`);
+                    .on('mouseover', d => {
+                        showTip(metricTitle(d));
                     })
-                    .on('mouseout', (_) => {
-                        d3.selectAll('.d3-tip').remove();
-                    });
+                    .on('mouseout', hideTip);
             },
             safeDraw() {
                 this.ifExistsSvgThenRemove();

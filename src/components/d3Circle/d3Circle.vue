@@ -4,13 +4,8 @@
 
 <script>
     import * as d3 from 'd3';
-    import tip from 'd3-tip';
-    import offset from 'document-offset';
+    import {showTip, hideTip} from '../../util/tooltip';
     import _ from 'lodash';
-
-    Object.assign(d3, {
-        tip
-    });
 
     export default {
         name: 'd3-circle',
@@ -64,18 +59,27 @@
                 const outerRadius = Math.min(g_w, g_h) / 2,
                     {
                         innerRadiusRatio = 0.8,
+
                         circleBackground = 'rgb(230, 237, 244)',
                         circleForeground = 'rgb(0, 181, 241)',
+
                         labelColor = 'rgb(0, 181, 241)',
+
                         labelFontSize = 50,
                         labelFontWeight = 900,
                         labelFontOpacity = 0.5,
+
                         precision = 2,
 
-                        animationDuration = 500,
+                        animationDuration = 1000,
                         circleTitle = `${data}`
-                    } = this.options,
-                    label = d3.format(`.${precision}%`)(data),
+                    } = this.options;
+
+                if (innerRadiusRatio >= 1) {
+                    return;
+                }
+
+                const label = d3.format(`.${precision}%`)(data),
                     innerRadius = innerRadiusRatio * outerRadius;
 
                 const svg = d3.select(this.$el)
@@ -110,32 +114,20 @@
                     endAngle: 2 * Math.PI
                 });
 
-                const tip = d3.tip()
-                    .attr('class', 'd3-tip')
-                    .offset([0, 0]);
-
                 o.append('text')
                     .attr('text-anchor', 'middle')
                     .attr('x', 0)
                     .attr('y', 0)
-                    .attr('dy', '0.35em')
+                    .attr('dy', '0.32em')
                     .text(label)
                     .attr('fill', labelColor)
                     .attr('fill-opacity', labelFontOpacity)
                     .attr('font-size', labelFontSize)
                     .attr('font-weight', labelFontWeight)
-                    .on('mouseover', function () {
-                        g.call(tip);
-                        tip.html(circleTitle);
-                        tip.show();
-
-                        const tipSelection = d3.select('.d3-tip');
-                        tipSelection.style('top', `${offset(this).top - tipSelection.node().getBoundingClientRect().height - 10}px`);
-                        tipSelection.style('left', `${offset(this).left + this.getBBox().width / 2 - tipSelection.node().getBoundingClientRect().width / 2}px`);
+                    .on('mouseover', () => {
+                        showTip(circleTitle);
                     })
-                    .on('mouseout', function () {
-                        d3.selectAll('.d3-tip').remove();
-                    });
+                    .on('mouseout', hideTip);
 
                 o.append('g')
                     .append('path')
@@ -151,12 +143,10 @@
                     .transition()
                     .duration(animationDuration)
                     .attrTween('d', function () {
-                        const interpolator = d3.interpolate( interpolateStart, interpolateEnd);
+                        const interpolator = d3.interpolate(interpolateStart, interpolateEnd);
 
                         return t => arcGen(interpolator(t));
                     });
-
-                o.attr('cursor', 'pointer');
             },
             safeDraw() {
                 this.ifExistsSvgThenRemove();
@@ -244,5 +234,9 @@
         -moz-user-select: none;
         -ms-user-select: none;
         user-select: none;
+    }
+
+    .d3-circle path {
+        cursor: pointer;
     }
 </style>

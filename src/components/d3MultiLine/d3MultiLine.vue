@@ -4,96 +4,30 @@
 
 <script>
     import * as d3 from 'd3';
-    import tip from 'd3-tip';
-    import mixins from '../../mixins';
-    import classifyGroup from '../../util/classifyGroup';
     import _ from 'lodash';
-    import offset from 'document-offset';
-
-    Object.assign(d3, {
-        tip
-    });
+    import brush from '../../util/brush';
+    import mixins from '../../mixins';
+    import groupBy from '../../util/groupBy';
+    import realBBox from '../../util/realBBox';
+    import responsiveAxis from '../../util/responsiveAxis';
+    import timeFormat from '../../util/timeFormat';
+    import {toggleCross, toggleClass} from '../../util/toggle';
+    import {showTip, hideTip} from '../../util/tooltip';
+    import wrap from '../../util/wrap';
+    import {
+        transformFirstTickTextToTextAnchorStart,
+        transformLastTickTextToTextAnchorEnd,
+    } from '../../util/transformTick';
 
     const GetAllKeys = (data) => [...new Set(data.map(d => d.key))];
-
-    const TransformAxisToVertical = function (texts) {
-        texts
-            .each(function (d, i) {
-                const text = d3.select(this);
-
-                const y = text.attr('y');
-
-                text
-                    .attr('text-anchor', 'start')
-                    .attr('transform', `rotate(90)`)
-                    .attr('y', null)
-                    .attr('x', y);
-
-                if (i !== texts.size() - 1) {
-                    text
-                        .attr('dy', null);
-                }
-            });
-    };
-
-    const ToggleCross = function (container, rect, stroke, strokeWidth) {
-        const selection = container.selectAll('line');
-        if (!selection.empty()) {
-            selection.remove();
-            return;
-        }
-
-        const pos = rect.node().getBBox();
-
-        const x1 = pos.x,
-            y1 = pos.y,
-            x2 = pos.x + pos.width,
-            y2 = pos.y + pos.height;
-
-        container.append('line')
-            .attr('x1', x1)
-            .attr('y1', y1)
-            .attr('x2', x2)
-            .attr('y2', y2)
-            .attr('stroke', stroke)
-            .attr('stroke-width', strokeWidth)
-            .attr('pointer-events', 'none');
-
-        container.append('line')
-            .attr('x1', x2)
-            .attr('y1', y1)
-            .attr('x2', x1)
-            .attr('y2', y2)
-            .attr('stroke', stroke)
-            .attr('stroke-width', strokeWidth)
-            .attr('pointer-events', 'none');
-    };
-
-    const calculateRealBBox = (g) => {
-        const pos = g.node().getBBox(),
-            transform = g.attr('transform'),
-            [translateX, translateY] = transform !== null ? transform.split(/\(|\)|\,/).slice(1, 3).map(x => parseFloat(x)) : [0, 0];
-
-        return {
-            x: pos.x + translateX,
-            y: pos.y + translateY,
-            width: pos.width,
-            height: pos.height
-        };
-    };
 
     export default {
         name: 'd3-multi-line',
         mixins: [mixins],
         methods: {
             drawMultiLine() {
-                const _data = _.cloneDeep(this.data),
-                    data = classifyGroup(_data, 'group'),
-                    groups = Object.keys(data);
+                const _data = _.cloneDeep(this.data);
 
-                if (groups.length === 0) {
-                    return;
-                }
 
                 const {left = 0, top = 0, right = 0, bottom = 0} = this.margin,
                     {
@@ -105,8 +39,11 @@
                         crossWidth = 2,
                         crossColor = 'white',
 
-                        axisXLabel = 'key',
-                        axisYLabel = 'Value',
+                        axisXLabel = null,
+                        axisYLabel = null,
+
+                        tickSize = 10,
+                        tickPadding = 8,
 
                         axisXGroupLabelLaneHeight = 30,
                         axisXGroupLabelWidth = 15,
@@ -118,23 +55,30 @@
                         axisLabelFontWeight = 400,
                         axisLabelFontOpacity = 0.5,
 
-                        axisXLaneHeight = 30,
-                        axisYLaneWidth = 40,
+                        axisXLaneHeight = 60,
+                        axisYLaneWidth = 35,
 
                         axisFontSize = 12,
                         axisFontWeight = 400,
-                        axisFontOpacity = 0.5,
+                        axisFontOpacity = 1,
 
-                        isAxisXTime = false,
+                        isAxisXTime = true,
+                        axisXTimeInterval = null,
+                        sort = true,
 
-                        dashedGroups = groups,
+                        dashedGroups = [],
                         strokeDashArray = 5,
+
+                        isAxisXPathShow = true,
+                        isAxisYPathShow = true,
 
                         curve = 'curveCardinal',
 
-                        isAxisXTextHorizontal = true,
+                        breakWords = true,
 
-                        screenAdaptive = true
+                        axisYTickFormat = '.2s',
+
+                        groupKey = 'group'
                     } = this.options,
                     {
                         axisXLabelLaneHeight = _.isNull(axisXLabel) ? 0 : 30,
@@ -142,11 +86,55 @@
                     } = this.options;
 
                 const [w, h] = this.getElWidthHeight(),
-                    g_w = w - left - right - axisYLabelLaneWidth - axisYLaneWidth,
+                    offsetRight = 10,
+                    g_w = w - left - right - axisYLabelLaneWidth - axisYLaneWidth - offsetRight,
                     g_h = h - top - bottom - axisXLabelLaneHeight - axisXLaneHeight - axisXGroupLabelLaneHeight;
 
                 if (![g_w, g_h].every(el => el > 0)) {
                     return;
+                }
+
+                if (isAxisXTime && sort) {
+                    _data.sort((a, b) => a.key > b.key ? 1 : -1);
+                }
+
+                const data = groupBy(_data, groupKey),
+                    groups = Object.keys(data);
+
+                if (groups.length === 0) {
+                    return;
+                }
+
+                const schemeCategory20 = d3.scaleOrdinal()
+                    .domain(groups)
+                    .range(d3.schemeCategory20);
+
+                const yScale = d3.scaleLinear()
+                    .domain([0, d3.max(_data.map(d => d.value))])
+                    .range([g_h, 0]);
+
+                const xScale = d3.scalePoint()
+                    .domain(GetAllKeys(_data))
+                    .range([0, g_w]);
+
+                const tickFormat = (d) => {
+                    if (!isAxisXTime) {
+                        return d;
+                    }
+
+                    return _.isNumber(d)
+                        ? timeFormat(new Date(d), axisXTimeInterval)
+                        : timeFormat(d, axisXTimeInterval);
+                };
+
+                const lineGen = d3.line()
+                    .x(d => xScale(isAxisXTime ? (_.isNumber(d) ? new Date(d.key) : d.key) : d.key))
+                    .y(d => yScale(d.value))
+                    .defined(d => !_.isNull(d) && !_.isUndefined(d));
+
+                if (!_.isNull(curve) && !_.isUndefined(d3[curve])) {
+                    lineGen
+                        .curve(d3[curve]);
                 }
 
                 const svg = d3.select(this.$el)
@@ -154,9 +142,23 @@
                     .attr('width', w)
                     .attr('height', h);
 
-                const schemeCategory20 = d3.scaleOrdinal()
-                    .domain(groups)
-                    .range(d3.schemeCategory20);
+                if (isAxisXTime) {
+                    const extent = [
+                        [left + axisYLaneWidth + axisYLabelLaneWidth, top + axisXGroupLabelLaneHeight],
+                        [w - right - offsetRight, g_h + top + axisXGroupLabelLaneHeight]
+                    ];
+
+                    svg.call(brush.bind(this), extent, xScale, _data);
+                }
+
+                svg.append('defs')
+                    .append('clipPath')
+                    .attr('id', 'clip-multi-line')
+                    .append('rect')
+                    .attr('x', 0)
+                    .attr('y', 0)
+                    .attr('width', g_w)
+                    .attr('height', g_h);
 
                 const axisXGroupLabelLane = svg.append('g')
                     .attr('transform', `translate(${left + axisYLabelLaneWidth + axisYLaneWidth}, ${top})`)
@@ -183,21 +185,8 @@
                     .attr('width', g_w)
                     .attr('height', axisXLaneHeight);
 
-                const tip = d3.tip()
-                    .attr('class', 'd3-tip')
-                    .offset([0, 0]);
-
                 const g = svg.append('g')
                     .attr('transform', `translate(${left + axisYLabelLaneWidth + axisYLaneWidth}, ${top + axisXGroupLabelLaneHeight})`)
-                    .attr('width', g_w)
-                    .attr('height', g_h);
-
-                svg.append('defs')
-                    .append('clipPath')
-                    .attr('id', 'clip-multi-line-g')
-                    .append('rect')
-                    .attr('x', 0)
-                    .attr('y', 0)
                     .attr('width', g_w)
                     .attr('height', g_h);
 
@@ -222,15 +211,8 @@
                             .attr('stroke', d => schemeCategory20(d))
                             .attr('stroke-opacity', axisXGroupLabelBorderColorOpacity)
                             .on('click', function (d) {
-                                ToggleCross(_g, d3.select(this), crossColor, crossWidth);
-
-                                svg.selectAll(`.d3-multi-line-${d}`)
-                                    .each(function (_d) {
-                                        const selection = d3.select(this),
-                                            display = selection.style('display');
-
-                                        selection.style('display', display === 'inline' ? 'none' : 'inline');
-                                    });
+                                toggleCross(_g, d3.select(this), crossColor, crossWidth);
+                                toggleClass(svg, `.d3-multi-line-${d}`);
                             });
 
                         const labelPos = label.node().getBBox();
@@ -240,14 +222,14 @@
                             .attr('text-anchor', 'start')
                             .attr('x', labelPos.x + labelPos.width)
                             .attr('y', axisXGroupLabelLaneHeight / 2)
-                            .attr('dy', '0.35em')
+                            .attr('dy', '0.32em')
                             .text(d);
 
                         if (i !== 0) {
                             _g.attr('transform', `translate(${previousPos.x + previousPos.width + axisXGroupLabelGap}, 0)`);
                         }
 
-                        previousPos = calculateRealBBox(_g);
+                        previousPos = realBBox(_g);
                     });
 
                 const GroupLabelContainerPos = GroupLabelContainer.node().getBBox();
@@ -260,7 +242,7 @@
                     .attr('text-anchor', 'middle')
                     .attr('x', g_w / 2)
                     .attr('y', axisXLabelLaneHeight / 2)
-                    .attr('dy', '0.35em')
+                    .attr('dy', '0.32em')
                     .text(axisXLabel)
                     .attr('fill', '#000')
                     .attr('fill-opacity', axisLabelFontOpacity)
@@ -280,85 +262,56 @@
                     .attr('font-size', axisLabelFontSize)
                     .attr('font-weight', axisLabelFontWeight);
 
-                const scaleY = d3.scaleLinear()
-                    .domain([0, d3.max(_data.map(d => d.value))])
-                    .range([g_h, 0]);
-
-                let scaleX;
-                if (_data.length !== 1) {
-                    scaleX = isAxisXTime
-                        ? d3.scaleTime().domain(d3.extent(_data.map(d => typeof d === 'number' ? new Date(d.key) : d.key))).range([0, g_w])
-                        : d3.scalePoint().domain(GetAllKeys(_data)).range([0, g_w]);
-                }
-
-                else {
-                    scaleX = d3.scalePoint().domain(_data.map(d => d.key)).range([0, g_w]);
-                }
-
                 axisYLane
                     .append('g')
                     .attr('transform', `translate(${axisYLaneWidth}, 0)`)
                     .attr('class', 'axis axis--y')
-                    .call(d3.axisLeft(scaleY).ticks(this.selectTicksNumY(g_h)))
+                    .call(d3
+                        .axisLeft(yScale)
+                        .ticks(this.selectTicksNumY(g_h))
+                        .tickFormat(d3.format(axisYTickFormat))
+                        .tickSize(tickSize)
+                        .tickPadding(tickPadding))
                     .attr('fill-opacity', axisFontOpacity)
                     .attr('font-size', axisFontSize)
                     .attr('font-weight', axisFontWeight);
 
-                const axisX = axisXLane
+                const xAxis = d3
+                    .axisBottom(xScale)
+                    .tickFormat(tickFormat)
+                    .tickSize(tickSize)
+                    .tickPadding(tickPadding);
+
+                axisXLane
                     .append('g')
                     .attr('class', 'axis axis--x')
-                    .call(d3.axisBottom(scaleX))
+                    .call(xAxis)
                     .attr('fill-opacity', axisFontOpacity)
                     .attr('font-size', axisFontSize)
                     .attr('font-weight', axisFontWeight);
 
-                if (!isAxisXTextHorizontal) {
-                    const texts = axisX.selectAll('text');
+                if (isAxisXTime) {
+                    transformFirstTickTextToTextAnchorStart(svg);
+                    transformLastTickTextToTextAnchorEnd(svg);
 
-                    TransformAxisToVertical(texts);
+                    axisXLane
+                        .call(responsiveAxis, xAxis, xScale);
                 }
 
-                else {
-                    svg.select('.axis.axis--x .tick:last-child text')
-                        .attr('text-anchor', 'end');
-
-                    svg.select('.axis.axis--x .tick:first-of-type text')
-                        .attr('text-anchor', 'start');
+                if (breakWords) {
+                    axisXLane
+                        .selectAll('text')
+                        .call(wrap, xScale.step());
                 }
 
-                if (isAxisXTextHorizontal && screenAdaptive) {
-                    const ticks = axisX.selectAll('.tick'),
-                        texts = axisX.selectAll('text');
-
-                    let previousTickEndX,
-                        textLengthSum = 0;
-
-                    ticks.each(function (d, i) {
-                        const tick = d3.select(this),
-                            textLength = tick.select('text').node().getComputedTextLength(),
-                            tickPos = tick.node().getBBox(),
-                            tickTranslateX = parseFloat(tick.attr('transform').split(/\(|\)|\,/).slice(1, 2)),
-                            startX = tickTranslateX + tickPos.x,
-                            endX = startX + tickPos.width;
-
-                        textLengthSum += textLength;
-
-                        if ((i !== 0 && startX < previousTickEndX) || (i === ticks.size() - 1 && (textLengthSum > g_w))) {
-                            TransformAxisToVertical(texts);
-                        }
-
-                        previousTickEndX = endX;
-                    });
+                if (!isAxisYPathShow) {
+                    axisYLane.select('.domain')
+                        .attr('display', 'none');
                 }
 
-                const lineGen = d3.line()
-                    .x(d => scaleX(isAxisXTime ? (typeof d === 'number' ? new Date(d.key) : d.key) : d.key))
-                    .y(d => scaleY(d.value))
-                    .defined(d => d !== null && d !== undefined);
-
-                if (curve !== null && d3[curve] !== undefined) {
-                    lineGen
-                        .curve(d3[curve]);
+                if (!isAxisXPathShow) {
+                    axisXLane.select('.domain')
+                        .attr('display', 'none');
                 }
 
                 g.selectAll('path')
@@ -366,9 +319,11 @@
                     .enter()
                     .append('path')
                     .attr('class', d => `d3-multi-line-${d}`)
+                    .attr('clip-path', 'url(#clip-multi-line)')
                     .attr('d', d => lineGen(data[d]))
-                    .attr('stroke-dasharray', d => dashedGroups.some(el => el === d) ? strokeDashArray : 0)
+                    .attr('stroke-dasharray', d => dashedGroups.some(el => el === d) ? (_.isNumber(strokeDashArray) ? strokeDashArray : 0) : 0)
                     .attr('fill', 'transparent')
+                    .attr('pointer-events', 'none')
                     .attr('stroke', d => schemeCategory20(d))
                     .attr('stroke-width', strokeWidth);
 
@@ -377,23 +332,15 @@
                     .enter()
                     .append('circle')
                     .attr('class', d => `d3-multi-line-${d.group}`)
-                    .attr('clip-path', 'url(#clip-multi-line-g)')
-                    .attr('cx', d => scaleX(isAxisXTime ? (typeof d === 'number' ? new Date(d.key) : d.key) : d.key))
-                    .attr('cy', d => scaleY(d.value))
+                    .attr('clip-path', 'url(#clip-multi-line)')
+                    .attr('cx', d => xScale(isAxisXTime ? (_.isNumber(d) ? new Date(d.key) : d.key) : d.key))
+                    .attr('cy', d => yScale(d.value))
                     .attr('r', circleRadius)
                     .attr('fill', d => schemeCategory20(d.group))
-                    .on('mouseover', function (d) {
-                        g.call(tip);
-                        tip.html(circleTitle(d));
-                        tip.show();
-
-                        const tipSelection = d3.select('.d3-tip');
-                        tipSelection.style('top', `${offset(this).top - tipSelection.node().getBoundingClientRect().height - 10}px`);
-                        tipSelection.style('left', `${offset(this).left + this.getBBox().width / 2 - tipSelection.node().getBoundingClientRect().width / 2}px`);
+                    .on('mouseover', (d) => {
+                        showTip(circleTitle(d));
                     })
-                    .on('mouseout', (d) => {
-                        d3.selectAll('.d3-tip').remove();
-                    });
+                    .on('mouseout', hideTip);
             },
             safeDraw() {
                 this.ifExistsSvgThenRemove();
@@ -409,11 +356,13 @@
 <style>
     @import url(../../css/index.css);
 
-    .d3-multi-line circle:hover, .d3-multi-line rect:hover, .d3-multi-line text:hover {
+    .d3-multi-line circle:hover,
+    .d3-multi-line rect:hover,
+    .d3-multi-line text:hover {
         cursor: pointer;
     }
 
-    .d3-multi-line .label {
+    .d3-multi-line text {
         -webkit-user-select: none;
         -moz-user-select: none;
         -ms-user-select: none;

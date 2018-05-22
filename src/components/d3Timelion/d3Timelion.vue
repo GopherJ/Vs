@@ -178,7 +178,7 @@
 
                 // brushed callback
                 function brushed() {
-                    if (d3.event.selection) {
+                    if (d3.event && d3.event.selection) {
                         const [dateTimeStart, dateTimeEnd] = Array.prototype.map.call(d3.event.selection, el => timeScale.invert(el - left - axisYWidth - axisYLabelWidth));
                         self.$emit('range-updated', dateTimeStart, dateTimeEnd);
 
@@ -196,8 +196,13 @@
                         }
 
                         // restore brush dom tree
-                        d3.select('.d3-time-lion .brush').selectAll('*').remove();
-                        d3.select('.d3-time-lion .brush').attr('fill', null).attr('pointer-events', null);
+                        d3.select('.d3-time-lion .brush')
+                            .selectAll('*')
+                            .remove();
+
+                        d3.select('.d3-time-lion .brush')
+                            .attr('fill', null)
+                            .attr('pointer-events', null);
 
                         // https://github.com/d3/d3-brush/issues/10
                         // clear brush state, d3v4 state also brush on selection
@@ -207,7 +212,7 @@
 
                 // brush callback
                 function brushing() {
-                    if (d3.event.selection) {
+                    if (d3.event && d3.event.selection) {
                         // selection is b so that the selection.x and selection.y is coordinates in svg
                         const [dateTimeStart, dateTimeEnd] = Array.prototype.map.call(d3.event.selection, el => timeScale.invert(el - left - axisYWidth - axisYLabelWidth));
                         self.updateTimeRangeLabel(dateTimeStart, dateTimeEnd);
@@ -374,7 +379,9 @@
                                         i: this.$parent.i,
                                         payload: val
                                     });
-                                } else {
+                                }
+
+                                else {
                                     this.$root.$emit('interval-updated', val);
                                 }
                             }
