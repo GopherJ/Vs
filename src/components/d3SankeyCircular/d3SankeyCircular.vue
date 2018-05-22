@@ -170,7 +170,7 @@
                     .append('g')
                     .attr('transform', `translate(0, ${axisXSelectBoxLaneHeight})`);
 
-                const SelectBoxLabel = axisXSelectBoxLane.append('text')
+                const selectBoxLabel = axisXSelectBoxLane.append('text')
                     .attr('text-anchor', 'middle')
                     .attr('x', g_w / 2)
                     .attr('y', axisXSelectBoxLaneHeight / 2)
@@ -181,21 +181,21 @@
                     .attr('font-weight', axisXSelectBoxLabelFontWeight)
                     .attr('fill-opacity', axisXSelectBoxLabelFontOpacity);
 
-                const SelectBoxLabelPos = SelectBoxLabel.node().getBBox();
+                const selectBoxLabelPos = selectBoxLabel.node().getBBox();
 
                 const FOREIGN_OBJECT = axisXSelectBoxLane
                     .append('foreignObject');
 
                 if (!isMobile) {
                     FOREIGN_OBJECT
-                        .attr('transform', `translate(${SelectBoxLabelPos.x + SelectBoxLabelPos.width}, 0)`)
-                        .attr('width', g_w - SelectBoxLabelPos.x - SelectBoxLabelPos.width);
+                        .attr('transform', `translate(${selectBoxLabelPos.x + selectBoxLabelPos.width}, 0)`)
+                        .attr('width', g_w - selectBoxLabelPos.x - selectBoxLabelPos.width);
                 }
 
                 else {
                     FOREIGN_OBJECT
-                        .attr('transform', `translate(${SelectBoxLabelPos.x + SelectBoxLabelPos.width / 2}, ${SelectBoxLabelPos.y + SelectBoxLabelPos.height})`)
-                        .attr('width', g_w - SelectBoxLabelPos.x - SelectBoxLabelPos.width / 2);
+                        .attr('transform', `translate(${selectBoxLabelPos.x + selectBoxLabelPos.width / 2}, ${selectBoxLabelPos.y + selectBoxLabelPos.height})`)
+                        .attr('width', g_w - selectBoxLabelPos.x - selectBoxLabelPos.width / 2);
                 }
 
                 FOREIGN_OBJECT
@@ -234,8 +234,6 @@
                 const nodeG = g
                     .append('g')
                     .attr('class', 'nodes')
-                    .attr('font-family', 'sans-serif')
-                    .attr('font-size', 10)
                     .selectAll('g');
 
                 const sankeyData = sankey(data);
@@ -275,7 +273,7 @@
                         hideTip();
 
                         d3.selectAll('.node')
-                            .style('opacity', 0.5);
+                            .style('fill-opacity', 0.5);
 
                         d3.selectAll('.link')
                             .style('opacity', 0.7);
