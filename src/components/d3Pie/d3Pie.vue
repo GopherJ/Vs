@@ -4,9 +4,9 @@
 
 <script>
     import * as d3 from 'd3';
-    import {showTip, hideTip} from '../../util/tooltip';
-    import mixins from '../../mixins';
     import _ from 'lodash';
+    import mixins from '../../mixins';
+    import {showTip, hideTip} from '../../util/tooltip';
 
     export default {
         name: 'd3-pie',
@@ -15,6 +15,11 @@
             drawPie() {
                 const data = _.cloneDeep(this.data);
                 const [w, h] = this.getElWidthHeight();
+
+                if (data.length === 0 || ![w, h].every(el => el > 0)) {
+                    return;
+                }
+
                 const {
                         left = 0,
                         top = 0,
@@ -29,22 +34,23 @@
 
                         arcTitle = d => `${d.data.key}<br>${d.data.value}`,
 
-                        arcLabel = _ => null,
+                        arcLabel = d => null,
 
 
                         axisXLabel = null,
+
                         axisLabelFontSize = 12,
                         axisLabelFontWeight = 400,
                         axisLabelFontOpacity = 0.5,
 
-                        arcLabelFontSize = 10,
+                        arcLabelFontSize = 9,
                         arcLabelFontWeight = 400,
                         arcLabelFontOpacity = 0.5,
 
                         animationDuration = 1000,
                         delay = 50,
 
-                        colorDefault = 'rgb(175, 240, 91)'
+                        defaultColor = 'rgb(175, 240, 91)'
                     } = this.options,
                     {
                         axisXLabelHeight = _.isNull(axisXLabel) ? 0 : 30,
@@ -111,7 +117,7 @@
 
                         return t => pathGen(interpolate(t));
                     })
-                    .attr('fill', d =>  data.length > 1 ? interpolateWarm(d.data.value) : colorDefault);
+                    .attr('fill', d =>  data.length > 1 ? interpolateWarm(d.data.value) : defaultColor);
 
                 paths
                     .on('mouseover', (d) => {
@@ -123,6 +129,7 @@
                     .append('text')
                     .attr('transform', d => `translate(${arcLabelLane.centroid(d)})`)
                     .attr('text-anchor', 'middle')
+                    .attr('pointer-events', 'none')
                     .attr('fill-opacity', 0)
                     .transition()
                     .duration(animationDuration)

@@ -345,7 +345,6 @@
                 FOREIGN_OBJECT
                     .attr('height', timeRangeLabelLaneHeight)
                     .append('xhtml:select')
-                    .attr('class', 'form-control')
                     .on('change', () => {
                         const targetVal = d3.event.target.value,
                             val = targetVal === 'Auto' ? targetVal : Number.parseInt(targetVal, 10);
@@ -389,5 +388,32 @@
         -ms-user-select: none;
         user-select: none;
         cursor: pointer;
+    }
+     .d3-timelion select {
+        height: 32px;
+        padding: 5px 15px;
+        background-color: #fff;
+        background-image: none;
+        border: 1px solid #ecf0f1;
+        border-top-width: 2px;
+        border-right-width: 2px;
+        border-bottom-width: 2px;
+        border-left-width: 2px;
+        border-radius: 4px;
+        box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);
+        transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+    }
+
+    .d3-timelion select:focus {
+        border: 2px solid #ccc;
+    }
+
+    .d3-timelion select:-moz-focusring {
+        color: transparent;
+        text-shadow: 0 0 0 #000;
+    }
+
+    .d3-timelion option:not(:checked) {
+        color: black;
     }
 </style>

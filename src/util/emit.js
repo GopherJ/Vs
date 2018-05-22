@@ -1,25 +1,25 @@
 /**
  *
- * @param context
+ * @param instance
  * @param eventName
  * @param args
  */
-function emit(context, eventName, ...args) {
-    context.$emit(eventName, ...args);
+function emit(instance, eventName, ...args) {
+    instance.$emit(eventName, ...args);
 
-    if (context.$root === context) {
+    if (instance.$root === instance) {
         return;
     }
 
 
-    if (context.$parent.i) {
-        context.$root.$emit(eventName, {
-            i: context.$parent.i,
+    if (instance.$parent.i) {
+        instance.$root.$emit(eventName, {
+            i: instance.$parent.i,
             payload: args
         });
     }
 
-    context.$root.$emit(eventName, ...args);
+    instance.$root.$emit(eventName, ...args);
 }
 
 export default emit;
