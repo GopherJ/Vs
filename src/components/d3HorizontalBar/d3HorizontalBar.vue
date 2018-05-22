@@ -12,7 +12,7 @@
     import timeFormat from '../../util/timeFormat';
     import brush from '../../util/brush';
     import wrap from '../../util/wrap';
-    import {selectPaddingInnerOuterX, selectTicksNumY} from '../../util/selectNumTicks';
+    import {selectPaddingInnerOuterX, selectTicksNumY} from '../../util/select';
 
     export default {
         name: 'd3-horizontal-bar',

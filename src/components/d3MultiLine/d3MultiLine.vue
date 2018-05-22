@@ -13,6 +13,7 @@
     import timeFormat from '../../util/timeFormat';
     import {toggleCross, toggleClass} from '../../util/toggle';
     import {showTip, hideTip} from '../../util/tooltip';
+    import {selectTicksNumY} from '../../util/select';
     import wrap from '../../util/wrap';
     import {
         transformFirstTickTextToTextAnchorStart,
@@ -27,8 +28,6 @@
         methods: {
             drawMultiLine() {
                 const _data = _.cloneDeep(this.data);
-
-
                 const {left = 0, top = 0, right = 0, bottom = 0} = this.margin,
                     {
                         strokeWidth = 2,
@@ -268,7 +267,7 @@
                     .attr('class', 'axis axis--y')
                     .call(d3
                         .axisLeft(yScale)
-                        .ticks(this.selectTicksNumY(g_h))
+                        .ticks(selectTicksNumY(g_h))
                         .tickFormat(d3.format(axisYTickFormat))
                         .tickSize(tickSize)
                         .tickPadding(tickPadding))

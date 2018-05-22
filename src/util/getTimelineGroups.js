@@ -1,5 +1,4 @@
 /* eslint-disable */
-
 /**
  * first type of time line entry
  *
@@ -43,81 +42,49 @@ function Interval(group, from, to, label, title, className) {
  * @param data
  */
 const classifyDataByGroup = (data) => {
-   const results = {};
-   let dateTimeStart, dateTimeEnd;
+    const results = {};
+    let dateTimeStart, dateTimeEnd;
 
-   for (let i = 0, l = data.length; i < l; i += 1) {
-       // try to spread all props
-       const { group, from, to, label, at, title, className, symbol } = data[i];
+    for (let i = 0, l = data.length; i < l; i += 1) {
+        const {group, from, to, label, at, title, className, symbol} = data[i];
 
-       if (results[group]) {
-           // Interval
-           if ((from > 0) && (to > 0) && label) {
-               results[group].push(new Interval(group, from, to, label, title, className));
+        if ((from > 0) && (to > 0) && label) {
+            dateTimeStart = i === 0 ? from : (dateTimeStart > from ? from : dateTimeStart);
+            dateTimeEnd = i === 0 ? to : (dateTimeEnd < to ? to : dateTimeEnd);
 
-               // dateTimeStart, dateTimeEnd
-               if (i === 0) {
-                   dateTimeStart = from;
-                   dateTimeEnd = to;
-               } else {
-                   dateTimeStart = dateTimeStart > from ? from : dateTimeStart;
-                   dateTimeEnd = dateTimeEnd < to ? to : dateTimeEnd;
-               }
-           }
-           // Point
-           else if ((at > 0) && title) {
-               results[group].push(new Point(group, at, title, symbol, className));
+            if (results[group]) {
+                results[group].push(new Interval(group, from, to, label, title, className));
+            }
 
-               // dateTimeStart, dateTimeEnd
-               if (i === 0) {
-                   dateTimeStart = at;
-                   dateTimeEnd = at;
-               } else {
-                   dateTimeStart = dateTimeStart > at ? at : dateTimeStart;
-                   dateTimeEnd = dateTimeEnd < at ? at : dateTimeEnd;
-               }
-           }
-       } else {
-           if ((from > 0) && (to > 0) && label) {
-               results[group] = [new Interval(group, from, to, label, title, className)];
+            else {
+                results[group] = [new Interval(group, from, to, label, title, className)];
+            }
+        }
 
-               // dateTimeStart, dateTimeEnd
-               if (i === 0) {
-                   dateTimeStart = from;
-                   dateTimeEnd = to;
-               } else {
-                   dateTimeStart = dateTimeStart > from ? from : dateTimeStart;
-                   dateTimeEnd = dateTimeEnd < to ? to : dateTimeEnd;
-               }
-           }
+        else if ((at > 0) && title) {
+            dateTimeStart = i === 0 ? at : (dateTimeStart > at ? at : dateTimeStart);
+            dateTimeEnd = i === 0 ? at : (dateTimeEnd < at ? at : dateTimeEnd);
 
-           else if ((at > 0) && title) {
-               results[group] = [new Point(group, at, title, symbol, className)];
+            if (results[group]) {
+                results[group].push(new Point(group, at, title, symbol, className));
+            } else {
+                results[group] = [new Point(group, at, title, symbol, className)];
+            }
+        }
+    }
 
-                // dateTimeStart, dateTimeEnd
-               if (i === 0) {
-                   dateTimeStart = at;
-                   dateTimeEnd = at;
-               } else {
-                   dateTimeStart = dateTimeStart > at ? at : dateTimeStart;
-                   dateTimeEnd = dateTimeEnd < at ? at : dateTimeEnd;
-               }
-           }
-       }
-   }
-
-   return  {
-       dateTimeStart,
-       dateTimeEnd,
-       results
-   };
+    return {
+        dateTimeStart,
+        dateTimeEnd,
+        results
+    };
 };
 
 
 /**
  * check if two entries collide
  *
- * @param entry1, entry2
+ * @param e1, e2
  */
 const isCollided = (e1, e2) => {
     if (e1 === e2) {
@@ -137,19 +104,8 @@ const isCollided = (e1, e2) => {
     }
 
     else if (e1 instanceof Interval && e2 instanceof Interval) {
-        return e2.from <= e1.to ||  e1.from <= e2.to;
+        return e2.from <= e1.to || e1.from <= e2.to;
     }
-};
-
-
-/**
- * to see if already exists collided entry
- *
- * @param arr
- * @param e
- */
-const existCollisonInArray = (arr, e) => {
-    return arr.some(el => isCollided(el, e));
 };
 
 
@@ -159,7 +115,7 @@ const existCollisonInArray = (arr, e) => {
  * @returns {*}
  */
 const sortDataByTimestamp = (data) => {
-    return data.sort((a,b) => {
+    return data.sort((a, b) => {
         if (a instanceof Point && b instanceof Interval) {
             return a.at > b.from ? 1 : -1;
         }
@@ -234,7 +190,7 @@ const chunkGroupData = (data) => {
  * @param data
  */
 const getGroupsData = (data) => {
-    const { results, dateTimeStart, dateTimeEnd } = classifyDataByGroup(data);
+    const {results, dateTimeStart, dateTimeEnd} = classifyDataByGroup(data);
 
     return Object.keys(results).reduce((ite, cur) => {
         ite['data'][cur] = chunkGroupData(results[cur]);
@@ -242,8 +198,7 @@ const getGroupsData = (data) => {
     }, {
         dateTimeStart,
         dateTimeEnd,
-        data: {
-        },
+        data: {},
         groups: Object.keys(results)
     });
 };

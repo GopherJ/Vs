@@ -8,7 +8,7 @@
     import {showTip, hideTip} from '../../util/tooltip';
     import timeFormat from '../../util/timeFormat';
     import emit from '../../util/emit';
-    import {selectTicksNumX, selectPaddingInnerOuterY} from '../../util/selectNumTicks';
+    import {selectTicksNumX, selectPaddingInnerOuterY} from '../../util/select';
     import {transformLastTickTextToTextAnchorEnd} from '../../util/transformTick';
     import _ from 'lodash';
 

@@ -13,7 +13,7 @@
     import wrap from '../../util/wrap';
     import emit from '../../util/emit';
     import INTERVAL from '../../util/interval';
-    import {selectPaddingInnerOuterX, selectTicksNumY} from '../../util/selectNumTicks';
+    import {selectPaddingInnerOuterX, selectTicksNumY} from '../../util/select';
 
     const tpl = `
                 <option value='Auto'>Auto</option>

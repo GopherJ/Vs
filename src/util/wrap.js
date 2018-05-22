@@ -4,7 +4,7 @@ import * as d3 from 'd3';
 
 /**
  *
- * @param text
+ * @param texts
  * @param width
  */
 function wrap(texts, width) {

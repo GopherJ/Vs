@@ -1,7 +1,7 @@
 @keyframes show {
   from {
     opacity: 0;
-    transform: translateY(0px);
+    transform: translateY(5px);
   }
 
   to {
@@ -48,17 +48,14 @@
 }
 
 
-/* rect rendering method */
 rect {
     shape-rendering: crispEdges;
 }
 
-/* use buefy font setting */
 text {
     font-family: BlinkMacSystemFont, -apple-system, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, Helvetica, Arial, sans-serif;
 }
 
-/* axis */
 .axis {
     -webkit-user-select: none;
     -moz-user-select: none;
@@ -97,83 +94,3 @@ option:not(:checked) {
     color: black; /* prevent <option>s from becoming transparent as well */
 }
 
-/* d3-timeline classes */
-.d3-time-line .entry--interval--default {
-    fill: #6eadc1;
-    stroke: #6eadc1;
-    fill-opacity: 0.125;
-    stroke-opacity: 1;
-    cursor: pointer;
-}
-
-.d3-time-line .entry--point--default {
-    fill: #6eadc1;
-    stroke: #6eadc1;
-    fill-opacity: 0.125;
-    stroke-opacity: 1;
-    cursor: pointer;
-}
-
-.d3-time-line .entry--interval--error {
-    fill: #ff3860;;
-    stroke: #ff3860;
-    fill-opacity: 0.125;
-    stroke-opacity: 1;
-    cursor: pointer;
-}
-
-.d3-time-line .entry--point--error {
-    fill: #ff3860;;
-    stroke: #ff3860;
-    fill-opacity: 0.125;
-    stroke-opacity: 1;
-    cursor: pointer;
-}
-
-.d3-time-line .entry--interval--success {
-    fill: #23d160;;
-    stroke: #23d160;
-    fill-opacity: 0.125;
-    stroke-opacity: 1;
-    cursor: pointer;
-}
-
-.d3-time-line .entry--point--success {
-    fill: #23d160;;
-    stroke: #23d160;
-    fill-opacity: 0.125;
-    stroke-opacity: 1;
-    cursor: pointer;
-}
-
-.d3-time-line .entry--interval--info {
-    fill: #167df0;;
-    stroke: #167df0;
-    fill-opacity: 0.125;
-    stroke-opacity: 1;
-    cursor: pointer;
-}
-
-.d3-time-line .entry--point--info {
-    fill: #167df0;;
-    stroke: #167df0;
-    fill-opacity: 0.125;
-    stroke-opacity: 1;
-    cursor: pointer;
-}
-
-.d3-time-line .entry--interval--warn {
-    fill: #ffdd57;;
-    stroke: #ffdd57;
-    fill-opacity: 0.125;
-    stroke-opacity: 1;
-    cursor: pointer;
-}
-
-.d3-time-line .entry--point--warn {
-    fill: #ffdd57;;
-    stroke: #ffdd57;
-    fill-opacity: 0.125;
-    stroke-opacity: 1;
-    cursor: pointer;
-}

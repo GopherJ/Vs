@@ -11,7 +11,7 @@
     import responsiveAxis from '../../util/responsiveAxis';
     import wrap from '../../util/wrap';
     import timeFormat from '../../util/timeFormat';
-    import {selectTicksNumY} from '../../util/selectNumTicks';
+    import {selectTicksNumY} from '../../util/select';
     import {
         transformFirstTickTextToTextAnchorStart,
         transformLastTickTextToTextAnchorEnd

@@ -1,5 +1,5 @@
 <template>
-    <div :style="{ 'width' : width, 'height' : height }" class="d3-pie"></div>
+    <div  class="d3-pie" :style="{ 'width' : width, 'height' : height }"></div>
 </template>
 
 <script>

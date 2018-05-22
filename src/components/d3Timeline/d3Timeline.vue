@@ -7,8 +7,8 @@
     import _ from 'lodash';
     import mixins from '../../mixins';
     import {showTip, hideTip} from '../../util/tooltip';
-    import {selectPaddingInnerOuterY} from '../../util/selectNumTicks';
-    import {Point, Interval, getGroupsData} from '../../util/getGroupsData';
+    import {selectPaddingInnerOuterY} from '../../util/select';
+    import {Point, Interval, getGroupsData} from '../../util/getTimelineGroups';
     import roundedRect from '../../util/roundedRect';
 
     export default {
