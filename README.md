@@ -41,6 +41,7 @@ npm i -S d3-vs
 - `d3HeatMap`
 - `d3RadialBar`
 - `d3RadialSector`
+- `d3RadialLine`
 - `d3ScatterPlot`
 - `d3Table`
 - `d3WordCount`
