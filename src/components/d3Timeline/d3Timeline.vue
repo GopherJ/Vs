@@ -23,8 +23,7 @@
                     return;
                 }
 
-                const {left = 0, top = 0, right = 0, bottom = 0} = this.margin,
-                    {
+                const {
                         intervalCornerRadius = 4,
 
                         symbolSize = 200,
@@ -63,6 +62,7 @@
                     {
                         axisXLabelHeight = _.isNull(axisXLabel) ? 0 : 30,
                     } = this.options,
+                    {left = borderWidth, top = borderWidth, right = borderWidth, bottom = borderWidth} = this.margin,
                     g_w = w - left - right - groupLaneWidth,
                     g_h = h - top - bottom - axisXLaneHeight - axisXLabelHeight,
                     groupHeight = g_h / groups.length,
@@ -264,7 +264,6 @@
 
                 svg.on('mousemove', function () {
                     const [cx, cy] = d3.mouse(entryLaneContainer.node());
-                    console.log(cx, cy)
 
                     if (cx > groupLaneWidth && cx < g_w + groupLaneWidth && cy > 0 && cy < g_h) {
                         svg.attr('cursor', 'pointer');
