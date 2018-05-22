@@ -54,8 +54,7 @@
                         axisLabelFontWeight = 400,
                         axisLabelFontOpacity = 0.5,
 
-                        isAxisXPathShow = true,
-                        isAxisYPathShow = true,
+                        isAxisPathShow = true,
 
                         isAxisXTime = true,
                         axisXTimeInterval = null,
@@ -189,12 +188,10 @@
                         .call(wrap, xScale.step());
                 }
 
-                if (!isAxisXPathShow) {
+                if (!isAxisPathShow) {
                     axisXLane.select('.domain')
                         .attr('display', 'none');
-                }
 
-                if (!isAxisYPathShow) {
                     axisYLane.select('.domain')
                         .attr('display', 'none');
                 }

@@ -41,7 +41,7 @@ function Interval(group, from, to, label, title, className) {
  * get every group's data
  * @param data
  */
-const classifyDataByGroup = (data) => {
+const groupBy = (data) => {
     const results = {};
     let dateTimeStart, dateTimeEnd;
 
@@ -114,7 +114,7 @@ const isCollided = (e1, e2) => {
  * @param data
  * @returns {*}
  */
-const sortDataByTimestamp = (data) => {
+const sort = (data) => {
     return data.sort((a, b) => {
         if (a instanceof Point && b instanceof Interval) {
             return a.at > b.from ? 1 : -1;
@@ -140,38 +140,30 @@ const sortDataByTimestamp = (data) => {
  *
  * @param data
  */
-const chunkGroupData = (data) => {
+const chunk = (data) => {
     const results = [
-        // to place the data of every lane
         []
     ];
 
-    // sort change the data
-    sortDataByTimestamp(data);
+    sort(data);
 
     for (let i = 0, l = data.length; i < l; i += 1) {
         const entry = data[i];
 
         for (let j = 0, L = results.length; j < L; j += 1) {
-            // no data in current lane
-            // add it directly
             if (results[j].length === 0) {
                 results[j].push(entry);
                 break;
             }
 
-            // last item in current lane
             const lastItem = results[j][results[j].length - 1];
 
-            // doesn't collide
             if (!isCollided(lastItem, entry)) {
                 results[j].push(entry);
                 break;
             }
 
-            // collide
             else {
-                // no other lane, so create a need lane
                 if (j === results.length - 1) {
                     results.push([entry]);
                 } else {
@@ -189,11 +181,11 @@ const chunkGroupData = (data) => {
  *
  * @param data
  */
-const getGroupsData = (data) => {
-    const {results, dateTimeStart, dateTimeEnd} = classifyDataByGroup(data);
+const getTimelineGroups = (data) => {
+    const {results, dateTimeStart, dateTimeEnd} = groupBy(data);
 
     return Object.keys(results).reduce((ite, cur) => {
-        ite['data'][cur] = chunkGroupData(results[cur]);
+        ite['data'][cur] = chunk(results[cur]);
         return ite;
     }, {
         dateTimeStart,
@@ -207,5 +199,5 @@ const getGroupsData = (data) => {
 export {
     Point,
     Interval,
-    getGroupsData
+    getTimelineGroups
 };

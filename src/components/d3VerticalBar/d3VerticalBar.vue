@@ -51,8 +51,7 @@
                         isShadowed = false,
                         shadowColor = 'rgb(230, 237, 244)',
 
-                        isAxisXPathShow = true,
-                        isAxisYPathShow = true,
+                        isAxisPathShow = true,
 
                         isAxisYTime = true,
                         axisYTimeInterval = null,
@@ -162,12 +161,10 @@
                     .attr('font-weight', axisFontWeight)
                     .attr('fill-opacity', axisFontOpacity);
 
-                if (isAxisXPathShow) {
+                if (isAxisPathShow) {
                     axisXLane.select('.domain')
                         .attr('display', 'none');
-                }
 
-                if (isAxisYPathShow) {
                     axisYLane.select('.domain')
                         .attr('display', 'none');
                 }

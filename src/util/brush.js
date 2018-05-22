@@ -42,7 +42,7 @@ function brush(svg, extent, scale, data) {
             }
 
             if (_.isFunction(scale.bandwidth)) {
-                const bisecLeft = d3.bisector(d => scale(d.key) + scale.bandwidth() / 2).left;
+                const bisecLeft = d3.bisector((d, x) => scale(d.key) + scale.bandwidth() - x).left;
 
                 let idx1 = bisecLeft(data, x1),
                     idx2 = bisecLeft(data, x2);

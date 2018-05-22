@@ -51,8 +51,7 @@
                         axisXTimeInterval = null,
                         sort = true,
 
-                        isAxisXPathShow = false,
-                        isAxisYPathShow = false,
+                        isAxisPathShow = false,
 
                         animationDuration = 1000,
                         delay = 50,
@@ -185,12 +184,10 @@
                     .attr('fill-opacity', axisFontOpacity)
                     .attr('font-weight', axisFontWeight);
 
-                if (!isAxisYPathShow) {
+                if (!isAxisPathShow) {
                     axisYLane.select('.domain')
                         .attr('display', 'none');
-                }
 
-                if (!isAxisXPathShow) {
                     axisXLane.select('.domain')
                         .attr('display', 'none');
                 }

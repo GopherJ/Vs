@@ -8,7 +8,7 @@
     import mixins from '../../mixins';
     import {showTip, hideTip} from '../../util/tooltip';
     import {selectPaddingInnerOuterY} from '../../util/select';
-    import {Point, Interval, getGroupsData} from '../../util/getTimelineGroups';
+    import {Point, Interval, getTimelineGroups} from '../../util/getTimelineGroups';
     import roundedRect from '../../util/roundedRect';
 
     export default {
@@ -17,7 +17,7 @@
         methods: {
             drawTimeline() {
                 const [w, h] = this.getElWidthHeight(),
-                    {dateTimeStart, dateTimeEnd, data, groups} = getGroupsData(_.cloneDeep(this.data));
+                    {dateTimeStart, dateTimeEnd, data, groups} = getTimelineGroups(_.cloneDeep(this.data));
 
                 if (groups.length === 0) {
                     return;

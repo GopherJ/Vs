@@ -9,6 +9,7 @@
     import mixins from '../../mixins';
     import {showTip, hideTip} from '../../util/tooltip';
     import timeFormat from '../../util/timeFormat';
+    import realBBox from '../../util/realBBox';
     import responsiveAxis from '../../util/responsiveAxis';
     import wrap from '../../util/wrap';
     import emit from '../../util/emit';
@@ -76,6 +77,7 @@
                         timeRangeLabelFontOpacity = 0.5,
 
                         axisXTimeInterval = null,
+                        sort = true,
 
                         isAxisPathShow = false,
 
@@ -103,6 +105,10 @@
                     return timeFormat(value, axisXTimeInterval);
                 };
 
+                if (sort) {
+                    data.sort((a, b) => a.key > b.key ? 1 : -1);
+                }
+
                 const svg = d3.select(this.$el)
                     .append('svg')
                     .attr('width', w)
@@ -114,7 +120,6 @@
                     .append('rect')
                     .attr('width', w)
                     .attr('height', h);
-
 
                 const b = svg.append('g')
                     .attr('class', 'brush');
@@ -136,7 +141,7 @@
                         const [x1, x2] = Array.prototype.map
                             .call(d3.event.selection, el => el - extent[0][0]);
 
-                        const bisecLeft = d3.bisector(d => xScale(d.key) + xScale.bandwidth() / 2).left;
+                        const bisecLeft = d3.bisector((d, x) => xScale(d.key) + xScale.bandwidth() - x).left;
 
                         let idx1 = bisecLeft(data, x1),
                             idx2 = bisecLeft(data, x2);
@@ -157,7 +162,7 @@
                         const [x1, x2] = Array.prototype.map
                             .call(d3.event.selection, el => el - extent[0][0]);
 
-                        const bisecLeft = d3.bisector(d => xScale(d.key) + xScale.bandwidth() / 2).left;
+                        const bisecLeft = d3.bisector((d, x) => xScale(d.key) + xScale.bandwidth() - x).left;
 
                         let idx1 = bisecLeft(data, x1),
                             idx2 = bisecLeft(data, x2);
@@ -239,7 +244,8 @@
                     .attr('font-weight', axisFontWeight);
 
                 if (!isAxisPathShow) {
-                    axisXLane.selectAll('.domain')
+                    axisXLane
+                        .selectAll('.domain')
                         .attr('display', 'none');
 
                     axisYLane
@@ -260,7 +266,17 @@
                     .attr('fill', fill)
                     .attr('fill-opacity', fillOpacity)
                     .attr('stroke', stroke)
-                    .attr('stroke-opacity', strokeOpacity)
+                    .attr('stroke-opacity', strokeOpacity);
+
+                rects
+                    .on('mousedown', (d) => {
+                        if (_.isNumber(axisXTimeInterval)) {
+                            const dateTimeStart = _.isNumber(d.key) ? new Date(d.key) : new Date(d.key.getTime()),
+                                dateTimeEnd = _.isNumber(d.key) ? new Date(d.key + axisXTimeInterval) : new Date(d.key.getTime() + axisXTimeInterval);
+
+                            emit(this, 'range-updated', dateTimeStart, dateTimeEnd);
+                        }
+                    })
                     .on('mouseover', d => {
                         showTip(barTitle(d));
                     })
@@ -327,22 +343,22 @@
 
                 const timeRangeLabelPos = timeRangeLabel.node().getBBox();
 
-                const FOREIGN_OBJECT = timeRangeLabelLane
+                const foreignObject = timeRangeLabelLane
                     .append('foreignObject');
 
                 if (!isMobile) {
-                    FOREIGN_OBJECT
+                    foreignObject
                         .attr('transform', `translate(${timeRangeLabelPos.x + timeRangeLabelPos.width}, ${top})`)
                         .attr('width', g_w - timeRangeLabelPos.x - timeRangeLabelPos.width);
 
                 } else {
-                    FOREIGN_OBJECT
+                    foreignObject
                         .attr('transform', `translate(${timeRangeLabelPos.x + timeRangeLabelPos.width / 2}, ${top + timeRangeLabelLaneHeight})`)
                         .attr('width', g_w - timeRangeLabelPos.x - timeRangeLabelPos.width / 2);
 
                 }
 
-                FOREIGN_OBJECT
+                foreignObject
                     .attr('height', timeRangeLabelLaneHeight)
                     .append('xhtml:select')
                     .on('change', () => {
@@ -389,7 +405,8 @@
         user-select: none;
         cursor: pointer;
     }
-     .d3-timelion select {
+
+    .d3-timelion select {
         height: 32px;
         padding: 5px 15px;
         background-color: #fff;

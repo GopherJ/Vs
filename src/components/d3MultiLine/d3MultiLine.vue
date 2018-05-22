@@ -68,8 +68,7 @@
                         dashedGroups = [],
                         strokeDashArray = 5,
 
-                        isAxisXPathShow = true,
-                        isAxisYPathShow = true,
+                        isAxisPathShow = true,
 
                         curve = 'curveCardinal',
 
@@ -303,12 +302,10 @@
                         .call(wrap, xScale.step());
                 }
 
-                if (!isAxisYPathShow) {
+                if (!isAxisPathShow) {
                     axisYLane.select('.domain')
                         .attr('display', 'none');
-                }
 
-                if (!isAxisXPathShow) {
                     axisXLane.select('.domain')
                         .attr('display', 'none');
                 }
