@@ -9,7 +9,6 @@
     import mixins from '../../mixins';
     import {showTip, hideTip} from '../../util/tooltip';
     import timeFormat from '../../util/timeFormat';
-    import realBBox from '../../util/realBBox';
     import responsiveAxis from '../../util/responsiveAxis';
     import wrap from '../../util/wrap';
     import emit from '../../util/emit';
@@ -101,8 +100,10 @@
                     return;
                 }
 
-                const tickFormat = (value) => {
-                    return timeFormat(value, axisXTimeInterval);
+                const axisXTickFormat = (value) => {
+                    return _.isNumber(value)
+                        ? timeFormat(new Date(value), axisXTimeInterval)
+                        : timeFormat(value, axisXTimeInterval);
                 };
 
                 if (sort) {
@@ -206,7 +207,7 @@
                     .axisBottom(xScale)
                     .tickSize(tickSize)
                     .tickPadding(tickPadding)
-                    .tickFormat(tickFormat);
+                    .tickFormat(axisXTickFormat);
 
                 axisXLane
                     .append('g')

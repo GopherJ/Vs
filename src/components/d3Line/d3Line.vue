@@ -74,14 +74,14 @@
                     g_h = h - top - bottom - axisXLabelLaneHeight - axisXLaneHeight - offsetTop,
                     ticks = selectTicksNumY(g_h);
 
-                const tickFormat = (d) => {
-                    if (!isAxisXTime) {
-                        return d;
+                const axisXTickFormat = (value) => {
+                    if (!isAxisXTime || _.isString(value)) {
+                        return value;
                     }
 
-                    return _.isNumber(d)
-                        ? timeFormat(new Date(d), axisXTimeInterval)
-                        : timeFormat(d, axisXTimeInterval);
+                    return _.isNumber(value)
+                        ? timeFormat(new Date(value), axisXTimeInterval)
+                        : timeFormat(value, axisXTimeInterval);
                 };
 
                 if (isAxisXTime && sort) {
@@ -136,7 +136,7 @@
 
                 const xAxis = d3
                     .axisBottom(xScale)
-                    .tickFormat(tickFormat)
+                    .tickFormat(axisXTickFormat)
                     .tickSize(tickSize)
                     .tickPadding(tickPadding);
 

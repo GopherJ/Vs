@@ -115,14 +115,14 @@
                     .domain(GetAllKeys(_data))
                     .range([0, g_w]);
 
-                const tickFormat = (d) => {
-                    if (!isAxisXTime) {
-                        return d;
+                const axisXTickFormat = (value) => {
+                    if (!isAxisXTime || _.isString(value)) {
+                        return value;
                     }
 
                     return _.isNumber(d)
-                        ? timeFormat(new Date(d), axisXTimeInterval)
-                        : timeFormat(d, axisXTimeInterval);
+                        ? timeFormat(new Date(value), axisXTimeInterval)
+                        : timeFormat(value, axisXTimeInterval);
                 };
 
                 const lineGen = d3.line()
@@ -276,7 +276,7 @@
 
                 const xAxis = d3
                     .axisBottom(xScale)
-                    .tickFormat(tickFormat)
+                    .tickFormat(axisXTickFormat)
                     .tickSize(tickSize)
                     .tickPadding(tickPadding);
 

@@ -76,14 +76,14 @@
                 const ticks = selectTicksNumX(g_w),
                     [paddingInner, paddingOuter] = selectPaddingInnerOuterY(g_h);
 
-                const tickFormat = (d) => {
-                    if (!isAxisYTime) {
-                        return d;
+                const axisYTickFormat = (value) => {
+                    if (!isAxisYTime || _.isString(value)) {
+                        return value;
                     }
 
-                    return _.isNumber(d)
-                        ? timeFormat(new Date(d), axisYTimeInterval)
-                        : timeFormat(d, axisYTimeInterval);
+                    return _.isNumber(value)
+                        ? timeFormat(new Date(value), axisYTimeInterval)
+                        : timeFormat(value, axisYTimeInterval);
                 };
 
                 if (isAxisYTime && sort) {
@@ -195,7 +195,7 @@
                     .attr('transform', `translate(${axisYLaneWidth}, 0)`)
                     .call(d3
                         .axisLeft(yScale)
-                        .tickFormat(tickFormat)
+                        .tickFormat(axisYTickFormat)
                         .tickSize(tickSize)
                         .tickPadding(tickPadding))
                     .attr('font-size', axisFontSize)

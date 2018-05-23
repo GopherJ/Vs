@@ -45,7 +45,7 @@
                         axisLabelFontOpacity = 0.5,
 
                         axisXLaneHeight = 60,
-                        axisYLaneWidth = 35,
+                        axisYLaneWidth = 60,
 
                         isAxisXTime = true,
                         axisXTimeInterval = null,
@@ -84,11 +84,13 @@
                     [paddingInner, paddingOuter] = selectPaddingInnerOuterX(g_w);
 
                 const axisXTickFormat = (value) => {
-                    if (!isAxisXTime) {
-                        return d;
+                    if (!isAxisXTime || _.isString(value)) {
+                        return value;
                     }
 
-                    return timeFormat(value, axisXTimeInterval);
+                    return _.isNumber(value)
+                        ? timeFormat(new Date(value), axisXTimeInterval)
+                        : timeFormat(value, axisXTimeInterval);
                 };
 
                 const svg = d3.select(this.$el)
