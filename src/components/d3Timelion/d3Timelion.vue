@@ -78,7 +78,7 @@
                         axisXTimeInterval = null,
                         sort = true,
 
-                        isAxisPathShow = false,
+                        isAxisPathShow = true,
 
                         animationDuration = 1000,
                         delay = 50,

@@ -17,9 +17,9 @@ function emit(instance, eventName, ...args) {
             i: instance.$parent.i,
             payload: args
         });
+    } else {
+        instance.$root.$emit(eventName, ...args);
     }
-
-    instance.$root.$emit(eventName, ...args);
 }
 
 export default emit;

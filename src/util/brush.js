@@ -1,6 +1,7 @@
 import * as d3 from 'd3';
-import emit from './emit';
 import _ from 'lodash';
+import emit from './emit';
+import isValidDate from './isValidDate';
 
 function brush(svg, extent, scale, data) {
     const b = svg.append('g')
@@ -38,7 +39,9 @@ function brush(svg, extent, scale, data) {
                 const dateTimeStart = _.isNumber(data[idx1].key) ? new Date(data[idx1].key) : data[idx1].key,
                     dateTimeEnd = _.isNumber(data[idx2].key) ? new Date(data[idx2].key) : data[idx2].key;
 
-                emit(this, 'range-updated', dateTimeStart, dateTimeEnd);
+                if ([dateTimeStart, dateTimeEnd].every(el => isValidDate(el))) {
+                    emit(this, 'range-updated', dateTimeStart, dateTimeEnd);
+                }
             }
 
             if (_.isFunction(scale.bandwidth)) {
@@ -54,7 +57,9 @@ function brush(svg, extent, scale, data) {
                 const dateTimeStart = _.isNumber(data[idx1].key) ? new Date(data[idx1].key) : data[idx1].key,
                     dateTimeEnd = _.isNumber(data[idx2].key) ? new Date(data[idx2].key) : data[idx2].key;
 
-                emit(this, 'range-updated', dateTimeStart, dateTimeEnd);
+                if ([dateTimeStart, dateTimeEnd].every(el => isValidDate(el))) {
+                    emit(this, 'range-updated', dateTimeStart, dateTimeEnd);
+                }
             }
 
             brush.move(b, null);

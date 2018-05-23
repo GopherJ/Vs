@@ -10,6 +10,7 @@
     import emit from '../../util/emit';
     import {selectTicksNumX, selectPaddingInnerOuterY} from '../../util/select';
     import {transformLastTickTextToTextAnchorEnd} from '../../util/transformTick';
+    import isValidDate from '../../util/isValidDate';
     import _ from 'lodash';
 
     export default {
@@ -26,7 +27,7 @@
                         fillOpacity = 0.6,
                         strokeOpacity = 1,
 
-                        barTitle = d => `${d.key}<br>${d.value}`,
+                        barTitle = d => `${d.value}`,
 
                         axisFontSize = 12,
                         axisFontWeight = 400,
@@ -136,10 +137,10 @@
 
                             const dateTimeStart = _.isNumber(data[idx1].key) ? new Date(data[idx1].key) : data[idx1].key,
                                 dateTimeEnd = _.isNumber(data[idx2].key) ? new Date(data[idx2].key) : data[idx2].key;
-                            console.log(dateTimeStart, dateTimeEnd)
 
-                            emit(self, 'range-updated', dateTimeStart, dateTimeEnd);
-
+                            if ([dateTimeStart, dateTimeEnd].every(el => isValidDate(el))) {
+                                emit(self, 'range-updated', dateTimeStart, dateTimeEnd);
+                            }
                             brushX.move(b, null);
                         }
                     }
@@ -202,7 +203,7 @@
                     .attr('font-weight', axisFontWeight)
                     .attr('fill-opacity', axisFontOpacity);
 
-                if (isAxisPathShow) {
+                if (!isAxisPathShow) {
                     axisXLane.select('.domain')
                         .attr('display', 'none');
 

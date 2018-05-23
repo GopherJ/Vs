@@ -28,7 +28,7 @@
                         fillOpacity = 0.6,
                         strokeOpacity = 1,
 
-                        barTitle = d => `${d.key}<br>${d.value}`,
+                        barTitle = d => `${d.value}`,
 
                         tickSize = 10,
                         tickPadding = 8,
@@ -51,7 +51,7 @@
                         axisXTimeInterval = null,
                         sort = true,
 
-                        isAxisPathShow = false,
+                        isAxisPathShow = true,
 
                         animationDuration = 1000,
                         delay = 50,
