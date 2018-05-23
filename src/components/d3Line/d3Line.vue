@@ -8,7 +8,7 @@
     import mixins from '../../mixins';
     import {showTip, hideTip} from '../../util/tooltip';
     import brush from '../../util/brush';
-    import responsiveAxis from '../../util/responsiveAxis';
+    import {responsiveAxisX} from '../../util/responsiveAxis';
     import wrap from '../../util/wrap';
     import timeFormat from '../../util/timeFormat';
     import {selectTicksNumY} from '../../util/select';
@@ -179,7 +179,7 @@
                     transformLastTickTextToTextAnchorEnd(svg);
 
                     axisXLane
-                        .call(responsiveAxis, xAxis, xScale);
+                        .call(responsiveAxisX, xAxis, xScale);
                 }
 
                 if (breakWords) {

@@ -9,7 +9,7 @@
     import mixins from '../../mixins';
     import groupBy from '../../util/groupBy';
     import realBBox from '../../util/realBBox';
-    import responsiveAxis from '../../util/responsiveAxis';
+    import {responsiveAxisX} from '../../util/responsiveAxis';
     import timeFormat from '../../util/timeFormat';
     import {toggleCross, toggleClass} from '../../util/toggle';
     import {showTip, hideTip} from '../../util/tooltip';
@@ -293,7 +293,7 @@
                     transformLastTickTextToTextAnchorEnd(svg);
 
                     axisXLane
-                        .call(responsiveAxis, xAxis, xScale);
+                        .call(responsiveAxisX, xAxis, xScale);
                 }
 
                 if (breakWords) {

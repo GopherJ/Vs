@@ -10,6 +10,7 @@
     import emit from '../../util/emit';
     import {selectTicksNumX, selectPaddingInnerOuterY} from '../../util/select';
     import {transformLastTickTextToTextAnchorEnd} from '../../util/transformTick';
+    import {responsiveAxisY} from '../../util/responsiveAxis';
     import isValidDate from '../../util/isValidDate';
     import _ from 'lodash';
 
@@ -191,17 +192,24 @@
 
                 transformLastTickTextToTextAnchorEnd(svg);
 
+                const yAxis = d3
+                    .axisLeft(yScale)
+                    .tickFormat(axisYTickFormat)
+                    .tickSize(tickSize)
+                    .tickPadding(tickPadding);
+
                 axisYLane.append('g')
                     .attr('class', 'axis axis--y')
                     .attr('transform', `translate(${axisYLaneWidth}, 0)`)
-                    .call(d3
-                        .axisLeft(yScale)
-                        .tickFormat(axisYTickFormat)
-                        .tickSize(tickSize)
-                        .tickPadding(tickPadding))
+                    .call(yAxis)
                     .attr('font-size', axisFontSize)
                     .attr('font-weight', axisFontWeight)
                     .attr('fill-opacity', axisFontOpacity);
+
+                if (isAxisYTime) {
+                    axisYLane
+                        .call(responsiveAxisY, yAxis, yScale);
+                }
 
                 if (!isAxisPathShow) {
                     axisXLane.select('.domain')

@@ -1,4 +1,4 @@
-import hasOverlap from './hasOverlap';
+import {hasOverlapX, hasOverlapY} from './hasOverlap';
 
 /**
  *
@@ -21,11 +21,11 @@ const GetScaleDomain = (scale, i) => {
  * @param axis
  * @param scale
  */
-function responsiveAxis(axisXLane, axis, scale) {
+function responsiveAxisX(axisXLane, axis, scale) {
     let ticks = axisXLane.selectAll('.tick');
     let scaleDomain = scale.domain(), i = 0;
 
-    while (hasOverlap(ticks)) {
+    while (hasOverlapX(ticks)) {
         i += 1;
         scaleDomain = GetScaleDomain(scale, i);
         axis.tickValues(scaleDomain);
@@ -34,4 +34,20 @@ function responsiveAxis(axisXLane, axis, scale) {
     }
 }
 
-export default responsiveAxis;
+function responsiveAxisY(axisYLane, axis, scale) {
+    let ticks = axisYLane.selectAll('.tick');
+    let scaleDomain = scale.domain(), i = 0;
+
+    while (hasOverlapY(ticks)) {
+        i += 1;
+        scaleDomain = GetScaleDomain(scale, i);
+        axis.tickValues(scaleDomain);
+        axisYLane.call(axis);
+        ticks = axisYLane.selectAll('.tick');
+    }
+}
+
+export {
+    responsiveAxisX,
+    responsiveAxisY
+};

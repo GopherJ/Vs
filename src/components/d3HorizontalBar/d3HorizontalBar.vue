@@ -8,7 +8,7 @@
     import mixins from '../../mixins';
     import {showTip, hideTip} from '../../util/tooltip';
     import emit from '../../util/emit';
-    import responsiveAxis from '../../util/responsiveAxis';
+    import {responsiveAxisX} from '../../util/responsiveAxis';
     import timeFormat from '../../util/timeFormat';
     import brush from '../../util/brush';
     import wrap from '../../util/wrap';
@@ -164,7 +164,7 @@
 
                 if (isAxisXTime) {
                     axisXLane
-                        .call(responsiveAxis, xAxis, xScale);
+                        .call(responsiveAxisX, xAxis, xScale);
                 }
 
                 if (breakWords) {
@@ -233,108 +233,9 @@
                 rects
                     .transition()
                     .duration(_.isNumber(animationDuration) ? animationDuration : 0)
-                    .delay((d, i) => i * (_.isNumber(delay) ? delay : 0))
+                    .delay((d, i) => i * (d.value === 0 ? 0 : (_.isNumber(delay) ? delay : 0)))
                     .attr('height', d => g_h - yScale(d.value))
                     .attr('y', d => yScale(d.value));
-
-                rects
-                    .each(function (d) {
-                        const x = xScale(d.key),
-                            self = this;
-
-                        const interpolateWarm = d3.scaleSequential()
-                            .domain([0, d.value])
-                            .interpolator(d3.interpolateWarm);
-
-
-                        if (d.children && d.children.length > 0) {
-                            if (d.children.every(el => _.isString(el.key))) {
-                                d3.select(self).remove();
-
-                                const _data = d.children.reduce((ite, cur, i) => {
-                                    const y = i === 0 ? yScale(d.value) : ite[ite.length - 1].y + ite[ite.length - 1].height;
-
-                                    ite.push({
-                                        y,
-                                        height: (g_h - yScale(d.value)) * (cur.value / d.value),
-                                        value: cur.value,
-                                        key: cur.key
-                                    });
-
-                                    return ite;
-                                }, []);
-
-                                const _childRects = g.selectAll('.child')
-                                    .data(_data)
-                                    .enter()
-                                    .append('rect');
-
-                                _childRects
-                                    .attr('x', x)
-                                    .attr('width', xScale.bandwidth())
-                                    .attr('y', _d => _d.y + _d.height)
-                                    .attr('height', _d => 0)
-                                    .attr('fill', _d => interpolateWarm(_d.value))
-                                    .attr('fill-opacity', fillOpacity)
-                                    .attr('stroke', _d => interpolateWarm(_d.value))
-                                    .attr('stroke-opacity', strokeOpacity)
-                                    .on('mouseover', _d => {
-                                        showTip(barTitle(_d));
-                                    })
-                                    .on('mouseout', hideTip);
-
-                                _childRects
-                                    .transition()
-                                    .duration(_.isNumber(animationDuration) ? animationDuration : 0)
-                                    .delay((d, i) => i * (_.isNumber(delay) ? delay : 0))
-                                    .attr('y', _d => _d.y)
-                                    .attr('height', _d => _d.height);
-
-                            } else if (d.children.every(el => _.isDate(el.key) || _.isNumber(el.key))) {
-                                d3.select(self).remove();
-
-                                const _data = d.children.reduce((ite, cur, i) => {
-                                    const width = xScale.bandwidth() / d.children.length;
-
-                                    const x = i === 0 ? xScale(d.key) : ite[ite.length - 1].x + width;
-                                    ite.push({
-                                        x,
-                                        width,
-                                        value: cur.value,
-                                        key: cur.key
-                                    });
-
-                                    return ite;
-                                }, []);
-
-                                const _childRects = g.selectAll('.child')
-                                    .data(_data)
-                                    .enter()
-                                    .append('rect');
-
-                                _childRects
-                                    .attr('x', _d => _d.x)
-                                    .attr('y', g_h)
-                                    .attr('height', 0)
-                                    .attr('width', _d => _d.width)
-                                    .attr('fill', _d => interpolateWarm(_d.value))
-                                    .attr('fill-opacity', fillOpacity)
-                                    .attr('stroke', _d => interpolateWarm(_d.value))
-                                    .attr('stroke-opacity', strokeOpacity)
-                                    .on('mouseover', _d => {
-                                        showTip(barTitle(_d));
-                                    })
-                                    .on('mouseout', hideTip);
-
-                                _childRects
-                                    .transition()
-                                    .duration(_.isNumber(animationDuration) ? animationDuration : 0)
-                                    .delay((d, i) => i * (_.isNumber(delay) ? delay : 0))
-                                    .attr('y', _d => yScale(_d.value))
-                                    .attr('height', _d => g_h - yScale(_d.value));
-                            }
-                        }
-                    });
 
                 axisXLabelLane
                     .append('text')

@@ -9,7 +9,7 @@
     import mixins from '../../mixins';
     import {showTip, hideTip} from '../../util/tooltip';
     import timeFormat from '../../util/timeFormat';
-    import responsiveAxis from '../../util/responsiveAxis';
+    import {responsiveAxisX} from '../../util/responsiveAxis';
     import wrap from '../../util/wrap';
     import emit from '../../util/emit';
     import INTERVAL from '../../util/interval';
@@ -218,7 +218,7 @@
                     .attr('font-weight', axisFontWeight);
 
                 axisXLane
-                    .call(responsiveAxis, xAxis, xScale);
+                    .call(responsiveAxisX, xAxis, xScale);
 
                 axisXLane
                     .selectAll('text')
