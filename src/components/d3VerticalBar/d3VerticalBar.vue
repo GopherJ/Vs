@@ -260,7 +260,7 @@
                 rects
                     .transition()
                     .duration(animationDuration)
-                    .delay((d, i) => i * delay)
+                    .delay((d, i) => i * (d.value === 0 ? 0 : (_.isNumber(delay) ? delay : 0)))
                     .attr('width', d => xScale(d.value));
 
                 axisXLabelLane
