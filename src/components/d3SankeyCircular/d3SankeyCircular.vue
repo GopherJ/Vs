@@ -7,8 +7,8 @@
     import _ from 'lodash';
     import * as d3SankeyCircular from 'd3-sankey-circular';
     import pathArrows from './pathArrows';
-    import emit from '../../util/emit';
-    import {showTip, hideTip} from '../../util/tooltip';
+    import emit from '../../utils/emit';
+    import {showTip, hideTip} from '../../utils/tooltip';
 
     Object.assign(d3, d3SankeyCircular);
 

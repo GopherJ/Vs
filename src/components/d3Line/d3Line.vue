@@ -6,16 +6,16 @@
     import * as d3 from 'd3';
     import _ from 'lodash';
     import mixins from '../../mixins';
-    import {showTip, hideTip} from '../../util/tooltip';
-    import brush from '../../util/brush';
-    import {responsiveAxisX} from '../../util/responsiveAxis';
-    import wrap from '../../util/wrap';
-    import timeFormat from '../../util/timeFormat';
-    import {selectTicksNumY} from '../../util/select';
+    import {showTip, hideTip} from '../../utils/tooltip';
+    import {brushX} from '../../utils/brush';
+    import {responsiveAxisX} from '../../utils/responsiveAxis';
+    import wrap from '../../utils/wrap';
+    import timeFormat from '../../utils/timeFormat';
+    import {selectTicksNumY} from '../../utils/select';
     import {
         transformFirstTickTextToTextAnchorStart,
         transformLastTickTextToTextAnchorEnd
-    } from '../../util/transformTick';
+    } from '../../utils/transformTick';
 
     export default {
         name: 'd3-line',
@@ -117,7 +117,7 @@
                         [w - right - offsetRight, h - axisXLaneHeight - axisXLabelLaneHeight]
                     ];
 
-                    svg.call(brush.bind(this), extent, xScale, data);
+                    svg.call(brushX.bind(this), extent, xScale, data);
                 }
 
                 svg.append('defs')

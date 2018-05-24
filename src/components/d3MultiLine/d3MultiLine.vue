@@ -5,20 +5,20 @@
 <script>
     import * as d3 from 'd3';
     import _ from 'lodash';
-    import brush from '../../util/brush';
+    import {brushX} from '../../utils/brush';
     import mixins from '../../mixins';
-    import groupBy from '../../util/groupBy';
-    import realBBox from '../../util/realBBox';
-    import {responsiveAxisX} from '../../util/responsiveAxis';
-    import timeFormat from '../../util/timeFormat';
-    import {toggleCross, toggleClass} from '../../util/toggle';
-    import {showTip, hideTip} from '../../util/tooltip';
-    import {selectTicksNumY} from '../../util/select';
-    import wrap from '../../util/wrap';
+    import groupBy from '../../utils/groupBy';
+    import realBBox from '../../utils/realBBox';
+    import {responsiveAxisX} from '../../utils/responsiveAxis';
+    import timeFormat from '../../utils/timeFormat';
+    import {toggleCross, toggleClass} from '../../utils/toggle';
+    import {showTip, hideTip} from '../../utils/tooltip';
+    import {selectTicksNumY} from '../../utils/select';
+    import wrap from '../../utils/wrap';
     import {
         transformFirstTickTextToTextAnchorStart,
         transformLastTickTextToTextAnchorEnd,
-    } from '../../util/transformTick';
+    } from '../../utils/transformTick';
 
     const GetAllKeys = (data) => [...new Set(data.map(d => d.key))];
 
@@ -146,7 +146,7 @@
                         [w - right - offsetRight, g_h + top + axisXGroupLabelLaneHeight]
                     ];
 
-                    svg.call(brush.bind(this), extent, xScale, _data);
+                    svg.call(brushX.bind(this), extent, xScale, _data);
                 }
 
                 svg.append('defs')

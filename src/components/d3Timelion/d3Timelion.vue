@@ -7,13 +7,13 @@
     import _ from 'lodash';
     import moment from 'moment';
     import mixins from '../../mixins';
-    import {showTip, hideTip} from '../../util/tooltip';
-    import timeFormat from '../../util/timeFormat';
-    import {responsiveAxisX} from '../../util/responsiveAxis';
-    import wrap from '../../util/wrap';
-    import emit from '../../util/emit';
-    import INTERVAL from '../../util/interval';
-    import {selectPaddingInnerOuterX, selectTicksNumY} from '../../util/select';
+    import {showTip, hideTip} from '../../utils/tooltip';
+    import timeFormat from '../../utils/timeFormat';
+    import {responsiveAxisX} from '../../utils/responsiveAxis';
+    import wrap from '../../utils/wrap';
+    import emit from '../../utils/emit';
+    import INTERVAL from '../../utils/interval';
+    import {selectPaddingInnerOuterX, selectTicksNumY} from '../../utils/select';
 
     const tpl = `
                 <option value='Auto'>Auto</option>
@@ -142,7 +142,7 @@
                         const [x1, x2] = Array.prototype.map
                             .call(d3.event.selection, el => el - extent[0][0]);
 
-                        const bisecLeft = d3.bisector((d, x) => xScale(d.key) + xScale.bandwidth() - x).left;
+                        const bisecLeft = d3.bisector((d, x) => xScale(d.key) + xScale.bandwidth() - x).right;
 
                         let idx1 = bisecLeft(data, x1),
                             idx2 = bisecLeft(data, x2);
@@ -163,7 +163,7 @@
                         const [x1, x2] = Array.prototype.map
                             .call(d3.event.selection, el => el - extent[0][0]);
 
-                        const bisecLeft = d3.bisector((d, x) => xScale(d.key) + xScale.bandwidth() - x).left;
+                        const bisecLeft = d3.bisector((d, x) => xScale(d.key) + xScale.bandwidth() - x).right;
 
                         let idx1 = bisecLeft(data, x1),
                             idx2 = bisecLeft(data, x2);

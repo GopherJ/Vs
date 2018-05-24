@@ -5,7 +5,7 @@
 <script>
     import * as d3 from 'd3';
     import _ from 'lodash';
-    import {showTip, hideTip} from '../../util/tooltip';
+    import {showTip, hideTip} from '../../utils/tooltip';
 
 
     export default {

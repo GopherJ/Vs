@@ -6,10 +6,10 @@
     import * as d3 from 'd3';
     import _ from 'lodash';
     import mixins from '../../mixins';
-    import {showTip, hideTip} from '../../util/tooltip';
-    import {selectPaddingInnerOuterY} from '../../util/select';
-    import {Point, Interval, getTimelineGroups} from '../../util/getTimelineGroups';
-    import roundedRect from '../../util/roundedRect';
+    import {showTip, hideTip} from '../../utils/tooltip';
+    import {selectPaddingInnerOuterY} from '../../utils/select';
+    import {Point, Interval, getTimelineGroups} from '../../utils/getTimelineGroups';
+    import roundedRect from '../../utils/roundedRect';
 
     export default {
         name: 'd3-timeline',

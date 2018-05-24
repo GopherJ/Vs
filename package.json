@@ -1,6 +1,6 @@
 {
   "name": "d3-vs",
-  "version": "0.1.9",
+  "version": "0.2.0",
   "description": "d3 visualisation with vuejs",
   "main": "dist/Vs.min.js",
   "scripts": {
@@ -27,8 +27,6 @@
     "d3-brush": "^1.0.4",
     "d3-queue": "^3.0.7",
     "d3-sankey-circular": "^0.23.0",
-    "d3-tip": "^0.7.1",
-    "d3-tipy": "^1.2.3",
     "document-offset": "^1.0.4",
     "lodash": "^4.17.5",
     "moment": "^2.22.0",
