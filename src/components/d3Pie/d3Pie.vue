@@ -6,7 +6,7 @@
     import * as d3 from 'd3';
     import _ from 'lodash';
     import mixins from '../../mixins';
-    import {showTip, hideTip} from '../../utils/tooltip';
+    import { showTip, hideTip } from '../../utils/tooltip';
 
     export default {
         name: 'd3-pie',

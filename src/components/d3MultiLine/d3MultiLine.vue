@@ -18,6 +18,7 @@
     import { firstTickTextAnchorStart, lastTickTextAnchorEnd } from '../../utils/textAnchor';
     import GetAllKeys from '../../utils/allKeys';
     import isAxisTime from '../../utils/isAxisTime';
+    import emit from '../../utils/emit';
 
     export default {
         name: 'd3-multi-line',
@@ -299,7 +300,7 @@
                     .attr('stroke', d => schemeCategory20(d))
                     .attr('stroke-width', strokeWidth);
 
-                g.selectAll('circle')
+                const circles = g.selectAll('circle')
                     .data(_data)
                     .enter()
                     .append('circle')
@@ -313,6 +314,13 @@
                         showTip(circleTitle(d));
                     })
                     .on('mouseout', hideTip);
+
+                if (isAxisXTime && _.isNumber(axisXTimeInterval)) {
+                        const dateTimeStart = d.key,
+                            dateTimeEnd = new Date(d.key.getTime() + axisXTimeInterval);
+
+                        emit(this, 'range-updated', dateTimeStart, dateTimeEnd);
+                }
 
                 if (!isAxisPathShow) {
                     axisYLane.select('.domain')

@@ -21,8 +21,9 @@
         methods: {
             drawVerticalBar() {
                 const [w, h] = this.getElWidthHeight(),
-                    data = _.cloneDeep(this.data),
-                    {
+                    data = _.cloneDeep(this.data);
+
+                const {
                         fill = '#6eadc1',
                         stroke = '#6eadc1',
                         fillOpacity = 0.6,

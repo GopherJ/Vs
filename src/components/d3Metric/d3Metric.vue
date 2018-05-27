@@ -7,7 +7,6 @@
     import _ from 'lodash';
     import {showTip, hideTip} from '../../utils/tooltip';
 
-
     export default {
         name: 'd3-metric',
         props: {

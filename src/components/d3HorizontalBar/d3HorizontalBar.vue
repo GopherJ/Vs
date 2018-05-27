@@ -12,7 +12,6 @@
     import { selectTicksNumX, selectPaddingInnerOuterY } from '../../utils/select';
     import { lastTickTextAnchorEnd } from '../../utils/textAnchor';
     import { responsiveAxisY } from '../../utils/responsiveAxis';
-    import isValidDate from '../../utils/isValidDate';
     import { brushY } from '../../utils/brush';
     import isAxisTime from '../../utils/isAxisTime';
 
