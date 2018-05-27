@@ -1,5 +1,3 @@
-// issue https://github.com/d3/d3/issues/1641
-// solution https://bl.ocks.org/mbostock/7555321
 import * as d3 from 'd3';
 
 /**

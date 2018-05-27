@@ -1,12 +1,12 @@
-import _ from 'lodash';
+import { isDate } from 'lodash';
 
 /**
  *
  * @param data
- * @returns {*}
+ * @return {boolean}
  */
 const isAxisTime = (data) => {
-    return data.every(el => _.isDate(el.key));
+    return data.every(d => isDate(d.key));
 };
 
 export default isAxisTime;

@@ -3,32 +3,41 @@ import realBBox from './realBBox';
 
 /**
  *
+ * check if tick texts of axis x have overlaps
+ *
  * @param ticks
- * @returns {boolean}
+ * @return {boolean}
  */
 const hasOverlapX = (ticks) => {
-    let previousTickPos, overlapped = false;
+    let previousTickRect, overlapped = false;
 
     ticks.each(function () {
-        const pos = realBBox(d3.select(this));
-        if (previousTickPos && previousTickPos.x + previousTickPos.width > pos.x) {
+        const rect = realBBox(d3.select(this));
+        if (previousTickRect && previousTickRect.x + previousTickRect.width > rect.x) {
             overlapped = true;
         }
-        previousTickPos = pos;
+        previousTickRect = rect;
     });
 
     return overlapped;
 };
 
+/**
+ *
+ * check if tick texts of axis y have overlaps
+ *
+ * @param ticks
+ * @return {boolean}
+ */
 const hasOverlapY = (ticks) => {
-    let previousTickPos, overlapped = false;
+    let previousTickRect, overlapped = false;
 
     ticks.each(function () {
-        const pos = realBBox(d3.select(this));
-        if (previousTickPos && previousTickPos.y + previousTickPos.height > pos.y) {
+        const rect = realBBox(d3.select(this));
+        if (previousTickRect && previousTickRect.y + previousTickRect.height > rect.y) {
             overlapped = true;
         }
-        previousTickPos = pos;
+        previousTickRect = rect;
     });
 
     return overlapped;

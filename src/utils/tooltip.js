@@ -1,6 +1,9 @@
 import * as d3 from 'd3';
 import offset from 'document-offset';
 
+/**
+ * get tooltip div
+ */
 const tooltip = (function (body) {
     const selection = body.select('.d3-tip');
 
@@ -15,9 +18,32 @@ const tooltip = (function (body) {
     }
 })(d3.select('body'));
 
+/**
+ *
+ * calculate tooltip offset top
+ *
+ * @param {d3.Selection} tooltip
+ * @param {HTMLElement} target
+ */
 const GetOffsetTop = (tooltip, target) => offset(target).top - tooltip.node().getBoundingClientRect().height - 10;
+
+
+/**
+ *
+ * calculate tooltip offset left
+ *
+ * @param {d3.Selection} tooltip
+ * @param {HTMLElement} target
+ */
 const GetOffsetLeft = (tooltip, target) => offset(target).left + target.getBBox().width / 2 - tooltip.node().getBoundingClientRect().width / 2;
 
+/**
+ *
+ * show tooltip
+ *
+ * @param {string} title
+ * @return {void}
+ */
 function showTip(title) {
     const target = d3.event.target;
 
@@ -37,6 +63,12 @@ function showTip(title) {
     tooltip.node().classList.add('show');
 }
 
+/**
+ *
+ * hide tooltip
+ *
+ * @return {void}
+ */
 function hideTip() {
     tooltip
         .style('visibility', 'hidden');

@@ -1,5 +1,14 @@
 import * as d3 from 'd3';
 
+/**
+ *
+ * toggle cross
+ *
+ * @param {d3.Selection} container
+ * @param {d3.Selection} rect
+ * @param {string} stroke
+ * @param {number} strokeWidth
+ */
 const toggleCross = (container, rect, stroke, strokeWidth) => {
     const selection = container.selectAll('line');
     if (!selection.empty()) {
@@ -7,12 +16,12 @@ const toggleCross = (container, rect, stroke, strokeWidth) => {
         return;
     }
 
-    const pos = rect.node().getBBox();
+    const rect = rect.node().getBBox();
 
-    const x1 = pos.x,
-        y1 = pos.y,
-        x2 = pos.x + pos.width,
-        y2 = pos.y + pos.height;
+    const x1 = rect.x,
+        y1 = rect.y,
+        x2 = rect.x + rect.width,
+        y2 = rect.y + rect.height;
 
     container.append('line')
         .attr('x1', x1)
@@ -33,9 +42,15 @@ const toggleCross = (container, rect, stroke, strokeWidth) => {
         .attr('pointer-events', 'none');
 };
 
+/**
+ *
+ * toggle class
+ *
+ * @param {d3.Selection} svg
+ * @param {d3.Selection} className
+ */
 const toggleClass = (svg, className) => {
-    svg
-        .selectAll(className)
+    svg.selectAll(className)
         .each(function () {
             const selection = d3.select(this),
                 display = selection.style('display');
@@ -48,4 +63,3 @@ export {
     toggleCross,
     toggleClass
 };
-

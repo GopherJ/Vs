@@ -1,6 +1,8 @@
-import {hasOverlapX, hasOverlapY} from './hasOverlap';
+import { hasOverlapX, hasOverlapY } from './hasOverlap';
 
 /**
+ *
+ * make xAxis's number of ticks responsive to container size
  *
  * @param axisXLane
  * @param axis
@@ -19,6 +21,8 @@ function responsiveAxisX(axisXLane, axis, scale) {
 }
 
 /**
+ *
+ * make yAxis's number of ticks responsive to container size
  *
  * @param axisYLane
  * @param axis

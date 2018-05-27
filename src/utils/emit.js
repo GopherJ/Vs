@@ -1,24 +1,24 @@
 /**
  *
- * @param instance
- * @param eventName
- * @param args
+ * @param {Vue} vm
+ * @param {string} eventName
+ * @param {array} args
  */
-function emit(instance, eventName, ...args) {
-    instance.$emit(eventName, ...args);
+function emit(vm, eventName, ...args) {
+    vm.$emit(eventName, ...args);
 
-    if (instance.$root === instance) {
+    if (vm.$root === vm) {
         return;
     }
 
 
-    if (instance.$parent.i) {
-        instance.$root.$emit(eventName, {
-            i: instance.$parent.i,
+    if (vm.$parent.$props.i) {
+        vm.$root.$emit(eventName, {
+            i: vm.$parent.$props.i,
             payload: args
         });
     } else {
-        instance.$root.$emit(eventName, ...args);
+        vm.$root.$emit(eventName, ...args);
     }
 }
 

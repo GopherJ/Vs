@@ -19,7 +19,7 @@
         name: 'd3-vertical-bar',
         mixins: [mixins],
         methods: {
-            drawHorizontalBar() {
+            drawVerticalBar() {
                 const [w, h] = this.getElWidthHeight();
 
                 const data = _.cloneDeep(this.data),
@@ -264,7 +264,7 @@
             },
             safeDraw() {
                 this.ifExistsSvgThenRemove();
-                this.drawHorizontalBar();
+                this.drawVerticalBar();
             },
             onResize() {
                 this.safeDraw();
