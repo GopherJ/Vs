@@ -11,11 +11,13 @@
     import { responsiveAxisX } from '../../utils/responsiveAxis';
     import wrap from '../../utils/wrap';
     import tickFormat from '../../utils/tickFormat';
-    import { selectTicksNumY } from '../../utils/select';
+    import { selectTicksNumY, selectPaddingInnerOuterX } from '../../utils/select';
+    import isAxisTime from '../../utils/isAxisTime';
     import {
         transformFirstTickTextToTextAnchorStart,
         transformLastTickTextToTextAnchorEnd
     } from '../../utils/transformTick';
+    import { firstTickTextAnchorStart, lastTickTextAnchorEnd } from '../../utils/textAnchor';
 
     export default {
         name: 'd3-line',
@@ -56,45 +58,36 @@
 
                         isAxisPathShow = true,
 
-                        isAxisXTime = true,
                         axisXTimeInterval = null,
-                        sort = true,
 
-                        breakWords = true,
+                        axisYTickFormat = '.2s',
 
-                        axisYTickFormat = '.2s'
+                        negative = false,
+
+                        nice = false
                     } = this.options,
                     {
                         axisXLabelLaneHeight = _.isNull(axisXLabel) ? 0 : 30,
                         axisYLabelLaneWidth = _.isNull(axisYLabel) ? 0 : 30,
                     } = this.options,
-                    offsetTop = 10,
-                    offsetRight = 10,
-                    g_w = w - left - right - axisYLabelLaneWidth - axisYLaneWidth - offsetRight,
-                    g_h = h - top - bottom - axisXLabelLaneHeight - axisXLaneHeight - offsetTop,
-                    ticks = selectTicksNumY(g_h);
+                    __offsetTop__ = 10,
+                    __offsetRight__ = 10,
+                    g_w = w - left - right - axisYLabelLaneWidth - axisYLaneWidth - __offsetRight__,
+                    g_h = h - top - bottom - axisXLabelLaneHeight - axisXLaneHeight - __offsetTop__;
 
-                const axisXTickFormat = (value) => {
-                    if (!isAxisXTime || _.isString(value)) {
-                        return value;
-                    }
-
-                    return _.isNumber(value)
-                        ? timeFormat(new Date(value), axisXTimeInterval)
-                        : timeFormat(value, axisXTimeInterval);
-                };
-
-                if (isAxisXTime && sort) {
-                    data.sort((a, b) => a.key > b.key ? 1 : -1);
-                }
+                const isAxisXTime = isAxisTime(data),
+                    axisXTickFormat = value => isAxisXTime ? tickFormat(value, axisXTimeInterval) : value,
+                    ticks = selectTicksNumY(g_h),
+                    [paddingInner, paddingOuter] = selectPaddingInnerOuterX(g_w);
 
                 const xScale = d3.scalePoint()
                     .domain(data.map(d => d.key))
                     .range([0, g_w]);
 
                 const yScale = d3.scaleLinear()
-                    .domain([0, d3.max(data, d => d.value)])
+                    .domain(negative ? d3.extent(data, d => d.value) : [0, d3.max(data, d => d.value)])
                     .range([g_h, 0]);
+                if (nice) yScale.nice();
 
                 const lineGen = d3.line()
                     .x(d => xScale(d.key))
@@ -108,31 +101,8 @@
 
                 const svg = d3.select(this.$el)
                     .append('svg')
-                    .attr('width', `${w}`)
-                    .attr('height', `${h}`);
-
-                if (isAxisXTime) {
-                    const extent = [
-                        [left + axisYLaneWidth + axisYLabelLaneWidth, top + offsetTop],
-                        [w - right - offsetRight, h - axisXLaneHeight - axisXLabelLaneHeight]
-                    ];
-
-                    svg.call(brushX.bind(this), extent, xScale, data);
-                }
-
-                svg.append('defs')
-                    .append('clipPath')
-                    .attr('id', 'clip-line')
-                    .append('rect')
-                    .attr('x', 0)
-                    .attr('y', 0)
-                    .attr('width', g_w)
-                    .attr('height', g_h);
-
-                const g = svg.append('g')
-                    .attr('transform', `translate(${left + axisYLabelLaneWidth + axisYLaneWidth}, ${top + offsetTop})`)
-                    .attr('width', `${g_w}`)
-                    .attr('height', `${g_h}`);
+                    .attr('width', w)
+                    .attr('height', h);
 
                 const xAxis = d3
                     .axisBottom(xScale)
@@ -140,15 +110,22 @@
                     .tickSize(tickSize)
                     .tickPadding(tickPadding);
 
+                const yAxis = d3
+                    .axisLeft(yScale)
+                    .ticks(ticks)
+                    .tickFormat(d3.format(axisYTickFormat))
+                    .tickSize(tickSize)
+                    .tickPadding(tickPadding);
+
                 const axisXLane = svg
                     .append('g')
-                    .attr('transform', `translate(${left + axisYLabelLaneWidth + axisYLaneWidth}, ${top + g_h + offsetTop})`)
+                    .attr('transform', `translate(${left + axisYLabelLaneWidth + axisYLaneWidth}, ${top + g_h + __offsetTop__})`)
                     .attr('width', g_w)
                     .attr('height', axisXLaneHeight);
 
                 const axisYLane = svg
                     .append('g')
-                    .attr('transform', `translate(${left + axisYLabelLaneWidth}, ${top + offsetTop})`)
+                    .attr('transform', `translate(${left + axisYLabelLaneWidth}, ${top + __offsetTop__})`)
                     .attr('width', axisYLaneWidth)
                     .attr('height', g_h);
 
@@ -156,79 +133,34 @@
                     .append('g')
                     .attr('class', 'axis axis--x')
                     .call(xAxis)
+                    .call(firstTickTextAnchorStart)
+                    .call(lastTickTextAnchorEnd)
                     .attr('font-size', axisFontSize)
                     .attr('fill-opacity', axisFontOpacity)
-                    .attr('font-weight', axisFontWeight);
+                    .attr('font-weight', axisFontWeight)
+                    .selectAll('text')
+                    .call(wrap, xScale.step());
 
                 axisYLane
                     .append('g')
                     .attr('transform', `translate(${axisYLaneWidth}, 0)`)
                     .attr('class', 'axis axis--y')
-                    .call(d3
-                        .axisLeft(yScale)
-                        .ticks(ticks)
-                        .tickFormat(d3.format(axisYTickFormat))
-                        .tickSize(tickSize)
-                        .tickPadding(tickPadding))
+                    .call(yAxis)
                     .attr('font-size', axisFontSize)
                     .attr('fill-opacity', axisFontOpacity)
                     .attr('font-weight', axisFontWeight);
 
-                if (isAxisXTime) {
-                    transformFirstTickTextToTextAnchorStart(svg);
-                    transformLastTickTextToTextAnchorEnd(svg);
-
-                    axisXLane
-                        .call(responsiveAxisX, xAxis, xScale);
-                }
-
-                if (breakWords) {
-                    axisXLane
-                        .selectAll('text')
-                        .call(wrap, xScale.step());
-                }
-
-                if (!isAxisPathShow) {
-                    axisXLane.select('.domain')
-                        .attr('display', 'none');
-
-                    axisYLane.select('.domain')
-                        .attr('display', 'none');
-                }
-
                 const axisXLabelLane = svg
                     .append('g')
-                    .attr('transform', `translate(${left + axisYLabelLaneWidth + axisYLaneWidth}, ${top + g_h + axisXLaneHeight + offsetTop})`)
+                    .attr('transform', `translate(${left + axisYLabelLaneWidth + axisYLaneWidth}, ${top + g_h + axisXLaneHeight + __offsetTop__})`)
                     .attr('width', g_w)
                     .attr('height', axisXLabelLaneHeight);
 
                 const axisYLabelLane = svg
                     .append('g')
-                    .attr('transform', `translate(${left}, ${top + offsetTop})`)
+                    .attr('transform', `translate(${left}, ${top + __offsetTop__})`)
                     .attr('width', axisYLabelLaneWidth)
                     .attr('height', g_h);
-
-                g.append('path')
-                    .datum(data)
-                    .attr('d', lineGen)
-                    .attr('clip-path', 'url(#clip-line)')
-                    .attr('fill', 'transparent')
-                    .attr('stroke', stroke)
-                    .attr('stroke-width', strokeWidth);
-
-                g.selectAll('circle')
-                    .data(data)
-                    .enter()
-                    .append('circle')
-                    .attr('r', circleRadius)
-                    .attr('cx', d => xScale(d.key))
-                    .attr('cy', d => yScale(d.value))
-                    .attr('fill', circleColor)
-                    .attr('clip-path', 'url(#clip-line)')
-                    .on('mouseover', (d) => {
-                        showTip(circleTitle(d));
-                    })
-                    .on('mouseout', hideTip);
 
                 axisXLabelLane
                     .append('text')
@@ -253,6 +185,62 @@
                     .attr('font-size', axisLabelFontSize)
                     .attr('font-weight', axisLabelFontWeight)
                     .attr('fill-opacity', axisLabelFontOpacity);
+
+                if (isAxisXTime) {
+                    const extent = [
+                        [left + axisYLaneWidth + axisYLabelLaneWidth, top + __offsetTop__],
+                        [w - right - __offsetRight__, h - axisXLaneHeight - axisXLabelLaneHeight]
+                    ];
+
+                    axisXLane
+                        .call(responsiveAxisX, xAxis, xScale);
+
+                    svg.call(brushX.bind(this), extent, xScale, data);
+                }
+
+                svg.append('defs')
+                    .append('clipPath')
+                    .attr('id', 'clip-line')
+                    .append('rect')
+                    .attr('x', 0)
+                    .attr('y', 0)
+                    .attr('width', g_w)
+                    .attr('height', g_h);
+
+                const g = svg.append('g')
+                    .attr('transform', `translate(${left + axisYLabelLaneWidth + axisYLaneWidth}, ${top + __offsetTop__})`)
+                    .attr('width', g_w)
+                    .attr('height', g_h);
+
+                g.append('path')
+                    .datum(data)
+                    .attr('d', lineGen)
+                    .attr('clip-path', 'url(#clip-line)')
+                    .attr('fill', 'transparent')
+                    .attr('stroke', stroke)
+                    .attr('stroke-width', strokeWidth);
+
+                g.selectAll('circle')
+                    .data(data)
+                    .enter()
+                    .append('circle')
+                    .attr('r', circleRadius)
+                    .attr('cx', d => xScale(d.key))
+                    .attr('cy', d => yScale(d.value))
+                    .attr('fill', circleColor)
+                    .attr('clip-path', 'url(#clip-line)')
+                    .on('mouseover', (d) => {
+                        showTip(circleTitle(d));
+                    })
+                    .on('mouseout', hideTip);
+
+                if (!isAxisPathShow) {
+                    axisXLane.select('.domain')
+                        .attr('display', 'none');
+
+                    axisYLane.select('.domain')
+                        .attr('display', 'none');
+                }
             },
             safeDraw() {
                 this.ifExistsSvgThenRemove();
