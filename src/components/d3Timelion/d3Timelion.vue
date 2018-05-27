@@ -52,7 +52,7 @@
                         fillOpacity = 0.6,
                         strokeOpacity = 1,
 
-                        barTitle = d => `${d.value}`,
+                        barTitle = d => `${d.key}<br>${d.value}`,
 
                         tickSize = 10,
                         tickPadding = 8,
@@ -84,7 +84,9 @@
 
                         axisYTickFormat = '.2s',
 
-                        negative = false
+                        negative = false,
+
+                        nice = true
                     } = this.options,
                     {
                         axisXLabelLaneHeight = _.isNull(axisXLabel) ? 0 : 60,
@@ -129,6 +131,7 @@
                 const yScale = d3.scaleLinear()
                     .domain(negative ? d3.extent(data, d => d.vallue) : [0, d3.max(data, d => d.value)])
                     .range([g_h, 0]);
+                if (nice) yScale.nice();
 
                 const xAxis = d3
                     .axisBottom(xScale)

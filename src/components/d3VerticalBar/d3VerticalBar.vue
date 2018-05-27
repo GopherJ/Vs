@@ -54,14 +54,11 @@
                         animationDuration = 1000,
                         delay = 50,
 
-                        isShadowed = false,
-                        shadowColor = 'rgb(230, 237, 244)',
-
-                        breakWords = true,
-
                         axisYTickFormat = '.2s',
 
-                        negative = false
+                        negative = false,
+
+                        nice = true
                     } = this.options,
                     {
                         axisXLabelLaneHeight = _.isNull(axisXLabel) ? 0 : 30,
@@ -89,6 +86,7 @@
                 const yScale = d3.scaleLinear()
                     .range([g_h, 0])
                     .domain(negative ? d3.extent(data, d => d.value) : [0, d3.max(data, d => d.value)]);
+                if (nice) yScale.nice();
 
                 const xScale = d3.scaleBand()
                     .range([0, g_w])
@@ -197,15 +195,6 @@
                     .data(data)
                     .enter();
 
-                if (isShadowed && _.isString(shadowColor)) {
-                    enter.append('rect')
-                        .attr('x', d => xScale(d.key))
-                        .attr('y', 0)
-                        .attr('width', xScale.bandwidth())
-                        .attr('height', g_h)
-                        .attr('fill', shadowColor);
-                }
-
                 const rects = enter.append('rect')
                     .attr('x', d => xScale(d.key))
                     .attr('y', g_h)
@@ -238,11 +227,9 @@
                     });
                 }
 
-                if (breakWords) {
-                    axisXLane
-                        .selectAll('text')
-                        .call(wrap, xScale.bandwidth());
-                }
+                axisXLane
+                    .selectAll('text')
+                    .call(wrap, xScale.bandwidth());
 
                 if (!isAxisPathShow) {
                     axisYLane
