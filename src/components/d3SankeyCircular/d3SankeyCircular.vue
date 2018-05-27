@@ -8,7 +8,8 @@
     import * as d3SankeyCircular from 'd3-sankey-circular';
     import pathArrows from './pathArrows';
     import emit from '../../utils/emit';
-    import {showTip, hideTip} from '../../utils/tooltip';
+    import { showTip, hideTip } from '../../utils/tooltip';
+    import highlightNodes from '../../utils/highlightNodes';
 
     Object.assign(d3, d3SankeyCircular);
 
@@ -26,26 +27,6 @@
             <option value="43200000">12 hour</option>
             <option value="86400000">24 hour</option>
     `;
-
-    const highlightNodes = (node, name) => {
-        let opacity = 0.3;
-
-        if (node.name === name) {
-            opacity = 1;
-        }
-        node.sourceLinks.forEach((link) => {
-            if (link.target.name === name) {
-                opacity = 1;
-            }
-        });
-        node.targetLinks.forEach((link) => {
-            if (link.source.name === name) {
-                opacity = 1;
-            }
-        });
-
-        return opacity;
-    };
 
     export default {
         name: 'd3-sankey-circular',
@@ -116,7 +97,6 @@
                     axisXSelectBoxLabelFontSize = 12,
                     axisXSelectBoxLabelFontWeight = 400,
                     axisXSelectBoxLabelFontOpacity = 0.5,
-                    axisXSelectBoxLaneHeight = 40,
 
                     axisXLabel = null,
 
@@ -129,8 +109,9 @@
                     {
                         axisXLabelLaneHeight = _.isNull(axisXLabel) ? 0 : 30,
                     } = this.options,
+                    __selectBoxLaneHeight__ = 40,
                     g_w = w,
-                    g_h = h - axisXLabelLaneHeight - axisXSelectBoxLaneHeight,
+                    g_h = h - axisXLabelLaneHeight - __selectBoxLaneHeight__,
                     isMobile = g_w <= 560;
 
                 if (![g_w, g_h].every(el => el > 0)) {
@@ -158,22 +139,22 @@
                 const axisXSelectBoxLane = svg
                     .append('g')
                     .attr('width', g_w)
-                    .attr('height', axisXSelectBoxLaneHeight);
+                    .attr('height', __selectBoxLaneHeight__);
 
                 const axisXLabelLane = svg
                     .append('g')
-                    .attr('transform', `translate(0, ${axisXSelectBoxLaneHeight + g_h})`)
+                    .attr('transform', `translate(0, ${__selectBoxLaneHeight__ + g_h})`)
                     .attr('width', g_w)
                     .attr('height', axisXLabelLaneHeight);
 
                 const g = svg
                     .append('g')
-                    .attr('transform', `translate(0, ${axisXSelectBoxLaneHeight})`);
+                    .attr('transform', `translate(0, ${__selectBoxLaneHeight__})`);
 
                 const selectBoxLabel = axisXSelectBoxLane.append('text')
                     .attr('text-anchor', 'middle')
                     .attr('x', g_w / 2)
-                    .attr('y', axisXSelectBoxLaneHeight / 2)
+                    .attr('y', __selectBoxLaneHeight__ / 2)
                     .attr('dy', '0.32em')
                     .text(axisXSelectBoxLabel)
                     .attr('fill', '#000')
@@ -181,35 +162,30 @@
                     .attr('font-weight', axisXSelectBoxLabelFontWeight)
                     .attr('fill-opacity', axisXSelectBoxLabelFontOpacity);
 
-                const selectBoxLabelPos = selectBoxLabel.node().getBBox();
-
-                const FOREIGN_OBJECT = axisXSelectBoxLane
-                    .append('foreignObject');
-
                 if (!isMobile) {
-                    FOREIGN_OBJECT
-                        .attr('transform', `translate(${selectBoxLabelPos.x + selectBoxLabelPos.width}, 0)`)
-                        .attr('width', g_w - selectBoxLabelPos.x - selectBoxLabelPos.width);
+                    const selectBoxLabelRect = selectBoxLabel.node().getBBox();
+
+                    const foreignObject = axisXSelectBoxLane
+                        .append('foreignObject');
+
+                    foreignObject
+                        .attr('transform', `translate(${selectBoxLabelRect.x + selectBoxLabelRect.width}, 0)`)
+                        .attr('width', g_w - selectBoxLabelRect.x - selectBoxLabelRect.width);
+
+                    foreignObject
+                        .attr('height', __selectBoxLaneHeight__)
+                        .append('xhtml:select')
+                        .style('float', 'left')
+                        .on('change', () => {
+                            const targetVal = d3.event.target.value,
+                                val = Number.parseInt(targetVal, 10);
+
+                            this.maxPeriod = val;
+                            emit(this, 'max-period-updated', this.maxPeriod);
+                        })
+                        .html(tpl)
+                        .property('value', this.maxPeriod);
                 }
-
-                else {
-                    FOREIGN_OBJECT
-                        .attr('transform', `translate(${selectBoxLabelPos.x + selectBoxLabelPos.width / 2}, ${selectBoxLabelPos.y + selectBoxLabelPos.height})`)
-                        .attr('width', g_w - selectBoxLabelPos.x - selectBoxLabelPos.width / 2);
-                }
-
-                FOREIGN_OBJECT
-                    .attr('height', axisXSelectBoxLaneHeight)
-                    .append('xhtml:select')
-                    .on('change', () => {
-                        const targetVal = d3.event.target.value,
-                            val = Number.parseInt(targetVal, 10);
-
-                        this.maxPeriod = val;
-                        emit(this, 'max-period-updated', this.maxPeriod);
-                    })
-                    .html(tpl)
-                    .property('value', this.maxPeriod);
 
                 axisXLabelLane.append('text')
                     .attr('text-anchor', 'middle')
@@ -320,7 +296,7 @@
                 const [g_real_w, g_real_h] = this.getSelectionWidthHeight(g),
                     [offsetX, offsetY] = this.getSelectionOffset(g);
 
-                g.attr('transform', `translate(${(g_w - g_real_w) / 2 - offsetX}, ${(g_h - g_real_h) / 2 - offsetY + axisXSelectBoxLaneHeight})`);
+                g.attr('transform', `translate(${(g_w - g_real_w) / 2 - offsetX}, ${(g_h - g_real_h) / 2 - offsetY + __selectBoxLaneHeight__})`);
             },
             getElWidthHeight() {
                 return [this.$el.clientWidth, this.$el.clientHeight];
@@ -413,7 +389,7 @@
     }
 
     .d3-sankey-circular select {
-        height: 32px;
+        height: 38px;
         padding: 5px 15px;
         background-color: #fff;
         background-image: none;

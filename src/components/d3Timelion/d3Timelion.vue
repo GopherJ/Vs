@@ -71,8 +71,6 @@
                         axisLabelFontWeight = 400,
                         axisLabelFontOpacity = 0.5,
 
-                        timeRangeLabelLaneHeight = 40,
-
                         timeRangeLabelFontSize = 12,
                         timeRangeLabelFontWeight = 400,
                         timeRangeLabelFontOpacity = 0.5,
@@ -92,8 +90,9 @@
                         axisXLabelLaneHeight = _.isNull(axisXLabel) ? 0 : 60,
                         axisYLabelLaneWidth = _.isNull(axisYLabel) ? 0 : 60,
                     } = this.options,
+                    __timeRangeLabelLaneHeight__ = 40,
                     g_w = w - left - right - axisYLabelLaneWidth - axisYLaneWidth,
-                    g_h = h - top - bottom - axisXLaneHeight - axisXLabelLaneHeight - timeRangeLabelLaneHeight;
+                    g_h = h - top - bottom - axisXLaneHeight - axisXLabelLaneHeight - __timeRangeLabelLaneHeight__;
                 if (![g_w, g_h].every(el => el > 0)) {
                     return;
                 }
@@ -146,7 +145,7 @@
 
                 const axisXLane = svg
                     .append('g')
-                    .attr('transform', `translate(${left + axisXLabelLaneHeight + axisYLaneWidth}, ${top + g_h + timeRangeLabelLaneHeight})`)
+                    .attr('transform', `translate(${left + axisXLabelLaneHeight + axisYLaneWidth}, ${top + g_h + __timeRangeLabelLaneHeight__})`)
                     .attr('width', g_w)
                     .attr('height', axisXLaneHeight);
 
@@ -163,7 +162,7 @@
 
                 const axisYLane = svg
                     .append('g')
-                    .attr('transform', `translate(${left + axisYLabelLaneWidth}, ${top + timeRangeLabelLaneHeight})`)
+                    .attr('transform', `translate(${left + axisYLabelLaneWidth}, ${top + __timeRangeLabelLaneHeight__})`)
                     .attr('width', axisYLaneWidth)
                     .attr('height', g_h);
 
@@ -178,12 +177,12 @@
 
                 const axisYLabelLane = svg
                     .append('g')
-                    .attr('transform', `translate(${left}, ${top + timeRangeLabelLaneHeight})`)
+                    .attr('transform', `translate(${left}, ${top + __timeRangeLabelLaneHeight__})`)
                     .attr('width', axisYLabelLaneWidth)
                     .attr('height', g_h);
 
                 const axisXLabelLane = svg.append('g')
-                    .attr('transform', `translate(${left + axisYLabelLaneWidth + axisYLaneWidth}, ${top + g_h + axisXLaneHeight + timeRangeLabelLaneHeight})`)
+                    .attr('transform', `translate(${left + axisYLabelLaneWidth + axisYLaneWidth}, ${top + g_h + axisXLaneHeight + __timeRangeLabelLaneHeight__})`)
                     .attr('width', g_w)
                     .attr('height', axisXLabelLaneHeight);
 
@@ -214,7 +213,7 @@
                     .append('g')
                     .attr('transform', `translate(${left + axisYLabelLaneWidth + axisYLaneWidth}, ${top})`)
                     .attr('width', g_w)
-                    .attr('height', timeRangeLabelLaneHeight);
+                    .attr('height', __timeRangeLabelLaneHeight__);
 
                 const [dateTimeStart, dateTimeEnd] = d3.extent(data.map(d => d.key));
 
@@ -223,7 +222,7 @@
                     .attr('class', 'label--time')
                     .attr('text-anchor', 'middle')
                     .attr('x', g_w / 2)
-                    .attr('y', timeRangeLabelLaneHeight / 2)
+                    .attr('y', __timeRangeLabelLaneHeight__ / 2)
                     .attr('dy', '0.32em')
                     .attr('fill', '#000')
                     .attr('font-size', timeRangeLabelFontSize)
@@ -243,31 +242,31 @@
                         .attr('width', g_w - timeRangeLabelRect.x - timeRangeLabelRect.width);
 
                     foreignObject
-                    .attr('height', timeRangeLabelLaneHeight)
-                    .append('xhtml:select')
-                    .style('float', 'left')
-                    .attr('pointer-events', 'none')
-                    .on('change', () => {
-                        const targetVal = d3.event.target.value,
-                            val = targetVal === 'Auto' ? targetVal : Number.parseInt(targetVal, 10);
+                        .attr('height', __timeRangeLabelLaneHeight__)
+                        .append('xhtml:select')
+                        .style('float', 'left')
+                        .attr('pointer-events', 'none')
+                        .on('change', () => {
+                            const targetVal = d3.event.target.value,
+                                val = targetVal === 'Auto' ? targetVal : Number.parseInt(targetVal, 10);
 
-                        this.interval = val;
-                        emit(self, 'interval-updated', this.interval);
-                    })
-                    .html(tpl)
-                    .property('value', this.interval);
+                            this.interval = val;
+                            emit(self, 'interval-updated', this.interval);
+                        })
+                        .html(tpl)
+                        .property('value', this.interval);
                 }
 
                 const extent = [
-                    [left + axisYLabelLaneWidth + axisYLaneWidth, top + timeRangeLabelLaneHeight],
-                    [w - right, g_h + top + timeRangeLabelLaneHeight]
+                    [left + axisYLabelLaneWidth + axisYLaneWidth, top + __timeRangeLabelLaneHeight__],
+                    [w - right, g_h + top + __timeRangeLabelLaneHeight__]
                 ];
 
                 svg.call(brushX.bind(this), extent, xScale, data, this.updateTimeRangeLabel);
 
                 const g = svg
                     .append('g')
-                    .attr('transform', `translate(${left + axisXLabelLaneHeight + axisYLaneWidth}, ${top + timeRangeLabelLaneHeight})`)
+                    .attr('transform', `translate(${left + axisXLabelLaneHeight + axisYLaneWidth}, ${top + __timeRangeLabelLaneHeight__})`)
                     .attr('width', g_w)
                     .attr('height', g_h);
 
