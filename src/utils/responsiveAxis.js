@@ -4,9 +4,9 @@ import { hasOverlapX, hasOverlapY } from './hasOverlap';
  *
  * make xAxis's number of ticks responsive to container size
  *
- * @param axisXLane
- * @param axis
- * @param scale
+ * @param {d3.Selection} axisXLane
+ * @param {d3.Axis} axis
+ * @param {d3.ScaleBand | d3.ScalePoint} scale
  */
 function responsiveAxisX(axisXLane, axis, scale) {
     let ticks = axisXLane.selectAll('.tick');
@@ -24,9 +24,9 @@ function responsiveAxisX(axisXLane, axis, scale) {
  *
  * make yAxis's number of ticks responsive to container size
  *
- * @param axisYLane
- * @param axis
- * @param scale
+ * @param {d3.Selection} axisYLane
+ * @param {d3.Axis} axis
+ * @param {d3.ScaleBand | d3.ScalePoint} scale
  */
 function responsiveAxisY(axisYLane, axis, scale) {
     let ticks = axisYLane.selectAll('.tick');

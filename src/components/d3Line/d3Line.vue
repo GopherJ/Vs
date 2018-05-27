@@ -1,17 +1,17 @@
 <template>
-    <div :style="{ 'width' : width, 'height' : height}" class="d3-line"></div>
+    <div  class="d3-line" :style="{ 'width' : width, 'height' : height}"></div>
 </template>
 
 <script>
     import * as d3 from 'd3';
     import _ from 'lodash';
     import mixins from '../../mixins';
-    import {showTip, hideTip} from '../../utils/tooltip';
-    import {brushX} from '../../utils/brush';
-    import {responsiveAxisX} from '../../utils/responsiveAxis';
+    import { showTip, hideTip } from '../../utils/tooltip';
+    import { brushX } from '../../utils/brush';
+    import { responsiveAxisX } from '../../utils/responsiveAxis';
     import wrap from '../../utils/wrap';
-    import timeFormat from '../../utils/timeFormat';
-    import {selectTicksNumY} from '../../utils/select';
+    import tickFormat from '../../utils/tickFormat';
+    import { selectTicksNumY } from '../../utils/select';
     import {
         transformFirstTickTextToTextAnchorStart,
         transformLastTickTextToTextAnchorEnd

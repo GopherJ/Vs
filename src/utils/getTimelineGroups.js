@@ -1,44 +1,52 @@
 /* eslint-disable */
 /**
- * first type of time line entry
  *
- * @param group
- * @param at
- * @param title
- * @param symbol
- * @param className
+ * time entry that represent a point
+ *
+ * @param {string} group
+ * @param {Date} at
+ * @param {string} title
+ * @param {string} symbol
+ * @param {string} className
  * @constructor
  */
-function Point(group, at, title, symbol, className) {
-    this.group = group;
-    this.at = at;
-    this.title = title;
-    this.symbol = symbol;
-    this.className = className;
+class Point {
+    constructor(group, at, title, symbol, className) {
+        this.group = group;
+        this.at = at;
+        this.title = title;
+        this.symbol = symbol;
+        this.className = className;
+    }
 }
 
 /**
- * second type of time line entry
  *
- * @param group
- * @param from
- * @param to
- * @param label
- * @param title
- * @param className
+ * time entry that represent a period
+ *
+ * @param {string} group
+ * @param {Date} from
+ * @param {Date} to
+ * @param {string} label
+ * @param {string} title
+ * @param {string} className
  * @constructor
  */
-function Interval(group, from, to, label, title, className) {
-    this.group = group;
-    this.from = from;
-    this.to = to;
-    this.label = label;
-    this.title = title;
-    this.className = className;
+class Interval {
+    constructor (group, from, to, label, title, className) {
+        this.group = group;
+        this.from = from;
+        this.to = to;
+        this.label = label;
+        this.title = title;
+        this.className = className;
+    }
 }
 
 /**
+ *
  * get every group's data
+ *
  * @param data
  */
 const groupBy = (data) => {
@@ -46,7 +54,7 @@ const groupBy = (data) => {
     let dateTimeStart, dateTimeEnd;
 
     for (let i = 0, l = data.length; i < l; i += 1) {
-        const {group, from, to, label, at, title, className, symbol} = data[i];
+        const { group, from, to, label, at, title, className, symbol } = data[i];
 
         if ((from > 0) && (to > 0) && label) {
             dateTimeStart = i === 0 ? from : (dateTimeStart > from ? from : dateTimeStart);
@@ -67,7 +75,9 @@ const groupBy = (data) => {
 
             if (results[group]) {
                 results[group].push(new Point(group, at, title, symbol, className));
-            } else {
+            }
+
+            else {
                 results[group] = [new Point(group, at, title, symbol, className)];
             }
         }
@@ -185,7 +195,7 @@ const getTimelineGroups = (data) => {
     const {results, dateTimeStart, dateTimeEnd} = groupBy(data);
 
     return Object.keys(results).reduce((ite, cur) => {
-        ite['data'][cur] = chunk(results[cur]);
+        ite.data[cur] = chunk(results[cur]);
         return ite;
     }, {
         dateTimeStart,

@@ -5,15 +5,15 @@
 <script>
     import * as d3 from 'd3';
     import _ from 'lodash';
-    import {brushX} from '../../utils/brush';
+    import { brushX } from '../../utils/brush';
     import mixins from '../../mixins';
     import groupBy from '../../utils/groupBy';
     import realBBox from '../../utils/realBBox';
-    import {responsiveAxisX} from '../../utils/responsiveAxis';
-    import timeFormat from '../../utils/timeFormat';
-    import {toggleCross, toggleClass} from '../../utils/toggle';
-    import {showTip, hideTip} from '../../utils/tooltip';
-    import {selectTicksNumY} from '../../utils/select';
+    import { responsiveAxisX } from '../../utils/responsiveAxis';
+    import tickFormat from '../../utils/tickFormat';
+    import { toggleCross, toggleClass } from '../../utils/toggle';
+    import { showTip, hideTip } from '../../utils/tooltip';
+    import { selectTicksNumY } from '../../utils/select';
     import wrap from '../../utils/wrap';
     import {
         transformFirstTickTextToTextAnchorStart,

@@ -7,13 +7,13 @@
     import _ from 'lodash';
     import moment from 'moment';
     import mixins from '../../mixins';
-    import {showTip, hideTip} from '../../utils/tooltip';
-    import timeFormat from '../../utils/timeFormat';
-    import {responsiveAxisX} from '../../utils/responsiveAxis';
+    import { showTip, hideTip } from '../../utils/tooltip';
+    import tickFormat from '../../utils/tickFormat';
+    import { responsiveAxisX } from '../../utils/responsiveAxis';
     import wrap from '../../utils/wrap';
     import emit from '../../utils/emit';
     import INTERVAL from '../../utils/interval';
-    import {selectPaddingInnerOuterX, selectTicksNumY} from '../../utils/select';
+    import { selectPaddingInnerOuterX, selectTicksNumY } from '../../utils/select';
 
     const tpl = `
                 <option value='Auto'>Auto</option>

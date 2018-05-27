@@ -5,14 +5,14 @@
 <script>
     import * as d3 from 'd3';
     import mixins from '../../mixins';
-    import {showTip, hideTip} from '../../utils/tooltip';
-    import timeFormat from '../../utils/timeFormat';
+    import { showTip, hideTip } from '../../utils/tooltip';
+    import tickFormat from '../../utils/tickFormat';
     import emit from '../../utils/emit';
-    import {selectTicksNumX, selectPaddingInnerOuterY} from '../../utils/select';
-    import {transformLastTickTextToTextAnchorEnd} from '../../utils/transformTick';
-    import {responsiveAxisY} from '../../utils/responsiveAxis';
+    import { selectTicksNumX, selectPaddingInnerOuterY } from '../../utils/select';
+    import { transformLastTickTextToTextAnchorEnd } from '../../utils/transformTick';
+    import { responsiveAxisY } from '../../utils/responsiveAxis';
     import isValidDate from '../../utils/isValidDate';
-    import {brushY} from '../../utils/brush';
+    import { brushY } from '../../utils/brush';
     import _ from 'lodash';
 
     export default {
@@ -20,9 +20,8 @@
         mixins: [mixins],
         methods: {
             drawVerticalBar() {
-                const [w, h] = this.getElWidthHeight();
-
-                const data = _.cloneDeep(this.data),
+                const [w, h] = this.getElWidthHeight(),
+                    data = _.cloneDeep(this.data),
                     {
                         fill = '#6eadc1',
                         stroke = '#6eadc1',

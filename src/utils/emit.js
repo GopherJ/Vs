@@ -1,8 +1,11 @@
 /**
  *
+ * use $root as eventBus
+ *
  * @param {Vue} vm
  * @param {string} eventName
  * @param {array} args
+ * @return {void}
  */
 function emit(vm, eventName, ...args) {
     vm.$emit(eventName, ...args);
