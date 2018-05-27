@@ -57,8 +57,13 @@ const groupBy = (data) => {
         const { group, from, to, label, at, title, className, symbol } = data[i];
 
         if ((from > 0) && (to > 0) && label) {
-            dateTimeStart = i === 0 ? from : (dateTimeStart > from ? from : dateTimeStart);
-            dateTimeEnd = i === 0 ? to : (dateTimeEnd < to ? to : dateTimeEnd);
+            dateTimeStart = i === 0
+                ? from
+                : (dateTimeStart > from ? from : dateTimeStart);
+
+            dateTimeEnd = i === 0
+                ? to
+                : (dateTimeEnd < to ? to : dateTimeEnd);
 
             if (results[group]) {
                 results[group].push(new Interval(group, from, to, label, title, className));
@@ -70,8 +75,13 @@ const groupBy = (data) => {
         }
 
         else if ((at > 0) && title) {
-            dateTimeStart = i === 0 ? at : (dateTimeStart > at ? at : dateTimeStart);
-            dateTimeEnd = i === 0 ? at : (dateTimeEnd < at ? at : dateTimeEnd);
+            dateTimeStart = i === 0
+                ? at
+                : (dateTimeStart > at ? at : dateTimeStart);
+
+            dateTimeEnd = i === 0
+                ? at
+                : (dateTimeEnd < at ? at : dateTimeEnd);
 
             if (results[group]) {
                 results[group].push(new Point(group, at, title, symbol, className));
