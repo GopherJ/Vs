@@ -13,11 +13,8 @@
     import tickFormat from '../../utils/tickFormat';
     import { selectTicksNumY, selectPaddingInnerOuterX } from '../../utils/select';
     import isAxisTime from '../../utils/isAxisTime';
-    import {
-        transformFirstTickTextToTextAnchorStart,
-        transformLastTickTextToTextAnchorEnd
-    } from '../../utils/transformTick';
     import { firstTickTextAnchorStart, lastTickTextAnchorEnd } from '../../utils/textAnchor';
+    import emit from '../../utils/emit';
 
     export default {
         name: 'd3-line',
@@ -137,9 +134,7 @@
                     .call(lastTickTextAnchorEnd)
                     .attr('font-size', axisFontSize)
                     .attr('fill-opacity', axisFontOpacity)
-                    .attr('font-weight', axisFontWeight)
-                    .selectAll('text')
-                    .call(wrap, xScale.step());
+                    .attr('font-weight', axisFontWeight);
 
                 axisYLane
                     .append('g')
@@ -198,6 +193,10 @@
                     svg.call(brushX.bind(this), extent, xScale, data);
                 }
 
+                axisXLane
+                    .selectAll('text')
+                    .call(wrap, xScale.step());
+
                 svg.append('defs')
                     .append('clipPath')
                     .attr('id', 'clip-line')
@@ -216,11 +215,12 @@
                     .datum(data)
                     .attr('d', lineGen)
                     .attr('clip-path', 'url(#clip-line)')
-                    .attr('fill', 'transparent')
+                    .attr('fill', 'none')
                     .attr('stroke', stroke)
-                    .attr('stroke-width', strokeWidth);
+                    .attr('stroke-width', strokeWidth)
+                    .attr('pointer-events', 'none');
 
-                g.selectAll('circle')
+                const circles = g.selectAll('circle')
                     .data(data)
                     .enter()
                     .append('circle')
@@ -233,6 +233,16 @@
                         showTip(circleTitle(d));
                     })
                     .on('mouseout', hideTip);
+
+                if (isAxisXTime && _.isNumber(axisXTimeInterval)) {
+                    circles
+                        .on('mousedown', (d) => {
+                            const dateTimeStart = d.key,
+                                dateTimeEnd = new Date(d.key.getTime() + axisXTimeInterval);
+
+                            emit(this, 'range-updated', dateTimeStart, dateTimeEnd);
+                        });
+                }
 
                 if (!isAxisPathShow) {
                     axisXLane.select('.domain')
