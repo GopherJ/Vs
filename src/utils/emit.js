@@ -15,7 +15,7 @@ function emit(vm, eventName, ...args) {
     }
 
 
-    if (vm.$parent.$props.i) {
+    if (vm.$parent.$props && vm.$parent.$props.i) {
         vm.$root.$emit(eventName, {
             i: vm.$parent.$props.i,
             payload: args

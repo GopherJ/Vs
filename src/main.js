@@ -1,6 +1,6 @@
 /* eslint-disable */
 import d3SankeyCircular from './components/d3SankeyCircular';
-// import d3Timelion from './components/d3Timelion';
+import d3Timelion from './components/d3Timelion';
 import d3Timeline from './components/d3Timeline';
 import d3Pie from './components/d3Pie';
 // import d3Line from './components/d3Line';
@@ -16,7 +16,7 @@ const install = (Vue, options = {}) => {
         // register store
     }
     Vue.component(d3SankeyCircular.name, d3SankeyCircular);
-    // Vue.component(d3Timelion.name, d3Timelion);
+    Vue.component(d3Timelion.name, d3Timelion);
     Vue.component(d3Timeline.name, d3Timeline);
     Vue.component(d3ProgressArc.name, d3ProgressArc);
     Vue.component(d3Pie.name, d3Pie);
@@ -36,7 +36,7 @@ export default {
 export {
     // local install
     d3SankeyCircular,
-    // d3Timelion,
+    d3Timelion,
     d3ProgressArc,
     d3Timeline,
     d3Pie,

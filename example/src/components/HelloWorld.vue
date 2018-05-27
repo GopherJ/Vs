@@ -10,7 +10,7 @@
         <d3-horizontal-bar :data="multiLineData"></d3-horizontal-bar>
         </div>
         <div class="box">
-        <d3-vertical-bar :data="multiLineData"></d3-vertical-bar>
+        <d3-vertical-bar :data="multiLineData" @range-updated="(args) => console(args)"></d3-vertical-bar>
         </div>
         <div class="box">
         <d3-circle :data="0.3"></d3-circle>
@@ -241,7 +241,10 @@
                             "key": -53007895084,
                             "value": 92.47637856894694
                         }
-                    ],
+                    ].map(x => ({
+                        key: new Date(x.key),
+                        value: x.value
+                    })),
 
                 nodes: [
                     {
@@ -553,6 +556,11 @@
                         value: 20
                     }
                 ]
+            }
+        },
+        methods:{
+            console(...args) {
+                console.log(args)
             }
         }
     }

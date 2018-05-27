@@ -83,8 +83,8 @@
 
                 const svg = d3.select(this.$el)
                     .append('svg')
-                    .attr('width', `${w}`)
-                    .attr('height', `${h}`);
+                    .attr('width', w)
+                    .attr('height', h);
 
                 const yScale = d3.scaleLinear()
                     .range([g_h, 0])
