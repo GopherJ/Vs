@@ -74,6 +74,7 @@
                 if (![g_w, g_h].every(el => el > 0)) {
                     return;
                 }
+
                 const isAxisYTime = isAxisTime(data),
                     axisYTickFormat = value => isAxisYTime ? tickFormat(value, axisYTimeInterval) : value,
                     ticks = selectTicksNumX(g_w),

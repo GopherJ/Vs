@@ -15,12 +15,9 @@
     import { showTip, hideTip } from '../../utils/tooltip';
     import { selectTicksNumY } from '../../utils/select';
     import wrap from '../../utils/wrap';
-    import {
-        transformFirstTickTextToTextAnchorStart,
-        transformLastTickTextToTextAnchorEnd,
-    } from '../../utils/transformTick';
-
-    const GetAllKeys = (data) => [...new Set(data.map(d => d.key))];
+    import { firstTickTextAnchorStart, lastTickTextAnchorEnd } from '../../utils/textAnchor';
+    import GetAllKeys from '../../utils/allKeys';
+    import isAxisTime from '../../utils/isAxisTime';
 
     export default {
         name: 'd3-multi-line',
@@ -61,9 +58,7 @@
                         axisFontWeight = 400,
                         axisFontOpacity = 1,
 
-                        isAxisXTime = true,
                         axisXTimeInterval = null,
-                        sort = true,
 
                         dashedGroups = [],
                         strokeDashArray = 5,
@@ -72,11 +67,13 @@
 
                         curve = 'curveCardinal',
 
-                        breakWords = true,
-
                         axisYTickFormat = '.2s',
 
-                        groupKey = 'group'
+                        groupKey = 'group',
+
+                        negative = false,
+
+                        nice = false
                     } = this.options,
                     {
                         axisXLabelLaneHeight = _.isNull(axisXLabel) ? 0 : 30,
@@ -84,19 +81,18 @@
                     } = this.options;
 
                 const [w, h] = this.getElWidthHeight(),
-                    offsetRight = 10,
-                    g_w = w - left - right - axisYLabelLaneWidth - axisYLaneWidth - offsetRight,
+                    __offsetRight__ = 10,
+                    g_w = w - left - right - axisYLabelLaneWidth - axisYLaneWidth - __offsetRight__,
                     g_h = h - top - bottom - axisXLabelLaneHeight - axisXLaneHeight - axisXGroupLabelLaneHeight;
 
                 if (![g_w, g_h].every(el => el > 0)) {
                     return;
                 }
 
-                if (isAxisXTime && sort) {
-                    _data.sort((a, b) => a.key > b.key ? 1 : -1);
-                }
-
-                const data = groupBy(_data, groupKey),
+                const isAxisXTime = isAxisTime(_data),
+                    axisXTickFormat = value => isAxisXTime ? tickFormat(value, axisXTimeInterval) : value,
+                    ticks = selectTicksNumY(g_w),
+                    data = groupBy(_data, groupKey),
                     groups = Object.keys(data);
 
                 if (groups.length === 0) {
@@ -108,25 +104,16 @@
                     .range(d3.schemeCategory20);
 
                 const yScale = d3.scaleLinear()
-                    .domain([0, d3.max(_data.map(d => d.value))])
+                    .domain(negative ? d3.extent(data, d => d.value) : [0, d3.max(_data.map(d => d.value))])
                     .range([g_h, 0]);
+                if (nice) yScale.nice();
 
                 const xScale = d3.scalePoint()
                     .domain(GetAllKeys(_data))
                     .range([0, g_w]);
 
-                const axisXTickFormat = (value) => {
-                    if (!isAxisXTime || _.isString(value)) {
-                        return value;
-                    }
-
-                    return _.isNumber(d)
-                        ? timeFormat(new Date(value), axisXTimeInterval)
-                        : timeFormat(value, axisXTimeInterval);
-                };
-
                 const lineGen = d3.line()
-                    .x(d => xScale(isAxisXTime ? (_.isNumber(d) ? new Date(d.key) : d.key) : d.key))
+                    .x(d => xScale(d.key))
                     .y(d => yScale(d.value))
                     .defined(d => !_.isNull(d) && !_.isUndefined(d));
 
@@ -139,24 +126,6 @@
                     .append('svg')
                     .attr('width', w)
                     .attr('height', h);
-
-                if (isAxisXTime) {
-                    const extent = [
-                        [left + axisYLaneWidth + axisYLabelLaneWidth, top + axisXGroupLabelLaneHeight],
-                        [w - right - offsetRight, g_h + top + axisXGroupLabelLaneHeight]
-                    ];
-
-                    svg.call(brushX.bind(this), extent, xScale, _data);
-                }
-
-                svg.append('defs')
-                    .append('clipPath')
-                    .attr('id', 'clip-multi-line')
-                    .append('rect')
-                    .attr('x', 0)
-                    .attr('y', 0)
-                    .attr('width', g_w)
-                    .attr('height', g_h);
 
                 const axisXGroupLabelLane = svg.append('g')
                     .attr('transform', `translate(${left + axisYLabelLaneWidth + axisYLaneWidth}, ${top})`)
@@ -182,11 +151,6 @@
                     .attr('transform', `translate(${left + axisYLabelLaneWidth + axisYLaneWidth}, ${top + axisXGroupLabelLaneHeight + g_h})`)
                     .attr('width', g_w)
                     .attr('height', axisXLaneHeight);
-
-                const g = svg.append('g')
-                    .attr('transform', `translate(${left + axisYLabelLaneWidth + axisYLaneWidth}, ${top + axisXGroupLabelLaneHeight})`)
-                    .attr('width', g_w)
-                    .attr('height', g_h);
 
                 const GroupLabelContainer = axisXGroupLabelLane
                     .append('g');
@@ -260,23 +224,16 @@
                     .attr('font-size', axisLabelFontSize)
                     .attr('font-weight', axisLabelFontWeight);
 
-                axisYLane
-                    .append('g')
-                    .attr('transform', `translate(${axisYLaneWidth}, 0)`)
-                    .attr('class', 'axis axis--y')
-                    .call(d3
-                        .axisLeft(yScale)
-                        .ticks(selectTicksNumY(g_h))
-                        .tickFormat(d3.format(axisYTickFormat))
-                        .tickSize(tickSize)
-                        .tickPadding(tickPadding))
-                    .attr('fill-opacity', axisFontOpacity)
-                    .attr('font-size', axisFontSize)
-                    .attr('font-weight', axisFontWeight);
-
                 const xAxis = d3
                     .axisBottom(xScale)
                     .tickFormat(axisXTickFormat)
+                    .tickSize(tickSize)
+                    .tickPadding(tickPadding);
+
+                const yAxis = d3
+                    .axisLeft(yScale)
+                    .ticks(selectTicksNumY(g_h))
+                    .tickFormat(d3.format(axisYTickFormat))
                     .tickSize(tickSize)
                     .tickPadding(tickPadding);
 
@@ -284,31 +241,50 @@
                     .append('g')
                     .attr('class', 'axis axis--x')
                     .call(xAxis)
+                    .call(firstTickTextAnchorStart)
+                    .call(lastTickTextAnchorEnd)
+                    .attr('fill-opacity', axisFontOpacity)
+                    .attr('font-size', axisFontSize)
+                    .attr('font-weight', axisFontWeight);
+
+                axisYLane
+                    .append('g')
+                    .attr('transform', `translate(${axisYLaneWidth}, 0)`)
+                    .attr('class', 'axis axis--y')
+                    .call(yAxis)
                     .attr('fill-opacity', axisFontOpacity)
                     .attr('font-size', axisFontSize)
                     .attr('font-weight', axisFontWeight);
 
                 if (isAxisXTime) {
-                    transformFirstTickTextToTextAnchorStart(svg);
-                    transformLastTickTextToTextAnchorEnd(svg);
+                    const extent = [
+                        [left + axisYLaneWidth + axisYLabelLaneWidth, top + axisXGroupLabelLaneHeight],
+                        [w - right - __offsetRight__, g_h + top + axisXGroupLabelLaneHeight]
+                    ];
 
                     axisXLane
                         .call(responsiveAxisX, xAxis, xScale);
+
+                    svg.call(brushX.bind(this), extent, xScale, _data);
                 }
 
-                if (breakWords) {
-                    axisXLane
-                        .selectAll('text')
-                        .call(wrap, xScale.step());
-                }
+                axisXLane
+                    .selectAll('text')
+                    .call(wrap, xScale.step());
 
-                if (!isAxisPathShow) {
-                    axisYLane.select('.domain')
-                        .attr('display', 'none');
+                svg.append('defs')
+                    .append('clipPath')
+                    .attr('id', 'clip-multi-line')
+                    .append('rect')
+                    .attr('x', 0)
+                    .attr('y', 0)
+                    .attr('width', g_w)
+                    .attr('height', g_h);
 
-                    axisXLane.select('.domain')
-                        .attr('display', 'none');
-                }
+                const g = svg.append('g')
+                    .attr('transform', `translate(${left + axisYLabelLaneWidth + axisYLaneWidth}, ${top + axisXGroupLabelLaneHeight})`)
+                    .attr('width', g_w)
+                    .attr('height', g_h);
 
                 g.selectAll('path')
                     .data(groups)
@@ -329,7 +305,7 @@
                     .append('circle')
                     .attr('class', d => `d3-multi-line-${d.group}`)
                     .attr('clip-path', 'url(#clip-multi-line)')
-                    .attr('cx', d => xScale(isAxisXTime ? (_.isNumber(d) ? new Date(d.key) : d.key) : d.key))
+                    .attr('cx', d => xScale(d.key))
                     .attr('cy', d => yScale(d.value))
                     .attr('r', circleRadius)
                     .attr('fill', d => schemeCategory20(d.group))
@@ -337,6 +313,14 @@
                         showTip(circleTitle(d));
                     })
                     .on('mouseout', hideTip);
+
+                if (!isAxisPathShow) {
+                    axisYLane.select('.domain')
+                        .attr('display', 'none');
+
+                    axisXLane.select('.domain')
+                        .attr('display', 'none');
+                }
             },
             safeDraw() {
                 this.ifExistsSvgThenRemove();

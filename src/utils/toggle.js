@@ -16,12 +16,12 @@ const toggleCross = (container, rect, stroke, strokeWidth) => {
         return;
     }
 
-    const rect = rect.node().getBBox();
+    const __rect__ = rect.node().getBBox();
 
-    const x1 = rect.x,
-        y1 = rect.y,
-        x2 = rect.x + rect.width,
-        y2 = rect.y + rect.height;
+    const x1 = __rect__.x,
+        y1 = __rect__.y,
+        x2 = __rect__.x + __rect__.width,
+        y2 = __rect__.y + __rect__.height;
 
     container.append('line')
         .attr('x1', x1)

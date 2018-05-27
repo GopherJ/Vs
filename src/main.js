@@ -7,7 +7,7 @@ import d3Line from './components/d3Line';
 import d3ProgressArc from './components/d3ProgressArc';
 import d3Metric from './components/d3Metric';
 import d3Circle from './components/d3Circle';
-// import d3MultiLine from './components/d3MultiLine';
+import d3MultiLine from './components/d3MultiLine';
 import d3HorizontalBar from './components/d3HorizontalBar';
 import d3VerticalBar from './components/d3VerticalBar';
 
@@ -23,7 +23,7 @@ const install = (Vue, options = {}) => {
     Vue.component(d3Line.name, d3Line);
     Vue.component(d3Metric.name, d3Metric);
     Vue.component(d3Circle.name, d3Circle);
-    // Vue.component(d3MultiLine.name, d3MultiLine);
+    Vue.component(d3MultiLine.name, d3MultiLine);
     Vue.component(d3HorizontalBar.name, d3HorizontalBar);
     Vue.component(d3VerticalBar.name, d3VerticalBar);
 };
@@ -42,7 +42,7 @@ export {
     d3Pie,
     d3Line,
     d3Metric,
-    // d3MultiLine,
+    d3MultiLine,
     d3Circle,
     d3HorizontalBar,
     d3VerticalBar

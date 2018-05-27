@@ -74,8 +74,7 @@
 
                 const isAxisXTime = isAxisTime(data),
                     axisXTickFormat = value => isAxisXTime ? tickFormat(value, axisXTimeInterval) : value,
-                    ticks = selectTicksNumY(g_h),
-                    [paddingInner, paddingOuter] = selectPaddingInnerOuterX(g_w);
+                    ticks = selectTicksNumY(g_h);
 
                 const xScale = d3.scalePoint()
                     .domain(data.map(d => d.key))
