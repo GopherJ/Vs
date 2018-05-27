@@ -128,7 +128,7 @@
                     .paddingOuter([paddingOuter]);
 
                 const yScale = d3.scaleLinear()
-                    .domain([0, d3.max(data, d => d.value)])
+                    .domain(negative ? d3.extent(data, d => d.vallue) : [0, d3.max(data, d => d.value)])
                     .range([g_h, 0]);
 
                 const xAxis = d3
@@ -216,7 +216,10 @@
                     .attr('width', g_w)
                     .attr('height', timeRangeLabelLaneHeight);
 
-                const timeRangeLabel = timeRangeLabelLane.append('text')
+                const [dateTimeStart, dateTimeEnd] = d3.extent(data.map(d => d.key));
+
+                const timeRangeLabel = timeRangeLabelLane
+                    .append('text')
                     .attr('class', 'label--time')
                     .attr('text-anchor', 'middle')
                     .attr('x', g_w / 2)
@@ -229,26 +232,21 @@
                     .attr('clip-path', 'url(#clip-timelion)')
                     .text(() => this.getTimeRangeLabel(dateTimeStart, dateTimeEnd));
 
-                const timeRangeLabelPos = timeRangeLabel.node().getBBox();
-
-                const foreignObject = timeRangeLabelLane
-                    .append('foreignObject');
-
                 if (!isMobile) {
-                    foreignObject
-                        .attr('transform', `translate(${timeRangeLabelPos.x + timeRangeLabelPos.width}, ${top})`)
-                        .attr('width', g_w - timeRangeLabelPos.x - timeRangeLabelPos.width);
-                }
+                    const timeRangeLabelRect = timeRangeLabel.node().getBBox();
 
-                else {
-                    foreignObject
-                        .attr('transform', `translate(${timeRangeLabelPos.x + timeRangeLabelPos.width / 2}, ${top + timeRangeLabelLaneHeight})`)
-                        .attr('width', g_w - timeRangeLabelPos.x - timeRangeLabelPos.width / 2);
-                }
+                    const foreignObject = timeRangeLabelLane
+                        .append('foreignObject');
 
-                foreignObject
+                    foreignObject
+                        .attr('transform', `translate(${timeRangeLabelRect.x + timeRangeLabelRect.width}, ${top})`)
+                        .attr('width', g_w - timeRangeLabelRect.x - timeRangeLabelRect.width);
+
+                    foreignObject
                     .attr('height', timeRangeLabelLaneHeight)
                     .append('xhtml:select')
+                    .style('float', 'left')
+                    .attr('pointer-events', 'none')
                     .on('change', () => {
                         const targetVal = d3.event.target.value,
                             val = targetVal === 'Auto' ? targetVal : Number.parseInt(targetVal, 10);
@@ -258,6 +256,7 @@
                     })
                     .html(tpl)
                     .property('value', this.interval);
+                }
 
                 const extent = [
                     [left + axisYLabelLaneWidth + axisYLaneWidth, top + timeRangeLabelLaneHeight],
@@ -271,18 +270,6 @@
                     .attr('transform', `translate(${left + axisXLabelLaneHeight + axisYLaneWidth}, ${top + timeRangeLabelLaneHeight})`)
                     .attr('width', g_w)
                     .attr('height', g_h);
-
-                const [dateTimeStart, dateTimeEnd] = d3.extent(data.map(d => d.key));
-
-                if (!isAxisPathShow) {
-                    axisXLane
-                        .selectAll('.domain')
-                        .attr('display', 'none');
-
-                    axisYLane
-                        .selectAll('.domain')
-                        .attr('display', 'none');
-                }
 
                 const enter = g.selectAll('rect')
                     .data(data)
@@ -301,12 +288,14 @@
 
                 rects
                     .on('mousedown', (d) => {
-                        if (_.isNumber(axisXTimeInterval)) {
-                            const dateTimeStart = d.key,
-                                dateTimeEnd = new Date(d.key.getTime() + axisXTimeInterval);
-
-                            emit(this, 'range-updated', dateTimeStart, dateTimeEnd);
+                        if (!_.isNumber(axisXTimeInterval)) {
+                            return;
                         }
+
+                        const dateTimeStart = d.key,
+                            dateTimeEnd = new Date(d.key.getTime() + axisXTimeInterval);
+
+                        emit(this, 'range-updated', dateTimeStart, dateTimeEnd);
                     })
                     .on('mouseover', d => {
                         showTip(barTitle(d));
@@ -319,6 +308,16 @@
                     .delay((d, i) => i * (d.value === 0 ? 0 : (_.isNumber(delay) ? delay : 0)))
                     .attr('y', d => yScale(d.value))
                     .attr('height', d => g_h - yScale(d.value));
+
+                if (!isAxisPathShow) {
+                    axisXLane
+                        .selectAll('.domain')
+                        .attr('display', 'none');
+
+                    axisYLane
+                        .selectAll('.domain')
+                        .attr('display', 'none');
+                }
             },
             getTimeRangeLabel(dateTimeStart, dateTimeEnd) {
                 const FORMAT = 'YYYY-MM-DD HH:mm:ss.SSS';
@@ -356,7 +355,7 @@
     }
 
     .d3-timelion select {
-        height: 32px;
+        height: 38px;
         padding: 5px 15px;
         background-color: #fff;
         background-image: none;
