@@ -43,7 +43,7 @@
                         axisFontWeight = 400,
                         axisFontOpacity = 1,
 
-                        axisXLabel = 'text',
+                        axisXLabel = null,
 
                         axisXLabelFontSize = 12,
                         axisXLabelFontWeight = 400,
@@ -52,7 +52,7 @@
                         backgroundColor = 'rgba(255, 255, 255, 0.125)',
 
                         borderRadius = 0,
-                        borderWidth = 20,
+                        borderWidth = 2,
                         borderColor = 'rgba(0, 0, 0, .125)',
 
                         boundingLineWidth = 2,
@@ -62,12 +62,12 @@
                         currentTimeLineColor = 'rgba(255, 56, 96, 1)'
                     } = this.options,
                     {
-                        axisXLabelHeight = _.isNull(axisXLabel) ? 0 : 30,
+                        axisXLabelLaneHeight = _.isNull(axisXLabel) ? 0 : 30,
                     } = this.options,
                     { left = 0, top = 0, right = 0, bottom = 0 } = this.margin,
                     __offset__  = borderWidth,
-                    g_w = w - left - right - groupLaneWidth,
-                    g_h = h - top - bottom - axisXLaneHeight - axisXLabelHeight,
+                    g_w = w - left - right - groupLaneWidth - 2 * __offset__,
+                    g_h = h - top - bottom - axisXLaneHeight - axisXLabelLaneHeight - 2 * __offset__,
                     groupHeight = g_h / groups.length,
                     [paddingInner, paddingOuter] = selectPaddingInnerOuterY(groupHeight);
 
@@ -82,7 +82,7 @@
 
                 const g = svg
                     .append('g')
-                    .attr('transform', `translate(${left}, ${top})`)
+                    .attr('transform', `translate(${left + __offset__}, ${top + __offset__})`)
                     .attr('width', g_w + groupLaneWidth)
                     .attr('height', g_h);
 
@@ -102,13 +102,13 @@
                     .append('clipPath')
                     .attr('id', 'clip-timeline')
                     .append('rect')
-                    .attr('x', groupLaneWidth + left)
-                    .attr('y', top)
-                    .attr('width', g_w - __offset__)
+                    .attr('x', groupLaneWidth)
+                    .attr('y', 0)
+                    .attr('width', g_w)
                     .attr('height', g_h + axisXLaneHeight);
 
                 svg.append('path')
-                    .attr('d', roundedRect(left + __offset__ / 2, top + __offset__ / 2, g_w + groupLaneWidth - __offset__, g_h + axisXLaneHeight, borderRadius, true, true, true, true))
+                    .attr('d', roundedRect(left + __offset__ / 2, top + __offset__ / 2, g_w + groupLaneWidth + __offset__, g_h + axisXLaneHeight + __offset__, borderRadius, true, true, true, true))
                     .attr('fill', backgroundColor)
                     .attr('stroke', borderColor)
                     .attr('stroke-width', borderWidth)
@@ -117,7 +117,7 @@
                 g.append('line')
                     .attr('class', 'line--y')
                     .attr('x1', groupLaneWidth)
-                    .attr('y1', __offset__)
+                    .attr('y1', 0)
                     .attr('x2', groupLaneWidth)
                     .attr('y2', g_h)
                     .attr('stroke', boundingLineColor)
@@ -132,8 +132,8 @@
                     .attr('stroke-width', boundingLineWidth)
                     .attr('y1', (d, i) => (i + 1) * groupHeight)
                     .attr('y2', (d, i) => (i + 1) * groupHeight)
-                    .attr('x1', __offset__)
-                    .attr('x2', g_w + groupLaneWidth - __offset__);
+                    .attr('x1', 0)
+                    .attr('x2', g_w + groupLaneWidth);
 
                 const xScale = d3.scaleTime()
                     .domain([dateTimeStart, dateTimeEnd])
@@ -149,8 +149,9 @@
                     .tickSize(tickSize)
                     .tickPadding(tickPadding);
 
-                const axisXLane = svg.append('g')
-                    .attr('transform', `translate(${left + groupLaneWidth}, ${top + g_h})`);
+                const axisXLane = svg
+                    .append('g')
+                    .attr('transform', `translate(${left + groupLaneWidth + __offset__}, ${top + g_h + __offset__})`);
 
                 axisXLane
                     .call(xAxis)
@@ -163,14 +164,15 @@
                     .selectAll('path')
                     .attr('display', 'none');
 
-                const axisXLabelLane = svg.append('g')
-                    .attr('transform', `translate(${left},${top + g_h + axisXLaneHeight})`)
+                const axisXLabelLane = svg
+                    .append('g')
+                    .attr('transform', `translate(${left + __offset__},${top + g_h + axisXLaneHeight + __offset__})`)
                     .attr('width', g_w + groupLaneWidth)
-                    .attr('height', axisXLabelHeight);
+                    .attr('height', axisXLabelLaneHeight);
 
                 axisXLabelLane.append('text')
                     .attr('x', (g_w + groupLaneWidth) / 2)
-                    .attr('y', axisXLabelHeight / 2)
+                    .attr('y', axisXLabelLaneHeight / 2)
                     .attr('fill', '#000')
                     .attr('dy', '0.32em')
                     .attr('text-anchor', 'middle')
@@ -254,7 +256,7 @@
                         .attr('class', 'line--reference')
                         .attr('x1', xScale(date))
                         .attr('x2', xScale(date))
-                        .attr('y1', __offset__)
+                        .attr('y1', 0)
                         .attr('y2', g_h)
                         .attr('stroke', currentTimeLineColor)
                         .attr('stroke-width', currentTimeLineWidth)
@@ -272,7 +274,7 @@
                         .attr('clip-path', 'url(#clip-timeline)')
                         .attr('x1', d => xScale(d))
                         .attr('x2', d => xScale(d))
-                        .attr('y1', __offset__)
+                        .attr('y1', 0)
                         .attr('y2', g_h)
                         .attr('stroke', boundingLineColor)
                         .attr('stroke-width', boundingLineWidth)
