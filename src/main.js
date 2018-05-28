@@ -11,6 +11,7 @@ import d3MultiLine from './components/d3MultiLine';
 import d3HorizontalBar from './components/d3HorizontalBar';
 import d3VerticalBar from './components/d3VerticalBar';
 import d3Area from './components/d3Area';
+import d3Tracker from './components/d3Tracker';
 
 const install = (Vue, options = {}) => {
     if (options.store) {
@@ -28,6 +29,7 @@ const install = (Vue, options = {}) => {
     Vue.component(d3HorizontalBar.name, d3HorizontalBar);
     Vue.component(d3VerticalBar.name, d3VerticalBar);
     Vue.component(d3Area.name, d3Area);
+    Vue.component(d3Tracker.name, d3Tracker);
 };
 
 export default {
@@ -48,6 +50,7 @@ export {
     d3Circle,
     d3HorizontalBar,
     d3VerticalBar,
-    d3Area
+    d3Area,
+    d3Tracker
 };
 
