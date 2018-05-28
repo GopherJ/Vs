@@ -189,8 +189,8 @@
                 const g = svg
                     .append('g')
                     .attr('transform', `translate(${left + axisYLabelLaneWidth + axisYLaneWidth}, ${top + __offsetTop__})`)
-                    .attr('width', `${g_w}`)
-                    .attr('height', `${g_h}`);
+                    .attr('width', g_w)
+                    .attr('height', g_h);
 
                 const enter = g.selectAll('rect')
                     .data(data)

@@ -52,7 +52,7 @@
                         backgroundColor = 'rgba(255, 255, 255, 0.125)',
 
                         borderRadius = 0,
-                        borderWidth = 4,
+                        borderWidth = 20,
                         borderColor = 'rgba(0, 0, 0, .125)',
 
                         boundingLineWidth = 2,
@@ -104,11 +104,11 @@
                     .append('rect')
                     .attr('x', groupLaneWidth + left)
                     .attr('y', top)
-                    .attr('width', g_w)
+                    .attr('width', g_w - __offset__)
                     .attr('height', g_h + axisXLaneHeight);
 
                 svg.append('path')
-                    .attr('d', roundedRect(left, top, g_w + groupLaneWidth, g_h + axisXLaneHeight, borderRadius, true, true, true, true))
+                    .attr('d', roundedRect(left + __offset__ / 2, top + __offset__ / 2, g_w + groupLaneWidth - __offset__, g_h + axisXLaneHeight, borderRadius, true, true, true, true))
                     .attr('fill', backgroundColor)
                     .attr('stroke', borderColor)
                     .attr('stroke-width', borderWidth)
@@ -117,7 +117,7 @@
                 g.append('line')
                     .attr('class', 'line--y')
                     .attr('x1', groupLaneWidth)
-                    .attr('y1', __offset__ / 2)
+                    .attr('y1', __offset__)
                     .attr('x2', groupLaneWidth)
                     .attr('y2', g_h)
                     .attr('stroke', boundingLineColor)
@@ -132,8 +132,8 @@
                     .attr('stroke-width', boundingLineWidth)
                     .attr('y1', (d, i) => (i + 1) * groupHeight)
                     .attr('y2', (d, i) => (i + 1) * groupHeight)
-                    .attr('x1', __offset__ / 2)
-                    .attr('x2', g_w + groupLaneWidth - __offset__ / 2);
+                    .attr('x1', __offset__)
+                    .attr('x2', g_w + groupLaneWidth - __offset__);
 
                 const xScale = d3.scaleTime()
                     .domain([dateTimeStart, dateTimeEnd])
@@ -254,7 +254,7 @@
                         .attr('class', 'line--reference')
                         .attr('x1', xScale(date))
                         .attr('x2', xScale(date))
-                        .attr('y1', __offset__ / 2)
+                        .attr('y1', __offset__)
                         .attr('y2', g_h)
                         .attr('stroke', currentTimeLineColor)
                         .attr('stroke-width', currentTimeLineWidth)
@@ -272,7 +272,7 @@
                         .attr('clip-path', 'url(#clip-timeline)')
                         .attr('x1', d => xScale(d))
                         .attr('x2', d => xScale(d))
-                        .attr('y1', __offset__ / 2)
+                        .attr('y1', __offset__)
                         .attr('y2', g_h)
                         .attr('stroke', boundingLineColor)
                         .attr('stroke-width', boundingLineWidth)
