@@ -33,6 +33,9 @@
         <div class="box">
             <d3-area :data="timelionData"></d3-area>
         </div>
+        <div class="box">
+            <d3-tracker :data="sliderData" :height="'200px'"></d3-tracker>
+        </div>
     </div>
 </template>
 
@@ -557,6 +560,13 @@
                         group: 'a',
                         key: new Date(2018, 6, 1),
                         value: 20
+                    }
+                ],
+                sliderData: [
+                    {
+                        from : new Date(2017, 1, 1),
+                        to: new Date(2018, 1,1),
+                        label: 'gps tracker'
                     }
                 ]
             }
