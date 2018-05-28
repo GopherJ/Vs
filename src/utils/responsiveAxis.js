@@ -20,6 +20,7 @@ function responsiveAxisX(axisXLane, axis, scale) {
     }
 }
 
+
 /**
  *
  * make yAxis's number of ticks responsive to container size
