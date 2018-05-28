@@ -30,6 +30,9 @@
         <div class="box">
             <d3-timelion :data="timelionData"></d3-timelion>
         </div>
+        <div class="box">
+            <d3-area :data="timelionData"></d3-area>
+        </div>
     </div>
 </template>
 
