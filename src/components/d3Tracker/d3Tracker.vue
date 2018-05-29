@@ -27,13 +27,18 @@
         mixins: [mixins],
         methods: {
             findPassingEntry(lanes, reference) {
-                const entries = [];
+                const entries = [],
+                    referenceTimestamp = reference.getTime();
+
                 for (let i = 0, l = lanes.length; i < l; i += 1) {
                     const lane = lanes[i];
                     for (let I = 0, L = lane.length; I < L; I += 1) {
                         const entry = lane[I];
                         if (entry instanceof Interval) {
-                            if (reference.getTime() >= entry.from.getTime() && reference.getTime() <= entry.to.getTime()) {
+                            const fromTimestamp = entry.from.getTime(),
+                                toTimestamp = entry.to.getTime();
+
+                            if (referenceTimestamp >= fromTimestamp && referenceTimestamp <= toTimestamp) {
                                 entries.push(entry.id);
                             }
                         }
@@ -331,35 +336,32 @@
                             }
 
                             if (entry instanceof Interval) {
+                                const X = xScale(entry.from),
+                                    W = xScale(entry.to) - xScale(entry.from);
+
                                 g
                                     .append('g')
                                     .attr('class', 'entry')
                                     .attr('clip-path', `url(#${clipPath})`)
                                     .append('path')
                                     .attr('class', `entry--${entry.className ? entry.className : 'default'}`)
-                                    .attr('d', () => {
-                                        const X = xScale(entry.from),
-                                            W = xScale(entry.to) - xScale(entry.from);
+                                    .attr('d', roundedRect(X, Y, W, H, intervalCornerRadius, true, true, true, true));
 
-                                        return roundedRect(X, Y, W, H, intervalCornerRadius, true, true, true, true);
-                                    });
-
-                                g
+                                const text = g
                                     .append('text')
                                     .attr('clip-path', `url(#${clipPath})`)
                                     .attr('class', 'entry entry--label')
                                     .attr('text-anchor', 'middle')
                                     .attr('pointer-events', 'none')
-                                    .attr('x', () => {
-                                        const X = xScale(entry.from),
-                                            W = xScale(entry.to) - xScale(entry.from);
-
-                                        return X + W / 2;
-                                    })
-                                    .attr('y', (Y + H / 2))
+                                    .attr('x', X + W / 2)
+                                    .attr('y', Y + H / 2)
                                     .text(entry.label || null)
                                     .attr('fill', '#fff')
                                     .attr('dy', '0.32em');
+
+                                if (text.node().getComputedTextLength() > W) {
+                                    text.remove();
+                                }
                             }
                         }
                     }
@@ -397,8 +399,9 @@
                                 .attr('x', x + v - overlayWidth / 2);
 
                             self.reference = self.scale.invert(x + v);
+                            const entries = self.findPassingEntry(lanes, self.reference);
 
-                            emit(self, 'reference-updated', self.reference);
+                            emit(self, 'reference-updated', self.reference, entries);
                         }
                     });
                 }
