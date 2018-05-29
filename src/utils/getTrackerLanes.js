@@ -1,9 +1,9 @@
-/* eslint-disable */
+import { isDate, isString } from 'lodash';
+
 /**
  *
  * time entry that represent a point
  *
- * @param {string} group
  * @param {Date} at
  * @param {string} title
  * @param {string} symbol
@@ -11,8 +11,7 @@
  * @constructor
  */
 class Point {
-    constructor(group, at, title, symbol, className) {
-        this.group = group;
+    constructor(at, title, symbol, className) {
         this.at = at;
         this.title = title;
         this.symbol = symbol;
@@ -24,7 +23,6 @@ class Point {
  *
  * time entry that represent a period
  *
- * @param {string} group
  * @param {Date} from
  * @param {Date} to
  * @param {string} label
@@ -33,8 +31,7 @@ class Point {
  * @constructor
  */
 class Interval {
-    constructor (group, from, to, label, title, className) {
-        this.group = group;
+    constructor (from, to, label, title, className) {
         this.from = from;
         this.to = to;
         this.label = label;
@@ -45,67 +42,59 @@ class Interval {
 
 /**
  *
- * get every group's data
+ * transform data to Interval or Point and calculate the dateTimeStart and dateTimeEnd
  *
- * @param data
+ * @param {Array} data
+ * @return {result, dateTimeStart, dateTimeEnd}
  */
-const groupBy = (data) => {
-    const results = {};
+const transform = (data) => {
+    const result = [];
     let dateTimeStart, dateTimeEnd;
 
     for (let i = 0, l = data.length; i < l; i += 1) {
-        const { group, from, to, label, at, title, className, symbol } = data[i];
+        const entry = data[i],
+            { from , to, at, label, title, className, symbol } = entry;
 
-        if ((from > 0) && (to > 0) && label) {
+        if (isDate(from) && isDate(to) && from < to) {
+            result.push(new Interval(from, to, label, title, className));
+
             dateTimeStart = i === 0
                 ? from
                 : (dateTimeStart > from ? from : dateTimeStart);
 
-            dateTimeEnd = i === 0
+            dateTimeEnd = i ===0
                 ? to
                 : (dateTimeEnd < to ? to : dateTimeEnd);
-
-            if (results[group]) {
-                results[group].push(new Interval(group, from, to, label, title, className));
-            }
-
-            else {
-                results[group] = [new Interval(group, from, to, label, title, className)];
-            }
         }
 
-        else if ((at > 0) && title) {
+
+        if (isDate(at)) {
+            result.push(new Point(at, title, symbol, className));
+
             dateTimeStart = i === 0
                 ? at
                 : (dateTimeStart > at ? at : dateTimeStart);
 
-            dateTimeEnd = i === 0
+            dateTimeEnd = i ===0
                 ? at
                 : (dateTimeEnd < at ? at : dateTimeEnd);
-
-            if (results[group]) {
-                results[group].push(new Point(group, at, title, symbol, className));
-            }
-
-            else {
-                results[group] = [new Point(group, at, title, symbol, className)];
-            }
         }
     }
 
     return {
+        result,
         dateTimeStart,
-        dateTimeEnd,
-        results
-    };
+        dateTimeEnd
+    }
 };
 
 
 /**
  * check if two entries collide
  *
- * @param e1
- * @param e2
+ * @param {Interval | Point} e1
+ * @param {Intervval | Point} e2
+ * @return {boolean}
  */
 const isCollided = (e1, e2) => {
     if (e1 === e2) {
@@ -133,7 +122,7 @@ const isCollided = (e1, e2) => {
 /**
  *
  * @param data
- * @returns {*}
+ * @return {void}
  */
 const sort = (data) => {
     return data.sort((a, b) => {
@@ -157,12 +146,13 @@ const sort = (data) => {
 
 /**
  *
- * data is the array of time line entries
+ * chunk result that has been transformed into different lanes
  *
  * @param data
+ * @return {Array}
  */
 const chunk = (data) => {
-    const results = [
+    const lanes = [
         []
     ];
 
@@ -171,22 +161,24 @@ const chunk = (data) => {
     for (let i = 0, l = data.length; i < l; i += 1) {
         const entry = data[i];
 
-        for (let j = 0, L = results.length; j < L; j += 1) {
-            if (results[j].length === 0) {
-                results[j].push(entry);
+        for (let j = 0, L = lanes.length; j < L; j += 1) {
+            const lane = lanes[j];
+
+            if (lane.length === 0) {
+                lane.push(entry);
                 break;
             }
 
-            const lastItem = results[j][results[j].length - 1];
+            const lastEntry = lane[lane.length - 1];
 
-            if (!isCollided(lastItem, entry)) {
-                results[j].push(entry);
+            if (!isCollided(lastEntry, entry)) {
+                lane.push(entry);
                 break;
             }
 
             else {
-                if (j === results.length - 1) {
-                    results.push([entry]);
+                if (j === lanes.length - 1) {
+                    lanes.push([entry]);
                 } else {
                     continue;
                 }
@@ -194,31 +186,32 @@ const chunk = (data) => {
         }
     }
 
-    return results;
+    return lanes;
 };
 
 
 /**
  *
+ * get tracker lanes and dateTimeRange
+ *
  * @param data
+ * @return {data, dateTimeStart, dateTimeEnd}
  */
-const getTimelineGroups = (data) => {
-    const {results, dateTimeStart, dateTimeEnd} = groupBy(data);
+const getTrackerLanes = (data) => {
+    const { result, dateTimeStart, dateTimeEnd } = transform(data);
 
-    return Object.keys(results).reduce((ite, cur) => {
-        ite.data[cur] = chunk(results[cur]);
-        return ite;
-    }, {
+    console.log(JSON.stringify(chunk(result), null, 4))
+
+    return {
+        lanes: chunk(result),
         dateTimeStart,
-        dateTimeEnd,
-        data: {},
-        groups: Object.keys(results)
-    });
+        dateTimeEnd
+    }
 };
 
 
 export {
     Point,
     Interval,
-    getTimelineGroups
+    getTrackerLanes
 };

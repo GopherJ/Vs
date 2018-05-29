@@ -3,46 +3,44 @@
 </template>
 
 <script>
-    import d3 from '../../utils/keybinding';
+    import * as d3 from 'd3';
     import _ from 'lodash';
     import mixins from '../../mixins';
     import { showTip, hideTip } from '../../utils/tooltip';
     import { selectPaddingInnerOuterY } from '../../utils/select';
-    import { Point, Interval, getTimelineGroups } from '../../utils/getTimelineGroups';
+    import { Point, Interval, getTrackerLanes } from '../../utils/getTrackerLanes';
     import roundedRect from '../../utils/roundedRect';
     import emit from '../../utils/emit';
+    import cursor from '../../utils/cursor';
 
     export default {
         name: 'd3-tracker',
         data() {
             return {
                 timer: null,
+                reference: null,
+                scale: null,
                 pause: false,
-                dateTimeStart: null
+                play: null
             }
         },
         mixins: [mixins],
         methods: {
-            drawTimeline() {
+            drawTracker() {
                 const [w, h] = this.getElWidthHeight(),
-                    { dateTimeStart, dateTimeEnd, data, groups } = getTimelineGroups(_.cloneDeep(this.data));
+                    { dateTimeStart, dateTimeEnd, lanes } = getTrackerLanes(_.cloneDeep(this.data)),
+                    self = this;
 
-                this.dateTimeStart = dateTimeStart;
-
-                if (groups.length === 0) {
+                if (lanes.length === 0) {
                     return;
                 }
+
+                self.reference = dateTimeStart;
 
                 const {
                         intervalCornerRadius = 4,
 
                         symbolSize = 400,
-
-                        groupLabelFontSize = 12,
-                        groupLabelFontWeight = 400,
-                        groupLabelFontOpacity = 1,
-
-                        groupLaneWidth = 200,
 
                         tickSize = 10,
                         tickPadding = 8,
@@ -55,9 +53,9 @@
 
                         axisXLabel = null,
 
-                        axisXLabelFontSize = 12,
-                        axisXLabelFontWeight = 400,
-                        axisXLabelFontOpacity = 0.5,
+                        axisLabelFontSize = 12,
+                        axisLabelFontWeight = 400,
+                        axisLabelFontOpacity = 0.5,
 
                         backgroundColor = 'rgba(255, 255, 255, 0.125)',
 
@@ -68,21 +66,23 @@
                         boundingLineWidth = 2,
                         boundingLineColor = 'rgba(0, 0, 0, .125)',
 
-                        currentTimeLineWidth = 2,
-                        currentTimeLineColor = 'rgba(255, 56, 96, 1)',
+                        referenceLineWidth = 4,
+                        referenceLineColor = 'rgba(255, 56, 96, 1)',
 
-                        overlayWidth = 60
+                        overlayWidth = 60,
+
+                        playDuration = 5000
                     } = this.options,
                     {
                         axisXLabelLaneHeight = _.isNull(axisXLabel) ? 0 : 30,
                     } = this.options,
                     { left = 0, top = 0, right = 0, bottom = 0 } = this.margin,
                     __offset__  = borderWidth,
-                    g_w = w - left - right - groupLaneWidth - 2 * __offset__,
+                    g_w = w - left - right - 2 * __offset__,
                     g_h = h - top - bottom - axisXLaneHeight - axisXLabelLaneHeight - 2 * __offset__,
-                    groupHeight = g_h / groups.length,
-                    [paddingInner, paddingOuter] = selectPaddingInnerOuterY(groupHeight),
-                    self = this;
+                    [paddingInner, paddingOuter] = selectPaddingInnerOuterY(g_h),
+                    cursorType = 'pointer',
+                    clipPath = 'clip-tracker';
 
                 if (![g_w, g_h].every(el => el > 0)) {
                     return;
@@ -96,18 +96,6 @@
                 const g = svg
                     .append('g')
                     .attr('transform', `translate(${left + __offset__}, ${top + __offset__})`)
-                    .attr('width', g_w + groupLaneWidth)
-                    .attr('height', g_h);
-
-                const groupLaneContainer = g
-                    .append('g')
-                    .attr('class', 'group--container')
-                    .attr('width', groupLaneWidth)
-                    .attr('height', g_h);
-
-                const entryLaneContainer = g
-                    .append('g')
-                    .attr('class', 'entry--container')
                     .attr('width', g_w)
                     .attr('height', g_h);
 
@@ -115,45 +103,26 @@
                     .append('clipPath')
                     .attr('id', 'clip-tracker')
                     .append('rect')
-                    .attr('x', groupLaneWidth)
+                    .attr('x', 0)
                     .attr('y', 0)
                     .attr('width', g_w)
                     .attr('height', g_h + axisXLaneHeight);
 
                 svg.append('path')
-                    .attr('d', roundedRect(left + __offset__ / 2, top + __offset__ / 2, g_w + groupLaneWidth + __offset__, g_h + axisXLaneHeight + __offset__, borderRadius, true, true, true, true))
+                    .attr('d', roundedRect(left + __offset__ / 2, top + __offset__ / 2, g_w + __offset__, g_h + axisXLaneHeight + __offset__, borderRadius, true, true, true, true))
                     .attr('fill', backgroundColor)
                     .attr('stroke', borderColor)
                     .attr('stroke-width', borderWidth)
                     .attr('pointer-events', 'none');
 
-                g.append('line')
-                    .attr('class', 'line--y')
-                    .attr('x1', groupLaneWidth)
-                    .attr('y1', 0)
-                    .attr('x2', groupLaneWidth)
-                    .attr('y2', g_h)
-                    .attr('stroke', boundingLineColor)
-                    .attr('stroke-width', boundingLineWidth);
-
-                g.selectAll('.line--x')
-                    .data(groups)
-                    .enter()
-                    .append('line')
-                    .attr('class', 'line--x')
-                    .attr('stroke', boundingLineColor)
-                    .attr('stroke-width', boundingLineWidth)
-                    .attr('y1', (d, i) => (i + 1) * groupHeight)
-                    .attr('y2', (d, i) => (i + 1) * groupHeight)
-                    .attr('x1', 0)
-                    .attr('x2', g_w + groupLaneWidth);
-
                 const xScale = d3.scaleTime()
                     .domain([dateTimeStart, dateTimeEnd])
                     .range([0, g_w]);
+                self.scale = xScale;
 
-                const yScale = (i) => d3.scaleBand()
-                    .range([groupHeight * (i + 1), groupHeight * i])
+                const yScale = d3.scaleBand()
+                    .range([g_h, 0])
+                    .domain(Object.keys(lanes))
                     .paddingInner(paddingInner)
                     .paddingOuter(paddingOuter);
 
@@ -164,7 +133,7 @@
 
                 const axisXLane = svg
                     .append('g')
-                    .attr('transform', `translate(${left + groupLaneWidth + __offset__}, ${top + g_h + __offset__})`);
+                    .attr('transform', `translate(${left + __offset__}, ${top + g_h + __offset__})`);
 
                 axisXLane
                     .call(xAxis)
@@ -174,213 +143,125 @@
                     .attr('fill-opacity', axisFontOpacity);
 
                 axisXLane
-                    .selectAll('path')
-                    .attr('display', 'none');
+                    .select('.domain')
+                    .attr('stroke', boundingLineColor)
+                    .attr('stroke-width', boundingLineWidth);
+
+                axisXLane
+                    .selectAll('line')
+                    .attr('stroke', boundingLineColor)
+                    .attr('stroke-width', boundingLineWidth);
 
                 const axisXLabelLane = svg
                     .append('g')
                     .attr('transform', `translate(${left + __offset__},${top + g_h + axisXLaneHeight + __offset__})`)
-                    .attr('width', g_w + groupLaneWidth)
+                    .attr('width', g_w)
                     .attr('height', axisXLabelLaneHeight);
 
-                axisXLabelLane.append('text')
-                    .attr('x', (g_w + groupLaneWidth) / 2)
+                axisXLabelLane
+                    .append('text')
+                    .attr('text-anchor', 'middle')
+                    .attr('x', g_w / 2)
                     .attr('y', axisXLabelLaneHeight / 2)
                     .attr('fill', '#000')
                     .attr('dy', '0.32em')
-                    .attr('text-anchor', 'middle')
                     .text(axisXLabel)
-                    .attr('font-size', axisXLabelFontSize)
-                    .attr('font-weight', axisXLabelFontWeight)
-                    .attr('fill-opacity', axisXLabelFontOpacity);
+                    .attr('font-size', axisLabelFontSize)
+                    .attr('font-weight', axisLabelFontWeight)
+                    .attr('fill-opacity', axisLabelFontOpacity);
 
                 function zooming() {
-                    const t = d3.event.transform.rescaleX(xScale);
+                    const newXScale = d3.event.transform.rescaleX(xScale);
+                    self.scale = newXScale;
 
-                    const axisXLaneElements = axisXLane.selectAll('*');
-                    if (!axisXLaneElements.empty()) axisXLaneElements.remove();
+                    const axisXLaneTicks = axisXLane.selectAll('*');
+                    if (!axisXLaneTicks.empty()) axisXLaneTicks.remove();
 
                     axisXLane
-                        .call(xAxis.scale(t))
+                        .call(xAxis.scale(newXScale))
                         .attr('class', 'axis axis--x')
                         .attr('font-size', axisFontSize)
                         .attr('font-weight', axisFontWeight)
                         .attr('fill-opacity', axisFontOpacity);
 
                     axisXLane
-                        .selectAll('path')
-                        .attr('display', 'none');
+                        .select('.domain')
+                        .attr('stroke', boundingLineColor)
+                        .attr('stroke-width', boundingLineWidth);
 
-                    const entry = entryLaneContainer.selectAll('.entry'),
-                        lineTick = entryLaneContainer.selectAll('.line--tick'),
-                        lineReference = entryLaneContainer.select('.line--reference'),
-                        overlay = entryLaneContainer.select('.overlay');
+                    axisXLane
+                        .selectAll('line')
+                        .attr('stroke', boundingLineColor)
+                        .attr('stroke-width', boundingLineWidth);
 
-                    if (!entry.empty()) entry.remove();
-                    if (!lineTick.empty()) lineTick.remove();
-                    if (!lineReference.empty()) lineReference.remove();
-                    if (!overlay.empty()) overlay.remove();
-
-                    drawTickLines(t);
-                    drawEntries(t);
-                    drawReference(t);
+                    drawTicks(newXScale);
+                    drawEntries(newXScale);
+                    drawReference(newXScale);
                 }
 
                 const zoom = d3.zoom()
-                    .extent([[left + groupLaneWidth, top], [g_w, g_h]])
                     .on('zoom', zooming);
 
-                svg.call(zoom);
-
-                groupLaneContainer.selectAll('.group--lane')
-                    .data(groups)
-                    .enter()
-                    .append('g')
-                    .attr('class', 'group--lane')
-                    .attr('fill', 'none')
-                    .attr('transform', (d, i) => `translate(0, ${i * groupHeight})`)
-                    .attr('width', groupLaneWidth)
-                    .attr('height', groupHeight)
-                    .append('text')
-                    .attr('x', groupLaneWidth / 2)
-                    .attr('y', groupHeight / 2)
-                    .attr('dy', '0.32em')
-                    .attr('text-anchor', 'middle')
-                    .attr('font-size', groupLabelFontSize)
-                    .attr('font-weight', groupLabelFontWeight)
-                    .attr('fill-opacity', groupLabelFontOpacity)
-                    .text(d => d)
-                    .attr('fill', '#000');
-
-                svg.on('mousemove', function () {
-                    const [cx, cy] = d3.mouse(entryLaneContainer.node());
-
-                    if (cx > groupLaneWidth && cx < g_w + groupLaneWidth && cy > 0 && cy < g_h) {
-                        svg.attr('cursor', 'pointer');
-                    }
-
-                    else {
-                        svg.attr('cursor', 'auto');
-                    }
-                });
+                svg
+                    .call(zoom)
+                    .call(cursor, g, g_w, g_h, cursorType);
 
                 function drawReference(xScale) {
-                    const date = self.dateTimeStart.valueOf();
-                    entryLaneContainer
+                    const x = xScale(self.reference);
+
+                    const overlaySelection = g.select('.overlay'),
+                        lineReferenceSelection = g.select('.line--reference');
+
+                    if (!overlaySelection.empty()) overlaySelection.remove();
+                    if (!lineReferenceSelection.empty()) lineReferenceSelection.remove();
+
+                    const line = g
+                        .append('line')
+                        .attr('pointer-events', 'none')
+                        .attr('class', 'line--reference')
+                        .attr('x1', x)
+                        .attr('y1', 0)
+                        .attr('x2', x)
+                        .attr('y2', g_h)
+                        .attr('stroke', referenceLineColor)
+                        .attr('stroke-width', referenceLineWidth);
+
+                    const overlay = g
                         .append('rect')
                         .attr('class', 'overlay')
-                        .attr('x', xScale(date) - overlayWidth / 2)
+                        .attr('pointer-events', 'all')
+                        .attr('fill', 'none')
+                        .attr('x', x - overlayWidth / 2)
                         .attr('y', 0)
                         .attr('width', overlayWidth)
                         .attr('height', g_h)
-                        .attr('fill', 'none')
-                        .attr('clip-path', 'url(#clip-tracker)')
-                        .attr('pointer-events', 'all')
                         .attr('cursor', 'move')
+                        .call(d3.drag()
+                            .on('drag', function() {
+                                  const  x = d3.event.x;
 
-                    const line = entryLaneContainer
-                        .append('line')
-                        .attr('class', 'line--reference')
-                        .attr('x1', xScale(date))
-                        .attr('x2', xScale(date))
-                        .attr('y1', 0)
-                        .attr('y2', g_h)
-                        .attr('stroke', currentTimeLineColor)
-                        .attr('stroke-width', currentTimeLineWidth)
-                        .attr('clip-path', 'url(#clip-tracker)')
-                        .attr('pointer-events', 'none')
+                                  overlay
+                                    .attr('x', x - overlayWidth / 2);
 
-                    entryLaneContainer.on('mousedown', function() {
-                        let [startX] = d3.mouse(entryLaneContainer.node()),
-                            target = d3.event.target;
+                                  line
+                                    .attr('x1', x)
+                                    .attr('x2', x);
 
-                        if (target.tagName === 'rect') {
-
-                            console.log(target.className)
-                            d3.event.stopImmediatePropagation();
-                            const rect = d3.select(target);
-                            svg.on(".zoom", null)
-
-                            svg.attr('cursor', 'move')
-
-                            rect
-                                .call(
-                                    d3.drag()
-                                        .on('drag', function(){
-                                           rect
-                                                .attr('x', d3.event.x);
-                                           line
-                                                .attr('x1', d3.event.x)
-                                                .attr('x2', d3.event.x);
-
-                                                self.dateTimeStart = xScale.invert(d3.event.x)
-                                                svg.attr('cursor', 'move')
-                                        })
-                                        .on('end', function(){
-                                           rect
-                                                .attr('x', d3.event.x);
-                                            line
-                                                .attr('x1', d3.event.x)
-                                                .attr('x2', d3.event.x);
-
-                                            svg.call(zoom)
-
-                                            svg.attr('cursor', 'auto')
-                                        })
-                                )
-                        }
-                    })
+                                  self.reference = xScale.invert(x);
+                            }));
                 }
 
-                // entryLaneContainer.on('dblclick', function() {
-                //     const target = d3.event.target;
-                //     if (target.tagName === 'rect') {
-                //         d3.event.stopImmediatePropagation();
-                //     }
-                // })
+                function drawTicks(xScale) {
+                    const ticks = xScale.ticks(),
+                        ticksSelection = g.selectAll('.line--tick');
+                    if (!ticksSelection.empty()) ticksSelection.remove();
 
-
-                d3.select('body').call(d3
-                    .keybinding()
-                    .on('space', function() {
-                        play(xScale)
-                    })
-                )
-
-                function play(xScale) {
-                    const duration = 10000;
-
-                    let line = entryLaneContainer.select('.line--reference'),
-                        x = parseFloat(line.attr('x1')),
-                        xEnd = xScale(dateTimeEnd),
-                        v = (xEnd - x) / (duration / 16);
-
-                    self.timer = setInterval(function() {
-                        line
-                            .attr('x1', x + v)
-                            .attr('x2', x + v)
-
-                            // self.dateTimeStart = xScale.invert(x + v);
-
-                        x += v;
-                        if (x >= xEnd) {
-                            clearInterval(self.timer);
-
-                            // line
-                            //     .attr('x1', xScale(dateTimeStart))
-                            //     .attr('x2', xScale(dateTimeStart))
-                        }
-                    }, 16)
-                }
-
-                function drawTickLines(xScale) {
-                    const ticks = xScale.ticks().map(el => el.valueOf());
-                    entryLaneContainer.selectAll('.line--tick')
+                    g.selectAll('.line--tick')
                         .data(ticks)
                         .enter()
                         .append('line')
                         .attr('class', 'line--tick')
-                        .attr('clip-path', 'url(#clip-tracker)')
+                        .attr('clip-path', `url(#${clipPath})`)
                         .attr('x1', d => xScale(d))
                         .attr('x2', d => xScale(d))
                         .attr('y1', 0)
@@ -391,92 +272,113 @@
                 }
 
                 function drawEntries(xScale) {
-                    for (let i = 0, l = groups.length; i < l; i += 1) {
-                        const groupData = data[groups[i]];
-                        const scaleAxisY = yScale(i).domain(Object.keys(groupData));
+                    const entriesSelection = g.selectAll('.entry');
+                    if (!entriesSelection.empty()) entriesSelection.remove();
 
-                        for (let j = 0; j < groupData.length; j += 1) {
-                            const Y = scaleAxisY(j.toString()),
-                                H = scaleAxisY.bandwidth(),
-                                entries = groupData[j];
+                    for (let i = 0, l = lanes.length; i < l; i += 1) {
+                        const lane = lanes[i],
+                            Y = yScale(i.toString()), H = yScale.bandwidth();
 
-                            for (let k = 0; k < entries.length; k += 1) {
-                                const entry = entries[k];
+                        const enter = g
+                            .data(lane);
 
-                                if (entry instanceof Point) {
-                                    const G = entryLaneContainer
-                                        .append('g')
-                                        .attr('class', 'entry')
-                                        .attr('clip-path', 'url(#clip-tracker)');
+                        enter
+                            .filter(d => d instanceof Point)
+                            .append('g')
+                            .attr('class', 'entry')
+                            .attr('clip-path', `url(#${clipPath})`)
+                            .append('path')
+                            .attr('transform', d => `translate(${xScale(d.at)}, ${Y + H / 2})`)
+                            .attr('class', d => `entry--${d.className ? d.className : 'default'}`)
+                            .attr('d', d => {
+                                const symbolGen = d3.symbol().size(symbolSize);
 
-                                    const symbolGen = d3.symbol().size(symbolSize);
+                                return symbolGen.type(d3[d.symbol] || d3['symbolCircle'])();
+                            });
 
-                                    const symbol = G.append('path')
-                                        .attr('transform', `translate(${xScale(entry.at)}, ${Y + H / 2})`)
-                                        .attr('class', `${entry.className ? entry.className : 'entry--point--default'}`)
-                                        .attr('d', symbolGen.type(d3[entry.symbol] || d3['symbolCircle'])());
+                        enter
+                            .filter(d => d instanceof Interval)
+                            .append('g')
+                            .attr('class', 'entry')
+                            .attr('clip-path', `url(#${clipPath})`)
+                            .append('path')
+                            .attr('class', d => `entry--${d.className ? d.className : 'default'}`)
+                            .attr('d', (d) => {
+                                const X = xScale(d.from),
+                                    W = xScale(d.to) - xScale(d.from);
 
-                                    symbol
-                                        .on('mouseover', d => {
-                                            showTip(entry.title);
-                                        })
-                                        .on('mouseout', hideTip);
-                                }
+                                return roundedRect(X, Y, W, H, intervalCornerRadius, true, true, true, true);
+                            });
 
-                                else if (entry instanceof Interval) {
-                                    const X = xScale(entry.from),
-                                        W = xScale(entry.to) - X;
+                        enter
+                            .filter(d => d instanceof Interval)
+                            .append('text')
+                            .attr('clip-path', `url(#${clipPath})`)
+                            .attr('class', 'entry entry--label')
+                            .attr('text-anchor', 'middle')
+                            .attr('pointer-events', 'none')
+                            .attr('x', d => {
+                                const X = xScale(d.from),
+                                    W = xScale(d.to) - xScale(d.from);
 
-                                    const G = entryLaneContainer
-                                        .append('g')
-                                        .attr('class', 'entry');
-
-                                    const interval = G.append('path')
-                                        .attr('class', `${entry.className ? entry.className : 'entry--interval--default'}`)
-                                        .attr('d', roundedRect(X, Y, W, H, intervalCornerRadius, true, true, true, true))
-                                        .attr('clip-path', 'url(#clip-tracker)');
-
-                                    if (entry.title) {
-                                        interval
-                                            .on('mouseover', d => {
-                                                showTip(entry.title);
-                                            })
-                                            .on('mouseout', hideTip);
-                                    }
-
-                                    const text = G.append('text')
-                                        .attr('class', 'entry--label')
-                                        .attr('text-anchor', 'middle')
-                                        .attr('pointer-events', 'none')
-                                        .attr('x', (X + W / 2))
-                                        .attr('y', (Y + H / 2))
-                                        .text(entry.label)
-                                        .attr('fill', '#fff')
-                                        .attr('dy', '0.32em')
-                                        .attr('clip-path', 'url(#clip-tracker)');
-
-                                    if (text.node().getComputedTextLength() > W) {
-                                        text.remove();
-                                    }
-                                }
-                            }
-                        }
+                                return X + W / 2;
+                            })
+                            .attr('y', (Y + H / 2))
+                            .text(d => d.label || null)
+                            .attr('fill', '#fff')
+                            .attr('dy', '0.32em');
                     }
                 }
 
-                drawTickLines(xScale);
+                self.play = function play() {
+                    let start = self.scale(dateTimeStart),
+                        end = self.scale(dateTimeEnd),
+                        v = (end - start) / playDuration * 16;
+
+                    self.timer = d3.timer(function(elapsed) {
+                        const line = svg.select('.line--reference'),
+                            x = parseFloat(line.attr('x1'));
+                            end = self.scale(dateTimeEnd);
+
+                        if (x >= end) {
+                            line
+                                .attr('x1', self.scale(dateTimeStart))
+                                .attr('x2', self.scale(dateTimeStart));
+
+                            self.reference = self.scale.invert(self.scale(dateTimeStart));
+                            self.pause = false;
+
+                            self.timer.stop();
+                        } else {
+                            line
+                                .attr('x1', x + v)
+                                .attr('x2', x + v);
+
+                            self.reference = self.scale.invert(x + v);
+                        }
+                    });
+                }
+
+                d3.select('body').on('keypress', () => {
+                    if (d3.event.keyCode === 0) self.pause = !self.pause;
+                });
+
+                drawTicks(xScale);
                 drawEntries(xScale);
                 drawReference(xScale);
-
-
-                // play(xScale);
             },
             safeDraw() {
                 this.ifExistsSvgThenRemove();
-                this.drawTimeline();
+                this.drawTracker();
             },
             onResize() {
                 this.safeDraw();
+            }
+        },
+        watch: {
+            pause(n, o) {
+                if (n) this.play();
+                if (!n) this.timer.stop();
             }
         }
     }
@@ -497,70 +399,35 @@
         cursor: pointer;
     }
 
-    .d3-tracker .entry--interval--default {
+    .d3-tracker .entry--default {
         fill:#896bda;
         stroke: #896bda;
         stroke-opacity: 1;
         cursor: pointer;
     }
 
-    .d3-tracker .entry--point--default {
-        fill:#896bda;
-        stroke: #896bda;
-        stroke-opacity: 1;
-        cursor: pointer;
-    }
-
-    .d3-tracker .entry--interval--error {
+    .d3-tracker .entry--error {
         fill: #ff3860;;
         stroke: #ff3860;
         stroke-opacity: 1;
         cursor: pointer;
     }
 
-    .d3-tracker .entry--point--error {
-        fill: #ff3860;;
-        stroke: #ff3860;
-        stroke-opacity: 1;
-        cursor: pointer;
-    }
-
-    .d3-tracker .entry--interval--success {
+    .d3-tracker .entry--success {
         fill: #23d160;;
         stroke: #23d160;
         stroke-opacity: 1;
         cursor: pointer;
     }
 
-    .d3-tracker .entry--point--success {
-        fill: #23d160;;
-        stroke: #23d160;
-        stroke-opacity: 1;
-        cursor: pointer;
-    }
-
-    .d3-tracker .entry--interval--info {
+    .d3-tracker .entry--info {
         fill: #167df0;;
         stroke: #167df0;
         stroke-opacity: 1;
         cursor: pointer;
     }
 
-    .d3-tracker .entry--point--info {
-        fill: #167df0;;
-        stroke: #167df0;
-        stroke-opacity: 1;
-        cursor: pointer;
-    }
-
-    .d3-tracker .entry--interval--warn {
-        fill: #ffdd57;;
-        stroke: #ffdd57;
-        stroke-opacity: 1;
-        cursor: pointer;
-    }
-
-    .d3-tracker .entry--point--warn {
+    .d3-tracker .entry--warn {
         fill: #ffdd57;;
         stroke: #ffdd57;
         stroke-opacity: 1;
