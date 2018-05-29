@@ -26,6 +26,22 @@
         },
         mixins: [mixins],
         methods: {
+            findPassingEntry(lanes, reference) {
+                const entries = [];
+                for (let i = 0, l = lanes.length; i < l; i += 1) {
+                    const lane = lanes[i];
+                    for (let I = 0, L = lane.length; I < L; I += 1) {
+                        const entry = lane[I];
+                        if (entry instanceof Interval) {
+                            if (reference.getTime() >= entry.from.getTime() && reference.getTime() <= entry.to.getTime()) {
+                                entries.push(entry.id);
+                            }
+                        }
+                    }
+                }
+
+                return entries;
+            },
             drawTracker() {
                 const [w, h] = this.getElWidthHeight(),
                     { dateTimeStart, dateTimeEnd, lanes } = getTrackerLanes(_.cloneDeep(this.data)),
@@ -71,7 +87,9 @@
 
                         overlayWidth = 60,
 
-                        playDuration = 5000
+                        playDuration = 5000,
+
+                        frequency = 100
                     } = this.options,
                     {
                         axisXLabelLaneHeight = _.isNull(axisXLabel) ? 0 : 30,
@@ -144,6 +162,13 @@
 
                 axisXLane
                     .select('.domain')
+                    .attr('display', 'none');
+                axisXLane
+                    .append('line')
+                    .attr('x1', 0)
+                    .attr('y1', 0)
+                    .attr('x2', g_w)
+                    .attr('y2', 0)
                     .attr('stroke', boundingLineColor)
                     .attr('stroke-width', boundingLineWidth);
 
@@ -186,8 +211,15 @@
 
                     axisXLane
                         .select('.domain')
-                        .attr('stroke', boundingLineColor)
-                        .attr('stroke-width', boundingLineWidth);
+                        .attr('display', 'none');
+                    axisXLane
+                    .append('line')
+                    .attr('x1', 0)
+                    .attr('y1', 0)
+                    .attr('x2', g_w)
+                    .attr('y2', 0)
+                    .attr('stroke', boundingLineColor)
+                    .attr('stroke-width', boundingLineWidth);
 
                     axisXLane
                         .selectAll('line')
@@ -247,7 +279,10 @@
                                     .attr('x1', x)
                                     .attr('x2', x);
 
-                                  self.reference = xScale.invert(x);
+                                  self.reference = self.scale.invert(x);
+                                  const entries = self.findPassingEntry(lanes, self.reference);
+
+                                  emit(self, 'reference-updated', self.reference, entries);
                             }));
                 }
 
@@ -337,6 +372,7 @@
 
                     self.timer = d3.timer(function(elapsed) {
                         const line = svg.select('.line--reference'),
+                            overlay = svg.select('.overlay'),
                             x = parseFloat(line.attr('x1'));
                             end = self.scale(dateTimeEnd);
 
@@ -344,6 +380,9 @@
                             line
                                 .attr('x1', self.scale(dateTimeStart))
                                 .attr('x2', self.scale(dateTimeStart));
+
+                            overlay
+                                .attr('x', self.scale(dateTimeStart) - overlayWidth / 2)
 
                             self.reference = self.scale.invert(self.scale(dateTimeStart));
                             self.pause = false;
@@ -354,7 +393,12 @@
                                 .attr('x1', x + v)
                                 .attr('x2', x + v);
 
+                            overlay
+                                .attr('x', x + v - overlayWidth / 2);
+
                             self.reference = self.scale.invert(x + v);
+
+                            emit(self, 'reference-updated', self.reference);
                         }
                     });
                 }

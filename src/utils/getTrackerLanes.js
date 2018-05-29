@@ -8,14 +8,16 @@ import { isDate, isString } from 'lodash';
  * @param {string} title
  * @param {string} symbol
  * @param {string} className
+ * @param {any} id
  * @constructor
  */
 class Point {
-    constructor(at, title, symbol, className) {
+    constructor(at, title, symbol, className, id) {
         this.at = at;
         this.title = title;
         this.symbol = symbol;
         this.className = className;
+        this.id = id;
     }
 }
 
@@ -28,15 +30,17 @@ class Point {
  * @param {string} label
  * @param {string} title
  * @param {string} className
+ * @param {any} id
  * @constructor
  */
 class Interval {
-    constructor (from, to, label, title, className) {
+    constructor (from, to, label, title, className, id) {
         this.from = from;
         this.to = to;
         this.label = label;
         this.title = title;
         this.className = className;
+        this.id = id;
     }
 }
 
@@ -53,10 +57,10 @@ const transform = (data) => {
 
     for (let i = 0, l = data.length; i < l; i += 1) {
         const entry = data[i],
-            { from , to, at, label, title, className, symbol } = entry;
+            { from , to, at, label, title, className, symbol, id } = entry;
 
         if (isDate(from) && isDate(to) && from < to) {
-            result.push(new Interval(from, to, label, title, className));
+            result.push(new Interval(from, to, label, title, className, id));
 
             dateTimeStart = i === 0
                 ? from
@@ -69,7 +73,7 @@ const transform = (data) => {
 
 
         if (isDate(at)) {
-            result.push(new Point(at, title, symbol, className));
+            result.push(new Point(at, title, symbol, className, id));
 
             dateTimeStart = i === 0
                 ? at
@@ -199,8 +203,6 @@ const chunk = (data) => {
  */
 const getTrackerLanes = (data) => {
     const { result, dateTimeStart, dateTimeEnd } = transform(data);
-
-    console.log(JSON.stringify(chunk(result), null, 4))
 
     return {
         lanes: chunk(result),
