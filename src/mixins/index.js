@@ -38,6 +38,11 @@ export default {
         getElWidthHeight() {
             return [this.$el.clientWidth, this.$el.clientHeight];
         },
+        getChildElWidthHeight(selector) {
+            const childNode = this.$el.querySelector(selector);
+
+            return [this.$el.clientWidth - childNode.clientWidth, childNode.clientHeight];
+        },
         getSelectionWidthHeight(selection) {
             return [
                 selection.node().getBBox().width,

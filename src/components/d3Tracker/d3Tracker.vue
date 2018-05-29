@@ -20,7 +20,7 @@
                 timer: null,
                 reference: null,
                 scale: null,
-                pause: false,
+                pause: true,
                 play: null
             }
         },
@@ -88,8 +88,6 @@
                         overlayWidth = 60,
 
                         playDuration = 5000,
-
-                        frequency = 100
                     } = this.options,
                     {
                         axisXLabelLaneHeight = _.isNull(axisXLabel) ? 0 : 30,
@@ -100,7 +98,8 @@
                     g_h = h - top - bottom - axisXLaneHeight - axisXLabelLaneHeight - 2 * __offset__,
                     [paddingInner, paddingOuter] = selectPaddingInnerOuterY(g_h),
                     cursorType = 'pointer',
-                    clipPath = 'clip-tracker';
+                    clipPath = 'clip-tracker',
+                    isFirefox = typeof InstallTrigger !== 'undefined';
 
                 if (![g_w, g_h].every(el => el > 0)) {
                     return;
@@ -314,54 +313,55 @@
                         const lane = lanes[i],
                             Y = yScale(i.toString()), H = yScale.bandwidth();
 
-                        const enter = g
-                            .data(lane);
+                        for (let I = 0, L = lane.length; I < L; I += 1) {
+                            const entry = lane[I];
+                            if (entry instanceof Point) {
+                                g
+                                    .append('g')
+                                    .attr('class', 'entry')
+                                    .attr('clip-path', `url(#${clipPath})`)
+                                    .append('path')
+                                    .attr('transform', `translate(${xScale(entry.at)}, ${Y + H / 2})`)
+                                    .attr('class', `entry--${entry.className ? entry.className : 'default'}`)
+                                    .attr('d', () => {
+                                        const symbolGen = d3.symbol().size(symbolSize);
 
-                        enter
-                            .filter(d => d instanceof Point)
-                            .append('g')
-                            .attr('class', 'entry')
-                            .attr('clip-path', `url(#${clipPath})`)
-                            .append('path')
-                            .attr('transform', d => `translate(${xScale(d.at)}, ${Y + H / 2})`)
-                            .attr('class', d => `entry--${d.className ? d.className : 'default'}`)
-                            .attr('d', d => {
-                                const symbolGen = d3.symbol().size(symbolSize);
+                                        return symbolGen.type(d3[entry.symbol] || d3['symbolCircle'])();
+                                    });
+                            }
 
-                                return symbolGen.type(d3[d.symbol] || d3['symbolCircle'])();
-                            });
+                            if (entry instanceof Interval) {
+                                g
+                                    .append('g')
+                                    .attr('class', 'entry')
+                                    .attr('clip-path', `url(#${clipPath})`)
+                                    .append('path')
+                                    .attr('class', `entry--${entry.className ? entry.className : 'default'}`)
+                                    .attr('d', () => {
+                                        const X = xScale(entry.from),
+                                            W = xScale(entry.to) - xScale(entry.from);
 
-                        enter
-                            .filter(d => d instanceof Interval)
-                            .append('g')
-                            .attr('class', 'entry')
-                            .attr('clip-path', `url(#${clipPath})`)
-                            .append('path')
-                            .attr('class', d => `entry--${d.className ? d.className : 'default'}`)
-                            .attr('d', (d) => {
-                                const X = xScale(d.from),
-                                    W = xScale(d.to) - xScale(d.from);
+                                        return roundedRect(X, Y, W, H, intervalCornerRadius, true, true, true, true);
+                                    });
 
-                                return roundedRect(X, Y, W, H, intervalCornerRadius, true, true, true, true);
-                            });
+                                g
+                                    .append('text')
+                                    .attr('clip-path', `url(#${clipPath})`)
+                                    .attr('class', 'entry entry--label')
+                                    .attr('text-anchor', 'middle')
+                                    .attr('pointer-events', 'none')
+                                    .attr('x', () => {
+                                        const X = xScale(entry.from),
+                                            W = xScale(entry.to) - xScale(entry.from);
 
-                        enter
-                            .filter(d => d instanceof Interval)
-                            .append('text')
-                            .attr('clip-path', `url(#${clipPath})`)
-                            .attr('class', 'entry entry--label')
-                            .attr('text-anchor', 'middle')
-                            .attr('pointer-events', 'none')
-                            .attr('x', d => {
-                                const X = xScale(d.from),
-                                    W = xScale(d.to) - xScale(d.from);
-
-                                return X + W / 2;
-                            })
-                            .attr('y', (Y + H / 2))
-                            .text(d => d.label || null)
-                            .attr('fill', '#fff')
-                            .attr('dy', '0.32em');
+                                        return X + W / 2;
+                                    })
+                                    .attr('y', (Y + H / 2))
+                                    .text(entry.label || null)
+                                    .attr('fill', '#fff')
+                                    .attr('dy', '0.32em');
+                            }
+                        }
                     }
                 }
 
@@ -385,7 +385,7 @@
                                 .attr('x', self.scale(dateTimeStart) - overlayWidth / 2)
 
                             self.reference = self.scale.invert(self.scale(dateTimeStart));
-                            self.pause = false;
+                            self.pause = true;
 
                             self.timer.stop();
                         } else {
@@ -403,9 +403,15 @@
                     });
                 }
 
-                d3.select('body').on('keypress', () => {
-                    if (d3.event.keyCode === 0) self.pause = !self.pause;
-                });
+                if (isFirefox) {
+                    d3.select('body').on('keypress', () => {
+                        if (d3.event.keyCode === 0 && d3.event.key !== 'c') self.pause = !self.pause;
+                    });
+                } else {
+                    d3.select('body').on('keydown', () => {
+                        if (d3.event.keyCode === 32) self.pause = !self.pause;
+                    });
+                }
 
                 drawTicks(xScale);
                 drawEntries(xScale);
@@ -421,8 +427,8 @@
         },
         watch: {
             pause(n, o) {
-                if (n) this.play();
-                if (!n) this.timer.stop();
+                if (n) this.timer.stop();
+                if (!n) this.play();
             }
         }
     }
