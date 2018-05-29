@@ -11,7 +11,6 @@
     import { Point, Interval, getTrackerLanes } from '../../utils/getTrackerLanes';
     import roundedRect from '../../utils/roundedRect';
     import emit from '../../utils/emit';
-    import cursor from '../../utils/cursor';
 
     export default {
         name: 'd3-tracker',
@@ -102,9 +101,7 @@
                     g_w = w - left - right - 2 * __offset__,
                     g_h = h - top - bottom - axisXLaneHeight - axisXLabelLaneHeight - 2 * __offset__,
                     [paddingInner, paddingOuter] = selectPaddingInnerOuterY(g_h),
-                    cursorType = 'pointer',
-                    clipPath = 'clip-tracker',
-                    isFirefox = typeof InstallTrigger !== 'undefined';
+                    isFirefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
 
                 if (![g_w, g_h].every(el => el > 0)) {
                     return;
@@ -239,8 +236,19 @@
                     .on('zoom', zooming);
 
                 svg
-                    .call(zoom)
-                    .call(cursor, g, g_w, g_h, cursorType);
+                    .call(zoom);
+
+                svg.on('mousemove', function () {
+                    const [cx, cy] = d3.mouse(g.node());
+
+                    if (cx > 0 && cx < g_w && cy > 0 && cy < g_h) {
+                        svg.attr('cursor', 'pointer');
+                    }
+
+                    else {
+                        svg.attr('cursor', 'auto');
+                    }
+                });
 
                 function drawReference(xScale) {
                     const x = xScale(self.reference);
@@ -300,7 +308,7 @@
                         .enter()
                         .append('line')
                         .attr('class', 'line--tick')
-                        .attr('clip-path', `url(#${clipPath})`)
+                        .attr('clip-path', `url(#clip-tracker)`)
                         .attr('x1', d => xScale(d))
                         .attr('x2', d => xScale(d))
                         .attr('y1', 0)
@@ -321,10 +329,10 @@
                         for (let I = 0, L = lane.length; I < L; I += 1) {
                             const entry = lane[I];
                             if (entry instanceof Point) {
-                                g
+                                const point = g
                                     .append('g')
                                     .attr('class', 'entry')
-                                    .attr('clip-path', `url(#${clipPath})`)
+                                    .attr('clip-path', `url(#clip-tracker)`)
                                     .append('path')
                                     .attr('transform', `translate(${xScale(entry.at)}, ${Y + H / 2})`)
                                     .attr('class', `entry--${entry.className ? entry.className : 'default'}`)
@@ -332,24 +340,40 @@
                                         const symbolGen = d3.symbol().size(symbolSize);
 
                                         return symbolGen.type(d3[entry.symbol] || d3['symbolCircle'])();
-                                    });
+                                    })
+
+                                if (entry.title) {
+                                    point
+                                        .on('mouseover', () => {
+                                            showTip(entry.title);
+                                        })
+                                        .on('mouseout', hideTip);
+                                }
                             }
 
                             if (entry instanceof Interval) {
                                 const X = xScale(entry.from),
                                     W = xScale(entry.to) - xScale(entry.from);
 
-                                g
+                                const interval = g
                                     .append('g')
                                     .attr('class', 'entry')
-                                    .attr('clip-path', `url(#${clipPath})`)
+                                    .attr('clip-path', `url(#clip-tracker)`)
                                     .append('path')
                                     .attr('class', `entry--${entry.className ? entry.className : 'default'}`)
                                     .attr('d', roundedRect(X, Y, W, H, intervalCornerRadius, true, true, true, true));
 
+                                if (entry.title) {
+                                    interval
+                                        .on('mouseover', () => {
+                                            showTip(entry.title);
+                                        })
+                                        .on('mouseout', hideTip);
+                                }
+
                                 const text = g
                                     .append('text')
-                                    .attr('clip-path', `url(#${clipPath})`)
+                                    .attr('clip-path', `url(#clip-tracker)`)
                                     .attr('class', 'entry entry--label')
                                     .attr('text-anchor', 'middle')
                                     .attr('pointer-events', 'none')
@@ -384,7 +408,7 @@
                                 .attr('x2', self.scale(dateTimeStart));
 
                             overlay
-                                .attr('x', self.scale(dateTimeStart) - overlayWidth / 2)
+                                .attr('x', self.scale(dateTimeStart) - overlayWidth / 2);
 
                             self.reference = self.scale.invert(self.scale(dateTimeStart));
                             self.pause = true;
@@ -408,7 +432,7 @@
 
                 if (isFirefox) {
                     d3.select('body').on('keypress', () => {
-                        if (d3.event.keyCode === 0 && d3.event.key !== 'c') self.pause = !self.pause;
+                        if (d3.event.keyCode === 0 && d3.event.key !== 'C') self.pause = !self.pause;
                     });
                 } else {
                     d3.select('body').on('keydown', () => {
