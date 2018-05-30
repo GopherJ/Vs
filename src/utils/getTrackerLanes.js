@@ -1,4 +1,5 @@
 import { isDate, isString } from 'lodash';
+import moment from 'moment';
 
 /**
  *
@@ -202,6 +203,14 @@ const chunk = (data) => {
  * @return {data, dateTimeStart, dateTimeEnd}
  */
 const getTrackerLanes = (data) => {
+    if (data.length === 0) {
+        return {
+            lanes: [[]],
+            dateTimeStart: moment().startOf('days'),
+            dateTimeEnd: moment().endOf('days')
+        };
+    }
+
     const { result, dateTimeStart, dateTimeEnd } = transform(data);
 
     return {

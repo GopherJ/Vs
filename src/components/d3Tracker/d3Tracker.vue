@@ -11,6 +11,7 @@
     import { Point, Interval, getTrackerLanes } from '../../utils/getTrackerLanes';
     import roundedRect from '../../utils/roundedRect';
     import emit from '../../utils/emit';
+    import { brushX } from '../../utils/brush';
 
     export default {
         name: 'd3-tracker',
@@ -65,9 +66,8 @@
             },
             drawTracker() {
                 const [w, h] = this.getElWidthHeight(),
-                    { dateTimeStart, dateTimeEnd, lanes } = getTrackerLanes(_.cloneDeep(this.data)),
                     self = this;
-                if (lanes.length === 0) return;
+                const { dateTimeStart, dateTimeEnd, lanes } = getTrackerLanes(_.cloneDeep(this.data));
 
                 const {
                         intervalCornerRadius = 4,
@@ -127,6 +127,29 @@
                     .attr('width', w)
                     .attr('height', h);
 
+                const xScale = d3.scaleTime()
+                    .domain([dateTimeStart, dateTimeEnd])
+                    .range([0, g_w]);
+                self.scale = xScale;
+
+                const yScale = d3.scaleBand()
+                    .range([g_h, 0])
+                    .domain(Object.keys(lanes))
+                    .paddingInner(paddingInner)
+                    .paddingOuter(paddingOuter);
+
+                const xAxis = d3
+                    .axisBottom(xScale)
+                    .tickSize(tickSize)
+                    .tickPadding(tickPadding);
+
+                const extent = [
+                    [left + __offset__, top + __offset__],
+                    [w - right - __offset__, h - axisXLaneHeight - __offset__ - axisXLabelLaneHeight]
+                ];
+
+                svg.call(brushX.bind(self), extent, xScale, lanes);
+
                 const g = svg
                     .append('g')
                     .attr('transform', `translate(${left + __offset__}, ${top + __offset__})`)
@@ -148,22 +171,6 @@
                     .attr('stroke', borderColor)
                     .attr('stroke-width', borderWidth)
                     .attr('pointer-events', 'none');
-
-                const xScale = d3.scaleTime()
-                    .domain([dateTimeStart, dateTimeEnd])
-                    .range([0, g_w]);
-                self.scale = xScale;
-
-                const yScale = d3.scaleBand()
-                    .range([g_h, 0])
-                    .domain(Object.keys(lanes))
-                    .paddingInner(paddingInner)
-                    .paddingOuter(paddingOuter);
-
-                const xAxis = d3
-                    .axisBottom(xScale)
-                    .tickSize(tickSize)
-                    .tickPadding(tickPadding);
 
                 const axisXLane = svg
                     .append('g')
@@ -440,7 +447,7 @@
                             self.reference = self.scale.invert(x + v);
                             const entries = self.findPassingEntries(lanes);
 
-                           emit(self, 'reference-updated', self.getTimeRange(dateTimeStart, dateTimeEnd), entries);
+                            emit(self, 'reference-updated', self.getTimeRange(dateTimeStart, dateTimeEnd), entries);
                         }
                     });
                 }

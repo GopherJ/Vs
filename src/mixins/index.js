@@ -107,7 +107,7 @@ export default {
         }
     },
     mounted() {
-        if (!this.safeDraw || this.data.length === 0) {
+        if (!this.safeDraw) {
             return;
         }
 
