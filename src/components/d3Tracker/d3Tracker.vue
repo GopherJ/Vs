@@ -25,14 +25,31 @@
         },
         mixins: [mixins],
         methods: {
-            findPassingEntry(lanes, reference) {
+            getTimeRange(dateTimeStart, dateTimeEnd) {
+                const reference = this.reference;
+
+                if (reference > dateTimeStart && reference < dateTimeEnd) {
+                    return [dateTimeStart, reference];
+                }
+
+                if (reference > dateTimeEnd) {
+                    return [dateTimeStart, reference];
+                }
+
+                if (reference < dateTimeStart) {
+                    return [reference, dateTimeEnd];
+                }
+            },
+            findPassingEntries(lanes) {
                 const entries = [],
-                    referenceTimestamp = reference.getTime();
+                    referenceTimestamp = this.reference.getTime();
 
                 for (let i = 0, l = lanes.length; i < l; i += 1) {
                     const lane = lanes[i];
+
                     for (let I = 0, L = lane.length; I < L; I += 1) {
                         const entry = lane[I];
+
                         if (entry instanceof Interval) {
                             const fromTimestamp = entry.from.getTime(),
                                 toTimestamp = entry.to.getTime();
@@ -50,12 +67,7 @@
                 const [w, h] = this.getElWidthHeight(),
                     { dateTimeStart, dateTimeEnd, lanes } = getTrackerLanes(_.cloneDeep(this.data)),
                     self = this;
-
-                if (lanes.length === 0) {
-                    return;
-                }
-
-                self.reference = dateTimeStart;
+                if (lanes.length === 0) return;
 
                 const {
                         intervalCornerRadius = 4,
@@ -92,6 +104,8 @@
                         overlayWidth = 60,
 
                         playDuration = 5000,
+
+                        frequency = 10000
                     } = this.options,
                     {
                         axisXLabelLaneHeight = _.isNull(axisXLabel) ? 0 : 30,
@@ -102,6 +116,7 @@
                     g_h = h - top - bottom - axisXLaneHeight - axisXLabelLaneHeight - 2 * __offset__,
                     [paddingInner, paddingOuter] = selectPaddingInnerOuterY(g_h),
                     isFirefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
+                self.reference = dateTimeStart;
 
                 if (![g_w, g_h].every(el => el > 0)) {
                     return;
@@ -292,9 +307,9 @@
                                     .attr('x2', x);
 
                                   self.reference = self.scale.invert(x);
-                                  const entries = self.findPassingEntry(lanes, self.reference);
+                                  const entries = self.findPassingEntries(lanes);
 
-                                  emit(self, 'reference-updated', self.reference, entries);
+                                 emit(self, 'reference-updated', self.getTimeRange(dateTimeStart, dateTimeEnd), entries);
                             }));
                 }
 
@@ -394,7 +409,7 @@
                 self.play = function play() {
                     let start = self.scale(dateTimeStart),
                         end = self.scale(dateTimeEnd),
-                        v = (end - start) / playDuration * 16;
+                        v = (end - start) / playDuration;
 
                     self.timer = d3.timer(function(elapsed) {
                         const line = svg.select('.line--reference'),
@@ -423,9 +438,9 @@
                                 .attr('x', x + v - overlayWidth / 2);
 
                             self.reference = self.scale.invert(x + v);
-                            const entries = self.findPassingEntry(lanes, self.reference);
+                            const entries = self.findPassingEntries(lanes);
 
-                            emit(self, 'reference-updated', self.reference, entries);
+                           emit(self, 'reference-updated', self.getTimeRange(dateTimeStart, dateTimeEnd), entries);
                         }
                     });
                 }
