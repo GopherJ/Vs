@@ -205,12 +205,11 @@ const chunk = (data) => {
 const getTrackerLanes = (data) => {
     if (data.length === 0) {
         return {
-            lanes: [[]],
             dateTimeStart: moment().startOf('days'),
-            dateTimeEnd: moment().endOf('days')
+            dateTimeEnd: moment().endOf('days'),
+            lanes: [[]]
         };
     }
-
     const { result, dateTimeStart, dateTimeEnd } = transform(data);
 
     return {

@@ -11,7 +11,7 @@
     import { Point, Interval, getTrackerLanes } from '../../utils/getTrackerLanes';
     import roundedRect from '../../utils/roundedRect';
     import emit from '../../utils/emit';
-    import { brushX } from '../../utils/brush';
+    // import { brushX } from '../../utils/brush';
 
     export default {
         name: 'd3-tracker',
@@ -104,8 +104,6 @@
                         overlayWidth = 60,
 
                         playDuration = 5000,
-
-                        frequency = 10000
                     } = this.options,
                     {
                         axisXLabelLaneHeight = _.isNull(axisXLabel) ? 0 : 30,
@@ -143,12 +141,12 @@
                     .tickSize(tickSize)
                     .tickPadding(tickPadding);
 
-                const extent = [
-                    [left + __offset__, top + __offset__],
-                    [w - right - __offset__, h - axisXLaneHeight - __offset__ - axisXLabelLaneHeight]
-                ];
+                // const extent = [
+                //     [left + __offset__, top + __offset__],
+                //     [w - right - __offset__, h - axisXLaneHeight - __offset__ - axisXLabelLaneHeight]
+                // ];
 
-                svg.call(brushX.bind(self), extent, xScale, lanes);
+                // svg.call(brushX.bind(self), extent, xScale);
 
                 const g = svg
                     .append('g')
@@ -416,7 +414,7 @@
                 self.play = function play() {
                     let start = self.scale(dateTimeStart),
                         end = self.scale(dateTimeEnd),
-                        v = (end - start) / playDuration;
+                        v = (end - start) / playDuration * 16;
 
                     self.timer = d3.timer(function(elapsed) {
                         const line = svg.select('.line--reference'),
@@ -449,16 +447,32 @@
 
                             emit(self, 'reference-updated', self.getTimeRange(dateTimeStart, dateTimeEnd), entries);
                         }
-                    });
+                    }, 16);
                 }
 
                 if (isFirefox) {
                     d3.select('body').on('keypress', () => {
-                        if (d3.event.keyCode === 0 && d3.event.key !== 'C') self.pause = !self.pause;
+                        const ev = d3.event;
+                        if (!(ev.keyCode === 0 && ev.key !== 'C')) return;
+
+                        if (ev.target === document.body) {
+                            ev.preventDefault();
+                        }
+
+                        self.pause = !self.pause;
                     });
                 } else {
                     d3.select('body').on('keydown', () => {
-                        if (d3.event.keyCode === 32) self.pause = !self.pause;
+                        const ev = d3.event;
+                        if (ev.keyCode !== 32) {
+                            return;
+                        }
+
+                        if (ev.target === document.body) {
+                            ev.preventDefault();
+                        }
+
+                        self.pause = !self.pause;
                     });
                 }
 
