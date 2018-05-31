@@ -41,6 +41,9 @@
                     return [reference, dateTimeEnd];
                 }
             },
+            pause() {
+                this.pause = !this.pause;
+            },
             findPassingEntries(lanes) {
                 const entries = [],
                     referenceTimestamp = this.reference.getTime();
@@ -261,9 +264,9 @@
                     .call(zoom);
 
                 svg.on('mousemove', function () {
-                    const [cx, cy] = d3.mouse(g.node());
+                    const [cx, cy] = d3.mouse(axisXLane.node());
 
-                    if (cx > 0 && cx < g_w && cy > 0 && cy < g_h) {
+                    if (cx > 0 && cx < g_w && cy > 0 && cy < axisXLaneHeight) {
                         svg.attr('cursor', 'pointer');
                     }
 
@@ -455,7 +458,7 @@
                 if (isFirefox) {
                     d3.select('body').on('keypress', () => {
                         const ev = d3.event;
-                        if (!(ev.keyCode === 0 && ev.key !== 'C')) return;
+                        if (ev.keyCode !== 0 || ev.shiftKey || ev.ctrlKey || ev.altKey) return;
 
                         if (ev.target === document.body) {
                             ev.preventDefault();
@@ -466,9 +469,7 @@
                 } else {
                     d3.select('body').on('keydown', () => {
                         const ev = d3.event;
-                        if (ev.keyCode !== 32) {
-                            return;
-                        }
+                        if (ev.keyCode !== 32) return;
 
                         if (ev.target === document.body) {
                             ev.preventDefault();

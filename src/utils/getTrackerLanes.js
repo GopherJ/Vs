@@ -205,8 +205,8 @@ const chunk = (data) => {
 const getTrackerLanes = (data) => {
     if (data.length === 0) {
         return {
-            dateTimeStart: moment().startOf('days'),
-            dateTimeEnd: moment().endOf('days'),
+            dateTimeStart: moment().startOf('month'),
+            dateTimeEnd: moment().endOf('month'),
             lanes: [[]]
         };
     }
