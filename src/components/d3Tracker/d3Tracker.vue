@@ -11,7 +11,7 @@
     import { Point, Interval, getTrackerLanes } from '../../utils/getTrackerLanes';
     import roundedRect from '../../utils/roundedRect';
     import emit from '../../utils/emit';
-    // import { brushX } from '../../utils/brush';
+    import { brushX } from '../../utils/brush';
 
     export default {
         name: 'd3-tracker',
@@ -103,7 +103,7 @@
 
                         overlayWidth = 60,
 
-                        playDuration = 5000,
+                        playDuration = 10000,
                     } = this.options,
                     {
                         axisXLabelLaneHeight = _.isNull(axisXLabel) ? 0 : 30,
@@ -141,12 +141,12 @@
                     .tickSize(tickSize)
                     .tickPadding(tickPadding);
 
-                // const extent = [
-                //     [left + __offset__, top + __offset__],
-                //     [w - right - __offset__, h - axisXLaneHeight - __offset__ - axisXLabelLaneHeight]
-                // ];
+                const extent = [
+                    [left + __offset__, top + __offset__],
+                    [w - right - __offset__, h - axisXLaneHeight - __offset__ - axisXLabelLaneHeight]
+                ];
 
-                // svg.call(brushX.bind(self), extent, xScale);
+                svg.call(brushX.bind(self), extent, self.scale);
 
                 const g = svg
                     .append('g')
@@ -219,6 +219,8 @@
                 function zooming() {
                     const newXScale = d3.event.transform.rescaleX(xScale);
                     self.scale = newXScale;
+
+                    svg.call(brushX.bind(self), extent, self.scale);
 
                     const axisXLaneTicks = axisXLane.selectAll('*');
                     if (!axisXLaneTicks.empty()) axisXLaneTicks.remove();

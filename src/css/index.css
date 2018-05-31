@@ -27,6 +27,7 @@
     color: #fff;
     border-radius: 2px;
     pointer-events: none;
+    z-index: 9999999;
 }
 
 /* Creates a small triangle extender for the tooltip */
@@ -45,6 +46,7 @@
     -o-transform: translate(-50%, 0);
     transform: translate(-50%, 0);
     pointer-events: none;
+    z-index: 9999999;
 }
 
 

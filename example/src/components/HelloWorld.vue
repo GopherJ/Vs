@@ -10,7 +10,7 @@
         <d3-horizontal-bar :data="multiLineData"></d3-horizontal-bar>
         </div>
         <div class="box">
-        <d3-vertical-bar :data="multiLineData" @range-updated="(args) => console(args)"></d3-vertical-bar>
+        <d3-vertical-bar :data="multiLineData" @range-updated="(...args) => console(args)"></d3-vertical-bar>
         </div>
         <div class="box">
         <d3-circle :data="0.3"></d3-circle>
@@ -34,7 +34,7 @@
             <d3-area :data="timelionData"></d3-area>
         </div>
         <div class="box">
-            <d3-tracker :data="sliderData" :height="'200px'"></d3-tracker>
+            <d3-tracker :data="sliderData" :height="'200px'" @reference-updated="(...x) => console(x)" @range-updated="(...x) => console(x)"></d3-tracker>
         </div>
     </div>
 </template>
@@ -564,15 +564,39 @@
                 ],
                 sliderData: [
                     {
-                        from : new Date(2017, 1, 1),
-                        to: new Date(2018, 1,1),
-                        label: 'gps tracker'
+                        from : new Date(2018, 1, 1),
+                        to: new Date(2018, 1,2),
+                        label: 'gps tracker',
+                        id: 1,
+                        title: 'a'
+                    },
+
+                    {
+                        from : new Date(2018, 1, 1),
+                        to: new Date(2018, 1,2),
+                        label: 'gps tracker',
+                        id: 2,
+                        title: 'b'
+                    },
+
+                    {
+                        from : new Date(2018, 1, 2),
+                        to: new Date(2018, 1,3),
+                        label: 'gps tracker',
+                        id: 3,
+                        title: 'c'
+                    },
+                    {
+                        at : new Date(2018,1, 1, 12),
+                        id: 4,
+                        title: 'd'
                     }
-                ]
+                ],
+
             }
         },
         methods:{
-            console(...args) {
+            console(args) {
                 console.log(args)
             }
         }
