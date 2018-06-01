@@ -14,8 +14,10 @@ import emit from './emit';
  * @return {void}
  */
 function brushX(svg, extent, scale, data, brushing) {
-    const b = svg.append('g')
-        .attr('class', 'brush');
+    const brushSelection = svg.select('.brush');
+    let b = !brushSelection.empty()
+        ? brushSelection
+        : svg.append('g').attr('class', 'brush');
 
     const brush = d3.brushX();
 

@@ -34,7 +34,10 @@
             <d3-area :data="timelionData"></d3-area>
         </div>
         <div class="box">
-            <d3-tracker :data="sliderData" :height="'200px'" @reference-updated="(...x) => console(x)" @range-updated="(...x) => console(x)"></d3-tracker>
+            <d3-tracker ref="tracker" :data="sliderData" :height="'200px'" @reference-updated="(...x) => console(x)" @range-updated="(...x) => console(x)"></d3-tracker>
+        </div>
+        <div class="box">
+            <button class="button" @click="$refs.tracker.setPause()">skjqlwj</button>
         </div>
     </div>
 </template>
@@ -44,6 +47,43 @@
         name: 'HelloWorld',
         data() {
             return {
+                trackerData2:  [
+    {
+        "id": "e53b8392adbef393",
+        "from": "2018-05-25T06:43:47.861Z",
+        "to": "2018-05-25T08:19:59.110Z",
+        "title": "Fri May 25 2018 08:00:00 GMT+0200 (Romance Daylight Time)<br>2376",
+        "label": "e53b8392adbef393"
+    },
+    {
+        "id": "e53b8392adbef393",
+        "from": "2018-05-25T09:15:41.006Z",
+        "to": "2018-05-25T09:18:17.530Z",
+        "title": "Fri May 25 2018 10:30:00 GMT+0200 (Romance Daylight Time)<br>176",
+        "label": "e53b8392adbef393"
+    },
+    {
+        "id": "e53b8392adbef393",
+        "from": "2018-05-25T11:35:35.627Z",
+        "to": "2018-05-25T13:04:39.897Z",
+        "title": "Fri May 25 2018 13:00:00 GMT+0200 (Romance Daylight Time)<br>482",
+        "label": "e53b8392adbef393"
+    },
+    {
+        "id": "e53b8392adbef393",
+        "from": "2018-05-25T13:30:54.431Z",
+        "to": "2018-05-25T15:47:06.449Z",
+        "title": "Fri May 25 2018 15:30:00 GMT+0200 (Romance Daylight Time)<br>119",
+        "label": "e53b8392adbef393"
+    },
+    {
+        "id": "e53b8392adbef393",
+        "from": "2018-05-25T16:02:49.980Z",
+        "to": "2018-05-25T16:45:33.502Z",
+        "title": "Fri May 25 2018 18:00:00 GMT+0200 (Romance Daylight Time)<br>81",
+        "label": "e53b8392adbef393"
+    }
+],
                 metricData: 40000,
                 timelionData:
                     [
@@ -598,6 +638,9 @@
         methods:{
             console(args) {
                 console.log(args)
+            },
+            t() {
+                console.log(this.$refs.tracker)
             }
         }
     }
