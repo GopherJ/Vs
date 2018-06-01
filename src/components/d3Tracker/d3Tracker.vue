@@ -41,7 +41,7 @@
                     return [reference, dateTimeEnd];
                 }
             },
-            pause() {
+            setPause() {
                 this.pause = !this.pause;
             },
             findPassingEntries(lanes) {

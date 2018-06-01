@@ -125,7 +125,8 @@ const isCollided = (e1, e2) => {
     }
 
     else if (e1 instanceof Interval && e2 instanceof Interval) {
-        return e2.from <= e1.to || e1.from <= e2.to;
+        return (e2.from <= e1.to && e2.to >= e1.to)
+            || (e1.from <= e2.to && e1.to >= e2.to);
     }
 };
 

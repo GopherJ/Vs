@@ -107,19 +107,20 @@ const isCollided = (e1, e2) => {
     }
 
     if (e1 instanceof Point && e2 instanceof Interval) {
-        return e1.at >= e2.from && e1.at <= e2.to;
+        return e1.at.valueOf() >= e2.from.valueOf() && e1.at.valueOf() <= e2.to.valueOf();
     }
 
     else if (e1 instanceof Interval && e2 instanceof Point) {
-        return e2.at >= e1.from && e2.at <= e1.to;
+        return e2.at.valueOf() >= e1.from.valueOf() && e2.at.valueOf() <= e1.to.valueOf();
     }
 
     else if (e1 instanceof Point && e2 instanceof Point) {
-        return e1.at === e2.at;
+        return e1.at.valueOf() === e2.at.valueOf();
     }
 
     else if (e1 instanceof Interval && e2 instanceof Interval) {
-        return e2.from <= e1.to || e1.from <= e2.to;
+        return (e2.from.valueOf() <= e1.to.valueOf() && e2.to.valueOf() >= e1.to.valueOf())
+            || (e1.from.valueOf() <= e2.to.valueOf() && e1.to.valueOf() >= e2.to.valueOf());
     }
 };
 
@@ -211,6 +212,7 @@ const getTrackerLanes = (data) => {
         };
     }
     const { result, dateTimeStart, dateTimeEnd } = transform(data);
+    console.log(data)
 
     return {
         lanes: chunk(result),
