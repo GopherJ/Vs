@@ -29,10 +29,6 @@
             getTimeRange(dateTimeStart, dateTimeEnd) {
                 const reference = this.reference;
 
-                if (reference > dateTimeStart && reference < dateTimeEnd) {
-                    return [dateTimeStart, reference];
-                }
-
                 if (reference > dateTimeEnd) {
                     return [dateTimeStart, reference];
                 }
@@ -40,6 +36,8 @@
                 if (reference < dateTimeStart) {
                     return [reference, dateTimeEnd];
                 }
+
+                return [dateTimeStart, reference];
             },
             setPause() {
                 this.pause = !this.pause;
@@ -54,13 +52,15 @@
                     for (let I = 0, L = lane.length; I < L; I += 1) {
                         const entry = lane[I];
 
-                        if (entry instanceof Interval) {
-                            const fromTimestamp = entry.from.getTime(),
-                                toTimestamp = entry.to.getTime();
+                        if (entry instanceof Point) {
+                            continue;
+                        }
 
-                            if (referenceTimestamp >= fromTimestamp && referenceTimestamp <= toTimestamp) {
-                                entries.push(entry.id);
-                            }
+                        const fromTimestamp = entry.from.getTime(),
+                            toTimestamp = entry.to.getTime();
+
+                        if (referenceTimestamp >= fromTimestamp && referenceTimestamp <= toTimestamp) {
+                            entries.push(entry);
                         }
                     }
                 }
@@ -128,6 +128,15 @@
                     .attr('width', w)
                     .attr('height', h);
 
+                svg.append('defs')
+                    .append('clipPath')
+                    .attr('id', 'clip-tracker')
+                    .append('rect')
+                    .attr('x', 0)
+                    .attr('y', 0)
+                    .attr('width', g_w)
+                    .attr('height', g_h + axisXLaneHeight);
+
                 const xScale = d3.scaleTime()
                     .domain([dateTimeStart, dateTimeEnd])
                     .range([0, g_w]);
@@ -144,30 +153,8 @@
                     .tickSize(tickSize)
                     .tickPadding(tickPadding);
 
-                const extent = [
-                    [left + __offset__, top + __offset__],
-                    [w - right - __offset__, h - axisXLaneHeight - __offset__ - axisXLabelLaneHeight]
-                ];
-
-                svg.call(brushX.bind(self), extent, self.scale);
-
-                const g = svg
-                    .append('g')
-                    .attr('transform', `translate(${left + __offset__}, ${top + __offset__})`)
-                    .attr('width', g_w)
-                    .attr('height', g_h);
-
-                svg.append('defs')
-                    .append('clipPath')
-                    .attr('id', 'clip-tracker')
-                    .append('rect')
-                    .attr('x', 0)
-                    .attr('y', 0)
-                    .attr('width', g_w)
-                    .attr('height', g_h + axisXLaneHeight);
-
                 svg.append('path')
-                    .attr('d', roundedRect(left + __offset__ / 2, top + __offset__ / 2, g_w + __offset__, g_h + axisXLaneHeight + __offset__, borderRadius, true, true, true, true))
+                    .attr('d', roundedRect(left + __offset__ / 2, top + __offset__ / 2, g_w + __offset__, g_h + axisXLaneHeight + axisXLabelLaneHeight +  __offset__, borderRadius, true, true, true, true))
                     .attr('fill', backgroundColor)
                     .attr('stroke', borderColor)
                     .attr('stroke-width', borderWidth)
@@ -185,16 +172,13 @@
                     .attr('fill-opacity', axisFontOpacity);
 
                 axisXLane
-                    .select('.domain')
-                    .attr('display', 'none');
-                axisXLane
                     .append('line')
                     .attr('x1', 0)
                     .attr('y1', 0)
                     .attr('x2', g_w)
                     .attr('y2', 0)
                     .attr('stroke', boundingLineColor)
-                    .attr('stroke-width', boundingLineWidth);
+                    .attr('stroke-width', boundingLineWidth)
 
                 axisXLane
                     .selectAll('line')
@@ -219,6 +203,19 @@
                     .attr('font-weight', axisLabelFontWeight)
                     .attr('fill-opacity', axisLabelFontOpacity);
 
+                const extent = [
+                    [left + __offset__, top + __offset__],
+                    [w - right - __offset__, h - axisXLaneHeight - __offset__ - axisXLabelLaneHeight]
+                ];
+
+                svg.call(brushX.bind(self), extent, self.scale);
+
+                const g = svg
+                    .append('g')
+                    .attr('transform', `translate(${left + __offset__}, ${top + __offset__})`)
+                    .attr('width', g_w)
+                    .attr('height', g_h);
+
                 function zooming() {
                     const newXScale = d3.event.transform.rescaleX(xScale);
                     self.scale = newXScale;
@@ -236,16 +233,13 @@
                         .attr('fill-opacity', axisFontOpacity);
 
                     axisXLane
-                        .select('.domain')
-                        .attr('display', 'none');
-                    axisXLane
-                    .append('line')
-                    .attr('x1', 0)
-                    .attr('y1', 0)
-                    .attr('x2', g_w)
-                    .attr('y2', 0)
-                    .attr('stroke', boundingLineColor)
-                    .attr('stroke-width', boundingLineWidth);
+                        .append('line')
+                        .attr('x1', 0)
+                        .attr('y1', 0)
+                        .attr('x2', g_w)
+                        .attr('y2', 0)
+                        .attr('stroke', boundingLineColor)
+                        .attr('stroke-width', boundingLineWidth);
 
                     axisXLane
                         .selectAll('line')
@@ -259,7 +253,6 @@
 
                 const zoom = d3.zoom()
                     .on('zoom', zooming);
-
                 svg
                     .call(zoom);
 
@@ -288,6 +281,7 @@
                         .append('line')
                         .attr('pointer-events', 'none')
                         .attr('class', 'line--reference')
+                        .attr('clip-path', `url(#clip-tracker)`)
                         .attr('x1', x)
                         .attr('y1', 0)
                         .attr('x2', x)
@@ -299,6 +293,7 @@
                         .append('rect')
                         .attr('class', 'overlay')
                         .attr('pointer-events', 'all')
+                        .attr('clip-path', `url(#clip-tracker)`)
                         .attr('fill', 'none')
                         .attr('x', x - overlayWidth / 2)
                         .attr('y', 0)
@@ -421,9 +416,12 @@
                         end = self.scale(dateTimeEnd),
                         v = (end - start) / playDuration * 16;
 
+
                     self.timer = d3.timer(function(elapsed) {
                         const line = svg.select('.line--reference'),
-                            overlay = svg.select('.overlay'),
+                            overlay = svg.select('.overlay');
+
+                        const
                             x = parseFloat(line.attr('x1'));
                             end = self.scale(dateTimeEnd);
 
@@ -505,6 +503,10 @@
 
     .d3-tracker path {
         cursor: pointer;
+    }
+
+    .d3-tracker .axis.axis--x .domain {
+        display: none;
     }
 
     .d3-tracker text {

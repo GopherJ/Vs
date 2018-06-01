@@ -212,7 +212,6 @@ const getTrackerLanes = (data) => {
         };
     }
     const { result, dateTimeStart, dateTimeEnd } = transform(data);
-    console.log(data)
 
     return {
         lanes: chunk(result),
