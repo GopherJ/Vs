@@ -1,6 +1,6 @@
 {
   "name": "d3-vs",
-  "version": "0.2.6",
+  "version": "0.2.7",
   "description": "d3 visualisation with vuejs",
   "main": "dist/Vs.min.js",
   "scripts": {
@@ -30,6 +30,7 @@
     "document-offset": "^1.0.4",
     "lodash": "^4.17.5",
     "moment": "^2.22.0",
+    "npm": "^6.1.0",
     "vue": "^2.5.13"
   },
   "devDependencies": {
