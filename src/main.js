@@ -16,6 +16,8 @@ import d3Slider from './components/d3Slider';
 import d3ICicle from './components/d3ICicle';
 import d3Sunburst from './components/d3Sunburst';
 import d3Tree from './components/d3Tree';
+import d3Pack from './components/d3Pack';
+import d3Cluster from './components/d3Cluster';
 
 const install = (Vue, options = {}) => {
     if (options.store) {
@@ -38,6 +40,8 @@ const install = (Vue, options = {}) => {
     Vue.component(d3ICicle.name, d3ICicle);
     Vue.component(d3Sunburst.name, d3Sunburst);
     Vue.component(d3Tree.name, d3Tree);
+    Vue.component(d3Pack.name, d3Pack);
+    Vue.component(d3Cluster.name, d3Cluster);
 };
 
 export default {
@@ -63,6 +67,8 @@ export {
     d3Slider,
     d3ICicle,
     d3Sunburst,
-    d3Tree
+    d3Tree,
+    d3Pack,
+    d3Cluster
 };
 
