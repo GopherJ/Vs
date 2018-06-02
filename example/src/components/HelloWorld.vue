@@ -50,6 +50,9 @@
         <div class="box">
             <d3-sunburst :data="icicleData"></d3-sunburst>
         </div>
+        <div class="box">
+            <d3-tree :data="icicleData"></d3-tree>
+        </div>
     </div>
 </template>
 
