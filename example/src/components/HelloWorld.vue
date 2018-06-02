@@ -39,6 +39,11 @@
         <div class="box">
             <button class="button" @click="$refs.tracker.setPause()">skjqlwj</button>
         </div>
+        <div class="box">
+            <d3-slider :min="new Date(2017, 1, 1)" :max="new Date(2018, 1, 1)" @drag-end="(...x) => console(x)"></d3-slider>
+            <d3-slider min="brown" max="steelblue" @drag-end="(...x) => console(x)"></d3-slider>
+            <d3-slider :min="1" :max="10" @drag-end="(...x) => console(x)"></d3-slider>
+        </div>
     </div>
 </template>
 

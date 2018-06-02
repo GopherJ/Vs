@@ -217,6 +217,7 @@
                     .attr('height', g_h);
 
                 function zooming() {
+                    console.log(d3.event.transform)
                     const newXScale = d3.event.transform.rescaleX(xScale);
                     self.scale = newXScale;
 
@@ -458,9 +459,7 @@
                         const ev = d3.event;
                         if (ev.keyCode !== 0 || ev.shiftKey || ev.ctrlKey || ev.altKey) return;
 
-                        if (ev.target === document.body) {
-                            ev.preventDefault();
-                        }
+                        if (ev.target === document.body) ev.preventDefault();
 
                         self.pause = !self.pause;
                     });
@@ -469,9 +468,7 @@
                         const ev = d3.event;
                         if (ev.keyCode !== 32) return;
 
-                        if (ev.target === document.body) {
-                            ev.preventDefault();
-                        }
+                        if (ev.target === document.body) ev.preventDefault();
 
                         self.pause = !self.pause;
                     });
