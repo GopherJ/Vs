@@ -9,7 +9,7 @@
     import { showTip, hideTip } from '../../utils/tooltip';
 
     export default {
-        name: 'd3-icicle',
+        name: 'd3-sunburst',
         mixins: [mixins],
         methods: {
             drawSunburst() {

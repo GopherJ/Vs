@@ -48,7 +48,7 @@
             <d3-icicle :data="icicleData"> </d3-icicle>
         </div>
         <div class="box">
-            <d3-suburst :data="icicleData"></d3-suburst>
+            <d3-sunburst :data="icicleData"></d3-sunburst>
         </div>
     </div>
 </template>
