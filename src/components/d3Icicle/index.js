@@ -1,3 +1,3 @@
-import d3Icicle from './d3Icicle';
+import d3ICicle from './d3ICicle';
 
-export default d3Icicle;
+export default d3ICicle;

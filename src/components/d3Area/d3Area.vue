@@ -9,6 +9,7 @@
     import { showTip, hideTip } from '../../utils/tooltip';
     import { selectTicksNumY } from '../../utils/select';
     import { brushX } from '../../utils/brush';
+    import isAxisTime from '../../utils/isAxisTime';
 
     export default {
         name: 'd3-area',
@@ -48,7 +49,7 @@
 
                         negative = false,
 
-                        nice = false,
+                        nice = true,
 
                         axisYTickFormat = '.2s'
                     } = this.options,

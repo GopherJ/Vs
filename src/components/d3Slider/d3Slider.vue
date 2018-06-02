@@ -129,8 +129,8 @@
                     const trackInset = g
                         .append('line')
                         .attr('class', 'track track--inset')
-                        .attr('x1', trackInsetStrokeWidth / 2)
-                        .attr('x2', g_w - trackInsetStrokeWidth)
+                        .attr('x1', trackStrokeWidth / 2)
+                        .attr('x2', g_w - trackStrokeWidth)
                         .attr('y1', g_h - circleRadius - circleStrokeWidth / 2)
                         .attr('y2', g_h - circleRadius - circleStrokeWidth / 2)
                         .attr('stroke', trackInsetStroke)
