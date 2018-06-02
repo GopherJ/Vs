@@ -44,6 +44,12 @@
             <d3-slider min="brown" max="steelblue" @drag-end="(...x) => console(x)"></d3-slider>
             <d3-slider :min="1" :max="10" @drag-end="(...x) => console(x)"></d3-slider>
         </div>
+        <div class="box">
+            <d3-icicle :data="icicleData"> </d3-icicle>
+        </div>
+        <div class="box">
+            <d3-suburst :data="icicleData"></d3-suburst>
+        </div>
     </div>
 </template>
 
@@ -52,6 +58,32 @@
         name: 'HelloWorld',
         data() {
             return {
+                icicleData: {
+  "key": "A1",
+  "children": [
+    {
+      "key": "B1",
+      "children": [
+        {
+          "key": "C1",
+          "value": 100
+        },
+        {
+          "key": "C2",
+          "value": 300
+        },
+        {
+          "key": "C3",
+          "value": 200
+        }
+      ]
+    },
+    {
+      "key": "B2",
+      "value": 200
+    }
+  ]
+},
                 trackerData2:  [
     {
         "id": "e53b8392adbef393",

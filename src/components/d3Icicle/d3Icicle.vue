@@ -89,11 +89,17 @@
                     .attr('fill', d => schemeCategory20(d.data.key))
                     .attr('fill-opacity', fillOpacity)
                     .attr('stroke-opacity', strokeOpacity)
+                    .on('mouseover', d => {
+                        showTip(rectTitle(d));
+                    })
+                    .on('mouseout', hideTip)
                     .select(function() {
                         return d3.select(this.parentNode)
                             .append('text')
                             .node();
                     })
+                    .attr('text-anchor', 'middle')
+                    .attr('pointer-events', 'none')
                     .attr('x', d => (d.x0 + d.x1) / 2)
                     .attr('y', d => (d.y0 + d.y1) / 2)
                     .attr('dy', '0.32em')

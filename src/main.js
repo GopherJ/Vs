@@ -13,7 +13,8 @@ import d3VerticalBar from './components/d3VerticalBar';
 import d3Area from './components/d3Area';
 import d3Tracker from './components/d3Tracker';
 import d3Slider from './components/d3Slider';
-import d3ICicle from './components/d3ICicle'
+import d3ICicle from './components/d3ICicle';
+import d3Sunburst from './components/d3Sunburst';
 
 const install = (Vue, options = {}) => {
     if (options.store) {
@@ -34,6 +35,7 @@ const install = (Vue, options = {}) => {
     Vue.component(d3Tracker.name, d3Tracker);
     Vue.component(d3Slider.name, d3Slider);
     Vue.component(d3ICicle.name, d3ICicle);
+    Vue.component(d3Sunburst.name, d3Sunburst);
 };
 
 export default {
@@ -57,6 +59,7 @@ export {
     d3Area,
     d3Tracker,
     d3Slider,
-    d3ICicle
+    d3ICicle,
+    d3Sunburst
 };
 
