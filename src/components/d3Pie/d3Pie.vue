@@ -14,11 +14,8 @@
         methods: {
             drawPie() {
                 const data = _.cloneDeep(this.data);
-                const [w, h] = this.getElWidthHeight();
 
-                if (data.length === 0 || ![w, h].every(el => el > 0)) {
-                    return;
-                }
+                const [w, h] = this.getElWidthHeight();
 
                 const {
                         left = 0,
@@ -65,14 +62,14 @@
 
                 const svg = d3.select(this.$el)
                     .append('svg')
-                    .attr('width', `${w}`)
-                    .attr('height', `${h}`);
+                    .attr('width', w)
+                    .attr('height', h);
 
                 const g = svg
                     .append('g')
                     .attr('transform', `translate(${left},${top})`)
-                    .attr('width', `${g_w}`)
-                    .attr('height', `${g_h}`)
+                    .attr('width', g_w)
+                    .attr('height', g_h)
                     .append('g')
                     .attr('transform', `translate(${g_w / 2},${g_h / 2})`);
 
@@ -109,8 +106,8 @@
 
                 paths
                     .transition()
-                    .duration(animationDuration)
-                    .delay((d, i) => delay * i)
+                    .duration(_.isNumber(animationDuration) ? animationDuration : 0)
+                    .delay((d,i) => (_.isNumber(delay) ? delay : 0) * i)
                     .attrTween('d', d => {
                         const startAngle = d.startAngle,
                               interpolate = d3.interpolate({endAngle: startAngle}, d);
@@ -130,8 +127,8 @@
                     .attr('pointer-events', 'none')
                     .attr('fill-opacity', 0)
                     .transition()
-                    .duration(animationDuration)
-                    .delay((d,i) => delay * i)
+                    .duration(_.isNumber(animationDuration) ? animationDuration : 0)
+                    .delay((d,i) => (_.isNumber(delay) ? delay : 0) * i)
                     .attr('fill-opacity', arcLabelFontOpacity)
                     .text(arcLabel)
                     .attr('font-size', arcLabelFontSize)
