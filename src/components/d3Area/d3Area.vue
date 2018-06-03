@@ -10,6 +10,7 @@
     import { selectTicksNumY } from '../../utils/select';
     import { brushX } from '../../utils/brush';
     import isAxisTime from '../../utils/isAxisTime';
+    import { responsiveAxisX } from '../../utils/responsiveAxis';
 
     export default {
         name: 'd3-area',
@@ -135,6 +136,9 @@
                         .attr('font-size', axisFontSize)
                         .attr('font-weight', axisFontWeight)
                         .attr('opacity', aixsFontOpacity);
+
+                    axisXLane
+                        .call(responsiveAxisX, xAxis, xScale)
 
                     const axisXLabelLane = svg
                         .append('g')

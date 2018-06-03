@@ -5,11 +5,12 @@
 <script>
     import * as d3 from 'd3';
     import { isNumber, isDate, isString, debounce } from 'lodash';
+    import isValidColor from '../../utils/isValidColor';
+    import emit from '../../utils/emit';
+    import axisShow from '../../utils/axisShow';
     import { showTip, hideTip } from '../../utils/tooltip';
     import { lastTickTextAnchorEnd, firstTickTextAnchorStart } from '../../utils/textAnchor';
-    import isValidColor from '../../utils/isValidColor';
-    import axisShow from '../../utils/axisShow';
-    import emit from '../../utils/emit';
+    import { responsiveAxisX } from '../../utils/responsiveAxis'
 
     export default {
         name: 'd3-slider',
@@ -190,6 +191,7 @@
                         .call(xAxis)
                         .call(firstTickTextAnchorStart)
                         .call(lastTickTextAnchorEnd)
+                        .call(responsiveAxisX, xAxis, xScale)
                         .call(axisShow, false, false)
                         .attr('font-size', axisFontSize)
                         .attr('opacity', axisFontOpacity)
@@ -203,13 +205,19 @@
 
                     function hueTween(x) {
                         const hueError = hueTarget - hueActual;
-                        if (Math.abs(hueError) < 1e-3) hueActual = hueTarget, hueTimer.stop();
+                        if (Math.abs(hueError) < 1e-3) {
+                            hueActual = hueTarget, hueTimer.stop();
+
+                            emit(self, 'drag-end', isAxisColor
+                                ? d3.interpolate(min, max)((hueActual - hueMin) / (hueMax - hueMin))
+                                : xScale.invert(hueActual));
+                        }
                         else hueActual += hueAlpha * hueError;
 
                         circle
                             .attr('cx', hueActual);
 
-                        emit(self, 'drag-end', isAxisColor
+                        emit(self, 'dragging', isAxisColor
                             ? d3.interpolate(min, max)((hueActual - hueMin) / (hueMax - hueMin))
                             : xScale.invert(hueActual));
                     };
@@ -219,7 +227,6 @@
                         hueTarget = x;
                         hueTimer.restart(hueTween);
                     };
-
 
                     const trackOverlay = g
                         .append('rect')

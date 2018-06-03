@@ -10,7 +10,7 @@ import { hasOverlapX, hasOverlapY } from './hasOverlap';
  */
 function responsiveAxisX(axisXLane, axis, scale) {
     let ticks = axisXLane.selectAll('.tick');
-    let scaleDomain = scale.domain();
+    let scaleDomain = scale.invert ? scale.ticks() : scale.domain();
 
     while (hasOverlapX(ticks)) {
         scaleDomain = scaleDomain.filter((d, i) => !(i % 2));
@@ -31,7 +31,7 @@ function responsiveAxisX(axisXLane, axis, scale) {
  */
 function responsiveAxisY(axisYLane, axis, scale) {
     let ticks = axisYLane.selectAll('.tick');
-    let scaleDomain = scale.domain();
+    let scaleDomain = scale.invert ? scale.ticks() : scale.domain();
 
     while (hasOverlapY(ticks)) {
         scaleDomain = scaleDomain.filter((d, i) => !(i % 2));
