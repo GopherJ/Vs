@@ -76,6 +76,12 @@
                     .innerRadius(d => d.y0)
                     .outerRadius(d => d.y1);
 
+                const label = d3.arc()
+                    .startAngle(d => d.x0)
+                    .endAngle(d => d.x1)
+                    .innerRadius(d => (d.y0 + d.y1) / 2)
+                    .outerRadius(d => (d.y0 + d.y1) / 2);
+
                 const partition = d3.partition()
                     .size([2 * Math.PI, r]);
 
@@ -94,17 +100,15 @@
                     .attr('stroke-opacity', strokeOpacity)
                     .on('mouseover', showTip(arcTitle))
                     .on('mouseout', hideTip)
-                    // .select(function() {
-                    //     return d3.select(this.parentNode)
-                    //         .append('text')
-                    //         .node();
-                    // })
-                    // .attr('text-anchor', 'middle')
-                    // .attr('pointer-events', 'none')
-                    // .attr('x', d => (d.x0 + d.x1) / 2)
-                    // .attr('y', d => (d.y0 + d.y1) / 2)
-                    // .attr('dy', '0.32em')
-                    // .text(d => d.data.key);
+                    .select(function() {
+                        return d3.select(this.parentNode)
+                            .append('text').node();
+                    })
+                    .attr('text-anchor', 'middle')
+                    .attr('pointer-events', 'none')
+                    .attr('transform', d => `translate(${label.centroid(d)})`)
+                    .attr('dy', '0.32em')
+                    .text(d => d.data.key);
             },
             safeDraw() {
                 this.ifExistsSvgThenRemove();

@@ -22,7 +22,7 @@
                     bottom = 0
                 } = this.margin,
                 {
-                    circleTitle = d => `${d.data.value}`,
+                    circleTitle = d => `${d.data.key}<br>${d.data.value}`,
 
                     circleFill = '#6eadc1',
                     circleStroke = '#6eadc1',
@@ -84,14 +84,20 @@
                     .attr('cx', d => d.x)
                     .attr('cy', d => d.y)
                     .attr('r', d => d.r)
-                    .attr('fill', circleFill)
-                    .attr('stroke', circleStroke)
+                    .attr('fill', d => schemeCategory20(d.data.key))
+                    .attr('stroke', d => schemeCategory20(d.data.key))
                     .attr('fill-opacity', circleFillOpacity)
                     .attr('stroke-opacity', circleStrokeOpacity)
-                    .on('mouseover', d => {
-                        showTip(circleTitle(d));
+                    .on('mouseover', showTip(circleTitle))
+                    .on('mouseout', hideTip)
+                    .select(function() {
+                        return d3.select(this.parentNode)
+                            .append('text').node();
                     })
-                    .on('mouseout', hideTip);
+                    .attr('text-anchor', 'middle')
+                    .attr('pointer-events', 'none')
+                    .attr('transform', d => `translate(${d.x}, ${d.y})`)
+                    .text(d => d.data.key);
             },
             safeDraw() {
                 this.ifExistsSvgThenRemove();

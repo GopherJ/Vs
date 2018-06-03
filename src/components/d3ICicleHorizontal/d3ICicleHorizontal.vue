@@ -98,8 +98,8 @@
                     })
                     .attr('text-anchor', 'middle')
                     .attr('pointer-events', 'none')
-                    .attr('x', d => (d.x0 + d.x1) / 2)
-                    .attr('y', d => (d.y0 + d.y1) / 2)
+                    .attr('x', d => (d.y0 + d.y1) / 2)
+                    .attr('y', d => (d.x0 + d.x1) / 2)
                     .attr('dy', '0.32em')
                     .text(d => d.data.key);
             },

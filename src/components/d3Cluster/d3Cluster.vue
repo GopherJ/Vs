@@ -22,7 +22,7 @@
                     bottom = 0
                 } = this.margin,
                 {
-                    nodeTitle = d => `${d.data.value}`,
+                    nodeTitle = d => `${d.data.key}<br>${d.data.value}`,
 
                     nodeFill = '#6eadc1',
                     nodeStroke = '#6eadc1',
@@ -33,7 +33,7 @@
                     linkStrokeWidth = 1,
                     linkStrokeOpacity = 1,
 
-                    nodeRadius = 3,
+                    nodeRadius = 10,
 
                     axisXLabel = null,
 
@@ -55,7 +55,7 @@
 
                 const g = svg
                     .append('g')
-                    .attr('transform',  `translate(${left}, ${top})`);
+                    .attr('transform',  `translate(${left + nodeRadius}, ${top + nodeRadius})`);
 
                 const axisXLabelLane = svg
                     .append('g')
@@ -76,11 +76,24 @@
                     .range(d3.schemeCategory20);
 
                 const cluster = d3.cluster()
-                    .size([g_w, g_h]);
+                    .size([g_w - 2 * nodeRadius, g_h - 2 * nodeRadius]);
 
                 const rootNode = d3.hierarchy(data);
 
                 cluster(rootNode);
+
+                g.selectAll('line')
+                    .data(rootNode.links())
+                    .enter()
+                    .append('line')
+                    .attr('x1', d => d.source.x)
+                    .attr('y1', d => d.source.y)
+                    .attr('x2', d => d.target.x)
+                    .attr('y2', d => d.target.y)
+                    .attr('pointer-events', 'none')
+                    .attr('stroke', linkStroke)
+                    .attr('stroke-opacity', linkStrokeOpacity)
+                    .attr('stroke-width', linkStrokeWidth);
 
                 g.selectAll('path')
                     .data(rootNode.descendants())
@@ -95,18 +108,6 @@
                     .attr('stroke-opacity', nodeStrokeOpacity)
                     .on('mouseover', showTip(nodeTitle))
                     .on('mouseout', hideTip);
-
-                g.selectAll('line')
-                    .data(rootNode.links())
-                    .enter()
-                    .append('line')
-                    .attr('x1', d => d.source.x)
-                    .attr('y1', d => d.source.y)
-                    .attr('x2', d => d.target.x)
-                    .attr('y2', d => d.target.y)
-                    .attr('stroke', linkStroke)
-                    .attr('stroke-opacity', linkStrokeOpacity)
-                    .attr('stroke-width', linkStrokeWidth);
             },
             safeDraw() {
                 this.ifExistsSvgThenRemove();
