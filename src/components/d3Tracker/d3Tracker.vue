@@ -176,8 +176,6 @@
                     .attr('x2', g_w)
                     .attr('stroke', boundingLineColor)
                     .attr('stroke-width', boundingLineWidth)
-
-                axisXLane
                     .selectAll('line')
                     .attr('stroke', boundingLineColor)
                     .attr('stroke-width', boundingLineWidth);
