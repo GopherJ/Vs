@@ -10,7 +10,7 @@
     import axisShow from '../../utils/axisShow';
     import { showTip, hideTip } from '../../utils/tooltip';
     import { lastTickTextAnchorEnd, firstTickTextAnchorStart } from '../../utils/textAnchor';
-    import { responsiveAxisX } from '../../utils/responsiveAxis'
+    import { responsiveAxisX } from '../../utils/responsiveAxis';
 
     export default {
         name: 'd3-slider',
@@ -86,7 +86,7 @@
                         circleStrokeOpacity = 0.5,
                         circleStrokeWidth = 1.25,
 
-                        isAxisShow = true,
+                        isAxisShow = false,
 
                         axisFontSize = 12,
                         axisFontWeight = 400,
@@ -104,6 +104,12 @@
                     isAxisColor = isString(min),
                     isAxisNumber = isNumber(min),
                     self = this;
+
+                    let hueMin = circleStrokeWidth / 2 + circleRadius,
+                        hueMax = g_w - circleStrokeWidth / 2 - circleRadius,
+                        hueActual = hueMin,
+                        hueTarget = hueMin,
+                        hueTimer = d3.timer(hueTween);
 
                     const svg = d3.select(this.$el)
                         .append('svg')
@@ -159,21 +165,21 @@
                         if (isAxisNumber) {
                             return d3.scaleLinear()
                                 .domain([min, max])
-                                .range([0, g_w - circleStrokeWidth  - 2 * circleRadius])
+                                .range([circleRadius + circleStrokeWidth / 2, g_w - circleStrokeWidth  - 2 * circleRadius])
                                 .clamp(true);
                         }
 
                         if (isAxisDate) {
                             return d3.scaleTime()
                                 .domain([min, max])
-                                .range([0, g_w - circleStrokeWidth  - 2 * circleRadius])
+                                .range([circleRadius + circleStrokeWidth / 2, g_w - circleStrokeWidth  - 2 * circleRadius])
                                 .clamp(true);
                         }
 
                         if (isAxisColor) {
                             return d3.scalePoint()
                                 .domain([min, max])
-                                .range([0, g_w - circleStrokeWidth  - 2 * circleRadius]);
+                                .range([circleRadius + circleStrokeWidth / 2, g_w - circleStrokeWidth  - 2 * circleRadius]);
                         }
                     })(isAxisDate, isAxisColor, isAxisNumber);
 
@@ -197,35 +203,34 @@
                         .attr('opacity', axisFontOpacity)
                         .attr('font-weight', axisFontWeight);
 
-                    let hueMin = circleStrokeWidth / 2 + circleRadius,
-                        hueMax = g_w - circleStrokeWidth / 2 - circleRadius,
-                        hueActual = hueMin,
-                        hueTarget = hueMin,
-                        hueTimer = d3.timer(hueTween);
-
                     function hueTween(x) {
                         const hueError = hueTarget - hueActual;
-                        if (Math.abs(hueError) < 1e-3) {
-                            hueActual = hueTarget, hueTimer.stop();
 
-                            emit(self, 'drag-end', isAxisColor
+                        let val = isAxisColor
                                 ? d3.interpolate(min, max)((hueActual - hueMin) / (hueMax - hueMin))
-                                : xScale.invert(hueActual));
+                                : xScale.invert(hueActual);
+
+                        if (Math.abs(hueError) < 1e-3) {
+                            hueActual = hueTarget, hueTimer.stop(), hideTip();
+
+                            emit(self, 'drag-end', val);
                         }
-                        else hueActual += hueAlpha * hueError;
 
-                        circle
-                            .attr('cx', hueActual);
+                        else {
+                            hueActual += hueAlpha * hueError;
 
-                        emit(self, 'dragging', isAxisColor
-                            ? d3.interpolate(min, max)((hueActual - hueMin) / (hueMax - hueMin))
-                            : xScale.invert(hueActual));
+                            circle
+                                .attr('cx', hueActual);
+
+                                showTip(typeof val === 'number'? val.toFixed(2) : val, circle.node())();
+
+                            emit(self, 'dragging', val);
+                        }
                     };
 
                     function hue(x) {
                         if (x >= circleRadius + circleStrokeWidth / 2 && x <= g_w - circleStrokeWidth / 2 - circleRadius)
-                        hueTarget = x;
-                        hueTimer.restart(hueTween);
+                        hueTarget = x, hueTimer.restart(hueTween);
                     };
 
                     const trackOverlay = g
@@ -236,7 +241,7 @@
                         .attr('height', circleRadius * 2 + circleStrokeWidth)
                         .attr('fill', 'none')
                         .attr('pointer-events', 'all')
-                        .attr('cursor', 'crosshair')
+                        .attr('cursor', 'pointer')
                         .call(d3.drag()
                             .on('start.interrupt', function() {
                                 trackOverlay.interrupt();
@@ -244,6 +249,16 @@
                             .on('start drag', function() {
                                 hue(d3.event.x);
                         }));
+
+                    trackOverlay
+                        .on('mouseover', function() {
+                            let val = isAxisColor
+                                ? d3.interpolate(min, max)((hueActual - hueMin) / (hueMax - hueMin))
+                                : xScale.invert(hueActual);
+
+                            showTip(typeof val === 'number' ? val.toFixed(2) : val, circle.node())();
+                        })
+                        .on('mouseout', hideTip);
             },
             safeDraw() {
                 this.ifExistsSvgThenRemove();
