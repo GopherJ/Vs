@@ -217,7 +217,6 @@
                     .attr('height', g_h);
 
                 function zooming() {
-                    console.log(d3.event.transform)
                     const newXScale = d3.event.transform.rescaleX(xScale);
                     self.scale = newXScale;
 
@@ -300,7 +299,9 @@
                         .attr('y', 0)
                         .attr('width', overlayWidth)
                         .attr('height', g_h)
-                        .attr('cursor', 'move')
+                        .attr('cursor', 'move');
+
+                    overlay
                         .call(d3.drag()
                             .on('drag', function() {
                                   const  x = d3.event.x;
