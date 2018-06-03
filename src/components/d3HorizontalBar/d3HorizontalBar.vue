@@ -67,8 +67,9 @@
                     } = this.options,
                     { left = 0, right = 0, top = 0, bottom = 0 } = this.margin,
                     __offsetRight__ = 10,
+                    __offsetBottom__ = 10,
                     g_w = w - left - right - axisYLabelLaneWidth - axisYLaneWidth - __offsetRight__,
-                    g_h = h - top - bottom - axisXLaneHeight - axisXLabelLaneHeight,
+                    g_h = h - top - bottom - axisXLaneHeight - axisXLabelLaneHeight - __offsetBottom__,
                     self = this;
 
                 if (![g_w, g_h].every(el => el > 0)) return;
@@ -107,6 +108,15 @@
                     .attr('width', w)
                     .attr('height', h);
 
+                svg.append('defs')
+                    .append('clipPath')
+                    .attr('id', 'clip-horizontal-bar')
+                    .append('rect')
+                    .attr('x', 0)
+                    .attr('y', 0)
+                    .attr('width', g_w)
+                    .attr('height', g_h);
+
                 const axisXLabelLane = svg
                     .append('g')
                     .attr('transform', `translate(${left + axisYLabelLaneWidth + axisYLaneWidth}, ${top})`)
@@ -144,6 +154,7 @@
                     .attr('class', 'axis axis--y')
                     .attr('transform', `translate(${axisYLaneWidth}, 0)`)
                     .call(yAxis)
+                    .call(axisShow, isAxisPathShow, true)
                     .attr('font-size', axisFontSize)
                     .attr('font-weight', axisFontWeight)
                     .attr('fill-opacity', axisFontOpacity);
@@ -177,7 +188,7 @@
                 if (isAxisYTime) {
                     const extent = [
                         [left + axisYLabelLaneWidth + axisYLaneWidth, top + axisXLaneHeight + axisXLabelLaneHeight],
-                        [w - right - __offsetRight__, h - bottom]
+                        [w - right - __offsetRight__, h - bottom - __offsetBottom__]
                     ];
 
                     axisYLane
@@ -198,6 +209,7 @@
 
                 const rects = enter
                     .append('rect')
+                    .attr('clip-path', 'url(#clip-horizontal-bar)')
                     .attr('y', d => yScale(d.key))
                     .attr('x', 0)
                     .attr('width', 0)
@@ -227,13 +239,8 @@
                     .delay((d, i) => i * (d.value === 0 ? 0 : (_.isNumber(delay) ? delay : 0)))
                     .attr('width', d => xScale(d.value));
 
-                if (!isAxisPathShow) {
-                    axisXLane.select('.domain')
-                        .attr('display', 'none');
-
-                    axisYLane.select('.domain')
-                        .attr('display', 'none');
-                }
+                axisXLane
+                    .call(axisShow, isAxisPathShow, true);
             },
             safeDraw() {
                 this.ifExistsSvgThenRemove();

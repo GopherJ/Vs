@@ -14,6 +14,7 @@
     import wrap from '../../utils/wrap';
     import { selectPaddingInnerOuterX, selectTicksNumY } from '../../utils/select';
     import isAxisTime from '../../utils/isAxisTime';
+    import axisShow from '../../utils/axisShow';
 
     export default {
         name: 'd3-vertical-bar',
@@ -67,12 +68,11 @@
                     } = this.options,
                     { left = 0, right = 0, top = 0, bottom = 0 } = this.margin,
                     __offsetTop__ = 10,
-                    g_w = w - left - right - axisYLabelLaneWidth - axisYLaneWidth,
+                    __offsetRight__ = 10,
+                    g_w = w - left - right - axisYLabelLaneWidth - axisYLaneWidth - __offsetRight__,
                     g_h = h - top - bottom - axisXLaneHeight - axisXLabelLaneHeight - __offsetTop__;
 
-                if (![g_w, g_h].every(el => el > 0)) {
-                    return;
-                }
+                if (![g_w, g_h].every(el => el > 0)) return;
 
                 const isAxisXTime = isAxisTime(data),
                     axisXTickFormat = value => isAxisXTime ? tickFormat(value, axisXTimeInterval) : value,
@@ -83,6 +83,15 @@
                     .append('svg')
                     .attr('width', w)
                     .attr('height', h);
+
+                svg.append('defs')
+                    .append('clipPath')
+                    .attr('id', 'clip-vertical-bar')
+                    .append('rect')
+                    .attr('x', 0)
+                    .attr('y', 0)
+                    .attr('width', g_w)
+                    .attr('height', g_h);
 
                 const yScale = d3.scaleLinear()
                     .range([g_h, 0])
@@ -125,15 +134,16 @@
                     .call(xAxis)
                     .attr('font-size', axisFontSize)
                     .attr('font-weight', axisFontWeight)
-                    .attr('fill-opacity', axisFontOpacity);
+                    .attr('opacity', axisFontOpacity);
 
                 axisYLane.append('g')
                     .attr('class', 'axis axis--y')
                     .attr('transform', `translate(${axisYLaneWidth}, 0)`)
                     .call(yAxis)
+                    .call(axisShow, isAxisPathShow, true)
                     .attr('font-size', axisFontSize)
                     .attr('font-weight', axisFontWeight)
-                    .attr('fill-opacity', axisFontOpacity);
+                    .attr('opacity', axisFontOpacity);
 
                 const axisXLabelLane = svg
                     .append('g')
@@ -176,7 +186,7 @@
                 if (isAxisXTime) {
                     const extent = [
                         [left + axisYLaneWidth + axisYLabelLaneWidth, top + __offsetTop__],
-                        [w - right, h - axisXLaneHeight - axisXLabelLaneHeight]
+                        [w - right - __offsetRight__, h - axisXLaneHeight - axisXLabelLaneHeight]
                     ];
 
                     axisXLane
@@ -196,7 +206,9 @@
                     .data(data)
                     .enter();
 
-                const rects = enter.append('rect')
+                const rects = enter
+                    .append('rect')
+                    .attr('clip-path', 'url(#clip-vertical-bar)')
                     .attr('x', d => xScale(d.key))
                     .attr('y', g_h)
                     .attr('height', 0)
@@ -227,18 +239,9 @@
                 }
 
                 axisXLane
+                    .call(axisShow, isAxisPathShow, true)
                     .selectAll('text')
                     .call(wrap, xScale.bandwidth());
-
-                if (!isAxisPathShow) {
-                    axisYLane
-                        .select('.domain')
-                        .attr('display', 'none');
-
-                    axisXLane
-                        .select('.domain')
-                        .attr('display', 'none');
-                }
             },
             safeDraw() {
                 this.ifExistsSvgThenRemove();

@@ -1,3 +1,5 @@
+import * as d3 from 'd3';
+
 /**
  *
  * control the visibility of axis's path and line
@@ -21,7 +23,18 @@ function axisShow (axisLane, isAxisPathShow, isAxisTickShow) {
 
         axisLane
             .selectAll('.tick text')
-            .attr('y', 0);
+            .attr('y', function() {
+                const text = d3.select(this),
+                    y = text.attr('y');
+
+                return y ? 0 : null;
+            })
+            .attr('x', function() {
+                const text = d3.select(this),
+                    x = text.attr('x');
+
+                return x ? 0 : null;
+            });
     }
 }
 
