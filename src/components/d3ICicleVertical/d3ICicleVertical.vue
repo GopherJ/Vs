@@ -1,5 +1,5 @@
 <template>
-    <div class="d3-icicle" :style="{ 'width': width, 'height': height }"></div>
+    <div class="d3-icicle-vertical" :style="{ 'width': width, 'height': height }"></div>
 </template>
 
 <script>
@@ -9,7 +9,7 @@
     import { showTip, hideTip } from '../../utils/tooltip';
 
     export default {
-        name: 'd3-icicle',
+        name: 'd3-icicle-vertical',
         mixins: [mixins],
         methods: {
             drawICicle() {
@@ -118,11 +118,11 @@
 <style>
     @import url(../../css/index.css);
 
-    .d3-icicle rect {
+    .d3-icicle-vertical rect {
         cursor: pointer;
     }
 
-    .d3-icicle text {
+    .d3-icicle-vertical text {
         user-select: none;
         -webkit-user-select: none;
         -moz-user-select: none;

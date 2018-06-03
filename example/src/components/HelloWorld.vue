@@ -45,13 +45,22 @@
             <d3-slider :min="1" :max="10" @drag-end="(...x) => console(x)"></d3-slider>
         </div>
         <div class="box">
-            <d3-icicle :data="icicleData"> </d3-icicle>
+            <d3-icicle-vertical :data="icicleData"> </d3-icicle-vertical>
+        </div>
+        <div class="box">
+            <d3-icicle-horizontal :data="icicleData"> </d3-icicle-horizontal>
         </div>
         <div class="box">
             <d3-sunburst :data="icicleData"></d3-sunburst>
         </div>
         <div class="box">
             <d3-tree :data="icicleData"></d3-tree>
+        </div>
+        <div class="box">
+            <d3-pack :data="icicleData"></d3-pack>
+        </div>
+        <div class="box">
+            <d3-cluster :data="icicleData"></d3-cluster>
         </div>
     </div>
 </template>

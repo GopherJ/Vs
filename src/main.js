@@ -13,7 +13,8 @@ import d3VerticalBar from './components/d3VerticalBar';
 import d3Area from './components/d3Area';
 import d3Tracker from './components/d3Tracker';
 import d3Slider from './components/d3Slider';
-import d3ICicle from './components/d3ICicle';
+import d3ICicleVertical from './components/d3ICicleVertical';
+import d3ICicleHorizontal from './components/d3ICicleHorizontal';
 import d3Sunburst from './components/d3Sunburst';
 import d3Tree from './components/d3Tree';
 import d3Pack from './components/d3Pack';
@@ -37,7 +38,8 @@ const install = (Vue, options = {}) => {
     Vue.component(d3Area.name, d3Area);
     Vue.component(d3Tracker.name, d3Tracker);
     Vue.component(d3Slider.name, d3Slider);
-    Vue.component(d3ICicle.name, d3ICicle);
+    Vue.component(d3ICicleVertical.name, d3ICicleVertical);
+    Vue.component(d3ICicleHorizontal.name, d3ICicleHorizontal);
     Vue.component(d3Sunburst.name, d3Sunburst);
     Vue.component(d3Tree.name, d3Tree);
     Vue.component(d3Pack.name, d3Pack);
@@ -59,7 +61,8 @@ export {
     d3Line,
     d3Metric,
     d3MultiLine,
-    d3Circle,
+    d3CircleVertical,
+    d3CircleHorizontal,
     d3HorizontalBar,
     d3VerticalBar,
     d3Area,
