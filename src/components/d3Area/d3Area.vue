@@ -191,7 +191,7 @@
                         .y1(d => yScale(d.value));
                     if (_.isString(curve) && !_.isUndefined(d3[curve])) area.curve(d3[curve]);
 
-                    g
+                    const path = g
                         .append('path')
                         .datum(data)
                         .attr('d', area)

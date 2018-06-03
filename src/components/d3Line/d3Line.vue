@@ -188,7 +188,7 @@
                     axisXLane
                         .call(responsiveAxisX, xAxis, xScale);
 
-                    svg.call(brushX.bind(this), extent, xScale, data);
+                    svg.call(brushX.bind(this), extent, xScale, data)
                 }
 
                 axisXLane

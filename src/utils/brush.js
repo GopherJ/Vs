@@ -76,9 +76,7 @@ function brushX(svg, extent, scale, data, brushing) {
     if (_.isFunction(brushing)) {
         brush
             .on('brush', () => {
-                if (_.isNull(d3.event.selection)) {
-                    return;
-                }
+                if (_.isNull(d3.event.selection)) return;
 
                 const [xLeft, xRight] = Array.prototype.map
                     .call(d3.event.selection, el => el - extent[0][0]);
@@ -201,9 +199,7 @@ function brushY(svg, extent, scale, data, brushing) {
         if (_.isFunction(brushing)) {
             brush
                 .on('brush', () => {
-                    if (_.isNull(d3.event.selection)) {
-                        return;
-                    }
+                    if (_.isNull(d3.event.selection)) return;
 
                     const [yTop, yBottom] = Array.prototype.map
                         .call(d3.event.selection, el => el - extent[0][0]);
