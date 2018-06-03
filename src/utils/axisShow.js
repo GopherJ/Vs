@@ -18,6 +18,10 @@ function axisShow (axisLane, isAxisPathShow, isAxisTickShow) {
         axisLane
             .selectAll('.tick line')
             .attr('display', 'none');
+
+        axisLane
+            .selectAll('.tick text')
+            .attr('y', 0);
     }
 }
 

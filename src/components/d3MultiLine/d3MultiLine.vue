@@ -19,6 +19,7 @@
     import GetAllKeys from '../../utils/allKeys';
     import isAxisTime from '../../utils/isAxisTime';
     import emit from '../../utils/emit';
+    import axisShow from '../../utils/axisShow';
 
     export default {
         name: 'd3-multi-line',
@@ -26,6 +27,7 @@
         methods: {
             drawMultiLine() {
                 const _data = _.cloneDeep(this.data);
+
                 const {left = 0, top = 0, right = 0, bottom = 0} = this.margin,
                     {
                         strokeWidth = 2,
@@ -66,7 +68,7 @@
 
                         isAxisPathShow = true,
 
-                        curve = 'curveCardinal',
+                        curve = 'curveMonotoneX',
 
                         axisYTickFormat = '.2s',
 
@@ -86,9 +88,7 @@
                     g_w = w - left - right - axisYLabelLaneWidth - axisYLaneWidth - __offsetRight__,
                     g_h = h - top - bottom - axisXLabelLaneHeight - axisXLaneHeight - axisXGroupLabelLaneHeight;
 
-                if (![g_w, g_h].every(el => el > 0)) {
-                    return;
-                }
+                if (![g_w, g_h].every(el => el > 0)) return;
 
                 const isAxisXTime = isAxisTime(_data),
                     axisXTickFormat = value => isAxisXTime ? tickFormat(value, axisXTimeInterval) : value,
@@ -96,9 +96,7 @@
                     data = groupBy(_data, groupKey),
                     groups = Object.keys(data);
 
-                if (groups.length === 0) {
-                    return;
-                }
+                if (!groups.length) return;
 
                 const schemeCategory20 = d3.scaleOrdinal()
                     .domain(groups)
@@ -118,10 +116,7 @@
                     .y(d => yScale(d.value))
                     .defined(d => !_.isNull(d) && !_.isUndefined(d));
 
-                if (!_.isNull(curve) && !_.isUndefined(d3[curve])) {
-                    lineGen
-                        .curve(d3[curve]);
-                }
+                if (!_.isNull(curve) && !_.isUndefined(d3[curve])) lineGen.curve(d3[curve]);
 
                 const svg = d3.select(this.$el)
                     .append('svg')
@@ -244,7 +239,7 @@
                     .call(xAxis)
                     .call(firstTickTextAnchorStart)
                     .call(lastTickTextAnchorEnd)
-                    .attr('fill-opacity', axisFontOpacity)
+                    .attr('opacity', axisFontOpacity)
                     .attr('font-size', axisFontSize)
                     .attr('font-weight', axisFontWeight);
 
@@ -253,7 +248,8 @@
                     .attr('transform', `translate(${axisYLaneWidth}, 0)`)
                     .attr('class', 'axis axis--y')
                     .call(yAxis)
-                    .attr('fill-opacity', axisFontOpacity)
+                    .call(axisShow, isAxisPathShow, true)
+                    .attr('opacity', axisFontOpacity)
                     .attr('font-size', axisFontSize)
                     .attr('font-weight', axisFontWeight);
 
@@ -270,6 +266,7 @@
                 }
 
                 axisXLane
+                    .call(axisShow, isAxisPathShow, true)
                     .selectAll('text')
                     .call(wrap, xScale.step());
 
@@ -318,14 +315,6 @@
                             dateTimeEnd = new Date(d.key.getTime() + axisXTimeInterval);
 
                         emit(this, 'range-updated', dateTimeStart, dateTimeEnd);
-                }
-
-                if (!isAxisPathShow) {
-                    axisYLane.select('.domain')
-                        .attr('display', 'none');
-
-                    axisXLane.select('.domain')
-                        .attr('display', 'none');
                 }
             },
             safeDraw() {

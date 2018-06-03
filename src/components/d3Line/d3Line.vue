@@ -11,9 +11,10 @@
     import { responsiveAxisX } from '../../utils/responsiveAxis';
     import wrap from '../../utils/wrap';
     import tickFormat from '../../utils/tickFormat';
-    import { selectTicksNumY, selectPaddingInnerOuterX } from '../../utils/select';
+    import { selectTicksNumY } from '../../utils/select';
     import isAxisTime from '../../utils/isAxisTime';
     import { firstTickTextAnchorStart, lastTickTextAnchorEnd } from '../../utils/textAnchor';
+    import axisShow from '../../utils/axisShow';
     import emit from '../../utils/emit';
 
     export default {
@@ -44,7 +45,7 @@
 
                         circleTitle = d => `${d.value}`,
 
-                        curve = 'curveCardinal',
+                        curve = 'curveMonotoneX',
 
                         axisXLabel = null,
                         axisYLabel = null,
@@ -90,10 +91,7 @@
                     .y(d => yScale(d.value))
                     .defined(d => !_.isNull(d) && !_.isUndefined(d));
 
-                if (!_.isNull(curve) && !_.isUndefined(d3[curve])) {
-                    lineGen
-                        .curve(d3[curve]);
-                }
+                if (!_.isNull(curve) && !_.isUndefined(d3[curve])) lineGen.curve(d3[curve]);
 
                 const svg = d3.select(this.$el)
                     .append('svg')
@@ -132,7 +130,7 @@
                     .call(firstTickTextAnchorStart)
                     .call(lastTickTextAnchorEnd)
                     .attr('font-size', axisFontSize)
-                    .attr('fill-opacity', axisFontOpacity)
+                    .attr('opacity', axisFontOpacity)
                     .attr('font-weight', axisFontWeight);
 
                 axisYLane
@@ -140,8 +138,9 @@
                     .attr('transform', `translate(${axisYLaneWidth}, 0)`)
                     .attr('class', 'axis axis--y')
                     .call(yAxis)
+                    .call(axisShow, isAxisPathShow, true)
                     .attr('font-size', axisFontSize)
-                    .attr('fill-opacity', axisFontOpacity)
+                    .attr('opacity', axisFontOpacity)
                     .attr('font-weight', axisFontWeight);
 
                 const axisXLabelLane = svg
@@ -193,6 +192,7 @@
                 }
 
                 axisXLane
+                    .call(axisShow, isAxisPathShow, true)
                     .selectAll('text')
                     .call(wrap, xScale.step());
 
@@ -239,14 +239,6 @@
 
                             emit(this, 'range-updated', dateTimeStart, dateTimeEnd);
                         });
-                }
-
-                if (!isAxisPathShow) {
-                    axisXLane.select('.domain')
-                        .attr('display', 'none');
-
-                    axisYLane.select('.domain')
-                        .attr('display', 'none');
                 }
             },
             safeDraw() {

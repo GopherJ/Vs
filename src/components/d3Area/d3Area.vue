@@ -51,7 +51,9 @@
 
                         nice = true,
 
-                        axisYTickFormat = '.2s'
+                        axisYTickFormat = '.2s',
+
+                        curve =  'curveLinear'
                     } = this.options,
                     {
                         axisXLabelLaneHeight = _.isNull(axisXLabel) ? 0 : 30,
@@ -176,6 +178,7 @@
                         .x(d => xScale(d.key))
                         .y0(yScale(0))
                         .y1(d => yScale(d.value));
+                    if (_.isString(curve) && !_.isUndefined(d3[curve])) area.curve(d3[curve]);
 
                     g
                         .append('path')

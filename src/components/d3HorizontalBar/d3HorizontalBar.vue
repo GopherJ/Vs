@@ -14,6 +14,7 @@
     import { responsiveAxisY } from '../../utils/responsiveAxis';
     import { brushY } from '../../utils/brush';
     import isAxisTime from '../../utils/isAxisTime';
+    import axisShow from '../../utils/axisShow';
 
     export default {
         name: 'd3-horizontal-bar',
@@ -70,9 +71,7 @@
                     g_h = h - top - bottom - axisXLaneHeight - axisXLabelLaneHeight,
                     self = this;
 
-                if (![g_w, g_h].every(el => el > 0)) {
-                    return;
-                }
+                if (![g_w, g_h].every(el => el > 0)) return;
 
                 const isAxisYTime = isAxisTime(data),
                     axisYTickFormat = value => isAxisYTime ? tickFormat(value, axisYTimeInterval) : value,
