@@ -12,6 +12,8 @@
     import roundedRect from '../../utils/roundedRect';
     import emit from '../../utils/emit';
     import { brushX } from '../../utils/brush';
+    import zoom from '../../utils/zoom';
+    import cursor from '../../utils/cursor';
 
     export default {
         name: 'd3-tracker',
@@ -83,7 +85,7 @@
                         axisXLaneHeight = 40,
 
                         axisFontSize = 12,
-                        axisFontWeight = 400,
+                        axisFontWeight = 600,
                         axisFontOpacity = 1,
 
                         axisXLabel = null,
@@ -119,9 +121,7 @@
                     isFirefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
                 self.reference = dateTimeStart;
 
-                if (![g_w, g_h].every(el => el > 0)) {
-                    return;
-                }
+                if (![g_w, g_h].every(el => el > 0)) return;
 
                 const svg = d3.select(this.$el)
                     .append('svg')
@@ -173,10 +173,7 @@
 
                 axisXLane
                     .append('line')
-                    .attr('x1', 0)
-                    .attr('y1', 0)
                     .attr('x2', g_w)
-                    .attr('y2', 0)
                     .attr('stroke', boundingLineColor)
                     .attr('stroke-width', boundingLineWidth)
 
@@ -208,7 +205,13 @@
                     [w - right - __offset__, h - axisXLaneHeight - __offset__ - axisXLabelLaneHeight]
                 ];
 
-                svg.call(brushX.bind(self), extent, self.scale);
+                svg
+                    .call(brushX.bind(self), extent, self.scale)
+                    .call(cursor, axisXLane, [
+                        [0, 0],
+                        [g_w, axisXLaneHeight]
+                    ])
+                    .call(zoom, zooming);
 
                 const g = svg
                     .append('g')
@@ -220,28 +223,11 @@
                     const newXScale = d3.event.transform.rescaleX(xScale);
                     self.scale = newXScale;
 
-                    svg.call(brushX.bind(self), extent, self.scale);
-
-                    const axisXLaneTicks = axisXLane.selectAll('*');
-                    if (!axisXLaneTicks.empty()) axisXLaneTicks.remove();
+                    svg
+                        .call(brushX.bind(self), extent, self.scale);
 
                     axisXLane
                         .call(xAxis.scale(newXScale))
-                        .attr('class', 'axis axis--x')
-                        .attr('font-size', axisFontSize)
-                        .attr('font-weight', axisFontWeight)
-                        .attr('fill-opacity', axisFontOpacity);
-
-                    axisXLane
-                        .append('line')
-                        .attr('x1', 0)
-                        .attr('y1', 0)
-                        .attr('x2', g_w)
-                        .attr('y2', 0)
-                        .attr('stroke', boundingLineColor)
-                        .attr('stroke-width', boundingLineWidth);
-
-                    axisXLane
                         .selectAll('line')
                         .attr('stroke', boundingLineColor)
                         .attr('stroke-width', boundingLineWidth);
@@ -250,23 +236,6 @@
                     drawEntries(newXScale);
                     drawReference(newXScale);
                 }
-
-                const zoom = d3.zoom()
-                    .on('zoom', zooming);
-                svg
-                    .call(zoom);
-
-                svg.on('mousemove', function () {
-                    const [cx, cy] = d3.mouse(axisXLane.node());
-
-                    if (cx > 0 && cx < g_w && cy > 0 && cy < axisXLaneHeight) {
-                        svg.attr('cursor', 'pointer');
-                    }
-
-                    else {
-                        svg.attr('cursor', 'auto');
-                    }
-                });
 
                 function drawReference(xScale) {
                     const x = xScale(self.reference);

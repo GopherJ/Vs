@@ -16,6 +16,7 @@
     import { firstTickTextAnchorStart, lastTickTextAnchorEnd } from '../../utils/textAnchor';
     import axisShow from '../../utils/axisShow';
     import emit from '../../utils/emit';
+    import emphasize from '../../utils/emphasize';
 
     export default {
         name: 'd3-line',

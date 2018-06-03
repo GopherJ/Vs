@@ -10,6 +10,9 @@
     import { selectPaddingInnerOuterY } from '../../utils/select';
     import { Point, Interval, getTimelineGroups } from '../../utils/getTimelineGroups';
     import roundedRect from '../../utils/roundedRect';
+    import axisShow from '../../utils/axisShow';
+    import cursor from '../../utils/cursor';
+    import zoom from '../../utils/zoom';
 
     export default {
         name: 'd3-timeline',
@@ -19,9 +22,7 @@
                 const [w, h] = this.getElWidthHeight(),
                     { dateTimeStart, dateTimeEnd, data, groups } = getTimelineGroups(_.cloneDeep(this.data));
 
-                if (groups.length === 0) {
-                    return;
-                }
+                if (!groups.length) return;
 
                 const {
                         intervalCornerRadius = 4,
@@ -43,16 +44,16 @@
                         axisFontWeight = 400,
                         axisFontOpacity = 1,
 
-                        axisXLabel = null,
+                        axisXLabel = 'test',
 
-                        axisXLabelFontSize = 12,
-                        axisXLabelFontWeight = 400,
-                        axisXLabelFontOpacity = 0.5,
+                        axisLabelFontSize = 12,
+                        axisLabelFontWeight = 400,
+                        axisLabelFontOpacity = 0.5,
 
                         backgroundColor = 'rgba(255, 255, 255, 0.125)',
 
                         borderRadius = 0,
-                        borderWidth = 2,
+                        borderWidth = 20,
                         borderColor = 'rgba(0, 0, 0, .125)',
 
                         boundingLineWidth = 2,
@@ -71,9 +72,7 @@
                     groupHeight = g_h / groups.length,
                     [paddingInner, paddingOuter] = selectPaddingInnerOuterY(groupHeight);
 
-                if (![g_w, g_h].every(el => el > 0)) {
-                    return;
-                }
+                if (![g_w, g_h].every(el => el > 0)) return;
 
                 const svg = d3.select(this.$el)
                     .append('svg')
@@ -97,6 +96,18 @@
                     .attr('class', 'entry--container')
                     .attr('width', g_w)
                     .attr('height', g_h);
+
+                const extent = [
+                    [left + groupLaneWidth, top],
+                    [g_w, g_h]
+                ];
+
+                svg
+                    .call(cursor, g, [
+                        [groupLaneWidth, g_w + groupLaneWidth],
+                        [0, g_h]
+                    ])
+                    .call(zoom, extent, zooming);
 
                 svg.append('defs')
                     .append('clipPath')
@@ -155,18 +166,15 @@
 
                 axisXLane
                     .call(xAxis)
+                    .call(axisShow, false, true)
                     .attr('class', 'axis axis--x')
                     .attr('font-size', axisFontSize)
                     .attr('font-weight', axisFontWeight)
-                    .attr('fill-opacity', axisFontOpacity);
-
-                axisXLane
-                    .selectAll('path')
-                    .attr('display', 'none');
+                    .attr('opacity', axisFontOpacity);
 
                 const axisXLabelLane = svg
                     .append('g')
-                    .attr('transform', `translate(${left + __offset__},${top + g_h + axisXLaneHeight + __offset__})`)
+                    .attr('transform', `translate(${left + __offset__},${top + g_h + axisXLaneHeight + 2 * __offset__})`)
                     .attr('width', g_w + groupLaneWidth)
                     .attr('height', axisXLabelLaneHeight);
 
@@ -177,45 +185,9 @@
                     .attr('dy', '0.32em')
                     .attr('text-anchor', 'middle')
                     .text(axisXLabel)
-                    .attr('font-size', axisXLabelFontSize)
-                    .attr('font-weight', axisXLabelFontWeight)
-                    .attr('fill-opacity', axisXLabelFontOpacity);
-
-                function zooming() {
-                    const t = d3.event.transform.rescaleX(xScale);
-
-                    const axisXLaneElements = axisXLane.selectAll('*');
-                    if (!axisXLaneElements.empty()) axisXLaneElements.remove();
-
-                    axisXLane
-                        .call(xAxis.scale(t))
-                        .attr('class', 'axis axis--x')
-                        .attr('font-size', axisFontSize)
-                        .attr('font-weight', axisFontWeight)
-                        .attr('fill-opacity', axisFontOpacity);
-
-                    axisXLane
-                        .selectAll('path')
-                        .attr('display', 'none');
-
-                    const entry = entryLaneContainer.selectAll('.entry'),
-                        lineTick = entryLaneContainer.selectAll('.line--tick'),
-                        lineReference = entryLaneContainer.select('.line--reference');
-
-                    if (!entry.empty()) entry.remove();
-                    if (!lineTick.empty()) lineTick.remove();
-                    if (!lineReference.empty()) lineReference.remove();
-
-                    drawReference(t);
-                    drawTickLines(t);
-                    drawEntries(t);
-                }
-
-                const zoom = d3.zoom()
-                    .extent([[left + groupLaneWidth, top], [g_w, g_h]])
-                    .on('zoom', zooming);
-
-                svg.call(zoom);
+                    .attr('font-size', axisLabelFontSize)
+                    .attr('font-weight', axisLabelFontWeight)
+                    .attr('fill-opacity', axisLabelFontOpacity);
 
                 groupLaneContainer.selectAll('.group--lane')
                     .data(groups)
@@ -237,19 +209,23 @@
                     .text(d => d)
                     .attr('fill', '#000');
 
-                svg.on('mousemove', function () {
-                    const [cx, cy] = d3.mouse(entryLaneContainer.node());
+                function zooming() {
+                    const t = d3.event
+                        .transform.rescaleX(xScale);
 
-                    if (cx > groupLaneWidth && cx < g_w + groupLaneWidth && cy > 0 && cy < g_h) {
-                        svg.attr('cursor', 'pointer');
-                    }
+                    axisXLane
+                        .call(xAxis.scale(t));
 
-                    else {
-                        svg.attr('cursor', 'auto');
-                    }
-                });
+                    drawReference(t);
+                    drawTickLines(t);
+                    drawEntries(t);
+                }
+
 
                 function drawReference(xScale) {
+                    const referenceSelection = entryLaneContainer.select('.line--reference');
+                    if (!referenceSelection.empty()) referenceSelection.remove();
+
                     const date = new Date().valueOf();
                     entryLaneContainer
                         .append('line')
@@ -265,7 +241,10 @@
                 }
 
                 function drawTickLines(xScale) {
-                    const ticks = xScale.ticks().map(el => el.valueOf());
+                    const ticksSelection = entryLaneContainer.selectAll('.line--tick');
+                    if (!ticksSelection.empty()) ticksSelection.remove();
+
+                    const ticks = xScale.ticks();
                     entryLaneContainer.selectAll('.line--tick')
                         .data(ticks)
                         .enter()
@@ -282,6 +261,9 @@
                 }
 
                 function drawEntries(xScale) {
+                    const entriesSelection = entryLaneContainer.selectAll('.entry');
+                    if (!entriesSelection.empty()) entriesSelection.remove();
+
                     for (let i = 0, l = groups.length; i < l; i += 1) {
                         const groupData = data[groups[i]];
                         const scaleAxisY = yScale(i).domain(Object.keys(groupData));

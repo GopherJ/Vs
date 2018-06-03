@@ -5,16 +5,16 @@ import * as d3 from 'd3';
  *
  * @param {d3.Selection} svg
  * @param {d3.Selection} g
- * @param {number} g_w
- * @param {number} g_h
- * @param {string} cursorType
+ * @param {[[number, number], [number, number]]} extent
+ * @param {string} cursor
  */
-function cursor(svg, g, g_w, g_h, cursorType) {
+function cursor(svg, g, extent, cursor) {
     svg.on('mousemove', function () {
-        const [cx, cy] = d3.mouse(g.node());
+        const [cx, cy] = d3.mouse(g.node()),
+            [[x0, y0], [x1, y1]] = extent;
 
-        if (cx > 0 && cx < g_w && cy > 0 && cy < g_h) {
-            svg.attr('cursor', cursorType);
+        if (cx > x0 && cx < x1 && cy > y0 && cy < y1) {
+            svg.attr('cursor', cursor || 'pointer');
         }
 
         else {
