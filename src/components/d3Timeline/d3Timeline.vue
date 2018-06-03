@@ -308,9 +308,7 @@
                                         .attr('d', symbolGen.type(d3[entry.symbol] || d3['symbolCircle'])());
 
                                     symbol
-                                        .on('mouseover', d => {
-                                            showTip(entry.title);
-                                        })
+                                        .on('mouseover', showTip(entry.title))
                                         .on('mouseout', hideTip);
                                 }
 
@@ -329,9 +327,7 @@
 
                                     if (entry.title) {
                                         interval
-                                            .on('mouseover', d => {
-                                                showTip(entry.title);
-                                            })
+                                            .on('mouseover', showTip(entry.title))
                                             .on('mouseout', hideTip);
                                     }
 

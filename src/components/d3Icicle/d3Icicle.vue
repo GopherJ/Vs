@@ -89,9 +89,7 @@
                     .attr('fill', d => schemeCategory20(d.data.key))
                     .attr('fill-opacity', fillOpacity)
                     .attr('stroke-opacity', strokeOpacity)
-                    .on('mouseover', d => {
-                        showTip(rectTitle(d));
-                    })
+                    .on('mouseover', showTip(rectTitle))
                     .on('mouseout', hideTip)
                     .select(function() {
                         return d3.select(this.parentNode)

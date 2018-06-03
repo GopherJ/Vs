@@ -209,9 +209,7 @@
                     .attr('stroke-opacity', strokeOpacity);
 
                 rects
-                    .on('mouseover', (d) => {
-                        showTip(barTitle(d));
-                    })
+                    .on('mouseover', showTip(barTitle))
                     .on('mouseout', hideTip);
 
                 if (isAxisYTime && _.isNumber(axisYTimeInterval)) {

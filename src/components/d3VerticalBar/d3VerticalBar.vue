@@ -214,9 +214,7 @@
                     .attr('height', d => g_h - yScale(d.value));
 
                 rects
-                    .on('mouseover', d => {
-                        showTip(barTitle(d));
-                    })
+                    .on('mouseover', showTip(barTitle))
                     .on('mouseout', hideTip);
 
                 if (isAxisXTime && _.isNumber(axisXTimeInterval)) {

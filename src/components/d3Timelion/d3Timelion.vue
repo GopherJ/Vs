@@ -299,9 +299,7 @@
 
                         emit(this, 'range-updated', dateTimeStart, dateTimeEnd);
                     })
-                    .on('mouseover', d => {
-                        showTip(barTitle(d));
-                    })
+                    .on('mouseover', showTip(barTitle))
                     .on('mouseout', hideTip);
 
                 rects

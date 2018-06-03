@@ -310,9 +310,7 @@
                     .attr('cy', d => yScale(d.value))
                     .attr('r', circleRadius)
                     .attr('fill', d => schemeCategory20(d.group))
-                    .on('mouseover', (d) => {
-                        showTip(circleTitle(d));
-                    })
+                    .on('mouseover', showTip(circleTitle))
                     .on('mouseout', hideTip);
 
                 if (isAxisXTime && _.isNumber(axisXTimeInterval)) {

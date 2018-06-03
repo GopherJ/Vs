@@ -124,9 +124,7 @@
                     .attr('fill-opacity', labelFontOpacity)
                     .attr('font-size', labelFontSize)
                     .attr('font-weight', labelFontWeight)
-                    .on('mouseover', () => {
-                        showTip(circleTitle);
-                    })
+                    .on('mouseover', showTip(circleTitle))
                     .on('mouseout', hideTip);
 
                 o.append('g')

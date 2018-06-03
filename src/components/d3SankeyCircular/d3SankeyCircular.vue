@@ -235,7 +235,7 @@
                     .on('mouseover', function (d) {
                         const thisName = d.name;
 
-                        showTip(nodeTitle(d));
+                        showTip(nodeTitle)(d);
 
                         node.selectAll('.node')
                             .style('opacity', d => highlightNodes(d, thisName));
@@ -276,9 +276,7 @@
                     .style('stroke-width', d => Math.max(1, d.width))
                     .style('opacity', 0.7)
                     .style('stroke', link => (link.circular ? circularLinkColor : linkColor))
-                    .on('mouseover', d => {
-                        showTip(linkTitle(d));
-                    })
+                    .on('mouseover', showTip(linkTitle))
                     .on('mouseout', hideTip);
 
                 const arrows = pathArrows()

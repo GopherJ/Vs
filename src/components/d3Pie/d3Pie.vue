@@ -120,9 +120,7 @@
                     .attr('fill', d =>  data.length > 1 ? interpolateWarm(d.data.value) : defaultColor);
 
                 paths
-                    .on('mouseover', (d) => {
-                        showTip(arcTitle(d));
-                    })
+                    .on('mouseover', showTip(arcTitle))
                     .on('mouseout', hideTip);
 
                 enter

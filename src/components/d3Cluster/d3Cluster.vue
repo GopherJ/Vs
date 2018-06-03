@@ -93,9 +93,7 @@
                     .attr('stroke', nodeStroke)
                     .attr('fill-opacity', nodeFillOpacity)
                     .attr('stroke-opacity', nodeStrokeOpacity)
-                    .on('mouseover', d => {
-                        showTip(nodeTitle(d));
-                    })
+                    .on('mouseover', showTip(nodeTitle))
                     .on('mouseout', hideTip);
 
                 g.selectAll('line')

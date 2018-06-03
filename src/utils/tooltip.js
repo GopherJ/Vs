@@ -41,26 +41,29 @@ const GetOffsetLeft = (tooltip, target) => offset(target).left + target.getBBox(
  *
  * show tooltip
  *
- * @param {string} title
+ * @param {(d) => string} title
  * @return {void}
  */
 function showTip(title) {
-    const target = d3.event.target;
 
-    tooltip
-        .html(title);
+    return function (d) {
+        const target = d3.event.target;
 
-    const top = GetOffsetTop(tooltip, target),
-        left = GetOffsetLeft(tooltip, target);
+            tooltip
+                .html(typeof title === 'function' ? title(d) : title);
 
-    tooltip
-        .style('top', `${top}px`)
-        .style('left', `${left}px`);
+            const top = GetOffsetTop(tooltip, target),
+                left = GetOffsetLeft(tooltip, target);
 
-    tooltip
-        .style('visibility', 'visible');
+            tooltip
+                .style('top', `${top}px`)
+                .style('left', `${left}px`);
 
-    tooltip.node().classList.add('show');
+            tooltip
+                .style('visibility', 'visible');
+
+            tooltip.node().classList.add('show');
+    }
 }
 
 /**

@@ -365,9 +365,7 @@
 
                                 if (entry.title) {
                                     point
-                                        .on('mouseover', () => {
-                                            showTip(entry.title);
-                                        })
+                                        .on('mouseover', showTip(entry.title))
                                         .on('mouseout', hideTip);
                                 }
                             }
@@ -386,9 +384,7 @@
 
                                 if (entry.title) {
                                     interval
-                                        .on('mouseover', () => {
-                                            showTip(entry.title);
-                                        })
+                                        .on('mouseover', showTip(entry.title))
                                         .on('mouseout', hideTip);
                                 }
 

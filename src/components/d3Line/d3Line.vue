@@ -228,9 +228,7 @@
                     .attr('cy', d => yScale(d.value))
                     .attr('fill', circleColor)
                     .attr('clip-path', 'url(#clip-line)')
-                    .on('mouseover', (d) => {
-                        showTip(circleTitle(d));
-                    })
+                    .on('mouseover', showTip(circleTitle))
                     .on('mouseout', hideTip);
 
                 if (isAxisXTime && _.isNumber(axisXTimeInterval)) {

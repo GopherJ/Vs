@@ -114,9 +114,7 @@
                     .attr('fill-opacity', metricLabelFontOpacity)
                     .attr('font-size', metricLabelFontSize)
                     .attr('font-weight', metricLabelFontWeight)
-                    .on('mouseover', d => {
-                        showTip(metricTitle(d));
-                    })
+                    .on('mouseover', showTip(metricTitle))
                     .on('mouseout', hideTip);
             },
             safeDraw() {
