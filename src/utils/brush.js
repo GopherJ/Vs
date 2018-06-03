@@ -24,9 +24,7 @@ function brushX(svg, extent, scale, data, brushing) {
     brush
         .extent(extent)
         .on('end', () => {
-            if (_.isNull(d3.event.selection)) {
-                return;
-            }
+            if (_.isNull(d3.event.selection)) return;
 
             const [xLeft, xRight] = Array.prototype.map
                 .call(d3.event.selection, el => el - extent[0][0]);
@@ -38,36 +36,38 @@ function brushX(svg, extent, scale, data, brushing) {
                 emit(this, 'range-updated', dateTimeStart, dateTimeEnd);
             }
 
-            if (_.isFunction(scale.step)) {
+            if (_.isFunction(scale.step) && !_.isFunction(scale.bandwidth)) {
                 const bisecRight = d3.bisector(d => scale(d.key)).right;
 
                 let iLeft = bisecRight(data, xLeft),
                     iRight = bisecRight(data, xRight);
 
-                if (iRight > data.length - 1) {
-                    iRight -= 1;
+                if (iRight > data.length - 1) iRight -= 1;
+
+
+                if (data[iLeft] && data[iRight]) {
+                    const dateTimeStart = data[iLeft].key,
+                        dateTimeEnd = data[iRight].key;
+
+                    emit(this, 'range-updated', dateTimeStart, dateTimeEnd);
                 }
-
-                const dateTimeStart = data[iLeft].key,
-                    dateTimeEnd = data[iRight].key;
-
-                emit(this, 'range-updated', dateTimeStart, dateTimeEnd);
             }
 
             if (_.isFunction(scale.bandwidth)) {
-                const bisecLeft = d3.bisector((d, x) => scale(d.key) + scale.bandwidth() - x).right;
+                const bisecRight = d3.bisector((d, x) => scale(d.key) + scale.bandwidth() - x).right;
 
-                let iLeft = bisecLeft(data, xLeft),
-                    iRight = bisecLeft(data, xRight);
+                let iLeft = bisecRight(data, xLeft),
+                    iRight = bisecRight(data, xRight);
 
-                if (iRight > data.length - 1) {
-                    iRight -= 1;
+                if (iRight > data.length - 1) iRight -= 1;
+
+
+                if (data[iLeft] && data[iRight]) {
+                    const dateTimeStart = data[iLeft].key,
+                        dateTimeEnd = data[iRight].key;
+
+                    emit(this, 'range-updated', dateTimeStart, dateTimeEnd);
                 }
-
-                const dateTimeStart = data[iLeft].key,
-                    dateTimeEnd = data[iRight].key;
-
-                emit(this, 'range-updated', dateTimeStart, dateTimeEnd);
             }
 
             brush.move(b, null);
@@ -90,36 +90,38 @@ function brushX(svg, extent, scale, data, brushing) {
                     brushing.bind(this)(dateTimeStart, dateTimeEnd);
                 }
 
-                if (_.isFunction(scale.step)) {
+
+                if (_.isFunction(scale.step) && !_.isFunction(scale.bandwidth)) {
                     const bisecRight = d3.bisector(d => scale(d.key)).right;
 
                     let iLeft = bisecRight(data, xLeft),
                         iRight = bisecRight(data, xRight);
 
-                    if (iRight > data.length - 1) {
-                        iRight -= 1;
+                    if (iRight > data.length - 1) iRight -= 1;
+
+
+                    if (data[iLeft] && data[iRight]) {
+                        const dateTimeStart = data[iLeft].key,
+                            dateTimeEnd = data[iRight].key;
+
+                        brushing.bind(this)(dateTimeStart, dateTimeEnd);
                     }
-
-                    const dateTimeStart = data[iLeft].key,
-                        dateTimeEnd = data[iRight].key;
-
-                    brushing.bind(this)(dateTimeStart, dateTimeEnd);
                 }
 
                 if (_.isFunction(scale.bandwidth)) {
-                    const bisecLeft = d3.bisector((d, x) => scale(d.key) + scale.bandwidth() - x).right;
+                    const bisecRight = d3.bisector((d, x) => scale(d.key) + scale.bandwidth() - x).right;
 
-                    let iLeft = bisecLeft(data, xLeft),
-                        iRight = bisecLeft(data, xRight);
+                    let iLeft = bisecRight(data, xLeft),
+                        iRight = bisecRight(data, xRight);
 
-                    if (iRight > data.length - 1) {
-                        iRight -= 1;
+                    if (iRight > data.length - 1) iRight -= 1;
+
+                    if (data[iLeft] && data[iRight]) {
+                        const dateTimeStart = data[iLeft].key,
+                            dateTimeEnd = data[iRight].key;
+
+                        brushing.bind(this)(dateTimeStart, dateTimeEnd);
                     }
-
-                    const dateTimeStart = data[iLeft].key,
-                        dateTimeEnd = data[iRight].key;
-
-                    brushing.bind(this)(dateTimeStart, dateTimeEnd);
                 }
             });
     }
@@ -148,9 +150,7 @@ function brushY(svg, extent, scale, data, brushing) {
         brush
             .extent(extent)
             .on('end', () => {
-                if (_.isNull(d3.event.selection)) {
-                    return;
-                }
+                if (_.isNull(d3.event.selection)) return;
 
                 const [yTop, yBottom] = Array.prototype.map
                     .call(d3.event.selection, el => el - extent[0][1]);
@@ -162,36 +162,36 @@ function brushY(svg, extent, scale, data, brushing) {
                     emit(this, 'range-updated', dateTimeStart, dateTimeEnd);
                 }
 
-                if (_.isFunction(scale.step)) {
-                    const bisecLeft = d3.bisector(d => scale(d.key)).right;
+                if (_.isFunction(scale.step) && !_.isFunction(scale.bandwidth)) {
+                    const bisecRight = d3.bisector(d => scale(d.key)).right;
 
-                    let iTop = bisecLeft(data, yTop),
-                        iBottom = bisecLeft(data, yBottom);
+                    let iTop = bisecRight(data, yTop),
+                        iBottom = bisecRight(data, yBottom);
 
-                    if (iBottom > data.length - 1) {
-                        iBottom -= 1;
+                    if (iBottom > data.length - 1) iBottom -= 1;
+
+                    if (data[iTop] && data[iBottom]) {
+                        const dateTimeStart = data[iTop].key,
+                            dateTimeEnd = data[iBottom].key;
+
+                        emit(this, 'range-updated', dateTimeStart, dateTimeEnd);
                     }
-
-                    const dateTimeStart = data[iTop].key,
-                        dateTimeEnd = data[iBottom].key;
-
-                    emit(this, 'range-updated', dateTimeStart, dateTimeEnd);
                 }
 
                 if (_.isFunction(scale.bandwidth)) {
-                    const bisecLeft = d3.bisector((d, x) => scale(d.key) + scale.bandwidth() - x).right;
+                    const bisecRight = d3.bisector((d, x) => scale(d.key) + scale.bandwidth() - x).right;
 
-                    let iTop = bisecLeft(data, yTop),
-                        iBottom = bisecLeft(data, yBottom);
+                    let iTop = bisecRight(data, yTop),
+                        iBottom = bisecRight(data, yBottom);
 
-                    if (iBottom > data.length - 1) {
-                        iBottom -= 1;
+                    if (iBottom > data.length - 1) iBottom -= 1;
+
+                    if (data[iTop] && data[iBottom]) {
+                        const dateTimeStart = data[iTop].key,
+                            dateTimeEnd = data[iBottom].key;
+
+                        emit(this, 'range-updated', dateTimeStart, dateTimeEnd);
                     }
-
-                    const dateTimeStart = data[iTop].key,
-                        dateTimeEnd = data[iBottom].key;
-
-                    emit(this, 'range-updated', dateTimeStart, dateTimeEnd);
                 }
 
                 brush.move(b, null);
@@ -205,46 +205,46 @@ function brushY(svg, extent, scale, data, brushing) {
                         return;
                     }
 
-                    const [xLeft, xRight] = Array.prototype.map
+                    const [yTop, yBottom] = Array.prototype.map
                         .call(d3.event.selection, el => el - extent[0][0]);
 
                     if (_.isFunction(scale.invert)) {
-                        const dateTimeStart = scale.invert(xLeft),
-                            dateTimeEnd = scale.invert(xRight);
+                        const dateTimeStart = scale.invert(yTop),
+                            dateTimeEnd = scale.invert(yBottom);
 
                         brushing.bind(this)(dateTimeStart, dateTimeEnd);
                     }
 
-                    if (_.isFunction(scale.step)) {
+                    if (_.isFunction(scale.step) && !_.isFunction(scale.bandwidth)) {
                         const bisecRight = d3.bisector(d => scale(d.key)).right;
 
-                        let iLeft = bisecRight(data, xLeft),
-                            iRight = bisecRight(data, xRight);
+                        let iTop = bisecRight(data, yTop),
+                            iBottom = bisecRight(data, yBottom);
 
-                        if (iRight > data.length - 1) {
-                            iRight -= 1;
+                        if (iBottom > data.length - 1) iBottom -= 1;
+
+                        if (data[iTop] && data[iBottom]) {
+                            const dateTimeStart = data[iTop].key,
+                                dateTimeEnd = data[iBottom].key;
+
+                            brushing.bind(this)(dateTimeStart, dateTimeEnd);
                         }
-
-                        const dateTimeStart = data[iLeft].key,
-                            dateTimeEnd = data[iRight].key;
-
-                        brushing.bind(this)(dateTimeStart, dateTimeEnd);
                     }
 
                     if (_.isFunction(scale.bandwidth)) {
-                        const bisecLeft = d3.bisector((d, x) => scale(d.key) + scale.bandwidth() - x).right;
+                        const bisecRight = d3.bisector((d, x) => scale(d.key) + scale.bandwidth() - x).right;
 
-                        let iLeft = bisecLeft(data, xLeft),
-                            iRight = bisecLeft(data, xRight);
+                        let iTop = bisecRight(data, yTop),
+                            iBottom = bisecRight(data, yBottom);
 
-                        if (iRight > data.length - 1) {
-                            iRight -= 1;
+                        if (iBottom > data.length - 1) iBottom -= 1;
+
+                        if (data[iTop] && data[iBottom]) {
+                            const dateTimeStart = data[iTop].key,
+                                dateTimeEnd = data[iBottom].key;
+
+                            brushing.bind(this)(dateTimeStart, dateTimeEnd);
                         }
-
-                        const dateTimeStart = data[iLeft].key,
-                            dateTimeEnd = data[iRight].key;
-
-                        brushing.bind(this)(dateTimeStart, dateTimeEnd);
                     }
                 });
         }

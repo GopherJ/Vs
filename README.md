@@ -19,21 +19,53 @@ npm i -S d3-vs
 
 ## Lists
 
+### Basic
+
 - `d3HorizontalBar`
 - `d3VerticalBar`
+- `d3Area`
 - `d3Line`
 - `d3Pie`
-- `d3ProgressArc`
-- `d3Metric`
-- `d3MultiLine`
-- `d3Circle`
-- `d3SankeyCircular`
+
+## Time Series
+
+- `d3HorizontalBar`
+- `d3VerticalBar`
+- `d3Area`
+- `d3Line`
 - `d3Timelion`
 - `d3Timeline`
+- `d3Tracker`
+
+## Functional
+
+- `d3ProgressArc`
+- `d3Slider`
+- `d3Tracker`
+
+## Layout
+- `d3ICicleHorizontal`
+- `d3ICicleVertical`
+- `d3Tree`
+- `d3Cluster`
+- `d3Sunburst`
+- `d3Pack`
+
+## Metrics
+- `d3Metric`
+- `d3Circle`
+
+## Grouped
+
+- `d3MultiLine`
+
+## Flow
+
+- `d3SankeyCircular`
+
 
 ## ToDo
 
-- `d3Area`
 - `d3ColorPicker`
 - `d3Gantt`
 - `d3Gauge`
@@ -44,8 +76,9 @@ npm i -S d3-vs
 - `d3RadialLine`
 - `d3ScatterPlot`
 - `d3Table`
-- `d3WordCount`
+- `d3WordCloud`
 - `d3Markdown`
+- `d3JsonViewer`
 
 
 ## Usage
