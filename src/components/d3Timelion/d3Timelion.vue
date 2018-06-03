@@ -16,6 +16,7 @@
     import { selectPaddingInnerOuterX, selectTicksNumY } from '../../utils/select';
     import isAxisTime from '../../utils/isAxisTime';
     import { brushX } from '../../utils/brush';
+    import axisShow from '../../utils/axisShow';
 
     const tpl = `
                 <option value='Auto'>Auto</option>
@@ -93,16 +94,14 @@
                         axisYLabelLaneWidth = _.isNull(axisYLabel) ? 0 : 60,
                     } = this.options,
                     __timeRangeLabelLaneHeight__ = 40,
-                    g_w = w - left - right - axisYLabelLaneWidth - axisYLaneWidth,
+                    __offsetRight__ = 10,
+                    g_w = w - left - right - axisYLabelLaneWidth - axisYLaneWidth - __offsetRight__,
                     g_h = h - top - bottom - axisXLaneHeight - axisXLabelLaneHeight - __timeRangeLabelLaneHeight__;
-                if (![g_w, g_h].every(el => el > 0)) {
-                    return;
-                }
+
+                if (![g_w, g_h].every(el => el > 0)) return;
 
                 const isAxisXTime = isAxisTime(data);
-                if (!isAxisXTime) {
-                    return;
-                }
+                if (!isAxisXTime) return;
 
                 const axisXTickFormat = value => tickFormat(value, axisXTimeInterval),
                     ticks = selectTicksNumY(g_h),
@@ -119,6 +118,8 @@
                     .append('clipPath')
                     .attr('id', 'clip-timelion')
                     .append('rect')
+                    .attr('x', 0)
+                    .attr('y', 0)
                     .attr('width', w)
                     .attr('height', h);
 
@@ -157,9 +158,10 @@
                     .attr('class', 'axis axis--x')
                     .call(xAxis)
                     .attr('font-size', axisFontSize)
-                    .attr('fill-opacity', axisFontOpacity)
+                    .attr('opacity', axisFontOpacity)
                     .attr('font-weight', axisFontWeight)
                     .call(responsiveAxisX, xAxis, xScale)
+                    .call(axisShow, isAxisPathShow, true)
                     .selectAll('text')
                     .call(wrap, xScale.bandwidth());
 
@@ -174,8 +176,9 @@
                     .attr('class', 'axis axis--y')
                     .attr('transform', `translate(${axisYLaneWidth}, 0)`)
                     .call(yAxis)
+                    .call(axisShow, isAxisPathShow, true)
                     .attr('font-size', axisFontSize)
-                    .attr('fill-opacity', axisFontOpacity)
+                    .attr('opacity', axisFontOpacity)
                     .attr('font-weight', axisFontWeight);
 
                 const axisYLabelLane = svg
@@ -262,7 +265,7 @@
 
                 const extent = [
                     [left + axisYLabelLaneWidth + axisYLaneWidth, top + __timeRangeLabelLaneHeight__],
-                    [w - right, g_h + top + __timeRangeLabelLaneHeight__]
+                    [w - right - __offsetRight__, g_h + top + __timeRangeLabelLaneHeight__]
                 ];
 
                 svg.call(brushX.bind(this), extent, xScale, data, this.updateTimeRangeLabel);
@@ -308,16 +311,6 @@
                     .delay((d, i) => i * (d.value === 0 ? 0 : (_.isNumber(delay) ? delay : 0)))
                     .attr('y', d => yScale(d.value))
                     .attr('height', d => g_h - yScale(d.value));
-
-                if (!isAxisPathShow) {
-                    axisXLane
-                        .selectAll('.domain')
-                        .attr('display', 'none');
-
-                    axisYLane
-                        .selectAll('.domain')
-                        .attr('display', 'none');
-                }
             },
             getTimeRangeLabel(dateTimeStart, dateTimeEnd) {
                 const FORMAT = 'YYYY-MM-DD HH:mm:ss.SSS';

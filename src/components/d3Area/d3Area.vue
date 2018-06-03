@@ -61,12 +61,14 @@
                     } = this.options,
                     [w, h] = this.getElWidthHeight(),
                     __offsetTop__ = 10,
-                    g_w =  w - left - right - axisYLaneWidth - axisYLabelLaneWidth,
+                    __offsetRight__ = 10,
+                    g_w =  w - left - right - axisYLaneWidth - axisYLabelLaneWidth - __offsetRight__,
                     g_h = h -top - bottom - axisXLaneHeight - axisXLabelLaneHeight - __offsetTop__;
 
-                    if (![g_w, g_h].every(el => el > 0)) {
-                        return;
-                    }
+                    if (![g_w, g_h].every(el => el > 0)) return;
+
+                    const isAxisXTime = isAxisTime(data);
+                    if (!isAxisXTime) return;
 
                     const ticks = selectTicksNumY(g_h);
 
@@ -74,6 +76,15 @@
                         .append('svg')
                         .attr('width', w)
                         .attr('height', h);
+
+                    svg.append('defs')
+                        .append('clipPath')
+                        .attr('id', 'clip-area')
+                        .append('rect')
+                        .attr('x', 0)
+                        .attr('y', 0)
+                        .attr('width', g_w)
+                        .attr('height', g_h);
 
                     const xScale = d3.scaleTime()
                         .domain(d3.extent(data, d => d.key))
@@ -115,7 +126,7 @@
                         .call(yAxis)
                         .attr('font-size', axisFontSize)
                         .attr('font-weight', axisFontWeight)
-                        .attr('fill-opacity', aixsFontOpacity);
+                        .attr('opacity', aixsFontOpacity);
 
                     axisXLane
                         .append('g')
@@ -123,7 +134,7 @@
                         .call(xAxis)
                         .attr('font-size', axisFontSize)
                         .attr('font-weight', axisFontWeight)
-                        .attr('fill-opacity', aixsFontOpacity);
+                        .attr('opacity', aixsFontOpacity);
 
                     const axisXLabelLane = svg
                         .append('g')
@@ -163,7 +174,7 @@
 
                     const extent = [
                         [left + axisYLabelLaneWidth + axisYLaneWidth, top + __offsetTop__],
-                        [w - right, h - axisXLaneHeight - axisXLabelLaneHeight]
+                        [w - right - __offsetRight__, h - axisXLaneHeight - axisXLabelLaneHeight]
                     ];
 
                     svg.call(brushX.bind(this), extent, xScale, data);
@@ -184,6 +195,7 @@
                         .append('path')
                         .datum(data)
                         .attr('d', area)
+                        .attr('clip-path', 'url(#clip-area)')
                         .attr('fill', fill)
                         .attr('fill-opacity', fillOpacity)
                         .attr('stroke', stroke)
