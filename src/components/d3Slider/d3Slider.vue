@@ -11,6 +11,7 @@
     import { showTip, hideTip } from '../../utils/tooltip';
     import { lastTickTextAnchorEnd, firstTickTextAnchorStart } from '../../utils/textAnchor';
     import { responsiveAxisX } from '../../utils/responsiveAxis';
+    import roundLine from '../../utils/roundLine';
 
     export default {
         name: 'd3-slider',
@@ -86,7 +87,7 @@
                         circleStrokeOpacity = 0.5,
                         circleStrokeWidth = 1.25,
 
-                        isAxisShow = false,
+                        isAxisShow = true,
 
                         axisFontSize = 12,
                         axisFontWeight = 400,
@@ -118,38 +119,31 @@
 
                     const g = svg
                         .append('g')
-                        .attr('transform', `translate(${left}, ${top})`)
-                        .attr('width', g_w)
-                        .attr('height', g_h);
+                        .attr('transform', `translate(${left}, ${top})`);
 
                     const track = g
                         .append('line')
                         .attr('class', 'track')
                         .attr('x1', trackStrokeWidth / 2)
-                        .attr('x2', g_w - trackStrokeWidth)
+                        .attr('x2', g_w - trackStrokeWidth / 2)
                         .attr('y1', g_h - circleRadius - circleStrokeWidth / 2)
                         .attr('y2', g_h - circleRadius - circleStrokeWidth / 2)
                         .attr('stroke', trackStroke)
                         .attr('stroke-opacity', trackStrokeOpacity)
-                        .attr('stroke-width', trackStrokeWidth);
+                        .attr('stroke-width', trackStrokeWidth)
+                        .call(roundLine, trackRounded);
 
                     const trackInset = g
                         .append('line')
                         .attr('class', 'track track--inset')
                         .attr('x1', trackStrokeWidth / 2)
-                        .attr('x2', g_w - trackStrokeWidth)
+                        .attr('x2', g_w - trackStrokeWidth / 2)
                         .attr('y1', g_h - circleRadius - circleStrokeWidth / 2)
                         .attr('y2', g_h - circleRadius - circleStrokeWidth / 2)
                         .attr('stroke', trackInsetStroke)
                         .attr('stroke-opacity', trackInsetStrokeOpacity)
-                        .attr('stroke-width', trackInsetStrokeWidth);
-
-                    if (trackRounded) {
-                        track
-                            .attr('stroke-linecap', 'round');
-                        trackInset
-                            .attr('stroke-linecap', 'round');
-                    }
+                        .attr('stroke-width', trackInsetStrokeWidth)
+                        .call(roundLine, trackRounded);
 
                     const circle = g
                         .append('circle')
@@ -213,7 +207,7 @@
                         if (Math.abs(hueError) < 1e-3) {
                             hueActual = hueTarget, hueTimer.stop(), hideTip();
 
-                            emit(self, 'drag-end', val);
+                            emit(self, 'dragend', val);
                         }
 
                         else {
