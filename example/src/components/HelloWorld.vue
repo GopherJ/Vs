@@ -22,7 +22,7 @@
         <d3-pie :data="multiLineData"></d3-pie>
         </div>
         <div class="box">
-            <d3-timeline :data="timelineData"></d3-timeline>
+            <d3-timeline :data="sliderData"></d3-timeline>
         </div>
         <div class="box">
             <d3-sankey-circular :nodes="nodes" :links="links"></d3-sankey-circular>

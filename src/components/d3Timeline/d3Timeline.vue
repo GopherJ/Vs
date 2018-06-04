@@ -85,27 +85,27 @@
                     .attr('width', w)
                     .attr('height', h);
 
-                const g = svg
-                    .append('g')
-                    .attr('transform', `translate(${left + __offset__}, ${top + __offset__})`)
-                    .attr('width', g_w + groupLaneWidth)
-                    .attr('height', g_h);
-
-                svg
-                    .call(cursor, g, [
-                        [groupLaneWidth, 0],
-                        [g_w + groupLaneWidth, g_h + axisXLaneHeight]
-                    ])
-                    .call(zoom, zooming);
-
                 svg.append('defs')
                     .append('clipPath')
                     .attr('id', 'clip-timeline')
                     .append('rect')
-                    .attr('x', groupLaneWidth)
+                    .attr('x', 0)
                     .attr('y', 0)
                     .attr('width', g_w)
                     .attr('height', g_h + axisXLaneHeight);
+
+                const g = svg
+                    .append('g')
+                    .attr('transform', `translate(${left + __offset__ + groupLaneWidth}, ${top + __offset__})`)
+                    .attr('width', g_w)
+                    .attr('height', g_h);
+
+                svg
+                    .call(cursor, g, [
+                        [0, 0],
+                        [g_w, g_h + axisXLaneHeight]
+                    ])
+                    .call(zoom, zooming);
 
                 svg.append('path')
                     .attr('d', roundedRect(left + __offset__ / 2, top + __offset__ / 2, g_w + groupLaneWidth + __offset__, g_h + axisXLaneHeight + __offset__, borderRadius, true, true, true, true))
@@ -116,23 +116,21 @@
 
                 g.append('line')
                     .attr('class', 'line--y')
-                    .attr('x1', groupLaneWidth)
-                    .attr('y1', 0)
-                    .attr('x2', groupLaneWidth)
                     .attr('y2', g_h)
                     .attr('stroke', boundingLineColor)
                     .attr('stroke-width', boundingLineWidth);
 
-                g.selectAll('.line--x')
+                svg.selectAll('.line--x')
                     .data(groups)
                     .enter()
+                    .append('g')
+                    .attr('transform', `translate(${left + __offset__}, ${top + __offset__})`)
                     .append('line')
                     .attr('class', 'line--x')
                     .attr('stroke', boundingLineColor)
                     .attr('stroke-width', boundingLineWidth)
                     .attr('y1', (d, i) => (i + 1) * groupHeight)
                     .attr('y2', (d, i) => (i + 1) * groupHeight)
-                    .attr('x1', 0)
                     .attr('x2', g_w + groupLaneWidth);
 
                 const xScale = d3.scaleTime()
@@ -183,16 +181,16 @@
                     .attr('font-weight', axisLabelFontWeight)
                     .attr('fill-opacity', axisLabelFontOpacity);
 
-                g
+                svg
                     .selectAll('.group--lane')
                     .data(groups)
                     .enter()
                     .append('g')
                     .attr('class', 'group--lane')
-                    .attr('fill', 'none')
-                    .attr('transform', (d, i) => `translate(0, ${i * groupHeight})`)
+                    .attr('transform', (d, i) => `translate(${left + __offset__}, ${top + __offset__ + i * groupHeight})`)
                     .attr('width', groupLaneWidth)
                     .attr('height', groupHeight)
+                    .attr('fill', 'none')
                     .append('text')
                     .attr('x', groupLaneWidth / 2)
                     .attr('y', groupHeight / 2)
@@ -205,6 +203,8 @@
                     .attr('fill', '#000');
 
                 function zooming() {
+                    hideTip();
+
                     const newScale = d3.event
                         .transform.rescaleX(xScale);
 
@@ -228,8 +228,8 @@
                     g
                         .append('line')
                         .attr('class', 'line--reference')
-                        .attr('x1', xScale(date) + groupLaneWidth)
-                        .attr('x2', xScale(date) + groupLaneWidth)
+                        .attr('x1', xScale(date))
+                        .attr('x2', xScale(date))
                         .attr('y1', 0)
                         .attr('y2', g_h)
                         .attr('stroke', currentTimeLineColor)
@@ -249,8 +249,8 @@
                         .append('line')
                         .attr('class', 'line--tick')
                         .attr('clip-path', 'url(#clip-timeline)')
-                        .attr('x1', d => xScale(d) + groupLaneWidth)
-                        .attr('x2', d => xScale(d) + groupLaneWidth)
+                        .attr('x1', d => xScale(d))
+                        .attr('x2', d => xScale(d))
                         .attr('y1', 0)
                         .attr('y2', g_h)
                         .attr('stroke', boundingLineColor)
@@ -283,7 +283,7 @@
                                     const symbolGen = d3.symbol().size(symbolSize);
 
                                     const symbol = G.append('path')
-                                        .attr('transform', `translate(${xScale(entry.at) + groupLaneWidth}, ${Y + H / 2})`)
+                                        .attr('transform', `translate(${xScale(entry.at)}, ${Y + H / 2})`)
                                         .attr('class', `${entry.className ? entry.className : 'entry--point--default'}`)
                                         .attr('d', symbolGen.type(d3[entry.symbol] || d3['symbolCircle'])());
 
@@ -293,8 +293,8 @@
                                 }
 
                                 else if (entry instanceof Interval) {
-                                    const X = xScale(entry.from) + groupLaneWidth,
-                                        W = xScale(entry.to) + groupLaneWidth - X;
+                                    const X = xScale(entry.from),
+                                        W = xScale(entry.to) - X;
 
                                     const G = g
                                         .append('g')

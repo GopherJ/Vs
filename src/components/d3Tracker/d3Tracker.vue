@@ -218,6 +218,8 @@
                     .attr('height', g_h);
 
                 function zooming() {
+                    hideTip();
+
                     const newXScale = d3.event.transform.rescaleX(xScale);
                     self.scale = newXScale;
 
