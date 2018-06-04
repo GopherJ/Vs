@@ -42,7 +42,8 @@
         <div class="box">
             <d3-slider :min="new Date(2017, 1, 1)" :max="new Date(2018, 1, 1)" @drag-end="(...x) => console(x)"></d3-slider>
             <d3-slider min="brown" max="steelblue" @drag-end="(...x) => console(x)"></d3-slider>
-            <d3-slider :min="1" :max="10" @drag-end="(...x) => console(x)"></d3-slider>
+            <d3-slider :min="1" :max="10" v-model="t"></d3-slider>
+            {{t}}
         </div>
         <div class="box">
             <d3-icicle-vertical :data="icicleData"> </d3-icicle-vertical>
@@ -70,6 +71,7 @@
         name: 'HelloWorld',
         data() {
             return {
+                t: 10,
                 icicleData: {
   "key": "A1",
   "children": [

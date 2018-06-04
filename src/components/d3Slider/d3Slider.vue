@@ -214,7 +214,7 @@
                     if (Math.abs(hueError) < 1e-3) {
                         hueActual = hueTarget, hueTimer.stop(), hideTip();
 
-                        emit(self, 'dragend', val);
+                        emit(self, 'input', val);
                     }
 
                     else {
@@ -225,7 +225,7 @@
 
                             showTip(typeof val === 'number'? val.toFixed(2) : val, circle.node())();
 
-                        emit(self, 'dragging', val);
+                        emit(self, 'input', val);
                     }
                 };
 
