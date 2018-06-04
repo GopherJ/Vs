@@ -37,7 +37,7 @@
                         groupLabelFontWeight = 400,
                         groupLabelFontOpacity = 1,
 
-                        groupLaneWidth = 0,
+                        groupLaneWidth = 200,
 
                         tickSize = 10,
                         tickPadding = 8,
@@ -89,18 +89,6 @@
                     .append('g')
                     .attr('transform', `translate(${left + __offset__}, ${top + __offset__})`)
                     .attr('width', g_w + groupLaneWidth)
-                    .attr('height', g_h);
-
-                const groupLaneContainer = g
-                    .append('g')
-                    .attr('class', 'group--container')
-                    .attr('width', groupLaneWidth)
-                    .attr('height', g_h);
-
-                const entryLaneContainer = g
-                    .append('g')
-                    .attr('class', 'entry--container')
-                    .attr('width', g_w)
                     .attr('height', g_h);
 
                 svg
@@ -195,7 +183,7 @@
                     .attr('font-weight', axisLabelFontWeight)
                     .attr('fill-opacity', axisLabelFontOpacity);
 
-                groupLaneContainer
+                g
                     .selectAll('.group--lane')
                     .data(groups)
                     .enter()
@@ -233,15 +221,15 @@
 
 
                 function drawReference(xScale) {
-                    const referenceSelection = entryLaneContainer.select('.line--reference');
+                    const referenceSelection = g.select('.line--reference');
                     if (!referenceSelection.empty()) referenceSelection.remove();
 
                     const date = new Date();
-                    entryLaneContainer
+                    g
                         .append('line')
                         .attr('class', 'line--reference')
-                        .attr('x1', xScale(date))
-                        .attr('x2', xScale(date))
+                        .attr('x1', xScale(date) + groupLaneWidth)
+                        .attr('x2', xScale(date) + groupLaneWidth)
                         .attr('y1', 0)
                         .attr('y2', g_h)
                         .attr('stroke', currentTimeLineColor)
@@ -251,18 +239,18 @@
                 }
 
                 function drawTickLines(xScale) {
-                    const ticksSelection = entryLaneContainer.selectAll('.line--tick');
+                    const ticksSelection = g.selectAll('.line--tick');
                     if (!ticksSelection.empty()) ticksSelection.remove();
 
                     const ticks = xScale.ticks();
-                    entryLaneContainer.selectAll('.line--tick')
+                    g.selectAll('.line--tick')
                         .data(ticks)
                         .enter()
                         .append('line')
                         .attr('class', 'line--tick')
                         .attr('clip-path', 'url(#clip-timeline)')
-                        .attr('x1', d => xScale(d))
-                        .attr('x2', d => xScale(d))
+                        .attr('x1', d => xScale(d) + groupLaneWidth)
+                        .attr('x2', d => xScale(d) + groupLaneWidth)
                         .attr('y1', 0)
                         .attr('y2', g_h)
                         .attr('stroke', boundingLineColor)
@@ -271,7 +259,7 @@
                 }
 
                 function drawEntries(xScale) {
-                    const entriesSelection = entryLaneContainer.selectAll('.entry');
+                    const entriesSelection = g.selectAll('.entry');
                     if (!entriesSelection.empty()) entriesSelection.remove();
 
                     for (let i = 0, l = groups.length; i < l; i += 1) {
@@ -287,7 +275,7 @@
                                 const entry = entries[k];
 
                                 if (entry instanceof Point) {
-                                    const G = entryLaneContainer
+                                    const G = g
                                         .append('g')
                                         .attr('class', 'entry')
                                         .attr('clip-path', 'url(#clip-timeline)');
@@ -295,7 +283,7 @@
                                     const symbolGen = d3.symbol().size(symbolSize);
 
                                     const symbol = G.append('path')
-                                        .attr('transform', `translate(${xScale(entry.at)}, ${Y + H / 2})`)
+                                        .attr('transform', `translate(${xScale(entry.at) + groupLaneWidth}, ${Y + H / 2})`)
                                         .attr('class', `${entry.className ? entry.className : 'entry--point--default'}`)
                                         .attr('d', symbolGen.type(d3[entry.symbol] || d3['symbolCircle'])());
 
@@ -305,10 +293,10 @@
                                 }
 
                                 else if (entry instanceof Interval) {
-                                    const X = xScale(entry.from),
-                                        W = xScale(entry.to) - X;
+                                    const X = xScale(entry.from) + groupLaneWidth,
+                                        W = xScale(entry.to) + groupLaneWidth - X;
 
-                                    const G = entryLaneContainer
+                                    const G = g
                                         .append('g')
                                         .attr('class', 'entry');
 
