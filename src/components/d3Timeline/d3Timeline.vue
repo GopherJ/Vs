@@ -37,7 +37,7 @@
                         groupLabelFontWeight = 400,
                         groupLabelFontOpacity = 1,
 
-                        groupLaneWidth = 200,
+                        groupLaneWidth = 0,
 
                         tickSize = 10,
                         tickPadding = 8,
@@ -51,7 +51,7 @@
                         axisXLabel = null,
 
                         axisLabelFontSize = 12,
-                        axisLabelFontWeight = 400,
+                        axisLabelFontWeight = 600,
                         axisLabelFontOpacity = 0.5,
 
                         backgroundColor = 'rgba(255, 255, 255, 0.125)',
@@ -72,12 +72,13 @@
                     { left = 0, top = 0, right = 0, bottom = 0 } = this.margin,
                     __offset__  = borderWidth,
                     g_w = w - left - right - groupLaneWidth - 2 * __offset__,
-                    g_h = h - top - bottom - axisXLaneHeight - axisXLabelLaneHeight - 2 * __offset__,
-                    groupHeight = g_h / groups.length,
-                    [paddingInner, paddingOuter] = selectPaddingInnerOuterY(groupHeight),
-                    self = this;
+                    g_h = h - top - bottom - axisXLaneHeight - axisXLabelLaneHeight - 2 * __offset__;
 
                 if (![g_w, g_h].every(el => el > 0)) return;
+
+                const groupHeight = g_h / groups.length,
+                    [paddingInner, paddingOuter] = selectPaddingInnerOuterY(groupHeight),
+                    self = this;
 
                 const svg = d3.select(this.$el)
                     .append('svg')
@@ -105,7 +106,7 @@
                 svg
                     .call(cursor, g, [
                         [groupLaneWidth, 0],
-                        [g_w + groupLaneWidth, g_h]
+                        [g_w + groupLaneWidth, g_h + axisXLaneHeight]
                     ])
                     .call(zoom, zooming);
 
@@ -162,14 +163,16 @@
 
                 const axisXLane = svg
                     .append('g')
-                    .attr('transform', `translate(${left + groupLaneWidth + __offset__}, ${top + g_h + __offset__})`);
+                    .attr('transform', `translate(${left + groupLaneWidth + __offset__}, ${top + g_h + __offset__})`)
+                    .attr('width', g_w)
+                    .attr('height', axisXLaneHeight);
 
                 axisXLane
                     .call(xAxis)
                     .attr('class', 'axis axis--x')
                     .attr('font-size', axisFontSize)
                     .attr('font-weight', axisFontWeight)
-                    .attr('opacity', axisFontOpacity)
+                    .attr('fill-opacity', axisFontOpacity)
                     .selectAll('line')
                     .attr('stroke', boundingLineColor)
                     .attr('stroke-width', boundingLineWidth);
