@@ -173,9 +173,9 @@
 
                 axisXLane
                     .append('line')
-                    .attr('x2', g_w)
-                    .attr('stroke', boundingLineColor)
-                    .attr('stroke-width', boundingLineWidth)
+                    .attr('x2', g_w);
+
+                axisXLane
                     .selectAll('line')
                     .attr('stroke', boundingLineColor)
                     .attr('stroke-width', boundingLineWidth);
@@ -290,6 +290,7 @@
                 function drawTicks(xScale) {
                     const ticks = xScale.ticks(),
                         ticksSelection = g.selectAll('.line--tick');
+
                     if (!ticksSelection.empty()) ticksSelection.remove();
 
                     g.selectAll('.line--tick')
@@ -383,8 +384,8 @@
 
 
                     self.timer = d3.timer(function(elapsed) {
-                        const line = svg.select('.line--reference'),
-                            overlay = svg.select('.overlay');
+                        const line = g.select('.line--reference'),
+                            overlay = g.select('.overlay');
 
                         const
                             x = parseFloat(line.attr('x1'));
