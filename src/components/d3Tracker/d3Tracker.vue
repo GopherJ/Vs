@@ -54,9 +54,7 @@
                     for (let I = 0, L = lane.length; I < L; I += 1) {
                         const entry = lane[I];
 
-                        if (entry instanceof Point) {
-                            continue;
-                        }
+                        if (entry instanceof Point) continue;
 
                         const fromTimestamp = entry.from.getTime(),
                             toTimestamp = entry.to.getTime();
@@ -68,6 +66,23 @@
                 }
 
                 return entries;
+            },
+            getNextEntryFrom(lanes) {
+                let from;
+
+                for (let i = 0, l = lanes.length; i < l; i += 1) {
+                    const lane = lanes[i];
+
+                    for (let I = 0, L = lane.length; I < L; I += 1) {
+                        const entry = lane[I];
+
+                        if (entry instanceof Interval && entry.from > this.reference) {
+                            from = !from ? entry.from : (from > entry.from ? entry.from : from);
+                        }
+                    }
+                }
+
+                return from;
             },
             drawTracker() {
                 const [w, h] = this.getElWidthHeight(),
@@ -109,6 +124,7 @@
                         overlayWidth = 60,
 
                         playDuration = 10000,
+                        playJump = true
                     } = this.options,
                     {
                         axisXLabelLaneHeight = _.isNull(axisXLabel) ? 0 : 30,
@@ -382,41 +398,72 @@
                 self.play = function play() {
                     let start = self.scale(dateTimeStart),
                         end = self.scale(dateTimeEnd),
-                        v = (end - start) / playDuration * 16;
-
+                        speed = (end - start) / playDuration * 16;
 
                     self.timer = d3.timer(function(elapsed) {
                         const line = g.select('.line--reference'),
                             overlay = g.select('.overlay');
 
-                        const
-                            x = parseFloat(line.attr('x1'));
+                        const xPrevious = +line.attr('x1'),
+                            start = self.scale(dateTimeStart),
                             end = self.scale(dateTimeEnd);
 
-                        if (x >= end) {
+                        if (xPrevious >= end) {
                             line
-                                .attr('x1', self.scale(dateTimeStart))
-                                .attr('x2', self.scale(dateTimeStart));
+                                .attr('x1', start)
+                                .attr('x2', start);
 
                             overlay
-                                .attr('x', self.scale(dateTimeStart) - overlayWidth / 2);
+                                .attr('x', start - overlayWidth / 2);
 
-                            self.reference = self.scale.invert(self.scale(dateTimeStart));
+                            self.reference = self.scale.invert(start);
                             self.pause = true;
 
                             self.timer.stop();
                         } else {
+                            const xNext = xPrevious + speed;
+
                             line
-                                .attr('x1', x + v)
-                                .attr('x2', x + v);
+                                .attr('x1', xNext)
+                                .attr('x2', xNext);
 
                             overlay
-                                .attr('x', x + v - overlayWidth / 2);
+                                .attr('x', xNext - overlayWidth / 2);
 
-                            self.reference = self.scale.invert(x + v);
+                            self.reference = self.scale.invert(xNext);
                             const entries = self.findPassingEntries(lanes);
 
-                            emit(self, 'reference-updated', self.getTimeRange(dateTimeStart, dateTimeEnd), entries);
+                            if (!entries.length && playJump) {
+                                const nextEntryFrom = self.getNextEntryFrom(lanes);
+
+                                if (!nextEntryFrom) {
+                                    self.reference = dateTimeStart;
+                                    const xNext = self.scale(self.reference);
+
+                                    line
+                                        .attr('x1', xNext)
+                                        .attr('x2', xNext);
+
+                                    overlay
+                                        .attr('x', xNext - overlayWidth / 2);
+
+                                    self.pause = true;
+
+                                    self.timer.stop();
+                                } else {
+                                    self.reference = nextEntryFrom;
+                                    const xNext = self.scale(self.reference);
+
+                                    line
+                                        .attr('x1', xNext)
+                                        .attr('x2', xNext);
+
+                                    overlay
+                                        .attr('x', xNext - overlayWidth / 2);
+                                }
+                            } else {
+                                emit(self, 'reference-updated', self.getTimeRange(dateTimeStart, dateTimeEnd), entries);
+                            }
                         }
                     }, 16);
                 }

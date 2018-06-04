@@ -1,7 +1,14 @@
 <template>
     <div class="section">
+        <nav class="nav">
+            <header>
+                <strong>
+                    d3-vs
+                </strong>
+            </header>
+        </nav>
         <div class="box">
-        <d3-metric :data="metricData"></d3-metric>
+            <d3-metric :data="metricData"></d3-metric>
         </div>
         <div class="box">
         <d3-multi-line :data="multiLineData"></d3-multi-line>
@@ -671,8 +678,8 @@
                     },
 
                     {
-                        from : new Date(2018, 1, 2),
-                        to: new Date(2018, 1,3),
+                        from : new Date(2018, 2, 2),
+                        to: new Date(2018, 2,3),
                         label: 'gps tracker',
                         id: 3,
                         title: 'c'
