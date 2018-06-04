@@ -1,4 +1,6 @@
+import { isDate } from 'lodash';
 /* eslint-disable */
+
 /**
  *
  * time entry that represent a point
@@ -54,9 +56,10 @@ const groupBy = (data) => {
     let dateTimeStart, dateTimeEnd;
 
     for (let i = 0, l = data.length; i < l; i += 1) {
-        const { group, from, to, label, at, title, className, symbol } = data[i];
+        const entry = data[i],
+            { group, from, to, label, at, title, className, symbol } = entry;
 
-        if ((from > 0) && (to > 0) && label) {
+        if (isDate(from) && isDate(to) && from < to) {
             dateTimeStart = i === 0
                 ? from
                 : (dateTimeStart > from ? from : dateTimeStart);
@@ -74,7 +77,7 @@ const groupBy = (data) => {
             }
         }
 
-        else if ((at > 0) && title) {
+        else if (isDate(at)) {
             dateTimeStart = i === 0
                 ? at
                 : (dateTimeStart > at ? at : dateTimeStart);
