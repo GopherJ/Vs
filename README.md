@@ -23,7 +23,6 @@ npm i -S d3-vs
 - `d3VerticalBar`
 - `d3Area`
 - `d3Line`
-
 - `d3Pie`
 
 ### Time Serie
