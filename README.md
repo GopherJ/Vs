@@ -2,10 +2,12 @@
 Vue Visualisation Package With `d3.js`.
 
 
+
 ## Installation
 ```javascript
 npm i -S d3-vs
 ```
+
 
 
 ## Demo
@@ -63,6 +65,7 @@ npm i -S d3-vs
 - `d3SankeyCircular`
 
 
+
 ## Usage
 
 `main.js`
@@ -85,17 +88,17 @@ Vue.use(Vs);
 <d3-line
     :data="data"
     :options="options"
+    :margin="margin"
     width="100%"
-    height="400px"
-    :margin="margin">
+    height="400px">
 </d3-line>
 
 <d3-horizontal-bar
     :data="data"
     :options=""options
+    :margin="margin"
     width="100%"
-    height="400px"
-    :margin="margin">
+    height="400px">
 </d3-horizontal-bar>
 
 <d3-vertical-bar
@@ -109,19 +112,19 @@ Vue.use(Vs);
 <d3-area
     :data="data"
     :options="options"
+    :margin="margin"
     width="100%"
-    height="400px"
-    :margin="margin">
+    height="400px">
 </d3-area>
 
 <d3-sankey-circular
     :nodes="nodes"
     :links="links"
     :options="options"
-    width="100%"
-    height="400px"
     :nodeTitle="nodeTitle"
-    :linkTitle="linkTitle">
+    :linkTitle="linkTitle"
+    width="100%"
+    height="400px">
 </d3-sankey-circular>
 
 <d3-multi-line
@@ -135,9 +138,9 @@ Vue.use(Vs);
 <d3-timelion
     :data="data"
     :options="options"
+    :margin="margin"
     width="100%"
     height="400px"
-    :margin="margin"
     @range-updated="(dateTimeStart, dateTimeEnd, interval) => fetchDataWithCurrentInterval(dateTimeStart, dateTimeEnd, interval)"
     @interval-updated="interval => fetchDataWithInterval(interval)">
 </d3-timelion>
@@ -149,7 +152,6 @@ Vue.use(Vs);
     width="100%"
     height="400px">
 </d3-timeline>
-
 
 <d3-progress-arc
     :data="data"
@@ -164,10 +166,12 @@ Vue.use(Vs);
     :options="options"
     :margin="margin"
     width="100%"
-    height="400px">
+    height="400px"
+    @reference-updated="(dateTimeRange, entries) => yourMethod(dateTimeRange, entries)">
 </d3-tracker>
 
 <d3-slider
+    v-model="data"
     :min="min"
     :max="max"
     :margin="margin"
@@ -231,50 +235,60 @@ Vue.use(Vs);
     width="100%"
     height="400px">
 </d3-metric>
+
+<d3-circle
+    :data="data"
+    :options="options"
+    :margin="margin"
+    width="100%"
+    height="400px">
+</d3-circle>
 ```
 
 
-## Examples
 
-![](./images/d3-metric.PNG)
+## Screenshots
 
-![](./images/d3-circle.PNG)
+![d3Metric](./images/d3-metric.PNG)
 
-![](./images/d3-horizontal-bar.PNG)
+![d3Circle](./images/d3-circle.PNG)
 
-![](./images/d3-vertical-bar.PNG)
+![d3HorizontalBar](./images/d3-horizontal-bar.PNG)
 
-![](./images/d3-pie.PNG)
+![d3VerticalBar](./images/d3-vertical-bar.PNG)
 
-![](./images/d3-line.PNG)
+![d3Pie](./images/d3-pie.PNG)
 
-![](./images/d3-area.PNG)
+![d3Line](./images/d3-line.PNG)
 
-![](./images/d3-multi-line.PNG)
+![d3Area](./images/d3-area.PNG)
 
-![](./images/d3-timeline.PNG)
+![d3MultiLine](./images/d3-multi-line.PNG)
 
-![](./images/d3-timelion.PNG)
+![d3Timline](./images/d3-timeline.PNG)
 
-![](./images/d3-tracker.PNG)
+![d3Timelion](./images/d3-timelion.PNG)
 
-![](./images/d3-sankey-circular.PNG)
+![d3Tracker](./images/d3-tracker.PNG)
 
-![](./images/d3-icicle-vertical.PNG)
+![d3SankeyCircular](./images/d3-sankey-circular.PNG)
 
-![](./images/d3-icicle-horizontal.PNG)
+![d3ICicleVertical](./images/d3-icicle-vertical.PNG)
 
-![](./images/d3-sunburst.PNG)
+![d3ICicleHorizontal](./images/d3-icicle-horizontal.PNG)
 
-![](./images/d3-pack.PNG)
+![d3Sunburst](./images/d3-sunburst.PNG)
 
-![](./images/d3-tree.PNG)
+![d3Pack](./images/d3-pack.PNG)
 
-![](./images/d3-cluster.PNG)
+![d3Tree](./images/d3-tree.PNG)
 
-![](./images/d3-slider.PNG)
+![d3Cluster](./images/d3-cluster.PNG)
 
-![](./images/d3-progress-arc.gif)
+![d3Slider](./images/d3-slider.PNG)
+
+![d3ProgressArc](./images/d3-progress-arc.gif)
+
 
 
 ## ToDo
@@ -292,6 +306,7 @@ Vue.use(Vs);
 - `d3WordCloud`
 - `d3Markdown`
 - `d3JsonViewer`
+
 
 
 ## License
