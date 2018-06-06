@@ -1,74 +1,84 @@
 <template>
-    <div class="section">
-        <nav class="nav">
-            <header>
-                <strong>
-                    d3-vs
-                </strong>
+    <div>
+        <nav class="hero is-primary is-bold">
+            <header class="hero-body has-text-centered">
+                <h1 class="title">
+                    Vs
+                </h1>
+                <h2 class="subtitle">
+                    0.3.1
+                </h2>
             </header>
         </nav>
-        <div class="box">
-            <d3-metric :data="metricData"></d3-metric>
-        </div>
-        <div class="box">
-        <d3-multi-line :data="multiLineData"></d3-multi-line>
-        </div>
-        <div class="box">
-        <d3-horizontal-bar :data="multiLineData"></d3-horizontal-bar>
-        </div>
-        <div class="box">
-        <d3-vertical-bar :data="multiLineData" @range-updated="(...args) => console(args)"></d3-vertical-bar>
-        </div>
-        <div class="box">
-        <d3-circle :data="0.3"></d3-circle>
-        </div>
-        <div class="box">
-        <d3-line :data="multiLineData"></d3-line>
-        </div>
-        <div class="box">
-        <d3-pie :data="multiLineData"></d3-pie>
-        </div>
-        <div class="box">
-            <d3-timeline :data="sliderData"></d3-timeline>
-        </div>
-        <div class="box">
-            <d3-sankey-circular :nodes="nodes" :links="links"></d3-sankey-circular>
-        </div>
-        <div class="box">
-            <d3-timelion :data="timelionData"></d3-timelion>
-        </div>
-        <div class="box">
-            <d3-area :data="timelionData"></d3-area>
-        </div>
-        <div class="box">
-            <d3-tracker ref="tracker" :data="sliderData" :height="'200px'" @reference-updated="(...x) => console(x)" @range-updated="(...x) => console(x)"></d3-tracker>
-        </div>
-        <div class="box">
-            <button class="button" @click="$refs.tracker.setPause()">skjqlwj</button>
-        </div>
-        <div class="box">
-            <d3-slider :min="new Date(2017, 1, 1)" :max="new Date(2018, 1, 1)" @drag-end="(...x) => console(x)"></d3-slider>
-            <d3-slider min="brown" max="steelblue" @drag-end="(...x) => console(x)"></d3-slider>
-            <d3-slider :min="1" :max="10" v-model="t"></d3-slider>
-            {{t}}
-        </div>
-        <div class="box">
-            <d3-icicle-vertical :data="icicleData"> </d3-icicle-vertical>
-        </div>
-        <div class="box">
-            <d3-icicle-horizontal :data="icicleData"> </d3-icicle-horizontal>
-        </div>
-        <div class="box">
-            <d3-sunburst :data="icicleData"></d3-sunburst>
-        </div>
-        <div class="box">
-            <d3-tree :data="icicleData"></d3-tree>
-        </div>
-        <div class="box">
-            <d3-pack :data="icicleData"></d3-pack>
-        </div>
-        <div class="box">
-            <d3-cluster :data="icicleData"></d3-cluster>
+
+        <div class="section">
+            <div class="box">
+                <d3-metric :data="metricData"></d3-metric>
+            </div>
+
+            <div class="box">
+                <d3-multi-line :data="multiLineData"></d3-multi-line>
+            </div>
+
+            <div class="box">
+                <d3-horizontal-bar :data="multiLineData"></d3-horizontal-bar>
+            </div>
+            <div class="box">
+                <d3-vertical-bar :data="multiLineData" @range-updated="(...args) => console(args)"></d3-vertical-bar>
+            </div>
+            <div class="box">
+                <d3-circle :data="0.3"></d3-circle>
+            </div>
+            <div class="box">
+                <d3-line :data="multiLineData"></d3-line>
+            </div>
+            <div class="box">
+                <d3-pie :data="multiLineData"></d3-pie>
+            </div>
+            <div class="box">
+                <d3-timeline :data="timelineData"></d3-timeline>
+            </div>
+            <div class="box">
+                <d3-sankey-circular :nodes="nodes" :links="links"></d3-sankey-circular>
+            </div>
+            <div class="box">
+                <d3-timelion :data="timelionData"></d3-timelion>
+            </div>
+            <div class="box">
+                <d3-area :data="timelionData"></d3-area>
+            </div>
+            <div class="box">
+                <d3-tracker ref="tracker" :data="sliderData" :height="'200px'" @reference-updated="(...x) => console(x)"
+                            @range-updated="(...x) => console(x)"></d3-tracker>
+            </div>
+            <div class="box">
+                <button class="button" @click="$refs.tracker.setPause()">skjqlwj</button>
+            </div>
+            <div class="box">
+                <d3-slider :min="new Date(2017, 1, 1)" :max="new Date(2018, 1, 1)"
+                           @drag-end="(...x) => console(x)"></d3-slider>
+                <d3-slider min="brown" max="steelblue" @drag-end="(...x) => console(x)"></d3-slider>
+                <d3-slider :min="1" :max="10" v-model="t"></d3-slider>
+                {{t}}
+            </div>
+            <div class="box">
+                <d3-icicle-vertical :data="icicleData"></d3-icicle-vertical>
+            </div>
+            <div class="box">
+                <d3-icicle-horizontal :data="icicleData"></d3-icicle-horizontal>
+            </div>
+            <div class="box">
+                <d3-sunburst :data="icicleData"></d3-sunburst>
+            </div>
+            <div class="box">
+                <d3-tree :data="icicleData"></d3-tree>
+            </div>
+            <div class="box">
+                <d3-pack :data="icicleData"></d3-pack>
+            </div>
+            <div class="box">
+                <d3-cluster :data="icicleData"></d3-cluster>
+            </div>
         </div>
     </div>
 </template>
@@ -80,68 +90,31 @@
             return {
                 t: 10,
                 icicleData: {
-  "key": "A1",
-  "children": [
-    {
-      "key": "B1",
-      "children": [
-        {
-          "key": "C1",
-          "value": 100
-        },
-        {
-          "key": "C2",
-          "value": 300
-        },
-        {
-          "key": "C3",
-          "value": 200
-        }
-      ]
-    },
-    {
-      "key": "B2",
-      "value": 200
-    }
-  ]
-},
-                trackerData2:  [
-    {
-        "id": "e53b8392adbef393",
-        "from": "2018-05-25T06:43:47.861Z",
-        "to": "2018-05-25T08:19:59.110Z",
-        "title": "Fri May 25 2018 08:00:00 GMT+0200 (Romance Daylight Time)<br>2376",
-        "label": "e53b8392adbef393"
-    },
-    {
-        "id": "e53b8392adbef393",
-        "from": "2018-05-25T09:15:41.006Z",
-        "to": "2018-05-25T09:18:17.530Z",
-        "title": "Fri May 25 2018 10:30:00 GMT+0200 (Romance Daylight Time)<br>176",
-        "label": "e53b8392adbef393"
-    },
-    {
-        "id": "e53b8392adbef393",
-        "from": "2018-05-25T11:35:35.627Z",
-        "to": "2018-05-25T13:04:39.897Z",
-        "title": "Fri May 25 2018 13:00:00 GMT+0200 (Romance Daylight Time)<br>482",
-        "label": "e53b8392adbef393"
-    },
-    {
-        "id": "e53b8392adbef393",
-        "from": "2018-05-25T13:30:54.431Z",
-        "to": "2018-05-25T15:47:06.449Z",
-        "title": "Fri May 25 2018 15:30:00 GMT+0200 (Romance Daylight Time)<br>119",
-        "label": "e53b8392adbef393"
-    },
-    {
-        "id": "e53b8392adbef393",
-        "from": "2018-05-25T16:02:49.980Z",
-        "to": "2018-05-25T16:45:33.502Z",
-        "title": "Fri May 25 2018 18:00:00 GMT+0200 (Romance Daylight Time)<br>81",
-        "label": "e53b8392adbef393"
-    }
-],
+                    "key": "A1",
+                    "children": [
+                        {
+                            "key": "B1",
+                            "children": [
+                                {
+                                    "key": "C1",
+                                    "value": 100
+                                },
+                                {
+                                    "key": "C2",
+                                    "value": 300
+                                },
+                                {
+                                    "key": "C3",
+                                    "value": 200
+                                }
+                            ]
+                        },
+                        {
+                            "key": "B2",
+                            "value": 200
+                        }
+                    ]
+                },
                 metricData: 40000,
                 timelionData:
                     [
@@ -477,62 +450,62 @@
                 timelineData: [
                     {
                         "group": "Name",
-                        "at": 1462053600000,
+                        "at": new Date(1462053600000),
                         "symbol": "symbolCircle",
                         "title": "kjlqwjq",
                         "className": "entry--point--warn"
                     },
                     {
                         "group": "Name",
-                        "at": 1462053600000,
+                        "at": new Date(1462053600000),
                         "title": "wlqjlw",
                         "className": "entry--point--success",
                         "symbol": "symbolWye"
                     },
                     {
                         "group": "Name",
-                        "at": 1467324000000,
+                        "at": new Date(1467324000000),
                         "className": "entry--point--error",
                         "title": "lqwpqow",
                         "symbol": "symbolSquare"
                     },
                     {
                         "group": "Name",
-                        "at": 1470002400000,
+                        "at": new Date(1470002400000),
                         "className": "entry--point--error",
                         "symbol": "symbolDiamond",
                         "title": "wopqowp"
                     },
                     {
                         "group": "Name",
-                        "at": 1472680800000,
+                        "at": new Date(1472680800000),
                         "title": "qoiwiu",
                         "className": "entry--point--error",
                         "symbol": "symbolTriangle"
                     },
                     {
                         "group": "Name",
-                        "at": 1475272800000,
+                        "at": new Date(1475272800000),
                         "symbol": "symbolSquare",
                         "title": "poiwsklajs"
                     },
                     {
                         "group": "Type",
-                        "at": 1462917600000,
+                        "at": new Date(1462917600000),
                         "title": "owqpwpqw",
                         "className": "entry--point--success",
                         "symbol": "symbolSquare"
                     },
                     {
                         "group": "Type",
-                        "at": 1463263200000,
+                        "at": new Date(1463263200000),
                         "className": "entry--point--success",
                         "symbol": "symbolCross",
                         "title": "qpwiqiwpo"
                     },
                     {
                         "group": "Type",
-                        "at": 1468101600000,
+                        "at": new Date(1468101600000),
                         "className": "entry--point--success",
                         "symbol": "symbolCross",
                         "title": "wqpwipqw"
@@ -540,13 +513,13 @@
                     {
                         "group": "Type",
                         "label": "I'm a label with a custom class",
-                        "from": 1464732000000,
-                        "to": 1467324000000,
+                        "from": new Date(1464732000000),
+                        "to": new Date(1467324000000),
                         "title": "This is my title"
                     },
                     {
                         "group": "Type",
-                        "at": 1475272800000,
+                        "at": new Date(1475272800000),
                         "title": "wqwqwipqw",
                         "className": "entry--point--warn",
                         "symbol": "symbolStar"
@@ -554,21 +527,21 @@
                     {
                         "group": "Type",
                         "symbol": "symbolStar",
-                        "at": 1477954800000,
+                        "at": new Date(1477954800000),
                         "title": "wqsjksals"
                     },
                     {
                         "group": "Imp",
                         "label": "I'am a label of class 'entry--interval--error'",
-                        "from": 1463263200000,
-                        "to": 1467324000000,
+                        "from": new Date(1463263200000),
+                        "to": new Date(1467324000000),
                         "className": "entry--interval--error"
                     },
                     {
                         "group": "Imp",
                         "label": "I'am a label of class 'entry--interval--success'",
-                        "from": 1470002400000,
-                        "to": 1473631200000,
+                        "from": new Date(1470002400000),
+                        "to": new Date(1473631200000),
                         "className": "entry--interval--success"
                     }
                 ],
@@ -662,30 +635,30 @@
                 ],
                 sliderData: [
                     {
-                        from : new Date(2018, 1, 1),
-                        to: new Date(2018, 1,2),
+                        from: new Date(2018, 1, 1),
+                        to: new Date(2018, 1, 2),
                         label: 'gps tracker',
                         id: 1,
                         title: 'a'
                     },
 
                     {
-                        from : new Date(2018, 1, 1),
-                        to: new Date(2018, 1,2),
+                        from: new Date(2018, 1, 1),
+                        to: new Date(2018, 1, 2),
                         label: 'gps tracker',
                         id: 2,
                         title: 'b'
                     },
 
                     {
-                        from : new Date(2018, 2, 2),
-                        to: new Date(2018, 2,3),
+                        from: new Date(2018, 2, 2),
+                        to: new Date(2018, 2, 3),
                         label: 'gps tracker',
                         id: 3,
                         title: 'c'
                     },
                     {
-                        at : new Date(2018,1, 1, 12),
+                        at: new Date(2018, 1, 1, 12),
                         id: 4,
                         title: 'd'
                     }
@@ -693,7 +666,7 @@
 
             }
         },
-        methods:{
+        methods: {
             console(args) {
                 console.log(args)
             },

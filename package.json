@@ -1,6 +1,6 @@
 {
   "name": "d3-vs",
-  "version": "0.3.3",
+  "version": "0.3.4",
   "description": "d3 visualisation with vuejs",
   "main": "dist/Vs.min.js",
   "scripts": {
