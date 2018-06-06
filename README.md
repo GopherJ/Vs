@@ -13,21 +13,18 @@ npm i -S d3-vs
 
 
 
-## Lists Of Components
+## Lists
 
 ### Basic
 
-> display the data which is of format `[{key: key, value: value}]`, key can be `Date`
-
 - `d3HorizontalBar`
-    - `brush support`
 - `d3VerticalBar`
 - `d3Area`
 - `d3Line`
 
 - `d3Pie`
 
-### Time Series
+### Time Serie
 
 - `d3HorizontalBar`
 - `d3VerticalBar`
@@ -52,7 +49,7 @@ npm i -S d3-vs
 - `d3Sunburst`
 - `d3Pack`
 
-### Metrics
+### Metric
 
 - `d3Metric`
 - `d3Circle`
@@ -117,9 +114,23 @@ Vue.use(Vs);
     :margin="margin">
 </d3-area>
 
-<d3-sankey-circular :nodes="nodes" :links="links" :options="options" width="100%" height="400px" :nodeTitle="nodeTitle" :linkTitle="linkTitle"></d3-sankey-circular>
+<d3-sankey-circular
+    :nodes="nodes"
+    :links="links"
+    :options="options"
+    width="100%"
+    height="400px"
+    :nodeTitle="nodeTitle"
+    :linkTitle="linkTitle">
+</d3-sankey-circular>
 
-<d3-multi-line :data="data" :options="options" width="100%" height="400px" :margin="margin">
+<d3-multi-line
+    :data="data"
+    :options="options"
+    :margin="margin"
+    width="100%"
+    height="400px">
+</d3-multi-line>
 
 <d3-timelion
     :data="data"
@@ -131,46 +142,137 @@ Vue.use(Vs);
     @interval-updated="interval => fetchDataWithInterval(interval)">
 </d3-timelion>
 
-<d3-timeline :data="data" :options="options" width="100%" height="400px" margin="margin"></d3-timeline>
+<d3-timeline
+    :data="data"
+    :options="options"
+    :margin="margin"
+    width="100%"
+    height="400px">
+</d3-timeline>
 
 
-<d3-progress-arc :data="data" width="100%" height="400px" :options="options" :margin="margin"></d3-progress-arc>
+<d3-progress-arc
+    :data="data"
+    :options="options"
+    :margin="margin"
+    width="100%"
+    height="400px">
+</d3-progress-arc>
 
-<d3-tracker :data="data" :options="options" width="100%" height="400px" :margin="margin"></d3-tracker>
+<d3-tracker
+    :data="data"
+    :options="options"
+    :margin="margin"
+    width="100%"
+    height="400px">
+</d3-tracker>
 
-<d3-slider :min="min" :max="max" :options="options" width="100%" height="100%" :margin="margin"></d3-slider>
+<d3-slider
+    :min="min"
+    :max="max"
+    :margin="margin"
+    :options="options"
+    width="100%"
+    height="100%">
+</d3-slider>
 
-<d3-icicle-horizontal :data="data" :options="options" width="100%"  height="400px" :margin="margin"></d3-icicle-horizontal>
+<d3-icicle-horizontal
+    :data="data"
+    :options="options"
+    :margin="margin"
+    width="100%"
+    height="400px">
+</d3-icicle-horizontal>
 
-<d3-icicle-vertical :data="data" :options="options" width="100%"  height="400px" :margin="margin"></d3-icicle-vertical>
+<d3-icicle-vertical
+    :data="data"
+    :options="options"
+    :margin="margin"
+    width="100%"
+    height="400px">
+</d3-icicle-vertical>
 
-<d3-tree :data="data" :options="options" width="100%"  height="400px" :margin="margin"></d3-tree>
+<d3-tree
+    :data="data"
+    :options="options"
+    :margin="margin"
+    width="100%"
+    height="400px">
+</d3-tree>
 
-<d3-cluster :data="data" :options="options" width="100%"  height="400px" :margin="margin"></d3-cluster>
+<d3-cluster
+    :data="data"
+    :options="options"
+    :margin="margin"
+    width="100%"
+    height="400px">
+</d3-cluster>
 
-<d3-sunburst :data="data" :options="options" width="100%"  height="400px" :margin="margin"></d3-sunburst>
+<d3-sunburst
+    :data="data"
+    :options="options"
+    :margin="margin"
+    width="100%"
+    height="400px">
+</d3-sunburst>
 
-<d3-pack :data="data" :options="options" width="100%"  height="400px" :margin="margin"></d3-pack>
+<d3-pack
+    :data="data"
+    :options="options"
+    :margin="margin"
+    width="100%"
+    height="400px">
+</d3-pack>
 
-<d3-metric :data="data" :options="options" width="100%" height="400px' :margin="margin"></d3-metric>
+<d3-metric
+    :data="data"
+    :options="options"
+    :margin="margin"
+    width="100%"
+    height="400px">
+</d3-metric>
 ```
 
 
 ## Examples
 
-![](./images/d3-bar-horizontal.PNG)
+![](./images/d3-metric.PNG)
+
+![](./images/d3-circle.PNG)
+
+![](./images/d3-horizontal-bar.PNG)
+
+![](./images/d3-vertical-bar.PNG)
 
 ![](./images/d3-pie.PNG)
 
 ![](./images/d3-line.PNG)
 
-![](./images/d3-bar-vertical.PNG)
+![](./images/d3-area.PNG)
+
+![](./images/d3-multi-line.PNG)
+
+![](./images/d3-timeline.PNG)
+
+![](./images/d3-timelion.PNG)
+
+![](./images/d3-tracker.PNG)
 
 ![](./images/d3-sankey-circular.PNG)
 
-![](./images/d3-time-line.PNG)
+![](./images/d3-icicle-vertical.PNG)
 
-![](./images/d3-time-lion.PNG)
+![](./images/d3-icicle-horizontal.PNG)
+
+![](./images/d3-sunburst.PNG)
+
+![](./images/d3-pack.PNG)
+
+![](./images/d3-tree.PNG)
+
+![](./images/d3-cluster.PNG)
+
+![](./images/d3-slider.PNG)
 
 ![](./images/d3-progress-arc.gif)
 
