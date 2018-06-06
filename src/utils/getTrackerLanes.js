@@ -9,16 +9,16 @@ import moment from 'moment';
  * @param {string} title
  * @param {string} symbol
  * @param {string} className
- * @param {any} id
+ * @param {any} payload
  * @constructor
  */
 class Point {
-    constructor(at, title, symbol, className, id) {
+    constructor(at, title, symbol, className, payload) {
         this.at = at;
         this.title = title;
         this.symbol = symbol;
         this.className = className;
-        this.id = id;
+        this.payload = payload;
     }
 }
 
@@ -31,17 +31,17 @@ class Point {
  * @param {string} label
  * @param {string} title
  * @param {string} className
- * @param {any} id
+ * @param {any} payload
  * @constructor
  */
 class Interval {
-    constructor (from, to, label, title, className, id) {
+    constructor (from, to, label, title, className, payload) {
         this.from = from;
         this.to = to;
         this.label = label;
         this.title = title;
         this.className = className;
-        this.id = id;
+        this.payload = payload;
     }
 }
 
@@ -58,10 +58,10 @@ const transform = (data) => {
 
     for (let i = 0, l = data.length; i < l; i += 1) {
         const entry = data[i],
-            { from , to, at, label, title, className, symbol, id } = entry;
+            { from , to, at, label, title, className, symbol, payload } = entry;
 
         if (isDate(from) && isDate(to) && from < to) {
-            result.push(new Interval(from, to, label, title, className, id));
+            result.push(new Interval(from, to, label, title, className, payload));
 
             dateTimeStart = i === 0
                 ? from
@@ -74,7 +74,7 @@ const transform = (data) => {
 
 
         if (isDate(at)) {
-            result.push(new Point(at, title, symbol, className, id));
+            result.push(new Point(at, title, symbol, className, payload));
 
             dateTimeStart = i === 0
                 ? at
