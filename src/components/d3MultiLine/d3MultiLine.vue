@@ -20,6 +20,7 @@
     import isAxisTime from '../../utils/isAxisTime';
     import emit from '../../utils/emit';
     import axisShow from '../../utils/axisShow';
+    import '../../utils/hashCode';
 
     export default {
         name: 'd3-multi-line',
@@ -170,7 +171,7 @@
                             .attr('stroke-opacity', axisXGroupLabelBorderColorOpacity)
                             .on('click', function (d) {
                                 toggleCross(_g, d3.select(this), crossColor, crossWidth);
-                                toggleClass(svg, `.d3-multi-line-${d}`);
+                                toggleClass(svg, `.d3-multi-line-${d.hashCode()}`);
                             });
 
                         const labelPos = label.node().getBBox();
@@ -288,7 +289,7 @@
                     .data(groups)
                     .enter()
                     .append('path')
-                    .attr('class', d => `d3-multi-line-${d}`)
+                    .attr('class', d => `d3-multi-line-${d.hashCode()}`)
                     .attr('clip-path', 'url(#clip-multi-line)')
                     .attr('d', d => lineGen(data[d]))
                     .attr('stroke-dasharray', d => dashedGroups.some(el => el === d) ? (_.isNumber(strokeDashArray) ? strokeDashArray : 0) : 0)
@@ -301,7 +302,7 @@
                     .data(_data)
                     .enter()
                     .append('circle')
-                    .attr('class', d => `d3-multi-line-${d.group}`)
+                    .attr('class', d => `d3-multi-line-${d[groupKey].hashCode()}`)
                     .attr('clip-path', 'url(#clip-multi-line)')
                     .attr('cx', d => xScale(d.key))
                     .attr('cy', d => yScale(d.value))

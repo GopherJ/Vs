@@ -114,9 +114,7 @@
                     g_h = h - axisXLabelLaneHeight - __selectBoxLaneHeight__,
                     isMobile = g_w <= 560;
 
-                if (![g_w, g_h].every(el => el > 0)) {
-                    return;
-                }
+                if (![g_w, g_h].every(el => el > 0)) return;
 
                 const nodeTitle = this.nodeTitle;
                 const linkTitle = this.linkTitle;
