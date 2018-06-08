@@ -505,6 +505,8 @@
             pause(n, o) {
                 if (n) this.timer.stop();
                 if (!n) this.play();
+
+                this.$emit('change', n);
             }
         }
     }
