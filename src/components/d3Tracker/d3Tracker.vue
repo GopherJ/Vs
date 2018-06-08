@@ -41,8 +41,9 @@
 
                 return [dateTimeStart, reference];
             },
-            setPause() {
-                this.pause = !this.pause;
+            setPause(n) {
+                if (_.isBoolean(n)) this.pause = n;
+                else this.pause = !this.pause;
             },
             findPassingEntries(lanes) {
                 const entries = [],
