@@ -124,7 +124,7 @@
                         overlayWidth = 60,
 
                         playDuration = 10000,
-                        playJump = true
+                        playJump = false
                     } = this.options,
                     {
                         axisXLabelLaneHeight = _.isNull(axisXLabel) ? 0 : 30,
