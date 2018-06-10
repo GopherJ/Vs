@@ -1,4 +1,5 @@
-import { isDate, isString } from 'lodash';
+
+import { isDate, first } from 'lodash';
 import moment from 'moment';
 
 /**
@@ -204,13 +205,41 @@ const chunk = (data) => {
  * @return {data, dateTimeStart, dateTimeEnd}
  */
 const getTrackerLanes = (data) => {
-    if (data.length === 0) {
+    if (!data.length) {
         return {
             dateTimeStart: moment().startOf('month'),
             dateTimeEnd: moment().endOf('month'),
-            lanes: [[]]
+            lanes: [
+                []
+            ]
         };
     }
+
+    if (data.length === 1) {
+        const elem = first(data),
+            { from , to, at, label, title, className, symbol, payload } = elem;
+
+        if (isDate(from) && isDate(to)) {
+            return {
+                dateTimeStart: from,
+                dateTimeEnd: to,
+                lanes: [
+                    [new Interval(from, to, label, title, className, payload)]
+                ]
+            }
+        }
+
+        if (isDate(at)) {
+            return {
+                dateTimeStart: moment().startOf('month'),
+                dateTimeEnd: moment().endOf('month'),
+                lanes: [
+                    [new Point(at, title, symbol, className, payload)]
+                ]
+            };
+        }
+    }
+
     const { result, dateTimeStart, dateTimeEnd } = transform(data);
 
     return {
