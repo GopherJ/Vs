@@ -31,13 +31,11 @@
             getTimeRange(dateTimeStart, dateTimeEnd) {
                 const reference = this.reference;
 
-                if (reference > dateTimeEnd) {
+                if (reference > dateTimeEnd)
                     return [dateTimeStart, reference];
-                }
 
-                if (reference < dateTimeStart) {
+                if (reference < dateTimeStart)
                     return [reference, dateTimeEnd];
-                }
 
                 return [dateTimeStart, reference];
             },
@@ -421,6 +419,8 @@
                             self.pause = true;
 
                             self.timer.stop();
+
+                            emit(self, 'play-end');
                         } else {
                             const xNext = xPrevious + speed;
 
