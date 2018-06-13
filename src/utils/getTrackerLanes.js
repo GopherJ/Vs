@@ -68,7 +68,7 @@ const transform = (data) => {
                 ? from
                 : (dateTimeStart > from ? from : dateTimeStart);
 
-            dateTimeEnd = i ===0
+            dateTimeEnd = i === 0
                 ? to
                 : (dateTimeEnd < to ? to : dateTimeEnd);
         }
@@ -81,7 +81,7 @@ const transform = (data) => {
                 ? at
                 : (dateTimeStart > at ? at : dateTimeStart);
 
-            dateTimeEnd = i ===0
+            dateTimeEnd = i === 0
                 ? at
                 : (dateTimeEnd < at ? at : dateTimeEnd);
         }
@@ -205,7 +205,7 @@ const chunk = (data) => {
  * @return {data, dateTimeStart, dateTimeEnd}
  */
 const getTrackerLanes = (data) => {
-    if (!data.length) {
+    if (!data.length || !data) {
         return {
             dateTimeStart: moment().startOf('month'),
             dateTimeEnd: moment().endOf('month'),
@@ -219,7 +219,7 @@ const getTrackerLanes = (data) => {
         const elem = first(data),
             { from , to, at, label, title, className, symbol, payload } = elem;
 
-        if (isDate(from) && isDate(to)) {
+        if (isDate(from) && isDate(to) && from < to) {
             return {
                 dateTimeStart: from,
                 dateTimeEnd: to,
