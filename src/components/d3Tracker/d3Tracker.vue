@@ -129,7 +129,7 @@
                         referenceLineWidth = 4,
                         referenceLineColor = 'rgba(255, 56, 96, 1)',
 
-                        overlayWidth = 60,
+                        overlayWidth = 30,
 
                         playDuration = 10000,
                         playJump = false

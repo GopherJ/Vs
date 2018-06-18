@@ -207,7 +207,7 @@ const chunk = (data) => {
 const getTrackerLanes = (data) => {
     if (!data.length) {
         return {
-            dateTimeStart: moment().startOf('month'),
+            dateTimeStart: moment(new Date()),
             dateTimeEnd: moment().endOf('month'),
             lanes: [
                 []
@@ -238,15 +238,40 @@ const getTrackerLanes = (data) => {
                 ]
             };
         }
+
+        return {
+            dateTimeStart: moment(new Date()),
+            dateTimeEnd: moment().endOf('month'),
+            lanes: [
+                []
+            ]
+        };
     }
 
     const { result, dateTimeStart, dateTimeEnd } = transform(data);
+    if (!result.length) {
+        return {
+            dateTimeStart: moment(new Date()),
+            dateTimeEnd: moment().endOf('month'),
+            lanes: [
+                []
+            ]
+        };
+    }
+
+    if (dateTimeStart.getTime() === dateTimeEnd.getTime()) {
+        return {
+            lanes: chunk(result),
+            dateTimeStart: moment(dateTimeStart).startOf('month'),
+            dateTimeEnd: moment(dateTimeStart).endOf('month')
+        };
+    }
 
     return {
         lanes: chunk(result),
         dateTimeStart,
         dateTimeEnd
-    }
+    };
 };
 
 
