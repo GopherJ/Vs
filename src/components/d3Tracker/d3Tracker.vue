@@ -85,12 +85,12 @@
                         const entry = lane[I];
 
                         if (entry instanceof Interval && entry.from > this.reference) {
-                            next = next > entry.from ? entry.from : next;
+                            next = !next ? entry.from : (next > entry.from ? entry.from : next);
                             break;
                         }
 
                         else if (entry instanceof Point && entry.at > this.reference) {
-                            next = next > entry.at ? entry.at : next;
+                            next = !next ? entry.at : (next > entry.at ? entry.at : next);
                             break;
                         }
                     }
