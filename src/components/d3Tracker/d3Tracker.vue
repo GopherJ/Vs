@@ -43,7 +43,7 @@
                 if (_.isBoolean(n)) this.pause = n;
                 else this.pause = !this.pause;
             },
-            findPassingEntries(lanes, dateTimeStart, dateTimeEnd, playDuration) {
+            findPassingEntriesWhenPlay(lanes, dateTimeStart, dateTimeEnd, playDuration) {
                 const entries = [],
                     referenceTimestamp = this.reference.getTime();
 
@@ -57,9 +57,10 @@
                             const speed = (dateTimeEnd.getTime() - dateTimeStart.getTime()) / playDuration * 16,
                                 atTimestamp = entry.at.getTime();
 
-                            if (referenceTimestamp <= atTimestamp && (referenceTimestamp + speed) >= atTimestamp) {
+                            if ((referenceTimestamp <= atTimestamp && (referenceTimestamp + speed) >= atTimestamp)
+                                || (referenceTimestamp >= atTimestamp && (referenceTimestamp - speed) <= atTimestamp)
+                            ) {
                                 entries.push(entry);
-                                break;
                             }
                         }
 
@@ -68,9 +69,47 @@
                                 toTimestamp = entry.to.getTime(),
                                 speed = (dateTimeEnd.getTime() - dateTimeStart.getTime()) / playDuration * 16;
 
-                            if ((referenceTimestamp >= fromTimestamp && referenceTimestamp <= toTimestamp) || (referenceTimestamp <= fromTimestamp && (referenceTimestamp + speed) >= toTimestamp)) {
+                            if ((referenceTimestamp >= fromTimestamp && referenceTimestamp <= toTimestamp)
+                                || (referenceTimestamp <= fromTimestamp && (referenceTimestamp + speed) >= toTimestamp)
+                                || (referenceTimestamp >= toTimestamp && (referenceTimestamp - speed) <= fromTimestamp)
+                            ) {
                                 entries.push(entry);
-                                break;
+                            }
+                        }
+                    }
+                }
+
+                return entries;
+            },
+            findPassingEntriesWhenDrag(lanes, dateTimeStart, dateTimeEnd, x, oldX) {
+                const entries = [],
+                    referenceTimestamp = this.reference.getTime(),
+                    oldReferenceTimestamp = this.scale.invert(oldX).getTime();
+
+                for (let i = 0, l = lanes.length; i < l; i += 1) {
+                    const lane = lanes[i];
+
+                    for (let I = 0, L = lane.length; I < L; I += 1) {
+                        const entry = lane[I];
+
+                        if (entry instanceof Point) {
+                            const atTimestamp = entry.at.getTime();
+
+                            if ((oldReferenceTimestamp < referenceTimestamp && referenceTimestamp >= atTimestamp && oldReferenceTimestamp <= atTimestamp)
+                                || (oldReferenceTimestamp > referenceTimestamp && referenceTimestamp <= atTimestamp && oldReferenceTimestamp >= atTimestamp)
+                            ) {
+                                entries.push(entry);
+                            }
+                        }
+
+                        else {
+                            const fromTimestamp = entry.from.getTime(),
+                                toTimestamp = entry.to.getTime();
+
+                            if (oldReferenceTimestamp < referenceTimestamp && !(oldReferenceTimestamp > toTimestamp || referenceTimestamp < fromTimestamp)
+                                || oldReferenceTimestamp > referenceTimestamp && !(referenceTimestamp > toTimestamp || oldReferenceTimestamp < fromTimestamp)
+                            ) {
+                                entries.push(entry);
                             }
                         }
                     }
@@ -306,7 +345,8 @@
                     overlay
                         .call(d3.drag()
                             .on('drag', function() {
-                                  const  x = d3.event.x;
+                                  const x = d3.event.x,
+                                    oldX = +overlay.attr('x') + overlayWidth / 2;
 
                                   overlay
                                     .attr('x', x - overlayWidth / 2);
@@ -316,9 +356,9 @@
                                     .attr('x2', x);
 
                                   self.reference = self.scale.invert(x);
-                                  const entries = self.findPassingEntries(lanes, dateTimeStart, dateTimeEnd, playDuration);
+                                  const entries = self.findPassingEntriesWhenDrag(lanes, dateTimeStart, dateTimeEnd, x, oldX);
 
-                                 emit(self, 'reference-updated', self.getTimeRange(dateTimeStart, dateTimeEnd), entries);
+                                  emit(self, 'reference-updated', self.getTimeRange(dateTimeStart, dateTimeEnd), entries);
                             }));
                 }
 
@@ -450,7 +490,7 @@
                                 .attr('x', xNext - overlayWidth / 2);
 
                             self.reference = self.scale.invert(xNext);
-                            const entries = self.findPassingEntries(lanes, dateTimeStart, dateTimeEnd, playDuration);
+                            const entries = self.findPassingEntriesWhenPlay(lanes, dateTimeStart, dateTimeEnd, playDuration);
 
                             if (!entries.length && playJump) {
                                 const nextEntryFrom = self.getNextEntryFrom(lanes);
