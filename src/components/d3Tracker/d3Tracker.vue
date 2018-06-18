@@ -59,6 +59,7 @@
 
                             if (referenceTimestamp <= atTimestamp && (referenceTimestamp + speed) >= atTimestamp) {
                                 entries.push(entry);
+                                break;
                             }
                         } else {
                             const fromTimestamp = entry.from.getTime(),
@@ -66,6 +67,7 @@
 
                             if (referenceTimestamp >= fromTimestamp && referenceTimestamp <= toTimestamp) {
                                 entries.push(entry);
+                                break;
                             }
                         }
                     }
@@ -74,7 +76,7 @@
                 return entries;
             },
             getNextEntryFrom(lanes) {
-                let from;
+                let next;
 
                 for (let i = 0, l = lanes.length; i < l; i += 1) {
                     const lane = lanes[i];
@@ -83,21 +85,25 @@
                         const entry = lane[I];
 
                         if (entry instanceof Interval && entry.from > this.reference) {
-                            from = !from ? entry.from : (from > entry.from ? entry.from : from);
-                        } else {
-                            from = !from ? entry.at : (from > entry.at ? entry.at : from);
+                            next = next > entry.from ? entry.from : next;
+                            break;
+                        }
+
+                        else if (entry instanceof Point && entry.at > this.reference) {
+                            next = next > entry.at ? entry.at : next;
+                            break;
                         }
                     }
                 }
 
-                return from;
+                return next;
             },
             drawTracker() {
                 const [w, h] = this.getElWidthHeight(),
                     self = this;
-                const { dateTimeStart, dateTimeEnd, lanes } = getTrackerLanes(_.cloneDeep(this.data));
 
-                const {
+                const { dateTimeStart, dateTimeEnd, lanes } = getTrackerLanes(_.cloneDeep(this.data)),
+                      {
                         intervalCornerRadius = 4,
 
                         symbolSize = 400,
