@@ -57,9 +57,7 @@
                             const speed = (dateTimeEnd.getTime() - dateTimeStart.getTime()) / playDuration * 16,
                                 atTimestamp = entry.at.getTime();
 
-                            if ((referenceTimestamp <= atTimestamp && (referenceTimestamp + speed) >= atTimestamp)
-                                || (referenceTimestamp >= atTimestamp && (referenceTimestamp - speed) <= atTimestamp)
-                            ) {
+                            if (referenceTimestamp <= atTimestamp && (referenceTimestamp + speed) >= atTimestamp) {
                                 entries.push(entry);
                             }
                         }
@@ -71,7 +69,6 @@
 
                             if ((referenceTimestamp >= fromTimestamp && referenceTimestamp <= toTimestamp)
                                 || (referenceTimestamp <= fromTimestamp && (referenceTimestamp + speed) >= toTimestamp)
-                                || (referenceTimestamp >= toTimestamp && (referenceTimestamp - speed) <= fromTimestamp)
                             ) {
                                 entries.push(entry);
                             }
@@ -81,7 +78,7 @@
 
                 return entries;
             },
-            findPassingEntriesWhenDrag(lanes, dateTimeStart, dateTimeEnd, x, oldX) {
+            findPassingEntriesWhenDrag(lanes, dateTimeStart, dateTimeEnd, oldX) {
                 const entries = [],
                     referenceTimestamp = this.reference.getTime(),
                     oldReferenceTimestamp = this.scale.invert(oldX).getTime();
@@ -95,7 +92,7 @@
                         if (entry instanceof Point) {
                             const atTimestamp = entry.at.getTime();
 
-                            if ((oldReferenceTimestamp < referenceTimestamp && referenceTimestamp >= atTimestamp && oldReferenceTimestamp <= atTimestamp)
+                            if ((oldReferenceTimestamp < referenceTimestamp && oldReferenceTimestamp <= atTimestamp && referenceTimestamp >= atTimestamp)
                                 || (oldReferenceTimestamp > referenceTimestamp && referenceTimestamp <= atTimestamp && oldReferenceTimestamp >= atTimestamp)
                             ) {
                                 entries.push(entry);
@@ -356,7 +353,7 @@
                                     .attr('x2', x);
 
                                   self.reference = self.scale.invert(x);
-                                  const entries = self.findPassingEntriesWhenDrag(lanes, dateTimeStart, dateTimeEnd, x, oldX);
+                                  const entries = self.findPassingEntriesWhenDrag(lanes, dateTimeStart, dateTimeEnd, oldX);
 
                                   emit(self, 'reference-updated', self.getTimeRange(dateTimeStart, dateTimeEnd), entries);
                             }));
