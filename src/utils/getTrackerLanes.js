@@ -64,11 +64,11 @@ const transform = (data) => {
         if (isDate(from) && isDate(to) && from < to) {
             result.push(new Interval(from, to, label, title, className, payload));
 
-            dateTimeStart = i === 0
+            dateTimeStart = !dateTimeStart
                 ? from
                 : (dateTimeStart > from ? from : dateTimeStart);
 
-            dateTimeEnd = i === 0
+            dateTimeEnd = !dateTimeEnd
                 ? to
                 : (dateTimeEnd < to ? to : dateTimeEnd);
         }
@@ -77,11 +77,11 @@ const transform = (data) => {
         if (isDate(at)) {
             result.push(new Point(at, title, symbol, className, payload));
 
-            dateTimeStart = i === 0
+            dateTimeStart = !dateTimeStart
                 ? at
                 : (dateTimeStart > at ? at : dateTimeStart);
 
-            dateTimeEnd = i === 0
+            dateTimeEnd = !dateTimeEnd
                 ? at
                 : (dateTimeEnd < at ? at : dateTimeEnd);
         }
@@ -205,7 +205,7 @@ const chunk = (data) => {
  * @return {data, dateTimeStart, dateTimeEnd}
  */
 const getTrackerLanes = (data) => {
-    if (!data.length || !data) {
+    if (!data.length) {
         return {
             dateTimeStart: moment().startOf('month'),
             dateTimeEnd: moment().endOf('month'),
@@ -231,8 +231,8 @@ const getTrackerLanes = (data) => {
 
         if (isDate(at)) {
             return {
-                dateTimeStart: moment().startOf('month'),
-                dateTimeEnd: moment().endOf('month'),
+                dateTimeStart: moment(at).startOf('month'),
+                dateTimeEnd: moment(at).endOf('month'),
                 lanes: [
                     [new Point(at, title, symbol, className, payload)]
                 ]

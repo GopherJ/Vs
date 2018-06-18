@@ -43,7 +43,7 @@
                 if (_.isBoolean(n)) this.pause = n;
                 else this.pause = !this.pause;
             },
-            findPassingEntries(lanes) {
+            findPassingEntries(lanes, dateTimeStart, dateTimeEnd, playDuration) {
                 const entries = [],
                     referenceTimestamp = this.reference.getTime();
 
@@ -53,13 +53,20 @@
                     for (let I = 0, L = lane.length; I < L; I += 1) {
                         const entry = lane[I];
 
-                        if (entry instanceof Point) continue;
+                        if (entry instanceof Point) {
+                            const speed = (dateTimeEnd.getTime() - dateTimeStart.getTime()) / playDuration * 16,
+                                atTimestamp = entry.at.getTime();
 
-                        const fromTimestamp = entry.from.getTime(),
-                            toTimestamp = entry.to.getTime();
+                            if (referenceTimestamp <= atTimestamp && (referenceTimestamp + speed) >= atTimestamp) {
+                                entries.push(entry);
+                            }
+                        } else {
+                            const fromTimestamp = entry.from.getTime(),
+                                toTimestamp = entry.to.getTime();
 
-                        if (referenceTimestamp >= fromTimestamp && referenceTimestamp <= toTimestamp) {
-                            entries.push(entry);
+                            if (referenceTimestamp >= fromTimestamp && referenceTimestamp <= toTimestamp) {
+                                entries.push(entry);
+                            }
                         }
                     }
                 }
@@ -77,6 +84,8 @@
 
                         if (entry instanceof Interval && entry.from > this.reference) {
                             from = !from ? entry.from : (from > entry.from ? entry.from : from);
+                        } else {
+                            from = !from ? entry.at : (from > entry.at ? entry.at : from);
                         }
                     }
                 }
@@ -298,7 +307,7 @@
                                     .attr('x2', x);
 
                                   self.reference = self.scale.invert(x);
-                                  const entries = self.findPassingEntries(lanes);
+                                  const entries = self.findPassingEntries(lanes, dateTimeStart, dateTimeEnd, playDuration);
 
                                  emit(self, 'reference-updated', self.getTimeRange(dateTimeStart, dateTimeEnd), entries);
                             }));
@@ -432,7 +441,7 @@
                                 .attr('x', xNext - overlayWidth / 2);
 
                             self.reference = self.scale.invert(xNext);
-                            const entries = self.findPassingEntries(lanes);
+                            const entries = self.findPassingEntries(lanes, dateTimeStart, dateTimeEnd, playDuration);
 
                             if (!entries.length && playJump) {
                                 const nextEntryFrom = self.getNextEntryFrom(lanes);
