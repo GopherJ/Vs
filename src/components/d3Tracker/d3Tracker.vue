@@ -61,11 +61,14 @@
                                 entries.push(entry);
                                 break;
                             }
-                        } else {
-                            const fromTimestamp = entry.from.getTime(),
-                                toTimestamp = entry.to.getTime();
+                        }
 
-                            if (referenceTimestamp >= fromTimestamp && referenceTimestamp <= toTimestamp) {
+                        else {
+                            const fromTimestamp = entry.from.getTime(),
+                                toTimestamp = entry.to.getTime(),
+                                speed = (dateTimeEnd.getTime() - dateTimeStart.getTime()) / playDuration * 16;
+
+                            if ((referenceTimestamp >= fromTimestamp && referenceTimestamp <= toTimestamp) || (referenceTimestamp <= fromTimestamp && (referenceTimestamp + speed) >= toTimestamp)) {
                                 entries.push(entry);
                                 break;
                             }
