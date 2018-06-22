@@ -8,7 +8,9 @@ import { isDate, first } from 'lodash';
  * @return {boolean}
  */
 const isAxisTime = (data) => {
-    let __isAxisTime__ = true;
+    if (!data.length) return false;
+    if (data.length === 1) return isDate(first(data).key);
+    let __isAxisTime__ = data.length === 1 ? isDate(first(data)) : true;
     data.sort((a, b) => {
         if (isDate(a.key) && isDate(b.key)) {
             return a.key > b.key ? 1 : -1;
