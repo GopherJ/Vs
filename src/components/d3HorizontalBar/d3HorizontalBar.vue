@@ -85,10 +85,10 @@
                 if (nice) xScale.nice();
 
                 const yScale = d3.scaleBand()
+                    .domain(data.map(d => d.key))
                     .range([0, g_h])
                     .paddingInner([paddingInner])
-                    .paddingOuter([paddingOuter])
-                    .domain(data.map(d => d.key));
+                    .paddingOuter([paddingOuter]);
 
                 const xAxis = d3
                     .axisTop(xScale)

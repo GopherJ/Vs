@@ -1,4 +1,4 @@
-import { isDate } from 'lodash';
+import { isDate, first } from 'lodash';
 
 /**
  *

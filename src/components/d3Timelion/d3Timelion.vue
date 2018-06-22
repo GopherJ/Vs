@@ -130,7 +130,7 @@
                     .paddingOuter([paddingOuter]);
 
                 const yScale = d3.scaleLinear()
-                    .domain(negative ? d3.extent(data, d => d.vallue) : [0, d3.max(data, d => d.value)])
+                    .domain(negative ? d3.extent(data, d => d.value) : [0, d3.max(data, d => d.value)])
                     .range([g_h, 0]);
                 if (nice) yScale.nice();
 
