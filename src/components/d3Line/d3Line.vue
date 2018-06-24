@@ -13,10 +13,10 @@
     import tickFormat from '../../utils/tickFormat';
     import { selectTicksNumY } from '../../utils/select';
     import isAxisTime from '../../utils/isAxisTime';
+    import isAxisNumber from '../../utils/isAxisNumber';
     import { firstTickTextAnchorStart, lastTickTextAnchorEnd } from '../../utils/textAnchor';
     import axisShow from '../../utils/axisShow';
     import emit from '../../utils/emit';
-    import emphasize from '../../utils/emphasize';
 
     export default {
         name: 'd3-line',
@@ -75,6 +75,7 @@
                     g_h = h - top - bottom - axisXLabelLaneHeight - axisXLaneHeight - __offsetTop__;
 
                 const isAxisXTime = isAxisTime(data),
+                    isAxisXNumber = isAxisNumber(data),
                     axisXTickFormat = value => isAxisXTime ? tickFormat(value, axisXTimeInterval) : value,
                     ticks = selectTicksNumY(g_h);
 
@@ -180,7 +181,7 @@
                     .attr('font-weight', axisLabelFontWeight)
                     .attr('fill-opacity', axisLabelFontOpacity);
 
-                if (isAxisXTime) {
+                if (isAxisXTime || isAxisXNumber) {
                     const extent = [
                         [left + axisYLaneWidth + axisYLabelLaneWidth, top + __offsetTop__],
                         [w - right - __offsetRight__, h - axisXLaneHeight - axisXLabelLaneHeight]

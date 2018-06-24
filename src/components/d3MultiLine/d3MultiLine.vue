@@ -18,6 +18,7 @@
     import { firstTickTextAnchorStart, lastTickTextAnchorEnd } from '../../utils/textAnchor';
     import GetAllKeys from '../../utils/allKeys';
     import isAxisTime from '../../utils/isAxisTime';
+    import isAxisNumber from '../../utils/isAxisNumber';
     import emit from '../../utils/emit';
     import axisShow from '../../utils/axisShow';
     import '../../utils/hashCode';
@@ -92,6 +93,7 @@
                 if (![g_w, g_h].every(el => el > 0)) return;
 
                 const isAxisXTime = isAxisTime(_data),
+                    isAxisXNumber = isAxisNumber(_data),
                     axisXTickFormat = value => isAxisXTime ? tickFormat(value, axisXTimeInterval) : value,
                     ticks = selectTicksNumY(g_w),
                     data = groupBy(_data, groupKey),
@@ -254,7 +256,7 @@
                     .attr('font-size', axisFontSize)
                     .attr('font-weight', axisFontWeight);
 
-                if (isAxisXTime) {
+                if (isAxisXTime || isAxisXNumber) {
                     const extent = [
                         [left + axisYLaneWidth + axisYLabelLaneWidth, top + axisXGroupLabelLaneHeight],
                         [w - right - __offsetRight__, g_h + top + axisXGroupLabelLaneHeight]
