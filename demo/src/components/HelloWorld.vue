@@ -15,17 +15,14 @@
         <div class="tile is-parent is-vertical">
             <article class="tile is-child content">
                 <h2 class="title">d3Metric</h2>
+
                 <hr>
+
                 <div class="columns">
-                    <div class="column is-8">
-                        <d3-metric :data="3" height="200px"></d3-metric>
+                    <div class="column is-8 box">
+                        <d3-horizontal-bar :data="horizontalBarData"></d3-horizontal-bar>
                     </div>
                     <div class="column is-4">
-                        <pre>
-                            <code>
-                                js
-                            </code>
-                        </pre>
                     </div>
                 </div>
             </article>
@@ -38,7 +35,13 @@
 export default {
   name: "HelloWorld",
   data() {
-    return {};
+    return {
+        horizontalBarData: [
+            { key: new Date(2017, 1, 1), value: 3 },
+            { key: new Date(2017, 6, 1), value: 4 },
+            { key: new Date(2017, 12, 1), value: 5 },
+        ]
+    };
   }
 };
 </script>
