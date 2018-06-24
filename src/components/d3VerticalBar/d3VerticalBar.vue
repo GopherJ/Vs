@@ -231,10 +231,10 @@
 
                 if (isAxisXTime && _.isNumber(axisXTimeInterval)) {
                     rects.on('mousedown', d => {
-                            const dateTimeStart = d.key,
-                                dateTimeEnd = new Date(d.key.getTime() + axisXTimeInterval);
+                        const dateTimeStart = d.key,
+                            dateTimeEnd = new Date(d.key.getTime() + axisXTimeInterval);
 
-                            emit(this, 'range-updated', dateTimeStart, dateTimeEnd);
+                        emit(this, 'range-updated', dateTimeStart, dateTimeEnd);
                     });
                 }
 

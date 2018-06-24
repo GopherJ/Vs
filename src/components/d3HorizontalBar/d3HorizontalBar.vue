@@ -194,7 +194,8 @@
                     axisYLane
                         .call(responsiveAxisY, yAxis, yScale);
 
-                    svg.call(brushY.bind(this), extent, yScale, data);
+                    svg
+                        .call(brushY.bind(this), extent, yScale, data);
                 }
 
                 const g = svg
@@ -224,8 +225,7 @@
                     .on('mouseout', hideTip);
 
                 if (isAxisYTime && _.isNumber(axisYTimeInterval)) {
-                    rects
-                        .on('mousedown', d => {
+                    rects.on('mousedown', d => {
                             const dateTimeStart = d.key,
                                 dateTimeEnd = new Date(d.key.getTime() + axisYTimeInterval);
 
