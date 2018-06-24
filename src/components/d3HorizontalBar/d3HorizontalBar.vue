@@ -14,6 +14,7 @@
     import { responsiveAxisY } from '../../utils/responsiveAxis';
     import { brushY } from '../../utils/brush';
     import isAxisTime from '../../utils/isAxisTime';
+    import isAxisNumber from '../../utils/isAxisNumber';
     import axisShow from '../../utils/axisShow';
 
     export default {
@@ -75,6 +76,7 @@
                 if (![g_w, g_h].every(el => el > 0)) return;
 
                 const isAxisYTime = isAxisTime(data),
+                    isAxisYNumber = isAxisNumber(data),
                     axisYTickFormat = value => isAxisYTime ? tickFormat(value, axisYTimeInterval) : value,
                     ticks = selectTicksNumX(g_w),
                     [paddingInner, paddingOuter] = selectPaddingInnerOuterY(g_h);
@@ -185,7 +187,7 @@
                     .attr('font-size', axisLabelFontSize)
                     .attr('font-weight', axisLabelFontWeight);
 
-                if (isAxisYTime) {
+                if (isAxisYTime || isAxisYNumber) {
                     const extent = [
                         [left + axisYLabelLaneWidth + axisYLaneWidth, top + axisXLaneHeight + axisXLabelLaneHeight],
                         [w - right - __offsetRight__, h - bottom - __offsetBottom__]

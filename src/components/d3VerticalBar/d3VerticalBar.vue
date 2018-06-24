@@ -14,6 +14,7 @@
     import wrap from '../../utils/wrap';
     import { selectPaddingInnerOuterX, selectTicksNumY } from '../../utils/select';
     import isAxisTime from '../../utils/isAxisTime';
+    import isAxisNumber from '../../utils/isAxisNumber';
     import axisShow from '../../utils/axisShow';
 
     export default {
@@ -75,6 +76,7 @@
                 if (![g_w, g_h].every(el => el > 0)) return;
 
                 const isAxisXTime = isAxisTime(data),
+                    isAxisXNumber = isAxisNumber(data),
                     axisXTickFormat = value => isAxisXTime ? tickFormat(value, axisXTimeInterval) : value,
                     ticks = selectTicksNumY(g_h),
                     [paddingInner, paddingOuter] = selectPaddingInnerOuterX(g_w);
@@ -183,7 +185,7 @@
                     .attr('font-size', axisLabelFontSize)
                     .attr('font-weight', axisLabelFontWeight);
 
-                if (isAxisXTime) {
+                if (isAxisXTime || isAxisXNumber) {
                     const extent = [
                         [left + axisYLaneWidth + axisYLabelLaneWidth, top + __offsetTop__],
                         [w - right - __offsetRight__, h - axisXLaneHeight - axisXLabelLaneHeight]
