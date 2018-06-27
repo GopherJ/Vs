@@ -1,34 +1,32 @@
 <template>
-<div>
-    <header class="hero is-primary is-bold">
-        <div class="hero-body has-text-centered">
-            <h2 class="title">
-                Vs
-            </h2>
-            <h3 class="subtitle">
-                0.3.2
-            </h3>
-        </div>
-    </header>
+    <div>
+        <section class="hero is-primary is-bold">
+            <div class="hero-head has-text-centered">
+                <header class="section">
+                    <h3 class="title">Vs</h3>
+                    <h4 class="subtitle">0.4.3</h4>
+                </header>
+            </div>
+        </section>
 
-    <section class="section">
-        <div class="tile is-parent is-vertical">
-            <article class="tile is-child content">
-                <h2 class="title">d3Metric</h2>
+        <section class="section">
+            <div class="tile is-parent is-vertical">
+                <article class="tile is-child content">
+                    <h2 class="title">d3Metric</h2>
 
-                <hr>
+                    <hr>
 
-                <div class="columns">
-                    <div class="column is-8 box">
-                        <d3-horizontal-bar :data="horizontalBarData"></d3-horizontal-bar>
+                    <div class="columns">
+                        <div class="column is-8 box">
+                            <d3-horizontal-bar :data="horizontalBarData"></d3-horizontal-bar>
+                        </div>
+                        <div class="column is-4">
+                        </div>
                     </div>
-                    <div class="column is-4">
-                    </div>
-                </div>
-            </article>
-        </div>
-    </section>
-</div>
+                </article>
+            </div>
+        </section>
+    </div>
 </template>
 
 <script>

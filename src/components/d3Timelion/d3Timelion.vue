@@ -352,11 +352,7 @@
         padding: 5px 15px;
         background-color: #fff;
         background-image: none;
-        border: 1px solid #ecf0f1;
-        border-top-width: 2px;
-        border-right-width: 2px;
-        border-bottom-width: 2px;
-        border-left-width: 2px;
+        border: 2px solid #ecf0f1;
         border-radius: 4px;
         box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);
         transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
