@@ -348,7 +348,7 @@
     }
 
     .d3-timelion select {
-        height: 38px;
+        height: 36px;
         padding: 5px 15px;
         background-color: #fff;
         background-image: none;

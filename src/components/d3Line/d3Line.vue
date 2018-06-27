@@ -42,7 +42,7 @@
                         tickPadding = 8,
 
                         circleRadius = 5,
-                        circleColor = 'rgba(188, 82, 188)',
+                        circleColor = 'rgb(188, 82, 188)',
 
                         circleTitle = d => `${d.value}`,
 
