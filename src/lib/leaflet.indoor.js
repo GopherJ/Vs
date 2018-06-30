@@ -1,4 +1,5 @@
 import L from 'leaflet';
+import LGrayscale from './leaflet.grayscale';
 
 /**
  *
@@ -120,10 +121,10 @@ L.Indoor = L.Class.extend({
             if (levels.length !== 0) {
                 this._level = levels[0];
             }
-        } else {
-            if (this._level in this._layers) {
-                this._map.addLayer(this._layers[this._level]);
-            }
+        }
+
+        if (this._level in this._layers) {
+            this._map.addLayer(this._layers[this._level]);
         }
     },
 
@@ -181,7 +182,7 @@ L.Indoor = L.Class.extend({
                 const level = options.getLevel(feature);
                 let layer;
 
-                if (!isLevel(level)) {
+                if (isEmpty(level)) {
                     console.warn('No level defined for feature');
                     return;
                 }
@@ -232,11 +233,7 @@ L.Indoor = L.Class.extend({
         return this._level;
     },
     setLevel(level) {
-        if (typeof level === 'object') {
-            level = level.newLevel;
-        }
-
-        if (this._level === level || !isLevel(level)) {
+        if (!isLevel(level) || this._level === level || !(level in this._layers)) {
             return;
         }
 
@@ -250,10 +247,8 @@ L.Indoor = L.Class.extend({
                 this._map.removeLayer(oldLayer);
             }
 
-            if (layer) {
-                this._map.addLayer(layer);
-                this._level = level;
-            }
+            this._map.addLayer(layer);
+            this._level = level;
         }
     },
     resetStyle(layer) {
@@ -293,8 +288,8 @@ L.Control.Level = L.Control.extend({
         L.setOptions(this, options);
         this._map = null;
         this._buttons = {};
-        this._listeners = [];
         this._level = this.options.level;
+        this._levels = this.options.levels;
 
         this.addEventListener('levelchange', this._levelChange, this);
     },
@@ -310,10 +305,10 @@ L.Control.Level = L.Control.extend({
 
         const levels = [];
 
-        for (let i = 0, l = this.options.levels.length; i <l; i += 1) {
-            let level = this.options.levels[i];
+        for (let i = 0, l = this._levels.length; i <l; i += 1) {
+            let level = this._levels[i];
 
-            const levelNum = self.options.parseLevel(level);
+            const levelNum = this.options.parseLevel(level);
 
             levels.push({
                 num: levelNum,
@@ -321,7 +316,7 @@ L.Control.Level = L.Control.extend({
             });
         }
 
-        levels.sort((a, b) => a.num - b.num);
+        levels.sort((a, b) => a.num > b.num ? 1 : -1);
 
         for (let i = levels.length - 1; i >= 0; i--) {
             let level = levels[i].num;
@@ -357,7 +352,7 @@ L.Control.Level = L.Control.extend({
     },
 
     setLevel(level) {
-        if (level === this._level) {
+        if (level === this._level || !(level in this._levels)) {
             return;
         }
 
@@ -372,7 +367,7 @@ L.Control.Level = L.Control.extend({
 
     getLevel() {
         return this._level;
-    },
+    }
 });
 
 L.Control.level = function (options) {

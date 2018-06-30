@@ -1,5 +1,5 @@
 /*
- * L.IndoorZone is custom geojson using geojson zone properties
+ * L.IndoorZone is custom geoJson using geoJson zone properties
  */
 
 import L from 'leaflet';
@@ -36,8 +36,7 @@ L.GeoJSON.IndoorZone = L.GeoJSON.extend({
         this._zoneId = feature.properties.id;
         this._zoneName = feature.properties.name;
 
-        const [lat, lng] = centroid(feature).geometry.coordinates;
-        this._labelcenter = L.latLng(lat, lng);
+        const [lng, lat] = centroid(feature).geometry.coordinates;
 
         const circleFeature = {
             type: 'Feature',
@@ -55,7 +54,7 @@ L.GeoJSON.IndoorZone = L.GeoJSON.extend({
         };
 
         this._labeled_circle_marker = new LabeledMarker(
-            circleFeature.geometry.coordinates.slice().reverse(),
+            [lat, lng],
             circleFeature,
             {
                 markerOptions: {
@@ -70,8 +69,12 @@ L.GeoJSON.IndoorZone = L.GeoJSON.extend({
         return this._labeled_circle_marker;
     },
 
-    getZoneID() {
+    getZoneId() {
         return this._zoneId;
+    },
+
+    getZoneName() {
+        return this._zoneName;
     },
 
     updateLabelText(text) {
@@ -93,6 +96,6 @@ L.GeoJSON.IndoorZone = L.GeoJSON.extend({
     }
 });
 
-L.geoJson.indoor_zone = function (feature, options) {
+L.geoJson.indoorZone = function (feature, options) {
     return new L.GeoJSON.IndoorZone(feature, options);
 };
