@@ -3,7 +3,7 @@
 import Vue from 'vue'
 import App from './App'
 import router from './router'
-import Vs from 'd3-vs';
+import Vs from '../../src/main';
 import Buefy from 'buefy';
 import 'buefy/lib/buefy.min.css';
 

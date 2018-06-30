@@ -20,6 +20,8 @@ import d3Tree from './components/d3Tree';
 import d3Pack from './components/d3Pack';
 import d3Cluster from './components/d3Cluster';
 
+import d3LChoropleth from './components/d3LChoropleth';
+
 const install = (Vue, options = {}) => {
     if (options.store) {
         // register store
@@ -38,12 +40,15 @@ const install = (Vue, options = {}) => {
     Vue.component(d3Area.name, d3Area);
     Vue.component(d3Tracker.name, d3Tracker);
     Vue.component(d3Slider.name, d3Slider);
+
     Vue.component(d3ICicleVertical.name, d3ICicleVertical);
     Vue.component(d3ICicleHorizontal.name, d3ICicleHorizontal);
     Vue.component(d3Sunburst.name, d3Sunburst);
     Vue.component(d3Tree.name, d3Tree);
     Vue.component(d3Pack.name, d3Pack);
     Vue.component(d3Cluster.name, d3Cluster);
+
+    Vue.component(d3LChoropleth.name, d3LChoropleth);
 };
 
 export default {
@@ -61,16 +66,19 @@ export {
     d3Line,
     d3Metric,
     d3MultiLine,
-    d3ICicleVertical,
-    d3ICicleHorizontal,
     d3HorizontalBar,
     d3VerticalBar,
     d3Area,
     d3Tracker,
     d3Slider,
+
     d3Sunburst,
     d3Tree,
     d3Pack,
-    d3Cluster
+    d3Cluster,
+    d3ICicleVertical,
+    d3ICicleHorizontal,
+
+    d3LChoropleth
 };
 

@@ -17,10 +17,8 @@
                     <hr>
 
                     <div class="columns">
-                        <div class="column is-8 box">
-                            <d3-horizontal-bar :data="horizontalBarData"></d3-horizontal-bar>
-                        </div>
-                        <div class="column is-4">
+                        <div class="column is-12 box">
+                            <d3-l-choropleth v-bind="testMap"></d3-l-choropleth>
                         </div>
                     </div>
                 </article>
@@ -38,7 +36,17 @@ export default {
             { key: new Date(2017, 1, 1), value: 3 },
             { key: new Date(2017, 6, 1), value: 4 },
             { key: new Date(2017, 12, 1), value: 5 },
-        ]
+        ],
+        testMap: {
+            data: {},
+            options: {
+                zoom: 19,
+                maxZoom: 23,
+                center: [48.843825, 2.372587],
+                url: 'https://{s}.tiles.mapbox.com/v4/fkruta.ljd3a238/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoiZmtydXRhIiwiYSI6InZLQXp0LXMifQ.IzN6KCblMOhYUoTydg80ug',
+                attribution: '&copy; <a href="http://www.mapbox.com/about/maps/" target="_blank">Terms &amp; Feedback</a>',
+            }
+        }
     };
   }
 };
