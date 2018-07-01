@@ -58,7 +58,7 @@ L.GeoJSON.IndoorZones = L.GeoJSON.extend({
         this._tags = unique(tags);
         this._controlBox = this._tags.reduce((ite, cur) => {
             const tagName = `Zone - Tag: ${cur}`;
-            ite[tagName]  = zoneTagHash[cur];
+            ite[tagName] = zoneTagHash[cur];
         }, {});
 
         L.control.layers(null, this._controlBox, {

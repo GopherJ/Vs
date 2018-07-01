@@ -24,7 +24,10 @@ config.output = {
 config.externals = ['buefy', 'vuex', 'vue'];
 // Resolver config
 config.resolve = {
-    extensions: ['.js', '.vue'],
+    extensions: ['.js', '.vue', '.css', '.scss', '.ts'],
+    alias: {
+        '~' : path.resolve(__dirname, '../node_modules')
+    },
     enforceExtension: false
 };
 

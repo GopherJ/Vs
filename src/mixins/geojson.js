@@ -12,13 +12,12 @@ export default {
             type: String,
             default: '400px'
         },
-        margin: {
-            type: Object,
-            default: () => ({})
-        },
         data: {
             type: Object,
             required: true
+        },
+        indoorMap: {
+            type: Array
         },
         options: {
             type: Object,
@@ -27,7 +26,7 @@ export default {
     },
     methods: {
         ifExistsMapThenRemove() {
-            const mapSelection = d3.select(this.$el).select('#leaflet-map');
+            const mapSelection = d3.select(this.$el).select('.leaflet-container');
 
             if (mapSelection.empty()) {
                 return;
@@ -70,7 +69,7 @@ export default {
                 }
             }
         },
-        margin: {
+        data: {
             deep: true,
             handler(n) {
                 if(this.safeDraw) {
@@ -80,7 +79,7 @@ export default {
                 }
             }
         },
-        data: {
+        indoorMap: {
             deep: true,
             handler(n) {
                 if(this.safeDraw) {
@@ -103,10 +102,6 @@ export default {
     },
     mounted() {
         if (!this.safeDraw) {
-            return;
-        }
-
-        if (!this.getElWidthHeight().every(el => el > 0)) {
             return;
         }
 

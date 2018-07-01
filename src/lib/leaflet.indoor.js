@@ -26,11 +26,6 @@ const isLevel = l => typeof l === 'number' || !isNaN(parseInt(l, 10));
 const isEmpty = n => n === '' || n === undefined || n === null;
 
 
-
-
-
-
-
 /**
  * A layer that will display indoor data
  *
@@ -40,7 +35,7 @@ const isEmpty = n => n === '' || n === undefined || n === null;
  * getLevels can be called to get the array of levels that are present.
  */
 
-L.Indoor = L.Class.extend({
+L.Indoor = L.Layer.extend({
 
     options: {
         // by default the levels are expected to be in the level attribute in
@@ -66,7 +61,8 @@ L.Indoor = L.Class.extend({
         if ('onSetLevel' in this.options && isFunction(this.options['onSetLevel'])) {
             this._onSetLevel = this.options.onSetLevel;
         } else {
-            this._onSetLevel = function (level) {};
+            this._onSetLevel = function (level) {
+            };
         }
 
         if ('onEachFeature' in this.options && isFunction(this.options['onEachFeature'])) {
@@ -210,7 +206,7 @@ L.Indoor = L.Class.extend({
 
                         layer.addData(feature);
                     });
-                // feature is on a single level
+                    // feature is on a single level
                 } else {
                     if (level in layers) {
                         layer = layers[level];
@@ -233,14 +229,14 @@ L.Indoor = L.Class.extend({
         return this._level;
     },
     setLevel(level) {
+        if (typeof level === 'object') level = level.newLevel;
+
         if (!isLevel(level) || this._level === level || !(level in this._layers)) {
             return;
         }
 
         const oldLayer = this._layers[this._level];
         const layer = this._layers[level];
-
-        this._onSetLevel(level);
 
         if (this._map !== null) {
             if (this._map.hasLayer(oldLayer)) {
@@ -249,6 +245,8 @@ L.Indoor = L.Class.extend({
 
             this._map.addLayer(layer);
             this._level = level;
+
+            this._onSetLevel(level);
         }
     },
     resetStyle(layer) {
@@ -273,7 +271,7 @@ L.indoor = function (data, options) {
 };
 
 L.Control.Level = L.Control.extend({
-    includes: L.Mixin.Events,
+    includes: L.Evented.prototype,
 
     options: {
         position: 'bottomright',
@@ -288,13 +286,15 @@ L.Control.Level = L.Control.extend({
         L.setOptions(this, options);
         this._map = null;
         this._buttons = {};
+        this._listeners = [];
         this._level = this.options.level;
         this._levels = this.options.levels;
 
-        this.addEventListener('levelchange', this._levelChange, this);
+        this.on('levelchange', this._levelChange, this);
     },
 
     onAdd(map) {
+        this._map = map;
         const div = L.DomUtil.create('div', 'leaflet-bar leaflet-control');
 
         div.style.font = "18px 'Lucida Console',Monaco,monospace";
@@ -305,7 +305,7 @@ L.Control.Level = L.Control.extend({
 
         const levels = [];
 
-        for (let i = 0, l = this._levels.length; i <l; i += 1) {
+        for (let i = 0, l = this._levels.length; i < l; i += 1) {
             let level = this._levels[i];
 
             const levelNum = this.options.parseLevel(level);
@@ -340,6 +340,10 @@ L.Control.Level = L.Control.extend({
         }
 
         return div;
+    },
+
+    onRemove() {
+        this._map = null;
     },
 
     _levelChange(e) {

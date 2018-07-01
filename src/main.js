@@ -21,6 +21,7 @@ import d3Pack from './components/d3Pack';
 import d3Cluster from './components/d3Cluster';
 
 import d3LChoropleth from './components/d3LChoropleth';
+import 'leaflet/dist/leaflet.css';
 
 const install = (Vue, options = {}) => {
     if (options.store) {
