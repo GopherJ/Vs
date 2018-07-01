@@ -61,7 +61,7 @@
 
                 levelControl.on('levelchange', indoorLayer.setLevel, indoorLayer);
 
-                L.indoorZones(data).addTo(Map);
+                L.GeoJSON.indoorZones(data).addTo(Map);
             },
             safeDraw() {
                 this.ifExistsMapThenRemove();

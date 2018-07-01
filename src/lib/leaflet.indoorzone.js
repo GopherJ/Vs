@@ -96,6 +96,6 @@ L.GeoJSON.IndoorZone = L.GeoJSON.extend({
     }
 });
 
-L.geoJson.indoorZone = function (feature, options) {
+L.GeoJSON.indoorZone = function (feature, options) {
     return new L.GeoJSON.IndoorZone(feature, options);
 };

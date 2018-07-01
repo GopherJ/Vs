@@ -295,6 +295,7 @@ L.Control.Level = L.Control.extend({
 
     onAdd(map) {
         this._map = map;
+
         const div = L.DomUtil.create('div', 'leaflet-bar leaflet-control');
 
         div.style.font = "18px 'Lucida Console',Monaco,monospace";

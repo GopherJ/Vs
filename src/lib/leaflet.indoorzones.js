@@ -10,7 +10,7 @@ import LIndoorZone from './leaflet.indoorzone';
  * @param arr
  * @returns {any[]}
  */
-const unique = arr => Array.from(new Set(...arr));
+const unique = arr => Array.from(new Set(arr));
 
 L.GeoJSON.IndoorZones = L.GeoJSON.extend({
     options: {
@@ -45,10 +45,20 @@ L.GeoJSON.IndoorZones = L.GeoJSON.extend({
                 ? feature.properties.tags
                 : 'none';
 
-            if (!zoneTagHash[tag]) {
-                zoneTagHash[tag] = L.layerGroup();
+            if (!L.Util.isArray(tag)) {
+                if (!zoneTagHash[tag]) {
+                    zoneTagHash[tag] = L.layerGroup();
+                } else {
+                    zoneTagHash[tag].addLayer(zone);
+                }
             } else {
-                zoneTagHash[tag].addLayer(zone);
+                tag.forEach(x => {
+                    if (!zoneTagHash[x]) {
+                        zoneTagHash[x] = L.layerGroup();
+                    } else {
+                        zoneTagHash[x].addLayer(zone);
+                    }
+                });
             }
 
             this._zones.addLayer(zone);
@@ -56,12 +66,14 @@ L.GeoJSON.IndoorZones = L.GeoJSON.extend({
         }
 
         this._tags = unique(tags);
-        this._controlBox = this._tags.reduce((ite, cur) => {
+        const controlBox = this._tags.reduce((ite, cur) => {
             const tagName = `Zone - Tag: ${cur}`;
             ite[tagName] = zoneTagHash[cur];
+
+            return ite;
         }, {});
 
-        L.control.layers(null, this._controlBox, {
+        this._controlBox = L.control.layers(null, controlBox, {
             collapsed: true,
             position: 'topright'
         });
