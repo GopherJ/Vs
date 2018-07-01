@@ -21,6 +21,7 @@ import d3Pack from './components/d3Pack';
 import d3Cluster from './components/d3Cluster';
 
 import d3LChoropleth from './components/d3LChoropleth';
+import d3LHeat from './components/d3LHeat';
 import 'leaflet/dist/leaflet.css';
 
 const install = (Vue, options = {}) => {
@@ -50,6 +51,7 @@ const install = (Vue, options = {}) => {
     Vue.component(d3Cluster.name, d3Cluster);
 
     Vue.component(d3LChoropleth.name, d3LChoropleth);
+    Vue.component(d3LHeat.name, d3LHeat);
 };
 
 export default {
@@ -80,6 +82,7 @@ export {
     d3ICicleVertical,
     d3ICicleHorizontal,
 
-    d3LChoropleth
+    d3LChoropleth,
+    d3LHeat
 };
 

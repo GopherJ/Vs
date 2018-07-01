@@ -1,5 +1,5 @@
 <template>
-    <div class="d3-l-choropleth" :style="{ 'width' : width, 'height': height }"></div>
+    <div class="d3-l-heat" :style="{ 'width' : width, 'height': height }"></div>
 </template>
 
 <script>
@@ -7,15 +7,16 @@
     import L from 'leaflet';
     import LChoropleth from 'leaflet-choropleth';
     import LGridLayerGoogleMutant from 'leaflet.gridlayer.googlemutant';
-    import mixins from '../../mixins/geojson';
+    import mixins from '../../mixins/coords';
     import LIndoor from '../../lib/leaflet.indoor';
     import LIndoorZones from '../../lib/leaflet.indoorzones';
+    import LHeat from '../../lib/leaflet.heat';
 
     export default {
-        name: 'd3-l-choropleth',
+        name: 'd3-l-heat',
         mixins: [mixins],
         methods: {
-            drawLChoropleth() {
+            drawLHeat() {
                 const data = this.data,
                     indoorMap = this.indoorMap,
                     {
@@ -46,26 +47,28 @@
 
                 levelControl.on('levelchange', indoorLayer.setLevel, indoorLayer);
 
-                L.choropleth(data, {
-                    valueProperty: 'value',
-                    scale: ['white', 'red'],
-                    steps: 5,
-                    mode: 'q',
-                    style: {
-                        color: '#fff',
-                        weight: 2,
-                        fillOpacity: 0.8
-                    },
-                    onEachFeature: function (feature, layer) {
-                        layer.bindPopup(feature.properties.value)
-                    }
-                }).addTo(Map);
+                // L.choropleth(data, {
+                //     valueProperty: 'value',
+                //     scale: ['white', 'red'],
+                //     steps: 5,
+                //     mode: 'q',
+                //     style: {
+                //         color: '#fff',
+                //         weight: 2,
+                //         fillOpacity: 0.8
+                //     },
+                //     onEachFeature: function (feature, layer) {
+                //         layer.bindPopup(feature.properties.value)
+                //     }
+                // }).addTo(Map);
+                //
+                // L.GeoJSON.indoorZones(data).addTo(Map);
 
-                L.GeoJSON.indoorZones(data).addTo(Map);
+                L.heatLayer(data, {radius: 8, max: 0.4}).addTo(Map);
             },
             safeDraw() {
                 this.ifExistsMapThenRemove();
-                this.drawLChoropleth();
+                this.drawLHeat();
             },
             onResize() {
                 this.safeDraw();
