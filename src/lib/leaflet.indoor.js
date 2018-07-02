@@ -351,6 +351,14 @@ L.Control.Level = L.Control.extend({
         return div;
     },
 
+    remove() {
+        if (this._map !== null) {
+            this._map.removeControl(this);
+        }
+
+        return this;
+    },
+
     onRemove() {
         this._map = null;
     },

@@ -65,6 +65,11 @@ L.HeatLayer = L.Layer.extend({
         this._reset();
     },
 
+    remove() {
+        this._map.removeLayer(this);
+        return this;
+    },
+
     onRemove: function (map) {
         if (this.options.pane) {
             this.getPane().removeChild(this._canvas);
@@ -77,6 +82,8 @@ L.HeatLayer = L.Layer.extend({
         if (map.options.zoomAnimation) {
             map.off('zoomanim', this._animateZoom, this);
         }
+
+        this.map = null;
     },
 
     addTo: function (map) {

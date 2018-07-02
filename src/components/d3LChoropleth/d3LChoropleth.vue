@@ -102,6 +102,7 @@
                 this._fullscreenControl = L.Control.Fullscreen().addTo(Map);
             },
             removeAll() {
+                if (this._fullscreenControl !== null) this._fullscreenControl.remove();
                 if (this._indoorZones !== null) this._indoorZones.remove();
                 if (this._choroplethLayer !== null) this._choroplethLayer.remove();
                 if (this._indoorLayer !== null) this._indoorLayer.remove();
@@ -109,7 +110,6 @@
                 if (this._tile !== null) this._tile.remove();
                 if (this._gridLayer !== null) this._gridLayer.remove();
                 if (this._map !== null) this._map.remove();
-                if (this._fullscreenControl !== null) this._fullscreenControl.remove();
             },
             safeDraw() {
                 this.removeAll();
