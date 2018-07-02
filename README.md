@@ -293,6 +293,10 @@ Vue.use(Vs);
 
 ![d3SankeyCircular](./images/d3-sankey-circular.PNG)
 
+![d3LChoropleth](./images/d3-l-choropleth.PNG)
+
+![d3LHeat](./images/d3-l-heat.PNG)
+
 ![d3ICicleVertical](./images/d3-icicle-vertical.PNG)
 
 ![d3ICicleHorizontal](./images/d3-icicle-horizontal.PNG)
@@ -308,10 +312,6 @@ Vue.use(Vs);
 ![d3Slider](./images/d3-slider.PNG)
 
 ![d3ProgressArc](./images/d3-progress-arc.gif)
-
-![d3LChoropleth](./images/d3-l-choropleth.PNG)
-
-![d3LHeat](./images/d3-l-heat.PNG)
 
 
 
