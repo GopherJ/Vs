@@ -138,7 +138,7 @@
                         .attr('opacity', aixsFontOpacity);
 
                     axisXLane
-                        .call(responsiveAxisX, xAxis, xScale)
+                        .call(responsiveAxisX, xAxis, xScale);
 
                     const axisXLabelLane = svg
                         .append('g')

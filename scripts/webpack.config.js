@@ -49,12 +49,8 @@ config.module = {
         },
         {
             test: /\.(png|jpe?g|gif|svg)(\?.*)?$/,
-            exclude: /node_modules|vendor/,
             use: {
-                loader: 'url-loader',
-                options: {
-                    name: 'images/[name].[ext]',
-                }
+                loader: 'file-loader',
             },
         },
         {

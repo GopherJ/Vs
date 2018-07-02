@@ -59,7 +59,7 @@
 
                 if (L.Util.isArray(indoorMaps) && indoorMaps.length > 0) {
                     this._indoorLayer = L.indoor(indoorMaps, {
-                        grayscale: true
+                        grayscale: false
                     }).addTo(Map);
                 }
 
@@ -90,6 +90,10 @@
         }
     }
 </script>
+
+<style>
+    @import url('../../css/index.css');
+</style>
 
 
 

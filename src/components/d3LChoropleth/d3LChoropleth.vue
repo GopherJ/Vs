@@ -102,5 +102,8 @@
     }
 </script>
 
+<style>
+    @import url('../../css/index.css');
+</style>
 
 
