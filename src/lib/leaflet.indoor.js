@@ -226,7 +226,7 @@ L.Indoor = L.Layer.extend({
     onAdd(map) {
         this._map = map;
 
-        if (!isLevel(this._level)) {
+        if (!isLevel(this._level) || !(this._level in this._layers)) {
             const levels = this.getLevels();
 
             if (levels.length !== 0) {
@@ -241,11 +241,9 @@ L.Indoor = L.Layer.extend({
             }
         }
 
-        if (this._level in this._layers) {
-            map.addLayer(this._layers[this._level]);
+        map.addLayer(this._layers[this._level]);
 
-            this._levelControl.addTo(map);
-        }
+        this._levelControl.addTo(map);
     },
 
     onRemove() {
@@ -347,7 +345,23 @@ L.Indoor = L.Layer.extend({
                     layer.addData(feature);
                 }
             });
+
         });
+
+        if (this._map != null && this._levelControl != null) {
+            this._map.removeControl(this._levelControl);
+        }
+
+        this._levelControl = new L.Control.Level({
+            level: this._level,
+            levels: this.getLevels()
+        });
+
+        this._levelControl.on('levelchange', this.setLevel, this);
+
+        if (this._map != null) {
+            this._levelControl.addTo(this._map);
+        }
     },
     getLevels() {
         return Object.keys(this._layers);
