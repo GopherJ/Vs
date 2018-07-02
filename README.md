@@ -63,6 +63,11 @@ npm i -S d3-vs
 
 - `d3SankeyCircular`
 
+### Leaflet
+
+- `d3LChoropleth`
+- `d3LHeat`
+
 
 
 ## Usage
@@ -242,6 +247,22 @@ Vue.use(Vs);
     width="100%"
     height="400px">
 </d3-circle>
+
+<d3-l-choropleth
+    :data="data"
+    :options="options"
+    :indoorMaps="indoorMaps"
+    width="100%"
+    height="400px">
+</d3-l-choropleth>
+
+<d3-l-heat
+    :data="data"
+    :options="options"
+    :indoorMaps="indoorMaps"
+    width="100%"
+    height="400px">
+</d3-l-heat>
 ```
 
 
@@ -288,6 +309,10 @@ Vue.use(Vs);
 
 ![d3ProgressArc](./images/d3-progress-arc.gif)
 
+![d3LChoropleth](./images/d3-l-choropleth.PNG)
+
+![d3LHeat](./images/d3-l-heat.PNG)
+
 
 
 ## ToDo
@@ -305,6 +330,7 @@ Vue.use(Vs);
 - `d3WordCloud`
 - `d3Markdown`
 - `d3JsonViewer`
+- `d3LReplay`
 
 
 
