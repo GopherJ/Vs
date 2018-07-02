@@ -70,8 +70,7 @@
                     __offsetRight__ = 10,
                     __offsetBottom__ = 10,
                     g_w = w - left - right - axisYLabelLaneWidth - axisYLaneWidth - __offsetRight__,
-                    g_h = h - top - bottom - axisXLaneHeight - axisXLabelLaneHeight - __offsetBottom__,
-                    self = this;
+                    g_h = h - top - bottom - axisXLaneHeight - axisXLabelLaneHeight - __offsetBottom__;
 
                 if (![g_w, g_h].every(el => el > 0)) return;
 

@@ -11,6 +11,7 @@
     import { brushX } from '../../utils/brush';
     import isAxisTime from '../../utils/isAxisTime';
     import { responsiveAxisX } from '../../utils/responsiveAxis';
+    import axisShow from '../../utils/axisShow';
 
     export default {
         name: 'd3-area',
@@ -125,6 +126,7 @@
                         .attr('transform', `translate(${axisYLaneWidth}, 0)`)
                         .attr('class', 'axis axis--y')
                         .call(yAxis)
+                        .call(axisShow, isAxisPathShow, true)
                         .attr('font-size', axisFontSize)
                         .attr('font-weight', axisFontWeight)
                         .attr('opacity', aixsFontOpacity);
@@ -133,6 +135,7 @@
                         .append('g')
                         .attr('class', 'axis axis--x')
                         .call(xAxis)
+                        .call(axisShow, isAxisPathShow, true)
                         .attr('font-size', axisFontSize)
                         .attr('font-weight', axisFontWeight)
                         .attr('opacity', aixsFontOpacity);

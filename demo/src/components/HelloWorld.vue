@@ -12,9 +12,19 @@
         <section class="section">
             <div class="tile is-parent is-vertical">
                 <article class="tile is-child content">
-                    <h2 class="title">d3Metric</h2>
+                    <h2 class="title">d3HorizontalBar</h2>
 
-                    <hr>
+                    <div class="columns">
+                        <div class="column is-12 box">
+                            <d3-area :data="horizontalBarData"></d3-area>
+                            <d3-horizontal-bar :data="horizontalBarData"></d3-horizontal-bar>
+                            <d3-vertical-bar :data="verticalBarData"></d3-vertical-bar>
+                        </div>
+                    </div>
+                </article>
+
+                <article class="tile is-child content">
+                    <h2 class="title">d3LChoropleth</h2>
 
                     <div class="columns">
                         <div class="column is-12 box">
@@ -24,11 +34,9 @@
                 </article>
             </div>
 
-             <div class="tile is-parent is-vertical">
+            <div class="tile is-parent is-vertical">
                 <article class="tile is-child content">
                     <h2 class="title">d3Metric</h2>
-
-                    <hr>
 
                     <div class="columns">
                         <div class="column is-12 box">
@@ -47,6 +55,11 @@
         data() {
             return {
                 horizontalBarData: [
+                    {key: new Date(2017, 1, 1), value: 3},
+                    {key: new Date(2017, 6, 1), value: 4},
+                    {key: new Date(2017, 12, 1), value: 5},
+                ],
+                verticalBarData: [
                     {key: new Date(2017, 1, 1), value: 3},
                     {key: new Date(2017, 6, 1), value: 4},
                     {key: new Date(2017, 12, 1), value: 5},
