@@ -3,72 +3,117 @@
 </template>
 
 <script>
-    import * as d3 from 'd3';
     import L from 'leaflet';
     import LChoropleth from 'leaflet-choropleth';
     import LGridLayerGoogleMutant from 'leaflet.gridlayer.googlemutant';
-    import mixins from '../../mixins/geojson';
+    import LFullscreen from 'leaflet-fullscreen';
+    import mixins from '../../mixins/geoJson';
     import LIndoor from '../../lib/leaflet.indoor';
     import LIndoorZones from '../../lib/leaflet.indoorzones';
 
     export default {
         name: 'd3-l-choropleth',
+        data() {
+            return {
+                _map: null,
+                _gridLayer: null,
+                _tile: null,
+
+                _indoorLayer: null,
+                _indoorLayerLevelControl: null,
+
+                _choroplethLayer: null,
+                _indoorZones: null,
+
+                _fullscreenControl: null
+            }
+        },
         mixins: [mixins],
         methods: {
             drawLChoropleth() {
                 const data = this.data,
-                    indoorMap = this.indoorMap,
+                    indoorMaps = this.indoorMaps,
+                    indoorZones = this.indoorZones,
                     {
-                        zoom, center, url, attribution, maxZoom
+                        zoom = 18,
+                        center,
+                        url,
+                        attribution,
+                        maxZoom = 23,
+                        minZoom = 1,
+
+                        valueProperty = 'value',
+                        scale = ['white', 'red'],
+                        steps = 5,
+                        mode = 'q',
+                        style: {
+                            color = '#fff',
+                            weight = 2,
+                            fillOpacity = 0.8
+                        }
                     } = this.options;
 
-                const Map = L.map(this.$el).setView(center, zoom);
-                L.gridLayer.googleMutant({
+                const Map = this._map = L.map(this.$el).setView(center, zoom);
+                this._gridLayer = L.gridLayer.googleMutant({
                     maxZoom,
+                    minZoom,
                     type: 'roadmap'
-                });
+                }).addTo(Map);
 
-                const Tile = L.tileLayer(url, {
+                this._tile = L.tileLayer(url, {
                     attribution,
                     maxZoom
                 }).addTo(Map);
 
-                const indoorLayer = L.indoor(indoorMap, {
-                    grayscale: true
-                }).addTo(Map);
+                if (L.Util.isArray(indoorMaps) && indoorMaps.length > 0) {
+                    const indoorLayer = this._indoorLayer = L.indoor(indoorMaps, {
+                        grayscale: true
+                    }).addTo(Map);
 
-                indoorLayer.setLevel('0');
+                    indoorLayer.setLevel('0');
 
-                const levelControl = L.Control.level({
-                    level: '0',
-                    levels: indoorLayer.getLevels()
-                }).addTo(Map);
+                    const levelControl = this._indoorLayerLevelControl = L.Control.level({
+                        level: '0',
+                        levels: indoorLayer.getLevels()
+                    }).addTo(Map);
 
-                levelControl.on('levelchange', indoorLayer.setLevel, indoorLayer);
+                    levelControl.on('levelchange', indoorLayer.setLevel, indoorLayer);
+                }
 
-                L.choropleth(data, {
-                    valueProperty: 'value',
-                    scale: ['white', 'red'],
-                    steps: 5,
-                    mode: 'q',
+                this._choroplethLayer = L.choropleth(data, {
+                    valueProperty,
+                    scale,
+                    steps,
+                    mode,
                     style: {
-                        color: '#fff',
-                        weight: 2,
-                        fillOpacity: 0.8
+                        color,
+                        weight,
+                        fillOpacity
                     },
                     onEachFeature: function (feature, layer) {
                         layer.bindPopup(feature.properties.value)
                     }
                 }).addTo(Map);
 
-                L.GeoJSON.indoorZones(data).addTo(Map);
+                if (indoorZones) {
+                    this._indoorZones = L.GeoJSON.indoorZones(data).addTo(Map);
+                }
+
+                this._fullscreenControl = L.Control.Fullscreen().addTo(Map);
+            },
+            removeAll() {
+                if (this._indoorZones !== null) this._indoorZones.remove();
+                if (this._choroplethLayer !== null) this._choroplethLayer.remove();
+                if (this._indoorLayer !== null) this._indoorLayer.remove();
+                if (this._indoorLayerLevelControl !== null) this._indoorLayerLevelControl.remove();
+                if (this._tile !== null) this._tile.remove();
+                if (this._gridLayer !== null) this._gridLayer.remove();
+                if (this._map !== null) this._map.remove();
+                if (this._fullscreenControl !== null) this._fullscreenControl.remove();
             },
             safeDraw() {
-                this.ifExistsMapThenRemove();
+                this.removeAll();
                 this.drawLChoropleth();
-            },
-            onResize() {
-                this.safeDraw();
             }
         }
     }

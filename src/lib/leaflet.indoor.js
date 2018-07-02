@@ -105,6 +105,7 @@ L.Indoor = L.Layer.extend({
 
     addTo(map) {
         map.addLayer(this);
+
         return this;
     },
 
@@ -120,8 +121,14 @@ L.Indoor = L.Layer.extend({
         }
 
         if (this._level in this._layers) {
-            this._map.addLayer(this._layers[this._level]);
+            map.addLayer(this._layers[this._level]);
         }
+    },
+
+    remove() {
+        this._map.removeLayer(this);
+
+        return this;
     },
 
     onRemove() {
@@ -133,6 +140,8 @@ L.Indoor = L.Layer.extend({
     },
 
     addData(data) {
+        if (!L.Util.isArray(data)) return;
+
         let layers = this._layers,
             options = this.options;
 
@@ -286,7 +295,6 @@ L.Control.Level = L.Control.extend({
         L.setOptions(this, options);
         this._map = null;
         this._buttons = {};
-        this._listeners = [];
         this._level = this.options.level;
         this._levels = this.options.levels;
 
@@ -357,7 +365,7 @@ L.Control.Level = L.Control.extend({
     },
 
     setLevel(level) {
-        if (level === this._level || !(level in this._levels)) {
+        if (level === this._level || !(this._levels.includes(level.toString()))) {
             return;
         }
 

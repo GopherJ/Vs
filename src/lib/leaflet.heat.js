@@ -1,9 +1,9 @@
 'use strict';
 
-import simpleheat from 'simpleheat';
+import simpleheat from './simpleheat';
 import L from 'leaflet';
 
-L.HeatLayer = (L.Layer ? L.Layer : L.Class).extend({
+L.HeatLayer = L.Layer.extend({
 
     // options: {
     //     minOpacity: 0.05,

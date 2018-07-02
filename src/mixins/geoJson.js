@@ -11,7 +11,7 @@ export default {
             default: '400px'
         },
         data: {
-            type: Array,
+            type: Object,
             required: true
         },
         indoorMaps: {
