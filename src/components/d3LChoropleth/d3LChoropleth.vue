@@ -15,7 +15,7 @@
             return {
                 _map: null,
                 _gridLayer: null,
-                _tile: null,
+                _tileLayer: null,
                 _indoorLayer: null,
                 _choroplethLayer: null,
                 _fullscreenControl: null
@@ -55,7 +55,7 @@
                     type: 'roadmap'
                 }).addTo(Map);
 
-                this._tile = L.tileLayer(url, {
+                this._tileLayer = L.tileLayer(url, {
                     attribution,
                     maxZoom
                 }).addTo(Map);
@@ -91,7 +91,7 @@
                 this._choroplethLayer = null;
                 this._indoorLayer = null;
                 this._fullscreenControl = null;
-                this._tile = null;
+                this._tileLayer = null;
                 this._gridLayer = null;
             },
             safeDraw() {

@@ -18,7 +18,7 @@
 
                     <div class="columns">
                         <div class="column is-12 box">
-                            <d3-l-choropleth v-bind="testMap"></d3-l-choropleth>
+                            <!--<d3-l-choropleth v-bind="testMap"></d3-l-choropleth>-->
                         </div>
                     </div>
                 </article>
@@ -32,7 +32,7 @@
 
                     <div class="columns">
                         <div class="column is-12 box">
-                            <!--<d3-l-heat v-bind="Object.assign(testMap, {data: points})"></d3-l-heat>-->
+                            <d3-l-heat v-bind="Object.assign(testMap, {data: points})"></d3-l-heat>
                         </div>
                     </div>
                 </article>
