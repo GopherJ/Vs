@@ -162,6 +162,7 @@ L.Indoor = L.Layer.extend({
         L.setOptions(this, options);
 
         const layers = this._layers = {};
+        this.bounds = {};
         this._map = null;
 
         this._levelControl = null;
@@ -295,6 +296,10 @@ L.Indoor = L.Layer.extend({
                         fadeAnimation: false,
                     }).addTo(layer);
                 }
+
+                if (indoor_map['map_bounds']) {
+                    this.bounds[map_level] = indoor_map['map_bounds'];
+                }
             }
 
             // Features
@@ -385,6 +390,10 @@ L.Indoor = L.Layer.extend({
             }
 
             this._map.addLayer(layer);
+            if (this.bounds[level]) {
+                this._map.fitBounds(this.bounds[level]);
+            }
+
             this._level = level;
 
             this._onSetLevel(level);
