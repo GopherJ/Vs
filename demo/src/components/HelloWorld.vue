@@ -32,7 +32,7 @@
 
                     <div class="columns">
                         <div class="column is-12 box">
-                            <d3-l-heat v-bind="Object.assign(testMap, {data: points})"></d3-l-heat>
+                            <!--<d3-l-heat v-bind="Object.assign(testMap, {data: points})"></d3-l-heat>-->
                         </div>
                     </div>
                 </article>
@@ -188,7 +188,7 @@
                             }
                         ]
                     },
-                    indoorMap: [
+                    indoorMaps: [
                         {
                             "name": null,
                             "uuid": "e80df700fb26013508f232dca1892d8d",

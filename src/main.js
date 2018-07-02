@@ -23,6 +23,7 @@ import d3Cluster from './components/d3Cluster';
 import d3LChoropleth from './components/d3LChoropleth';
 import d3LHeat from './components/d3LHeat';
 import 'leaflet/dist/leaflet.css';
+import 'leaflet-fullscreen/dist/leaflet.fullscreen.css';
 
 const install = (Vue, options = {}) => {
     if (options.store) {

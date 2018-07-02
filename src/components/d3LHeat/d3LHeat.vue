@@ -4,12 +4,12 @@
 
 <script>
     import L from 'leaflet';
-    import LChoropleth from 'leaflet-heat';
     import LGridLayerGoogleMutant from 'leaflet.gridlayer.googlemutant';
     import LFullscreen from 'leaflet-fullscreen';
     import mixins from '../../mixins/coords';
     import LIndoor from '../../lib/leaflet.indoor';
     import LIndoorZones from '../../lib/leaflet.indoorzones';
+    import LHeat from '../../lib/leaflet.heat';
 
     export default {
         name: 'd3-l-heat',
@@ -90,21 +90,19 @@
                     this._indoorZones = L.GeoJSON.indoorZones(data).addTo(Map);
                 }
 
-                this._fullscreenControl = L.Control.Fullscreen().addTo(Map);
             },
             removeAll() {
-                if (this._fullscreenControl !== null) this._fullscreenControl.remove();
-                if (this._indoorZones !== null) this._indoorZones.remove();
-                if (this._heatLayer !== null) this._heatLayer.remove();
-                if (this._indoorLayer !== null) this._indoorLayer.remove();
-                if (this._indoorLayerLevelControl !== null) this._indoorLayerLevelControl.remove();
-                if (this._tile !== null) this._tile.remove();
-                if (this._gridLayer !== null) this._gridLayer.remove();
-                if (this._map !== null) this._map.remove();
+                // if (this._indoorZones !== null) this._indoorZones.remove();
+                // if (this._heatLayer !== null) this._heatLayer.remove();
+                // if (this._indoorLayer !== null) this._indoorLayer.remove();
+                // if (this._indoorLayerLevelControl !== null) this._indoorLayerLevelControl.remove();
+                // if (this._tile !== null) this._tile.remove();
+                // if (this._gridLayer !== null) this._gridLayer.remove();
+                // if (this._map !== null) this._map.remove();
             },
             safeDraw() {
-                this.removeAll();
-                this.drawLChoropleth();
+                // this.removeAll();
+                this.drawLHeat();
             }
         }
     }
