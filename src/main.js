@@ -1,4 +1,6 @@
 /* eslint-disable */
+import L from 'leaflet';
+
 import d3SankeyCircular from './components/d3SankeyCircular';
 import d3Timelion from './components/d3Timelion';
 import d3Timeline from './components/d3Timeline';

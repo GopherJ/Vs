@@ -19,6 +19,7 @@
                             <d3-area :data="horizontalBarData"></d3-area>
                             <d3-horizontal-bar :data="horizontalBarData"></d3-horizontal-bar>
                             <d3-vertical-bar :data="verticalBarData"></d3-vertical-bar>
+                            <d3-timelion :data="verticalBarData"></d3-timelion>
                         </div>
                     </div>
                 </article>
@@ -28,7 +29,7 @@
 
                     <div class="columns">
                         <div class="column is-12 box">
-                            <d3-l-choropleth v-bind="testMap"></d3-l-choropleth>
+                            <!--<d3-l-choropleth v-bind="testMap"></d3-l-choropleth>-->
                         </div>
                     </div>
                 </article>
@@ -40,7 +41,7 @@
 
                     <div class="columns">
                         <div class="column is-12 box">
-                            <!--<d3-l-heat v-bind="Object.assign(testMap, {data: points})"></d3-l-heat>-->
+                            <d3-l-heat v-bind="Object.assign(testMap, {data: points})"></d3-l-heat>
                         </div>
                     </div>
                 </article>
