@@ -388,7 +388,10 @@ L.Indoor = L.Layer.extend({
                 this._map.removeLayer(oldLayer);
             }
 
-            this._map.addLayer(layer);
+            if (!this._map.hasLayer(layer)) {
+                this._map.addLayer(layer);
+            }
+
             if (this.bounds[level]) {
                 this._map.fitBounds(this.bounds[level]);
             }
@@ -397,24 +400,7 @@ L.Indoor = L.Layer.extend({
 
             this._onSetLevel(level);
         }
-    },
-
-    resetStyle(layer) {
-        // reset any custom styles
-        layer.options = layer.defaultOptions;
-        this._setLayerStyle(layer, this.options.style);
-        return this;
-    },
-
-    _setLayerStyle(layer, style) {
-        if (typeof style === 'function') {
-            style = style(layer.feature);
-        }
-
-        if (layer.setStyle) {
-            layer.setStyle(style);
-        }
-    },
+    }
 });
 
 L.indoor = function (data, options) {
