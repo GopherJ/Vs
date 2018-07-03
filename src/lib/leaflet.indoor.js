@@ -25,6 +25,13 @@ const isLevel = l => typeof l === 'number' || !isNaN(parseInt(l, 10));
 
 const isEmpty = n => n === '' || n === undefined || n === null;
 
+/**
+ *
+ * @param o
+ * @returns {boolean}
+ */
+const isObject = o => String(o) === '[object Object]';
+
 
 /**
  * leaflet indoor levels control
@@ -248,7 +255,10 @@ L.Indoor = L.Layer.extend({
             this._map.removeLayer(this._layers[this._level]);
         }
 
-        this._map.removeControl(this._levelControl);
+        if (this._levelControl !== null) {
+            this._map.removeControl(this._levelControl);
+        }
+
         this._map = null;
     },
 
@@ -299,6 +309,10 @@ L.Indoor = L.Layer.extend({
             }
 
             // Features
+            if (!isObject(indoor_map['map_features']) || !L.Util.isArray(indoor_map['map_features']['features'])) {
+                return;
+            }
+
             const features = indoor_map['map_features']['features'];
             features.forEach((feature) => {
                 const level = options.getLevel(feature);
