@@ -6,6 +6,7 @@
     import L from 'leaflet';
     import LChoropleth from 'leaflet-choropleth';
     import LGridLayerGoogleMutant from 'leaflet.gridlayer.googlemutant';
+    import LIndoor from '../../lib/leaflet.indoor';
     import LFullscreen from 'leaflet-fullscreen';
     import mixins from '../../mixins/geoJson';
 
@@ -61,7 +62,7 @@
                 }).addTo(Map);
 
                 if (L.Util.isArray(indoorMaps) && indoorMaps.length > 0) {
-                    this._indoorLayer = L.indoor(indoorMaps, {
+                    this._indoorLayer = L.indoorLayer(indoorMaps, {
                         grayscale: true
                     }).addTo(Map);
                 }

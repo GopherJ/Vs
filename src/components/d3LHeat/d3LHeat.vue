@@ -58,7 +58,7 @@
                 }).addTo(Map);
 
                 if (L.Util.isArray(indoorMaps) && indoorMaps.length > 0) {
-                    this._indoorLayer = L.indoor(indoorMaps, {
+                    this._indoorLayer = L.indoorLayer(indoorMaps, {
                         grayscale: false
                     }).addTo(Map);
                 }

@@ -36,7 +36,7 @@ const isObject = o => String(o) === '[object Object]';
 /**
  * leaflet indoor levels control
  */
-L.Control.Level = L.Control.extend({
+L.LevelControl = L.Control.extend({
     includes: L.Evented.prototype,
 
     options: {
@@ -141,8 +141,8 @@ L.Control.Level = L.Control.extend({
     }
 });
 
-L.Control.level = function (options) {
-    return new L.Control.Level(options);
+L.levelControl = function (options) {
+    return new L.LevelControl(options);
 };
 
 
@@ -155,7 +155,7 @@ L.Control.level = function (options) {
  * getLevels can be called to get the array of levels that are present.
  */
 
-L.Indoor = L.Layer.extend({
+L.IndoorLayer = L.Layer.extend({
 
     options: {
         // by default the levels are expected to be in the level attribute in
@@ -239,7 +239,7 @@ L.Indoor = L.Layer.extend({
             }
         }
 
-        this._levelControl = new L.Control.Level({
+        this._levelControl = L.levelControl({
             level: this._level,
             levels: this.getLevels()
         });
@@ -367,7 +367,7 @@ L.Indoor = L.Layer.extend({
             this._map.removeControl(this._levelControl);
         }
 
-        this._levelControl = new L.Control.Level({
+        this._levelControl = L.levelControl({
             level: this._level,
             levels: this.getLevels()
         });
@@ -417,9 +417,6 @@ L.Indoor = L.Layer.extend({
     }
 });
 
-L.indoor = function (data, options) {
-    return new L.Indoor(data, options);
+L.indoorLayer = function (data, options) {
+    return new L.IndoorLayer(data, options);
 };
-
-
-
