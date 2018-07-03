@@ -1,6 +1,4 @@
 /* eslint-disable */
-import L from 'leaflet';
-
 import d3SankeyCircular from './components/d3SankeyCircular';
 import d3Timelion from './components/d3Timelion';
 import d3Timeline from './components/d3Timeline';
@@ -24,14 +22,6 @@ import d3Cluster from './components/d3Cluster';
 
 import d3LChoropleth from './components/d3LChoropleth';
 import d3LHeat from './components/d3LHeat';
-
-L.Icon.Default.imagePath = '.';
-
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: require('leaflet/dist/images/marker-icon-2x.png'),
-  iconUrl: require('leaflet/dist/images/marker-icon.png'),
-  shadowUrl: require('leaflet/dist/images/marker-shadow.png'),
-});
 
 const install = (Vue, options = {}) => {
     if (options.store) {

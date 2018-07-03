@@ -17,8 +17,8 @@ config.entry = {
 config.output = {
     path: path.resolve(__dirname, '../dist'),
     filename: '[name].js',
-    library: "Vs",
-    libraryTarget: "umd",
+    library: 'Vs',
+    libraryTarget: 'umd',
 };
 
 config.externals = ['buefy', 'vuex', 'vue'];
@@ -26,7 +26,7 @@ config.externals = ['buefy', 'vuex', 'vue'];
 config.resolve = {
     extensions: ['.js', '.vue', '.css', '.scss', '.ts'],
     alias: {
-        '~' : path.resolve(__dirname, '../node_modules')
+        '~': path.resolve(__dirname, '../node_modules')
     },
     enforceExtension: false
 };
@@ -73,21 +73,21 @@ config.module = {
         {
             test: /\.scss$/,
             use: [{
-                loader: "style-loader",
+                loader: 'style-loader',
                 options: {
                     singleton: true,
                 }
             }, {
-                loader: "css-loader" // translates CSS into CommonJS
+                loader: 'css-loader' // translates CSS into CommonJS
             }, {
-                loader: "sass-loader" // compiles Sass to CSS
+                loader: 'sass-loader' // compiles Sass to CSS
             }]
         }
     ]
 };
 process.traceDeprecation = true;
 if (process.env.NODE_ENV === 'production') {
-    config.output.filename = "Vs.min.js"
+    config.output.filename = 'Vs.min.js';
     config.devtool = '#source-map';
 
     // Pass build environment inside bundle

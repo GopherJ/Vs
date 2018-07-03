@@ -107,15 +107,16 @@ L.Control.Level = L.Control.extend({
 
     _levelChange(e) {
         if (this._map !== null) {
-            if (typeof e.oldLevel !== 'undefined') {
+            if (e.oldLevel != undefined) {
                 this._buttons[e.oldLevel].style.backgroundColor = '#ffffff';
             }
+
             this._buttons[e.newLevel].style.backgroundColor = '#b0b0b0';
         }
     },
 
     setLevel(level) {
-        if (level === this._level || !(this._levels.includes(level.toString()))) {
+        if (level === this._level || !(this._levels.includes(String(level)))) {
             return;
         }
 
@@ -168,7 +169,7 @@ L.Indoor = L.Layer.extend({
         this._levelControl = null;
 
         if ('level' in this.options) {
-            this._level = this.options.level;
+            this._level = String(this.options.level);
         } else {
             this._level = null;
         }
@@ -218,12 +219,6 @@ L.Indoor = L.Layer.extend({
         this.addData(data);
     },
 
-    addTo(map) {
-        map.addLayer(this);
-
-        return this;
-    },
-
     onAdd(map) {
         this._map = map;
 
@@ -232,23 +227,24 @@ L.Indoor = L.Layer.extend({
 
             if (levels.length !== 0) {
                 this._level = levels[0];
-
-                this._levelControl = new L.Control.Level({
-                    level: levels[0],
-                    levels: this.getLevels()
-                });
-
-                this._levelControl.on('levelchange', this.setLevel, this);
+            } else {
+                return;
             }
         }
 
-        map.addLayer(this._layers[this._level]);
+        this._levelControl = new L.Control.Level({
+            level: this._level,
+            levels: this.getLevels()
+        });
+
+        this._levelControl.on('levelchange', this.setLevel, this);
 
         this._levelControl.addTo(map);
+        map.addLayer(this._layers[this._level]);
     },
 
-    onRemove() {
-        if (this._level in this._layers) {
+    onRemove(map) {
+        if (this._level in this._layers && this._map.hasLayer(this._layers[this._level])) {
             this._map.removeLayer(this._layers[this._level]);
         }
 
@@ -368,12 +364,15 @@ L.Indoor = L.Layer.extend({
             this._levelControl.addTo(this._map);
         }
     },
+
     getLevels() {
         return Object.keys(this._layers);
     },
+
     getLevel() {
         return this._level;
     },
+
     setLevel(level) {
         if (typeof level === 'object') level = level.newLevel;
 
@@ -399,12 +398,14 @@ L.Indoor = L.Layer.extend({
             this._onSetLevel(level);
         }
     },
+
     resetStyle(layer) {
         // reset any custom styles
         layer.options = layer.defaultOptions;
         this._setLayerStyle(layer, this.options.style);
         return this;
     },
+
     _setLayerStyle(layer, style) {
         if (typeof style === 'function') {
             style = style(layer.feature);
