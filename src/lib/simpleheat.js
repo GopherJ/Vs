@@ -113,12 +113,12 @@ simpleheat.prototype = {
         // colorize the heatmap, using opacity value of each pixel to get the right color from our gradient
         try {
             var colored = ctx.getImageData(0, 0, this._width, this._height);
-        } catch(e) {
+
+            this._colorize(colored.data, this._grad);
+            ctx.putImageData(colored, 0, 0);
+        } catch (e) {
             console.warn(e);
         }
-
-        this._colorize(colored.data, this._grad);
-        ctx.putImageData(colored, 0, 0);
 
         return this;
     },

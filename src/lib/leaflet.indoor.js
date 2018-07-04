@@ -388,7 +388,7 @@ L.IndoorLayer = L.Layer.extend({
     },
 
     setLevel(level) {
-        if (typeof level === 'object') level = level.newLevel;
+        if (isObject(level)) level = level.newLevel;
 
         if (!isLevel(level) || this._level === level || !(level in this._layers)) {
             return;
