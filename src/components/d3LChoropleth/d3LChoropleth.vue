@@ -19,7 +19,8 @@
                 _tileLayer: null,
                 _indoorLayer: null,
                 _choroplethLayer: null,
-                _fullscreenControl: null
+                _fullscreenControl: null,
+                _legend: null
             }
         },
         mixins: [mixins],
@@ -78,9 +79,33 @@
                         fillOpacity
                     },
                     onEachFeature: function (feature, layer) {
-                        layer.bindPopup(feature.properties.value.toString());
+                        layer.bindPopup(`Zone: ${feature.properties.name}<br>Value: ${feature.properties.value.toFixed(2)}`);
                     }
                 }).addTo(Map);
+
+                const legend = this._legend = L.control({
+                    position: 'topright'
+                });
+
+                const self = this;
+                legend.onAdd = function (map) {
+                    const div = L.DomUtil.create('div', 'info legend');
+                    const limits = self._choroplethLayer.options.limits;
+                    const colors = self._choroplethLayer.options.colors;
+                    const labels = [];
+
+                    div.innerHTML = '<div class="labels"><div class="min">' + limits[0].toFixed(2) + '</div> \
+                        <div class="max">' + limits[limits.length - 1].toFixed(2) + '</div></div>';
+
+                    limits.forEach(function (limit, index) {
+                        labels.push('<li style="background-color: ' + colors[index] + '"></li>')
+                    });
+
+                    div.innerHTML += '<ul>' + labels.join('') + '</ul>';
+                    return div
+                };
+
+                legend.addTo(Map);
 
                 this._fullscreenControl = new L.Control.Fullscreen();
                 Map.addControl(this._fullscreenControl);
@@ -105,6 +130,39 @@
 
 <style>
     @import url('../../css/index.css');
+
+    .d3-l-choropleth .legend {
+        color: #555;
+        padding: 6px 8px;
+        font: 12px Arial, Helvetica, sans-serif;
+        font-weight: bold;
+        background: white;
+        background: rgba(255, 255, 255, 0.8);
+        box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+        border-radius: 5px;
+    }
+
+     .d3-l-choropleth .legend ul {
+        list-style-type: none;
+        padding: 0px;
+        margin: 0px;
+        clear: both;
+    }
+
+    .d3-l-choropleth .legend li {
+        display: inline-block;
+        width: 30px;
+        height: 22px;
+    }
+
+    .d3-l-choropleth .legend .min {
+        float: left;
+        padding-bottom: 5px;
+    }
+
+    .d3-l-choropleth .legend .max {
+        float: right;
+    }
 </style>
 
 
