@@ -248,6 +248,12 @@ L.IndoorLayer = L.Layer.extend({
 
         this._levelControl.addTo(map);
         map.addLayer(this._layers[this._level]);
+
+        if (this.bounds[this._level]) {
+            this._map.fitBounds(this.bounds[this._level], {
+                padding: [20, 20]
+            });
+        }
     },
 
     onRemove(map) {
@@ -407,7 +413,9 @@ L.IndoorLayer = L.Layer.extend({
             }
 
             if (this.bounds[level]) {
-                this._map.fitBounds(this.bounds[level]);
+                this._map.fitBounds(this.bounds[level], {
+                    padding: [20, 20]
+                });
             }
 
             this._level = level;
