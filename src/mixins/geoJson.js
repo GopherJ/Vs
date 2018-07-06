@@ -29,7 +29,7 @@ export default {
         data: {
             deep: true,
             handler(n) {
-                if (this.safeDraw) return;
+                if (!this.safeDraw) return;
 
                 this.safeDraw();
             }
@@ -37,7 +37,7 @@ export default {
         indoorMaps: {
             deep: true,
             handler(n) {
-                if (this.safeDraw) return;
+                if (!this.safeDraw) return;
 
                 this.safeDraw();
             }
@@ -45,7 +45,7 @@ export default {
         indoorZones: {
             deep: true,
             handler(n) {
-                if (this.safeDraw) return;
+                if (!this.safeDraw) return;
 
                 this.safeDraw();
             }
@@ -53,7 +53,7 @@ export default {
         options: {
             deep: true,
             handler(n) {
-                if (this.safeDraw) return;
+                if (!this.safeDraw) return;
 
                 this.safeDraw();
             }

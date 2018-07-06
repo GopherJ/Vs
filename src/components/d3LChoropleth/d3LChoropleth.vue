@@ -124,6 +124,9 @@
                 this.reset();
                 this.drawLChoropleth();
             }
+        },
+        beforeDestroy() {
+            this.reset();
         }
     }
 </script>

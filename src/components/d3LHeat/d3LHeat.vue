@@ -87,6 +87,9 @@
                 this.reset();
                 this.drawLHeat();
             }
+        },
+        beforeDestroy() {
+            this.reset();
         }
     }
 </script>
