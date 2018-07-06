@@ -34,13 +34,9 @@
     "leaflet-fullscreen": "^1.0.2",
     "leaflet-labeled-circle": "^1.0.2",
     "leaflet.gridlayer.googlemutant": "^0.7.0",
-    "leaflet.heat": "^0.2.0",
     "lodash": "^4.17.5",
     "moment": "^2.22.0",
-    "ramda": "^0.25.0",
-    "simpleheat": "^0.4.0",
-    "vue": "^2.5.13",
-    "vue2-leaflet": "^1.0.2"
+    "vue": "^2.5.13"
   },
   "devDependencies": {
     "autoprefixer": "^8.2.0",
