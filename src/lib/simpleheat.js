@@ -8,8 +8,8 @@ function simpleheat(canvas) {
     this._canvas = canvas = typeof canvas === 'string' ? document.getElementById(canvas) : canvas;
 
     this._ctx = canvas.getContext('2d');
-    this._width = Math.max(canvas.width, 1);
-    this._height = Math.max(canvas.height, 1);
+    this._width = canvas.width;
+    this._height = canvas.height;
 
     this._max = 1;
     this._data = [];

@@ -98,8 +98,8 @@ L.HeatLayer = L.Layer.extend({
         canvas.style[originProp] = '50% 50%';
 
         var size = this._map.getSize();
-        canvas.width  = size.x;
-        canvas.height = size.y;
+        canvas.width  = Math.max(size.x, 1);
+        canvas.height = Math.max(size.y, 1);
 
         var animated = this._map.options.zoomAnimation && L.Browser.any3d;
         L.DomUtil.addClass(canvas, 'leaflet-zoom-' + (animated ? 'animated' : 'hide'));
