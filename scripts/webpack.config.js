@@ -50,7 +50,7 @@ config.module = {
         {
             test: /\.(png|jpe?g|gif|svg)(\?.*)?$/,
             use: {
-                loader: 'file-loader',
+                loader: 'url-loader',
             },
         },
         {
