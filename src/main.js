@@ -23,6 +23,15 @@ import d3Cluster from './components/d3Cluster';
 import d3LChoropleth from './components/d3LChoropleth';
 import d3LHeat from './components/d3LHeat';
 
+import L from 'leaflet';
+L.Icon.Default.imagePath = '.';
+
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: require('leaflet/dist/images/marker-icon-2x.png'),
+  iconUrl: require('leaflet/dist/images/marker-icon.png'),
+  shadowUrl: require('leaflet/dist/images/marker-shadow.png'),
+});
+
 const install = (Vue, options = {}) => {
     if (options.store) {
         // register store
