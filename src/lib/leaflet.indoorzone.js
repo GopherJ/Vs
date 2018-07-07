@@ -23,7 +23,7 @@ L.IndoorZone = L.GeoJSON.extend({
                 text: 0,
                 labelPosition: [
                     lng,
-                    lat,
+                    lat
                 ]
             },
             geometry: {
