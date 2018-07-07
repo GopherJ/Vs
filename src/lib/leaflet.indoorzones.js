@@ -47,7 +47,7 @@ L.IndoorZones = L.GeoJSON.extend({
     initialize(featureCollection, options) {
         L.setOptions(this, options);
 
-        this._zones = L.layerGroup();
+        this._zones = [];
         this._map = null;
 
         let tags = [], zoneTagHash = {};
@@ -70,6 +70,7 @@ L.IndoorZones = L.GeoJSON.extend({
                     zoneTagHash[tag] = L.layerGroup();
                 } else {
                     zoneTagHash[tag].addLayer(zone);
+                    zoneTagHash[tag].addLayer(zone.getCounterMarker());
                 }
 
                 tags = tags.concat(tag);
@@ -82,6 +83,7 @@ L.IndoorZones = L.GeoJSON.extend({
                             zoneTagHash[tag] = L.layerGroup();
                         } else {
                             zoneTagHash[tag].addLayer(zone);
+                            zoneTagHash[tag].addLayer(zone.getCounterMarker());
                         }
                     });
                 } else {
@@ -91,13 +93,14 @@ L.IndoorZones = L.GeoJSON.extend({
                         zoneTagHash[tag] = L.layerGroup();
                     } else {
                         zoneTagHash[tag].addLayer(zone);
+                        zoneTagHash[tag].addLayer(zone.getCounterMarker());
                     }
                 }
 
                 tags = tags.concat(tag);
             }
 
-            this._zones.addLayer(zone);
+            this._zones.push(zone);
         }
 
         this._tags = unique(tags);
@@ -117,15 +120,20 @@ L.IndoorZones = L.GeoJSON.extend({
     onAdd(map) {
         this._map = map;
 
-        map.addLayer(this._zones);
         map.addControl(this._controlBox);
     },
 
-    onRemove() {
-        this._map.removeLayer(this._zones);
-        this._map.removeControl(this._controlBox);
+    onRemove(map) {
+        if (this._map !== null) {
 
-        this._map = null;
+            this._map.removeControl(this._controlBox);
+
+            this._map = null;
+        }
+    },
+
+    getAllZones() {
+        return this._zones;
     }
 });
 
