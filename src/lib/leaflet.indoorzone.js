@@ -6,28 +6,7 @@ import L from 'leaflet';
 import LabeledMarker from 'leaflet-labeled-circle';
 import centroid from '@turf/centroid';
 
-L.GeoJSON.IndoorZone = L.GeoJSON.extend({
-    options: {
-        onEachFeature(feature, layer) {
-            if (L.Util.isArray(feature.properties.tags) && feature.properties.tags.length === 0) {
-                layer.bindPopup(`Name: ${feature.properties.name}<br/>Tags: none`);
-            } else {
-                layer.bindPopup(`Name: ${feature.properties.name}<br/>Tags: ${feature.properties.tags}`);
-            }
-        },
-
-        style(feature) {
-            let fill = '#ffffff';
-
-            return {
-                fillColor: feature.properties.rgb_color ||  fill,
-                weight: 1,
-                color: '#ff7800',
-                fillOpacity: 0.4,
-            };
-        }
-    },
-
+L.IndoorZone = L.GeoJSON.extend({
     initialize(feature, options) {
         L.setOptions(this, options);
 
@@ -82,7 +61,8 @@ L.GeoJSON.IndoorZone = L.GeoJSON.extend({
     },
 
     setDefaultFillColor() {
-        const fill = 'white';
+        const fill = '#ffffff';
+
         this.updateFillColor(fill);
     },
 
@@ -96,6 +76,6 @@ L.GeoJSON.IndoorZone = L.GeoJSON.extend({
     }
 });
 
-L.GeoJSON.indoorZone = function (feature, options) {
-    return new L.GeoJSON.IndoorZone(feature, options);
+L.indoorZone = function (feature, options) {
+    return new L.IndoorZone(feature, options);
 };

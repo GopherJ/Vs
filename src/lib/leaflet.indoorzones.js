@@ -8,26 +8,45 @@ import LIndoorZone from './leaflet.indoorzone';
 /**
  *
  * @param arr
- * @returns {any[]}
+ * @returns {array}
  */
-const unique = arr => Array.from(new Set(arr));
+const unique  = arr => Array.from(new Set(arr));
 
-L.GeoJSON.IndoorZones = L.GeoJSON.extend({
+/**
+ *
+ * @param s
+ * @returns {boolean}
+ */
+const isEmpty = s   => s === undefined || s === '' || s === null;
+
+L.IndoorZones = L.GeoJSON.extend({
     options: {
         onEachFeature(feature, layer) {
             const tags = feature.properties.tags,
-                name = feature.properties.name;
+                  name = feature.properties.name;
 
             if (L.Util.isArray(tags) && tags.length === 0) {
                 layer.bindPopup(`Name: ${name}<br/>Tags: none`);
             } else {
                 layer.bindPopup(`Name: ${name}<br/>Tags: ${tags}`);
             }
+        },
+
+        style(feature) {
+            const fill = '#ffffff';
+
+            return {
+                fillColor: feature.properties.rgb_color ||  fill,
+                weight: 1,
+                color: '#ff7800',
+                fillOpacity: 0.4,
+            };
         }
     },
 
     initialize(featureCollection, options) {
         L.setOptions(this, options);
+
         this._zones = L.layerGroup();
         this._map = null;
 
@@ -40,29 +59,45 @@ L.GeoJSON.IndoorZones = L.GeoJSON.extend({
                 continue;
             }
 
-            const zone = L.GeoJSON.indoorZone(feature);
-            const tag = feature.properties.tags
-                ? feature.properties.tags
-                : 'none';
+            const zone = L.indoorZone(feature, this.options);
 
-            if (!L.Util.isArray(tag)) {
+            const Tags = feature.properties.tags;
+
+            if (!L.Util.isArray(Tags)) {
+                const tag = isEmpty(Tags) ? 'none' : Tags;
+
                 if (!zoneTagHash[tag]) {
                     zoneTagHash[tag] = L.layerGroup();
                 } else {
                     zoneTagHash[tag].addLayer(zone);
                 }
+
+                tags = tags.concat(tag);
             } else {
-                tag.forEach(x => {
-                    if (!zoneTagHash[x]) {
-                        zoneTagHash[x] = L.layerGroup();
+                if (Tags.length > 0) {
+                    Tags.forEach(x => {
+                        const tag = isEmpty(x) ? 'none' : x;
+
+                        if (!zoneTagHash[tag]) {
+                            zoneTagHash[tag] = L.layerGroup();
+                        } else {
+                            zoneTagHash[tag].addLayer(zone);
+                        }
+                    });
+                } else {
+                    const tag = 'none';
+
+                    if (!zoneTagHash[tag]) {
+                        zoneTagHash[tag] = L.layerGroup();
                     } else {
-                        zoneTagHash[x].addLayer(zone);
+                        zoneTagHash[tag].addLayer(zone);
                     }
-                });
+                }
+
+                tags = tags.concat(tag);
             }
 
             this._zones.addLayer(zone);
-            tags = tags.concat(tag);
         }
 
         this._tags = unique(tags);
@@ -79,15 +114,11 @@ L.GeoJSON.IndoorZones = L.GeoJSON.extend({
         });
     },
 
-    addTo(map) {
-        map.addLayer(this._zones);
-        map.addControl(this._controlBox);
-
-        return this;
-    },
-
     onAdd(map) {
         this._map = map;
+
+        map.addLayer(this._zones);
+        map.addControl(this._controlBox);
     },
 
     onRemove() {
@@ -98,6 +129,6 @@ L.GeoJSON.IndoorZones = L.GeoJSON.extend({
     }
 });
 
-L.GeoJSON.indoorZones = function (featureCollection, options) {
-    return new L.GeoJSON.IndoorZones(featureCollection, options);
+L.indoorZones = function (featureCollection, options) {
+    return new L.IndoorZones(featureCollection, options);
 };
