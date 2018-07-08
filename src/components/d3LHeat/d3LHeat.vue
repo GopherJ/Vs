@@ -4,7 +4,7 @@
 
 <script>
     import L from 'leaflet';
-    // import LGridLayerGoogleMutant from 'leaflet.gridlayer.googlemutant';
+    import LGridLayerGoogleMutant from 'leaflet.gridlayer.googlemutant';
     import LFullscreen from 'leaflet-fullscreen';
     import LIndoor from '../../lib/leaflet.indoor';
     import LHeat from '../../lib/leaflet.heat';
@@ -15,7 +15,7 @@
         data() {
             return {
                 _map: null,
-                // _gridLayer: null,
+                _gridLayer: null,
                 _tileLayer: null,
                 _indoorLayer: null,
                 _heatLayer: null,
@@ -46,11 +46,11 @@
                 container.style.height = '100%';
 
                 const Map = this._map = L.map(this.$el.appendChild(container)).setView(center, zoom);
-                // this._gridLayer = L.gridLayer.googleMutant({
-                //     maxZoom,
-                //     minZoom,
-                //     type: 'roadmap'
-                // }).addTo(Map);
+                this._gridLayer = L.gridLayer.googleMutant({
+                    maxZoom,
+                    minZoom,
+                    type: 'roadmap'
+                }).addTo(Map);
 
                 this._tileLayer = L.tileLayer(url, {
                     attribution,
@@ -83,7 +83,7 @@
                 this._indoorLayer = null;
                 this._fullscreenControl = null;
                 this._tileLayer = null;
-                // this._gridLayer = null;
+                this._gridLayer = null;
             },
             safeDraw() {
                 this.reset();
