@@ -1,10 +1,10 @@
 # Vs
-Vue Visualisation Package With `d3.js`. Trusted by [Ubudu](www.ubudu.com).
+Vue Visualisation Package With `d3.js`. Trusted by [Ubudu](http://www.ubudu.com).
 
 
 # Project
 
-- [traject](traject.ubudu.com)
+- [traject](http://traject.ubudu.com)
 
 
 
