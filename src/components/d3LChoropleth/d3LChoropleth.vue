@@ -120,14 +120,12 @@
                 this._fullscreenControl = null;
                 this._tileLayer = null;
                 this._gridLayer = null;
+                this._legend = null;
             },
             safeDraw() {
                 this.reset();
                 this.drawLChoropleth();
             }
-        },
-        beforeDestroy() {
-            this.reset();
         }
     }
 </script>
