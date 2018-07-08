@@ -5,7 +5,7 @@
 <script>
     import L from 'leaflet';
     import LChoropleth from 'leaflet-choropleth';
-    import LGridLayerGoogleMutant from 'leaflet.gridlayer.googlemutant';
+    // import LGridLayerGoogleMutant from 'leaflet.gridlayer.googlemutant';
     import LIndoor from '../../lib/leaflet.indoor';
     import LFullscreen from 'leaflet-fullscreen';
     import mixins from '../../mixins/geoJson';
@@ -15,7 +15,7 @@
         data() {
             return {
                 _map: null,
-                _gridLayer: null,
+                // _gridLayer: null,
                 _tileLayer: null,
                 _indoorLayer: null,
                 _choroplethLayer: null,
@@ -51,15 +51,16 @@
                 container.style.height = '100%';
 
                 const Map = this._map = L.map(this.$el.appendChild(container)).setView(center, zoom);
-                this._gridLayer = L.gridLayer.googleMutant({
-                    maxZoom,
-                    minZoom,
-                    type: 'roadmap'
-                }).addTo(Map);
+                // this._gridLayer = L.gridLayer.googleMutant({
+                //     maxZoom,
+                //     minZoom,
+                //     type: 'roadmap'
+                // }).addTo(Map);
 
                 this._tileLayer = L.tileLayer(url, {
                     attribution,
-                    maxZoom
+                    maxZoom,
+                    minZoom
                 }).addTo(Map);
 
                 if (L.Util.isArray(indoorMaps) && indoorMaps.length > 0) {
@@ -119,7 +120,7 @@
                 this._indoorLayer = null;
                 this._fullscreenControl = null;
                 this._tileLayer = null;
-                this._gridLayer = null;
+                // this._gridLayer = null;
                 this._legend = null;
             },
             safeDraw() {
