@@ -5,7 +5,7 @@
 <script>
     import L from 'leaflet';
     import LChoropleth from 'leaflet-choropleth';
-    import LGridLayerGoogleMutant from 'leaflet.gridlayer.googlemutant';
+    import LGridLayerGoogleMutant from '../../lib/leaflet.gridlayer.googlemutant';
     import LIndoor from '../../lib/leaflet.indoor';
     import LFullscreen from 'leaflet-fullscreen';
     import mixins from '../../mixins/geoJson';

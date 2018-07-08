@@ -4,7 +4,7 @@
 
 <script>
     import L from 'leaflet';
-    import LGridLayerGoogleMutant from 'leaflet.gridlayer.googlemutant';
+    import LGridLayerGoogleMutant from '../../lib/leaflet.gridlayer.googlemutant';
     import LFullscreen from 'leaflet-fullscreen';
     import LIndoor from '../../lib/leaflet.indoor';
     import LHeat from '../../lib/leaflet.heat';
