@@ -3,7 +3,7 @@
  */
 
 import L from 'leaflet';
-import LabeledMarker from 'leaflet-labeled-circle';
+import LabeledMarker from './leaflet-labeled-circle';
 import centroid from '@turf/centroid';
 
 L.IndoorZone = L.GeoJSON.extend({
@@ -32,7 +32,7 @@ L.IndoorZone = L.GeoJSON.extend({
             }
         };
 
-        this._labeled_circle_marker = new LabeledMarker(
+        this._labeled_circle_marker = L.labeledCircleMarker(
             [lat, lng],
             circleFeature,
             {

@@ -413,6 +413,7 @@ L.IndoorLayer = L.Layer.extend({
             }
 
             if (this.bounds[level]) {
+                console.log(JSON.stringify(this.bounds, null, 4), this.bounds[level], this._map)
                 this._map.fitBounds(this.bounds[level], {
                     padding: [20, 20]
                 });

@@ -74,42 +74,24 @@
                 Map.addControl(this._fullscreenControl);
             },
             reset() {
-                 if (this._map !== null) {
-                    this._map.removeControl(this._fullscreenControl);
-                    this._fullscreenControl = null;
+                this.$el.innerHTML = '';
 
-                    this._map.removeControl(this._legend);
-                    this._legend = null;
+                this._map = null;
 
-                    this._map.removeLayer(this._heatLayer);
-                    this._heatLayer = null;
-
-                    this._map.removeLayer(this._tileLayer);
-                    this._tileLayer = null;
-
-                    this._map.removeLayer(this._gridLayer);
-                    this._gridLayer = null;
-
-                    this._map = null;
-                    this.$el.innerHTML = '';
-                }
-                // this.$el.innerHTML = '';
-                //
-                // this._map = null;
-                // this._heatLayer = null;
-                // this._indoorLayer = null;
-                // this._fullscreenControl = null;
-                // this._tileLayer = null;
-                // this._gridLayer = null;
+                this._heatLayer = null;
+                this._indoorLayer = null;
+                this._fullscreenControl = null;
+                this._tileLayer = null;
+                this._gridLayer = null;
             },
             safeDraw() {
                 this.reset();
                 this.drawLHeat();
             }
         },
-        // beforeDestroy() {
-        //     this.reset();
-        // }
+        beforeDestroy() {
+            this.reset();
+        }
     }
 </script>
 
