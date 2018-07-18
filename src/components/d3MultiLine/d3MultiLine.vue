@@ -22,6 +22,7 @@
     import emit from '../../utils/emit';
     import axisShow from '../../utils/axisShow';
     import '../../utils/hashCode';
+    import hashCode from '../../utils/hashCode';
 
     export default {
         name: 'd3-multi-line',
@@ -88,14 +89,14 @@
                 const [w, h] = this.getElWidthHeight(),
                     __offsetRight__ = 10,
                     g_w = w - left - right - axisYLabelLaneWidth - axisYLaneWidth - __offsetRight__,
-                    g_h = h - top - bottom - axisXLabelLaneHeight - axisXLaneHeight - axisXGroupLabelLaneHeight;
+                    g_h = h - top - bottom - axisXLabelLaneHeight - axisXLaneHeight - axisXGroupLabelLaneHeight,
+                    clipPathId = `clip-multi-line-${new Date().valueOf().toString().hashCode()}`;
 
                 if (![g_w, g_h].every(el => el > 0)) return;
 
                 const isAxisXTime = isAxisTime(_data),
                     isAxisXNumber = isAxisNumber(_data),
                     axisXTickFormat = value => isAxisXTime ? tickFormat(value, axisXTimeInterval) : value,
-                    ticks = selectTicksNumY(g_w),
                     data = groupBy(_data, groupKey),
                     groups = Object.keys(data);
 
@@ -275,7 +276,7 @@
 
                 svg.append('defs')
                     .append('clipPath')
-                    .attr('id', 'clip-multi-line')
+                    .attr('id', clipPathId)
                     .append('rect')
                     .attr('x', 0)
                     .attr('y', 0)
@@ -292,7 +293,7 @@
                     .enter()
                     .append('path')
                     .attr('class', d => `d3-multi-line-${d.hashCode()}`)
-                    .attr('clip-path', 'url(#clip-multi-line)')
+                    .attr('clip-path', `url(#${clipPathId})`)
                     .attr('d', d => lineGen(data[d]))
                     .attr('stroke-dasharray', d => dashedGroups.some(el => el === d) ? (_.isNumber(strokeDashArray) ? strokeDashArray : 0) : 0)
                     .attr('fill', 'transparent')
@@ -300,12 +301,12 @@
                     .attr('stroke', d => schemeCategory20(d))
                     .attr('stroke-width', strokeWidth);
 
-                const circles = g.selectAll('circle')
+                g.selectAll('circle')
                     .data(_data)
                     .enter()
                     .append('circle')
                     .attr('class', d => `d3-multi-line-${d[groupKey].hashCode()}`)
-                    .attr('clip-path', 'url(#clip-multi-line)')
+                    .attr('clip-path', `url(#${clipPathId})`)
                     .attr('cx', d => xScale(d.key))
                     .attr('cy', d => yScale(d.value))
                     .attr('r', circleRadius)

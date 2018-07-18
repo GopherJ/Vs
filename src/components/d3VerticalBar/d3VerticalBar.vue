@@ -16,6 +16,7 @@
     import isAxisTime from '../../utils/isAxisTime';
     import isAxisNumber from '../../utils/isAxisNumber';
     import axisShow from '../../utils/axisShow';
+    import hashCode from '../../utils/hashCode';
 
     export default {
         name: 'd3-vertical-bar',
@@ -71,7 +72,8 @@
                     __offsetTop__ = 10,
                     __offsetRight__ = 10,
                     g_w = w - left - right - axisYLabelLaneWidth - axisYLaneWidth - __offsetRight__,
-                    g_h = h - top - bottom - axisXLaneHeight - axisXLabelLaneHeight - __offsetTop__;
+                    g_h = h - top - bottom - axisXLaneHeight - axisXLabelLaneHeight - __offsetTop__,
+                    clipPathId = `clip-vertical-bar-${new Date().valueOf().toString().hashCode()}`;
 
                 if (![g_w, g_h].every(el => el > 0)) return;
 
@@ -88,7 +90,7 @@
 
                 svg.append('defs')
                     .append('clipPath')
-                    .attr('id', 'clip-vertical-bar')
+                    .attr('id', clipPathId)
                     .append('rect')
                     .attr('x', 0)
                     .attr('y', 0)
@@ -210,7 +212,7 @@
 
                 const rects = enter
                     .append('rect')
-                    .attr('clip-path', 'url(#clip-vertical-bar)')
+                    .attr('clip-path', `url(#${clipPathId})`)
                     .attr('x', d => xScale(d.key))
                     .attr('y', g_h)
                     .attr('height', 0)

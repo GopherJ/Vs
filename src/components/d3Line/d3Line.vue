@@ -17,6 +17,7 @@
     import { firstTickTextAnchorStart, lastTickTextAnchorEnd } from '../../utils/textAnchor';
     import axisShow from '../../utils/axisShow';
     import emit from '../../utils/emit';
+    import hashCode from '../../utils/hashCode';
 
     export default {
         name: 'd3-line',
@@ -72,7 +73,8 @@
                     __offsetTop__ = 10,
                     __offsetRight__ = 10,
                     g_w = w - left - right - axisYLabelLaneWidth - axisYLaneWidth - __offsetRight__,
-                    g_h = h - top - bottom - axisXLabelLaneHeight - axisXLaneHeight - __offsetTop__;
+                    g_h = h - top - bottom - axisXLabelLaneHeight - axisXLaneHeight - __offsetTop__,
+                    clipPathId = `clip-line-${new Date().valueOf().toString().hashCode()}`;
 
                 const isAxisXTime = isAxisTime(data),
                     isAxisXNumber = isAxisNumber(data),
@@ -200,7 +202,7 @@
 
                 svg.append('defs')
                     .append('clipPath')
-                    .attr('id', 'clip-line')
+                    .attr('id', clipPathId)
                     .append('rect')
                     .attr('x', 0)
                     .attr('y', 0)
@@ -215,7 +217,7 @@
                 g.append('path')
                     .datum(data)
                     .attr('d', lineGen)
-                    .attr('clip-path', 'url(#clip-line)')
+                    .attr('clip-path', `url(#${clipPathId})`)
                     .attr('fill', 'none')
                     .attr('stroke', stroke)
                     .attr('stroke-width', strokeWidth)
@@ -229,7 +231,7 @@
                     .attr('cx', d => xScale(d.key))
                     .attr('cy', d => yScale(d.value))
                     .attr('fill', circleColor)
-                    .attr('clip-path', 'url(#clip-line)')
+                    .attr('clip-path', `url(#${clipPathId})`)
                     .on('mouseover', showTip(circleTitle))
                     .on('mouseout', hideTip);
 

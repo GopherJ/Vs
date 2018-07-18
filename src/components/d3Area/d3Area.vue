@@ -6,12 +6,12 @@
     import * as d3 from 'd3';
     import _ from 'lodash';
     import mixins from '../../mixins';
-    import { showTip, hideTip } from '../../utils/tooltip';
     import { selectTicksNumY } from '../../utils/select';
     import { brushX } from '../../utils/brush';
     import isAxisTime from '../../utils/isAxisTime';
     import { responsiveAxisX } from '../../utils/responsiveAxis';
     import axisShow from '../../utils/axisShow';
+    import hashCode from '../../utils/hashCode';
 
     export default {
         name: 'd3-area',
@@ -65,7 +65,8 @@
                     __offsetTop__ = 10,
                     __offsetRight__ = 10,
                     g_w =  w - left - right - axisYLaneWidth - axisYLabelLaneWidth - __offsetRight__,
-                    g_h = h -top - bottom - axisXLaneHeight - axisXLabelLaneHeight - __offsetTop__;
+                    g_h = h -top - bottom - axisXLaneHeight - axisXLabelLaneHeight - __offsetTop__,
+                    clipPathId = `clip-area-${new Date().valueOf().toString().hashCode()}`;
 
                     if (![g_w, g_h].every(el => el > 0)) return;
 
@@ -81,7 +82,7 @@
 
                     svg.append('defs')
                         .append('clipPath')
-                        .attr('id', 'clip-area')
+                        .attr('id', clipPathId)
                         .append('rect')
                         .attr('x', 0)
                         .attr('y', 0)
@@ -198,11 +199,11 @@
                         .y1(d => yScale(d.value));
                     if (_.isString(curve) && !_.isUndefined(d3[curve])) area.curve(d3[curve]);
 
-                    const path = g
+                    g
                         .append('path')
                         .datum(data)
                         .attr('d', area)
-                        .attr('clip-path', 'url(#clip-area)')
+                        .attr('clip-path', `url(#${clipPathId})`)
                         .attr('fill', fill)
                         .attr('fill-opacity', fillOpacity)
                         .attr('stroke', stroke)
