@@ -1,7 +1,6 @@
 # Vs
 
 Vue Visualisation Package using `d3.js` and `leaflet`. Package used in [Ubudu](http://www.ubudu.com). See also:
-
     - [LayoutGrid](https://github.com/GopherJ/LayoutGrid)  :  Creating a powerful dashboard using `Vs` and `vue-grid-layout`
 
 
@@ -94,7 +93,49 @@ This component is for showing simple scientific data. It accepts the type `Numbe
 |`metricLabelFontSize`|`metric font size`|`number`|`120`|
 |`metricLabelFontWeight`|`metric font weight`|`number`|`900`|
 |`metricLabelFontOpacity`|`metric font opacity`|`number ([0, 1])`|`0.5`|
-|`metricTitle`|`metric tooltip`|`function`|`d => `${d}``|
+|`metricTitle`|`metric tooltip`|`function`|`d => d`|
+|`metricPrecision`|`metric precision`|`number`|`2`|
+
+
+
+
+###d3Pie
+
+This component can be a pie chart or a donut chart. It takes an array of elements like `{key : 'key', value : 'value'}`. `key` will be used
+in tooltip, `value` will be used to calculate the angle needed.
+
+![d3Pie](./images/d3-pie.PNG)
+
+`template`
+```
+<d3-pie
+    :data="data"
+    :options="options"
+    :margin="margin"
+    width="100%"
+    height="400px">
+</d3-pie>
+```
+`options`
+|key|description|type|default|
+|:---|:---|:---|:---|
+|`innerRadius`|`inner radius`|`number`|`50`|
+|`cornerRadius`|`corner radius`|`number`|`0`|
+|`padAngle`|`pad angle (percentage)`|`number`|`0.01`|
+|`arcTitle`|`tooltip`|`function`|`d => d.data.key + '<br>' + d.data.value`|
+|`arcLabel`|`label will be shown in arcs`|`string OR null`|`null`|
+|`axisXLabel`|`label of axis x`|`string OR null`|`null`|
+|`axisLabelFontSize`|`label font size`|`number`|`12`|
+|`axisLabelFontWeight`|` abel font weight`|`number`|`400`|
+|`axisLabelFontOpacity`|`label font opacity`|`number ([0, 1])`|`0.5`|
+|`arcLabelFontSize`|`label font size of every arc`|`number`|`9`|
+|`arcLabelFontWeight`|` abel font weight of every arc`|`number`|`400`|
+|`arcLabelFontOpacity`|`label font opacity of every arc`|`number ([0, 1])`|`0.5`|
+|`animationDuration`|`duration of animation`|`number`|`1000`|
+|`delay`|`delay of animation (milliseconds)`|`number`|`50`|
+|`defaultColor`|`color will be used when there is only one item in array`|`string (rgb, hex, rgba, hsl...)`|`rgb(175, 240, 91)`|
+
+
 
 
 
@@ -107,13 +148,7 @@ This component is for showing simple scientific data. It accepts the type `Numbe
 
 `template`
 ```vue
-<d3-pie
-    :data="data"
-    :options="options"
-    :margin="margin"
-    width="100%"
-    height="400px">
-</d3-pie>
+
 
 <d3-line
     :data="data"
@@ -301,7 +336,6 @@ This component is for showing simple scientific data. It accepts the type `Numbe
 
 ![d3VerticalBar](./images/d3-vertical-bar.PNG)
 
-![d3Pie](./images/d3-pie.PNG)
 
 ![d3Line](./images/d3-line.PNG)
 
