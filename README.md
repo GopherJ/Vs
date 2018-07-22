@@ -290,6 +290,65 @@ by using the brush or by clicking a bar if `options.axisYTimeInterval` has been 
 
 
 
+*###d3Line*
+
+This component is for showing scientific data in line chart. It takes an array of elements like `{key : 'key', value : 'value'}`, `key` will be
+used in tooltip, value will be used to calculate the width needed. By default when every `key` is of type date, brush will be enabled. You can chose a new range
+by using the brush.
+
+![d3Line](./images/d3-line.PNG)
+
+`template`
+
+```vue
+<d3-line
+    :data="data"
+    :options="options"
+    :margin="margin"
+    width="100%"
+    height="400px">
+</d3-line>
+```
+
+`options`
+
+|key|description|type|default|
+|:---|:---|:---|:---|
+|`stroke`|`line edge color`|`string (rgb, hex, rgba, hsl...)`|`rgb(188, 82, 188)`|
+|`strokeWidth`|`line edge width`|`number`|`2`|
+|`axisXLaneHeight`|`lane height of the axis x`|`number`|`60`|
+|`axisYLaneWidth`|`lane width of the axis y`|`number`|`35`|
+|`axisFontSize`|`axis text font size`|`number`|`12`|
+|`axisFontWeight`|`axis text font weight`|`number`|`400`|
+|`axisFontOpacity`|`axis text font opacity`|`number`|`1`|
+|`tickSize`|`tick height/width of axis`|`number`|`10`|
+|`tickPadding`|`tick padding`|`number`|`8`|
+|`circleRadius`|`emphasis circle radius`|`number`|`5`|
+|`circleColor`|`emphasis circle color`|`number`|`rgb(188, 82, 188)`|
+|`circleTitle`|`emphasis circle tooltip`|`function`|`d => d.value`|
+|`curve`|`curve algorithm`|`string`|`curveMonotoneX`|
+|`axisXLabel`|`label of axis x`|`string or null`|`null`|
+|`axisYLabel`|`label of axis y`|`string or null`|`null`|
+|`axisLabelFontSize`|`label font size`|`number`|`12`|
+|`axisLabelFontWeight`|`label font weight`|`number`|`400`|
+|`axisLabelFontOpacity`|`label font opacity`|`number`|`0.5`|
+|`axisXTimeInterval`|`used when data is of type date_histogram, it will be used to decide the date format of axis x`|`number OR null`|`null`|
+|`axisXTickFormat`|`d3-format support`|`string`|`.2s`|
+|`negative`|`the axis y should start at 0 or not`|`boolean`|`false`|
+|`nice`|`the tick number of axis should be rounded or not`|`false`|
+
+
+`events`
+
+|name|description|arguments|
+|:---|:---|:---|
+|`range-updated`|`new range has been chosen by using the brush|`(dateTimeStart, dateTimeEnd)`|
+
+
+
+
+
+
 
 
 
