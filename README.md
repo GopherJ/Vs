@@ -766,52 +766,48 @@ as data.
 
 
 
+## Layout
 
+*###d3Tree*
 
+This component is for showing `tree` layout which is recursive. It takes an object of `Hierarchical layouts` as data.
 
+![d3Tree](./images/d3-tree.PNG)
 
+`hierarchical layout object`
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+```javascript
+{
+  "name": "A1",
+  "children": [
+    {
+      "name": "B1",
+      "children": [
+        {
+          "name": "C1",
+          "value": 100
+        },
+        {
+          "name": "C2",
+          "value": 300
+        },
+        {
+          "name": "C3",
+          "value": 200
+        }
+      ]
+    },
+    {
+      "name": "B2",
+      "value": 200
+    }
+  ]
+}
+```
 
 `template`
+
 ```vue
-
-
-
-
-
-<d3-icicle-horizontal
-    :data="data"
-    :options="options"
-    :margin="margin"
-    width="100%"
-    height="400px">
-</d3-icicle-horizontal>
-
-<d3-icicle-vertical
-    :data="data"
-    :options="options"
-    :margin="margin"
-    width="100%"
-    height="400px">
-</d3-icicle-vertical>
-
 <d3-tree
     :data="data"
     :options="options"
@@ -819,7 +815,67 @@ as data.
     width="100%"
     height="400px">
 </d3-tree>
+```
 
+`options`
+
+|key|description|type|default|
+|:---|:---|:---|:---|
+|`nodeTitle`|`tooltip`|`function`|`d => d.data.key + '<br>' + 'd.data.value'`|
+|`nodeFill`|`tree node internal color`|`string (rgb, hex, rgba, hsl...)`|`#6eadc1`|
+|`nodeStroke`|`tree node edge color`|`string (rgb, hex, rgba, hsl...)`|`#6eadc1`|
+|`nodeFillOpacity`|`tree node internal color opacity`|`number`|`0.6`|
+|`nodeStrokeOpacity`|`tree node edge color opacity`|`number`|`1`|
+|`linkStroke`|`link edge color`|`string (rgb, hex, rgba, hsl...)`|`#6eadc1`|
+|`linkStrokeWidth`|`link edge width`|`number`|`1`|
+|`linkStrokeOpacity`|`link edge color opacity`|`number`|`1`|
+|`nodeRadius`|`tree node circle radius`|`number`|`10`|
+|`axisXLabel`|`label of axis x`|`string or null`|`null`|
+|`axisFontSize`|`axis text font size`|`number`|`12`|
+|`axisFontWeight`|`axis text font weight`|`number`|`400`|
+|`axisFontOpacity`|`axis text font opacity`|`number ([0, 1])`|`0.5`|
+
+
+*###d3Cluster*
+
+This component is like `d3-tree` but with all leaf nodes are at the same height. It takes an object of `Hierarchical layouts` as data.
+
+![d3Cluster](./images/d3-cluster.PNG)
+
+`hierarchical layout object`
+
+```javascript
+{
+  "name": "A1",
+  "children": [
+    {
+      "name": "B1",
+      "children": [
+        {
+          "name": "C1",
+          "value": 100
+        },
+        {
+          "name": "C2",
+          "value": 300
+        },
+        {
+          "name": "C3",
+          "value": 200
+        }
+      ]
+    },
+    {
+      "name": "B2",
+      "value": 200
+    }
+  ]
+}
+```
+
+`template`
+
+```vue
 <d3-cluster
     :data="data"
     :options="options"
@@ -827,7 +883,133 @@ as data.
     width="100%"
     height="400px">
 </d3-cluster>
+```
 
+`options`
+
+|key|description|type|default|
+|:---|:---|:---|:---|
+|`nodeTitle`|`tooltip`|`function`|`d => d.data.key + '<br>' + 'd.data.value'`|
+|`nodeFill`|`tree node internal color`|`string (rgb, hex, rgba, hsl...)`|`#6eadc1`|
+|`nodeStroke`|`tree node edge color`|`string (rgb, hex, rgba, hsl...)`|`#6eadc1`|
+|`nodeFillOpacity`|`tree node internal color opacity`|`number`|`0.6`|
+|`nodeStrokeOpacity`|`tree node edge color opacity`|`number`|`1`|
+|`linkStroke`|`link edge color`|`string (rgb, hex, rgba, hsl...)`|`#6eadc1`|
+|`linkStrokeWidth`|`link edge width`|`number`|`1`|
+|`linkStrokeOpacity`|`link edge color opacity`|`number`|`1`|
+|`nodeRadius`|`tree node circle radius`|`number`|`10`|
+|`axisXLabel`|`label of axis x`|`string or null`|`null`|
+|`axisFontSize`|`axis text font size`|`number`|`12`|
+|`axisFontWeight`|`axis text font weight`|`number`|`400`|
+|`axisFontOpacity`|`axis text font opacity`|`number ([0, 1])`|`0.5`|
+
+
+*###d3ICicleHorizontal*
+
+This component is for show `icicle horizontal` layout which is recursive. It takes an object of `Hierarchical layouts` as data.
+
+![d3ICicleHorizontal](./images/d3-icicle-horizontal.PNG)
+
+`template`
+
+```vue
+<d3-icicle-horizontal
+    :data="data"
+    :options="options"
+    :margin="margin"
+    width="100%"
+    height="400px">
+</d3-icicle-horizontal>
+```
+
+`options`
+
+|key|description|type|default|
+|:---|:---|:---|:---|
+|`rectTitle`|`tooltip`|`function`|`d => d.data.value`|
+|`padding`|`partition padding`|`number`|`0`|
+|`fillOpacity`|`partition internal color opacity`|`number`|`0.6`|
+|`strokeOpacity`|`partition edge color opacity`|`number`|`1`|
+|`axisXLabel`|`label of axis x`|`string or null`|`null`|
+|`axisFontSize`|`axis text font size`|`number`|`12`|
+|`axisFontWeight`|`axis text font weight`|`number`|`400`|
+|`axisFontOpacity`|`axis text font opacity`|`number ([0, 1])`|`0.5`|
+
+
+
+*###d3ICicleVertical*
+
+This component is for show `icicle vertical` layout which is recursive. It takes an object of `Hierarchical layouts` as data.
+
+![d3ICicleVertical](./images/d3-icicle-vertical.PNG)
+
+`template`
+
+```vue
+<d3-icicle-vertical
+    :data="data"
+    :options="options"
+    :margin="margin"
+    width="100%"
+    height="400px">
+</d3-icicle-vertical>
+```
+
+`options`
+
+|key|description|type|default|
+|:---|:---|:---|:---|
+|`rectTitle`|`tooltip`|`function`|`d => d.data.value`|
+|`padding`|`partition padding`|`number`|`0`|
+|`fillOpacity`|`partition internal color opacity`|`number`|`0.6`|
+|`strokeOpacity`|`partition edge color opacity`|`number`|`1`|
+|`axisXLabel`|`label of axis x`|`string or null`|`null`|
+|`axisFontSize`|`axis text font size`|`number`|`12`|
+|`axisFontWeight`|`axis text font weight`|`number`|`400`|
+|`axisFontOpacity`|`axis text font opacity`|`number ([0, 1])`|`0.5`|
+
+
+
+*###d3Sunburst*
+
+This component is for showing `sunburst` layout. It takes an object of `Hierarchical layouts` as data.
+
+![d3Sunburst](./images/d3-sunburst.PNG)
+
+`hierarchical layout object`
+
+```javascript
+{
+  "name": "A1",
+  "children": [
+    {
+      "name": "B1",
+      "children": [
+        {
+          "name": "C1",
+          "value": 100
+        },
+        {
+          "name": "C2",
+          "value": 300
+        },
+        {
+          "name": "C3",
+          "value": 200
+        }
+      ]
+    },
+    {
+      "name": "B2",
+      "value": 200
+    }
+  ]
+}
+```
+
+`template`
+
+```vue
 <d3-sunburst
     :data="data"
     :options="options"
@@ -835,7 +1017,61 @@ as data.
     width="100%"
     height="400px">
 </d3-sunburst>
+```
 
+`options`
+
+|key|description|type|default|
+|:---|:---|:---|:---|
+|`arcTitle`|`tooltip`|`function`|`d => d.data.value`|
+|`padding`|`partition padding`|`number`|`0`|
+|`fillOpacity`|`partition internal color opacity`|`number`|`0.6`|
+|`strokeOpacity`|`partition edge color opacity`|`number`|`1`|
+|`axisXLabel`|`label of axis x`|`string or null`|`null`|
+|`axisFontSize`|`axis text font size`|`number`|`12`|
+|`axisFontWeight`|`axis text font weight`|`number`|`400`|
+|`axisFontOpacity`|`axis text font opacity`|`number ([0, 1])`|`0.5`|
+
+*###d3Pack*
+
+This component is for showing `pack` layout. It takes an object of `Hierarchical layouts` as data.
+
+![d3Pack](./images/d3-pack.PNG)
+
+`hierarchical layout object`
+
+```javascript
+{
+  "name": "A1",
+  "children": [
+    {
+      "name": "B1",
+      "children": [
+        {
+          "name": "C1",
+          "value": 100
+        },
+        {
+          "name": "C2",
+          "value": 300
+        },
+        {
+          "name": "C3",
+          "value": 200
+        }
+      ]
+    },
+    {
+      "name": "B2",
+      "value": 200
+    }
+  ]
+}
+```
+
+`template`
+
+```vue
 <d3-pack
     :data="data"
     :options="options"
@@ -843,8 +1079,23 @@ as data.
     width="100%"
     height="400px">
 </d3-pack>
+```
+
+`options`
+
+|key|description|type|default|
+|:---|:---|:---|:---|
+|`circleTitle`|`tooltip`|`function`|`d => d.data.key + '<br>' + d.data.value`|
+|`circleFillOpacity`|`partition circle internal color opacity`|`number`|`0.6`|
+|`circleStrokeOpacity`|`partition circle edge color opacity`|`number`|`1`|
+|`axisXLabel`|`label of axis x`|`string or null`|`null`|
+|`axisFontSize`|`axis text font size`|`number`|`12`|
+|`axisFontWeight`|`axis text font weight`|`number`|`400`|
+|`axisFontOpacity`|`axis text font opacity`|`number ([0, 1])`|`0.5`|
 
 
+`template`
+```vue
 <d3-l-choropleth
     :data="data"
     :options="options"
@@ -869,21 +1120,6 @@ as data.
 ![d3LChoropleth](./images/d3-l-choropleth.PNG)
 
 ![d3LHeat](./images/d3-l-heat.PNG)
-
-![d3ICicleVertical](./images/d3-icicle-vertical.PNG)
-
-![d3ICicleHorizontal](./images/d3-icicle-horizontal.PNG)
-
-![d3Sunburst](./images/d3-sunburst.PNG)
-
-![d3Pack](./images/d3-pack.PNG)
-
-![d3Tree](./images/d3-tree.PNG)
-
-![d3Cluster](./images/d3-cluster.PNG)
-
-
-![d3ProgressArc](./images/d3-progress-arc.gif)
 
 
 
