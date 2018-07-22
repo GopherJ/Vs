@@ -64,7 +64,7 @@ import {
 ## Basic
 
 
-###d3Metric
+*###d3Metric*
 
 This component is for showing simple scientific data. It accepts the type `Number` as data.
 
@@ -99,7 +99,7 @@ This component is for showing simple scientific data. It accepts the type `Numbe
 
 
 
-###d3Circle
+*###d3Circle*
 
 This component is for showing a simple percentage data. It accepts the type `Number` as data. The data must be in the range `[0, 1]`.
 
@@ -134,7 +134,7 @@ This component is for showing a simple percentage data. It accepts the type `Num
 
 
 
-###d3Pie
+*###d3Pie*
 
 This component can be a pie chart or a donut chart. It takes an array of elements like `{key : 'key', value : 'value'}`. `key` will be used
 in tooltip, `value` will be used to calculate the angle needed.
@@ -173,7 +173,7 @@ in tooltip, `value` will be used to calculate the angle needed.
 |`defaultColor`|`color will be used when there is only one item in array`|`string (rgb, hex, rgba, hsl...)`|`rgb(175, 240, 91)`|
 
 
-###d3VerticalBar
+*###d3VerticalBar*
 
 This component is for showing scientific data in vertical bar chart. It takes an array of elements like `{key : 'key', value : 'value'}`, `key` will be
 used in tooltip, value will be used to calculate the height needed. By default when every `key` is of type date, brush will be enabled. You can chose a new range
@@ -232,7 +232,7 @@ by using the brush or by clicking a bar if `options.axisXTimeInterval` has been 
 
 
 
-###d3HorizontalBar
+*###d3HorizontalBar*
 
 This component is for showing scientific data in horizontal bar chart. It takes an array of elements like `{key : 'key', value : 'value'}`, `key` will be
 used in tooltip, value will be used to calculate the width needed. By default when every `key` is of type date, brush will be enabled. You can chose a new range
