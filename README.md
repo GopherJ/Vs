@@ -392,6 +392,134 @@ This components is for show big date_histogram data, It takes an array of elemen
 
 
 
+*###d3MultiLine*
+
+This component is for showing multiple lines together. It takes an array of elements like `{group: 'string', key : 'String|Date|Number', value: 'Number'}`.
+
+![d3MultiLine](./images/d3-multi-line.PNG)
+
+`template`
+
+```vue
+<d3-multi-line
+    :data="data"
+    :options="options"
+    :margin="margin"
+    width="100%"
+    height="400px">
+</d3-multi-line>
+```
+
+`options`
+
+|key|description|type|default|
+|:---|:---|:---|:---|
+|`strokeWidth`|`line edge width`|`number`|`2`|
+|`axisXLaneHeight`|`lane height of the axis x`|`number`|`60`|
+|`axisYLaneWidth`|`lane width of the axis y`|`number`|`35`|
+|`axisFontSize`|`axis text font size`|`number`|`12`|
+|`axisFontWeight`|`axis text font weight`|`number`|`400`|
+|`axisFontOpacity`|`axis text font opacity`|`number`|`1`|
+|`tickSize`|`tick height/width of axis`|`number`|`10`|
+|`tickPadding`|`tick padding`|`number`|`8`|
+|`circleRadius`|`emphasis circle radius`|`number`|`5`|
+|`circleTitle`|`emphasis circle tooltip`|`function`|`d => d.value`|
+|`crossWidth`|`legend cross line edge width`|`number`|`2`|
+|`crossColor`|`legend cross line color`|`string (rgb, hex, rgba, hsl...)`|`white`|
+|`curve`|`curve algorithm`|`string`|`curveMonotoneX`|
+|`axisXLabel`|`label of axis x`|`string or null`|`null`|
+|`axisYLabel`|`label of axis y`|`string or null`|`null`|
+|`axisLabelFontSize`|`label font size`|`number`|`12`|
+|`axisLabelFontWeight`|`label font weight`|`number`|`400`|
+|`axisLabelFontOpacity`|`label font opacity`|`number`|`0.5`|
+|`axisXTimeInterval`|`used when data is of type date_histogram, it will be used to decide the date format of axis x`|`number OR null`|`null`|
+|`axisXTickFormat`|`d3-format support`|`string`|`.2s`|
+|`negative`|`the axis y should start at 0 or not`|`boolean`|`false`|
+|`nice`|`the tick number of axis should be rounded or not`|`false`|
+|`isAxisPathShow`|`if the axis path will be shown`|`boolean`|`true`|
+|`axisXGroupLabelLaneHeight`|`group lane height`|`number`|`35`|
+|`axisXGroupLabelWidth`|`group legend width`|`number`|`15`|
+|`axisXGroupLabelFillColorOpacity`|`group legend internal color opacity`|`number`|`1`|
+|`axisXGroupLabelBorderColorOpacity`|`group legend edge color opacity`|`number`|`0.6`|
+|`axisXGroupLabelGap`|`group legend gap`|`number`|`10`|
+|`dashedGroups`|`dash groups`|`Array<string>`|`[]`|
+|`strokeDashArray`|`dash array`|`number`|`5`|
+
+
+
+## Flow Of Transitions
+
+*###d3SankeyCircular*
+
+This component is for showing the flow of transitions between zones. It takes an array `nodes` to represent all the zones, and it takes an array of elements
+like:
+
+
+```javascript
+{
+    source: `String`,
+    target: `String`,
+    value: 'Number'
+}
+```
+
+![d3SankeyCircular](./images/d3-sankey-circular.PNG)
+
+
+`template`
+
+```vue
+<d3-sankey-circular
+    :nodes="nodes"
+    :links="links"
+    :options="options"
+    :nodeTitle="nodeTitle"
+    :linkTitle="linkTitle"
+    width="100%"
+    height="400px">
+</d3-sankey-circular>
+```
+
+`nodeTitle`
+
+Tooltip of zone. Default to `d => ${d.name}<br>${d.value} `.
+
+`linkTitle`
+
+Tooltip of link. Default to `d => ${d.source.name} → ${d.target.name}<br>${d.value}`.
+
+`options`
+
+|key|description|type|default|
+|:---|:---|:---|:---|
+|`nodeWidth`|`node width`|`number`|`20`|
+|`nodeTextFontSize`|`node text font size`|`number`|`12`|
+|`nodeTextFontWeight`|`node text font weight`|`number`|`600`|
+|`nodeTextFontOpacity`|`node text font opacity`|`number`|`1`|
+|`circularLinkGap`|`circular link gap`|`number`|`4`|
+|`circularLinkColor`|`circularLinkColor`|`string (rgb, hex, rgba, hsl...)`|`red`|
+|`linkColor`|`link color`|`string (rgb, hex, rgba, hsl...)`|`black`|
+|`gapLength`|`gap length`|`number`|`150`|
+|`arrowLength`|`arrow length`|`number`|`10`|
+|`arrowHeadSize`|`arrow head size`|`number`|`4`|
+|`axisXSelectBoxLabel`|`select box label`|`string`|`Max interval among the same trajectory`|
+|`axisXSelectBoxLabelFontSize`|`select box label font size`|`number`|`12`|
+|`axisXSelectBoxLabelFontWeight`|`select box label font weight`|`number`|`400`|
+|`axisXSelectBoxLabelFontOpacity`|`select box label font opacity`|`number`|`0.5`|
+|`axisXLabel`|`label of axis x`|`string OR null`|`null`|
+|`axisXLabelFontSize`|`label font size of axis x`|`number`|`12`|
+|`axisXLabelFontWeight`|`label font weight of axis x`|`number`|`400`|
+|`axisXLabelFontOpacity`|`label font opacity`|`number`|`1`|
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -414,23 +542,8 @@ This components is for show big date_histogram data, It takes an array of elemen
 
 
 
-<d3-sankey-circular
-    :nodes="nodes"
-    :links="links"
-    :options="options"
-    :nodeTitle="nodeTitle"
-    :linkTitle="linkTitle"
-    width="100%"
-    height="400px">
-</d3-sankey-circular>
 
-<d3-multi-line
-    :data="data"
-    :options="options"
-    :margin="margin"
-    width="100%"
-    height="400px">
-</d3-multi-line>
+
 
 <d3-timelion
     :data="data"
@@ -525,21 +638,6 @@ This components is for show big date_histogram data, It takes an array of elemen
     height="400px">
 </d3-pack>
 
-<d3-metric
-    :data="data"
-    :options="options"
-    :margin="margin"
-    width="100%"
-    height="400px">
-</d3-metric>
-
-<d3-circle
-    :data="data"
-    :options="options"
-    :margin="margin"
-    width="100%"
-    height="400px">
-</d3-circle>
 
 <d3-l-choropleth
     :data="data"
@@ -572,7 +670,6 @@ This components is for show big date_histogram data, It takes an array of elemen
 ![d3Line](./images/d3-line.PNG)
 
 
-![d3MultiLine](./images/d3-multi-line.PNG)
 
 ![d3Timline](./images/d3-timeline.PNG)
 
@@ -580,7 +677,6 @@ This components is for show big date_histogram data, It takes an array of elemen
 
 ![d3Tracker](./images/d3-tracker.PNG)
 
-![d3SankeyCircular](./images/d3-sankey-circular.PNG)
 
 ![d3LChoropleth](./images/d3-l-choropleth.PNG)
 
