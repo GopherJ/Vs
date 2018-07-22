@@ -27,7 +27,7 @@ import {
     // Flow transition
     d3SankeyCircular,
 
-    // Special
+    // Time Serie
     d3Timelion,
     d3Timeline,
 
@@ -190,6 +190,7 @@ by using the brush or by clicking a bar if `options.axisXTimeInterval` has been 
     :options="options"
     :margin="margin"
     width="100%"
+    @range-updated="(dateTimeStart, dateTimeEnd) => fetchDataWithCurrentInterval(dateTimeStart, dateTimeEnd)"
     height="400px">
 </d3-vertical-bar>
 ```
@@ -247,6 +248,7 @@ by using the brush or by clicking a bar if `options.axisYTimeInterval` has been 
     :data="data"
     :options="options"
     :margin="margin"
+    @range-updated="(dateTimeStart, dateTimeEnd) => fetchDataWithCurrentInterval(dateTimeStart, dateTimeEnd)"
     width="100%"
     height="400px">
 </d3-horizontal-bar>
@@ -305,6 +307,7 @@ by using the brush.
     :data="data"
     :options="options"
     :margin="margin"
+    @range-updated="(dateTimeStart, dateTimeEnd) => fetchDataWithCurrentInterval(dateTimeStart, dateTimeEnd)"
     width="100%"
     height="400px">
 </d3-line>
@@ -358,6 +361,7 @@ This components is for show big date_histogram data, It takes an array of elemen
     :data="data"
     :options="options"
     :margin="margin"
+    @range-updated="(dateTimeStart, dateTimeEnd) => fetchDataWithCurrentInterval(dateTimeStart, dateTimeEnd)"
     width="100%"
     height="400px">
 </d3-area>
@@ -405,6 +409,7 @@ This component is for showing multiple lines together. It takes an array of elem
     :data="data"
     :options="options"
     :margin="margin"
+    @range-updated="(dateTimeStart, dateTimeEnd) => fetchDataWithCurrentInterval(dateTimeStart, dateTimeEnd)"
     width="100%"
     height="400px">
 </d3-multi-line>
@@ -475,6 +480,7 @@ like:
     :options="options"
     :nodeTitle="nodeTitle"
     :linkTitle="linkTitle"
+    @max-period-updated="(period) => yourMethod(period)"
     width="100%"
     height="400px">
 </d3-sankey-circular>
@@ -513,6 +519,150 @@ Tooltip of link. Default to `d => ${d.source.name} → ${d.target.name}<br>${d.v
 
 
 
+## Time Series
+
+
+*###d3Timelion*
+
+This component is similar to `kibana timelion` with a interval select box. It accepts an array of elements like `{ key : 'Date', value: 'Number'}`.
+
+![d3Timelion](./images/d3-timelion.PNG)
+
+`template`
+
+```vue
+<d3-timelion
+    :data="data"
+    :options="options"
+    :margin="margin"
+    width="100%"
+    height="400px"
+    @range-updated="(dateTimeStart, dateTimeEnd) => fetchDataWithCurrentInterval(dateTimeStart, dateTimeEnd)"
+    @interval-updated="interval => fetchDataWithInterval(interval)">
+</d3-timelion>
+```
+
+`options`
+
+|key|description|type|default|
+|:---|:---|:---|:---|
+|`fill`|`bar internal color`|`string (rgb, hex, hsl...)`|`#6eadc1`|
+|`stroke`|`bar edge color`|`string (rgb, hex, hsl...)`|`#6eadc1`|
+|`fillOpacity`|`bar internal color opacity`|`number`|`0.6`|
+|`strokeOpacity`|`bar edge color opacity`|`number`|`1`|
+|`barTitle`|`tooltip`|`function`|`d => d.value`|
+|`tickSize`|`tick height/width of axis`|`number`|`10`|
+|`tickPadding`|`tick padding`|`number`|`8`|
+|`axisFontSize`|`axis text font size`|`number`|`12`|
+|`axisFontWeight`|`axis text font weight`|`number`|`400`|
+|`axisFontOpacity`|`axis text font opacity`|`number ([0, 1])`|`0.5`|
+|`axisXLabel`|`label of axis x`|`string or null`|`null`|
+|`axisYLabel`|`label of axis y`|`string or null`|`null`|
+|`axisLabelFontSize`|`label font size`|`number`|`12`|
+|`axisLabelFontWeight`|`label font weight`|`number`|`400`|
+|`axisLabelFontOpacity`|`label font opacity`|`number`|`0.5`|
+|`axisXLaneHeight`|`lane height of axis x`|`number`|`60`|
+|`axisYLaneWidth`|`lane width of axis y`|`number`|`60`|
+|`axisXTimeInterval`|`used when data is of type date_histogram, it will be used to decide the date format of axis x`|`number OR null`|`null`|
+|`isAxisPathShow`|`if the axis path will be shown`|`boolean`|`true`|
+|`animationDuration`|`duration of animation`|`number`|`1000`|
+|`delay`|`delay of animation (milliseconds)`|`number`|`50`|
+|`axisYTickFormat`|`d3-format support`|`string`|`.2s`|
+|`negative`|`the axis y should start at 0 or not`|`boolean`|`false`|
+|`nice`|`the tick number of axis should be rounded or not`|`false`|
+|`timeRangeLabelFontSize`|`time range label font size`|`number`|`12`|
+|`timeRangeLabelFontWeight`|`time range label font weight`|`number`|`400`|
+|`timeRangeLabelFontOpacity`|`time range label font opacity`|`number`|`0.5`|
+
+`events`
+
+|event|description|arguments|
+|:---|:---|:---|
+|`range-updated`|`user has chosen a new time range by using the brush`|`(dateTimeStart, dateTimeEnd)`|
+|`interval-updated`|`user has changed the time interval by using the select box`|`(interval)`|
+
+
+
+*###d3Timeline*
+
+This component is for showing time entries. We have two type entries in `d3Timeline`, they are `Point` and `Interval`. It takes an array of entries as data.
+
+![d3Timline](./images/d3-timeline.PNG)
+
+To specify an entry `Point`:
+
+```javascript
+{
+   at: 'Date',
+   // tooltip
+   title: 'String',
+   group: 'String',
+   // internally we have 4 className, they are 'entry--point--default', 'entry--point--success', 'entry--point--warn', 'entry--point--info'
+   // you can also specify your own class and add it to SPA. The class shouldn't be in scoped style
+   className: 'String',
+   // it supports 7 symbols, they are 'symbolCircle', 'symbolCross', 'symbolDiamond', 'symbolSquare', 'symbolStar', 'symbolTriangle', 'symbolWye'
+   symbol: 'String'
+}
+```
+
+To specify an entry 'Interval':
+
+```javascript
+{
+    from : 'Date',
+    to: 'Date',
+    // tooltip
+    title: 'String',
+    label: 'String',
+    group: 'String',
+    // internally we have 4 className, they are 'entry--point--default', 'entry--point--success', 'entry--point--warn', 'entry--point--info'
+    // you can also specify your own class and add it to SPA. The class shouldn't be in scoped style
+    className: 'String'
+}
+```
+
+
+`template`
+
+```vue
+<d3-timeline
+    :data="data"
+    :options="options"
+    :margin="margin"
+    width="100%"
+    height="400px">
+</d3-timeline>
+```
+
+`options`
+
+|key|description|type|default|
+|:---|:---|:---|:---|
+|`intervalCornerRadius`|`corner radius of Interval entry `|`number`|`4`|
+|`symbolSize`|`symbol size of Point entry `|`number`|`400`|
+|`groupLabelFontSize`|`group label font size`|`number`|`12`|
+|`groupLabelFontWeight`|`group label font weight`|`number`|`400`|
+|`groupLabelFontOpacity`|`group label font opacity`|`number`|`1`|
+|`groupLaneWidth`|`group lane width`|`number`|`200`|
+|`tickSize`|`tick size of axis`|`number`|`10`|
+|`tickPadding`|`tick size padding`|`number`|`8`|
+|`axisXLaneHeight`|`lane height of axis x`|`number`|`40`|
+|`axisFontSize`|`axis text font size`|`number`|`12`|
+|`axisFontWeight`|`axis text font weight`|`number`|`400`|
+|`axisFontOpacity`|`axis text font opacity`|`number ([0, 1])`|`0.5`|
+|`axisXLabel`|`label of axis x`|`string or null`|`null`|
+|`axisYLabel`|`label of axis y`|`string or null`|`null`|
+|`axisLabelFontSize`|`label font size`|`number`|`12`|
+|`axisLabelFontWeight`|`label font weight`|`number`|`600`|
+|`axisLabelFontOpacity`|`label font opacity`|`number`|`0.5`|
+|`backgroundColor`|`background color`|`string (rgb, hex, rgba, hsl...)`|`rgba(255, 255, 255, 0.125)`|
+|`borderRadius`|`border radius`|`number`|`0`|
+|`borderWidth`|`border width`|`number`|`2`|
+|`borderColor`|`border color`|`string (rgb, hex, rgba, hsl...)`|`rgba(0, 0, 0, .125)`|
+|`boundingLineWidth`|`bounding line width`|`number`|`2`|
+|`boundingLineColor`|`bounding line color`|`string (rgb, hex, rgba, hesl...)`|`rgba(0, 0, 0, .125)`|
+|`currentTimeLineWidth`|`current time line width`|`number`|`2`|
+|`currentTimeLineColor`|`current time line color`|`string (rgb, hex, rgba, hsl...)`|`rgba(255, 56, 96, 1)`|
 
 
 
@@ -553,15 +703,16 @@ Tooltip of link. Default to `d => ${d.source.name} → ${d.target.name}<br>${d.v
     height="400px"
     @range-updated="(dateTimeStart, dateTimeEnd, interval) => fetchDataWithCurrentInterval(dateTimeStart, dateTimeEnd, interval)"
     @interval-updated="interval => fetchDataWithInterval(interval)">
-</d3-timelion>
-
-<d3-timeline
+</d3-timelion><d3-timelion
     :data="data"
     :options="options"
     :margin="margin"
     width="100%"
-    height="400px">
-</d3-timeline>
+    height="400px"
+    @range-updated="(dateTimeStart, dateTimeEnd, interval) => fetchDataWithCurrentInterval(dateTimeStart, dateTimeEnd, interval)"
+    @interval-updated="interval => fetchDataWithInterval(interval)">
+</d3-timelion>
+
 
 <d3-progress-arc
     :data="data"
@@ -671,9 +822,7 @@ Tooltip of link. Default to `d => ${d.source.name} → ${d.target.name}<br>${d.v
 
 
 
-![d3Timline](./images/d3-timeline.PNG)
 
-![d3Timelion](./images/d3-timelion.PNG)
 
 ![d3Tracker](./images/d3-tracker.PNG)
 
