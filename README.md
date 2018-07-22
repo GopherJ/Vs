@@ -117,6 +117,7 @@ in tooltip, `value` will be used to calculate the angle needed.
 </d3-pie>
 ```
 `options`
+
 |key|description|type|default|
 |:---|:---|:---|:---|
 |`innerRadius`|`inner radius`|`number`|`50`|
