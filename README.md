@@ -99,6 +99,40 @@ This component is for showing simple scientific data. It accepts the type `Numbe
 
 
 
+###d3Circle
+
+This component is for showing a simple percentage data. It accepts the type `Number` as data. The data must be in the range `[0, 1]`.
+
+![d3Circle](./images/d3-circle.PNG)
+
+`template`
+
+```vue
+<d3-circle
+    :data="data"
+    :options="options"
+    :margin="margin"
+    width="100%"
+    height="400px">
+</d3-circle>
+```
+
+`options`
+
+|key|description|type|default|
+|:---|:---|:---|:---|
+|`innerRadiusRatio`|`innerRadius / outerRadius`|`number`|`0.8`|
+|`circleBackground`|`circle background color`|`string (rgb, hex, rgba, hsl...)`|`rgb(230, 237, 244)`|
+|`circleForeground`|`circle foreground color`|`string (rgb, hex, rgba, hsl...)`|`rgb(0, 181, 241)`|
+|`labelColor`|`label color`|`string (rgb, hex, rgba, hsl...)`|`rgb(0, 181, 241)`|
+|`labelFontSize`|`label font size`|`number`|`50`|
+|`labelFontWeight`|`label font weight`|`number`|`900`|
+|`labelFontOpacity`|`label font opacity`|`number`|`0.5`|
+|`precision`|`precision of data`|`number`|`2`|
+|`animationDuration`|`duration of animation`|`number`|`1000`|
+|`delay`|`delay of animation (milliseconds)`|`number`|`50`|
+
+
 
 ###d3Pie
 
