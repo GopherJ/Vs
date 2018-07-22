@@ -1,88 +1,109 @@
 # Vs
-Vue Visualisation Package With `d3.js`. Trusted by [Ubudu](http://www.ubudu.com).
 
+Vue Visualisation Package using `d3.js` and `leaflet`. Package used in [Ubudu](http://www.ubudu.com). See also:
 
-## Project
-
-- [traject](http://traject.ubudu.com)
+    - [LayoutGrid](https://github.com/GopherJ/LayoutGrid)  :  Creating a powerful dashboard using `Vs` and `vue-grid-layout`
 
 
 
 ## Installation
-```javascript
+
+```
 npm i -S d3-vs
 ```
 
 
 
-## Demo
-[Vs](https://gopherj.github.io/Vs/#/)
-
-
-
-## Lists
-
-### Basic
-
-- `d3HorizontalBar`
-- `d3VerticalBar`
-- `d3Area`
-- `d3Line`
-- `d3Pie`
-
-### Time Serie
-
-- `d3HorizontalBar`
-- `d3VerticalBar`
-- `d3Area`
-- `d3Line`
-- `d3Timelion`
-- `d3Timeline`
-- `d3Tracker`
-
-### Functional
-
-- `d3ProgressArc`
-- `d3Slider`
-- `d3Tracker`
-
-### Layout
-
-- `d3ICicleHorizontal`
-- `d3ICicleVertical`
-- `d3Tree`
-- `d3Cluster`
-- `d3Sunburst`
-- `d3Pack`
-
-### Metric
-
-- `d3Metric`
-- `d3Circle`
-
-### Grouped
-
-- `d3MultiLine`
-
-### Flow
-
-- `d3SankeyCircular`
-
-### Leaflet
-
-- `d3LChoropleth`
-- `d3LHeat`
-
-
-
 ## Usage
 
-`main.js`
 ```javascript
 import Vs from 'd3-vs';
 
+// install globally all components
 Vue.use(Vs);
+
+// import only the components that you need and register it manually
+import {
+    // Flow transition
+    d3SankeyCircular,
+
+    // Special
+    d3Timelion,
+    d3Timeline,
+
+    // Basic
+    d3Pie,
+    d3Line,
+    d3Metric,
+    d3MultiLine,
+    d3HorizontalBar,
+    d3VerticalBar,
+    d3Area,
+
+    // Functional
+    d3Tracker,
+    d3Slider,
+    d3ProgressArc,
+
+    // Layout
+    d3Sunburst,
+    d3Tree,
+    d3Pack,
+    d3Cluster,
+    d3ICicleVertical,
+    d3ICicleHorizontal,
+
+    // Leaflet
+    d3LChoropleth,
+    d3LHeat
+} from 'd3-vs';
 ```
+
+
+
+## Basic
+
+
+###d3Metric
+
+This component is for showing simple scientific data. It accepts the type `Number` as data.
+
+![d3Metric](./images/d3-metric.PNG)
+
+`template`
+
+```vue
+<d3-metric
+    :data="data"
+    :options="options"
+    :margin="margin"
+    width="100%"
+    height="400px">
+</d3-metric>
+```
+
+`options`
+
+|key|description|type|default|
+|:---|:---|:---|:---|
+|`axisXLabel`|`label of horizontally which will be put above the data`|`string OR null`|`null`|
+|`axisLabelFontSize`|`label font size`|`number`|`12`|
+|`axisLabelFontWeight`|`label font weight`|`number`|`400`|
+|`axisLabelFontOpacity`|`label font opacity`|`number ([0, 1])`|`0.5`|
+|`metricLabelColor`|`metric color`|`string (rgb, hex, rgba, hsl...)`|`black`|
+|`metricLabelFontSize`|`metric font size`|`number`|`120`|
+|`metricLabelFontWeight`|`metric font weight`|`number`|`900`|
+|`metricLabelFontOpacity`|`metric font opacity`|`number ([0, 1])`|`0.5`|
+|`metricTitle`|`metric tooltip`|`function`|`d => `${d}``|
+
+
+
+
+
+
+
+
+
 
 `template`
 ```vue
@@ -273,7 +294,6 @@ Vue.use(Vs);
 
 ## Screenshots
 
-![d3Metric](./images/d3-metric.PNG)
 
 ![d3Circle](./images/d3-circle.PNG)
 
