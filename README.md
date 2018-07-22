@@ -107,7 +107,8 @@ in tooltip, `value` will be used to calculate the angle needed.
 ![d3Pie](./images/d3-pie.PNG)
 
 `template`
-```
+
+```vue
 <d3-pie
     :data="data"
     :options="options"
@@ -129,12 +130,131 @@ in tooltip, `value` will be used to calculate the angle needed.
 |`axisLabelFontSize`|`label font size`|`number`|`12`|
 |`axisLabelFontWeight`|` abel font weight`|`number`|`400`|
 |`axisLabelFontOpacity`|`label font opacity`|`number ([0, 1])`|`0.5`|
-|`arcLabelFontSize`|`label font size of every arc`|`number`|`9`|
-|`arcLabelFontWeight`|` abel font weight of every arc`|`number`|`400`|
-|`arcLabelFontOpacity`|`label font opacity of every arc`|`number ([0, 1])`|`0.5`|
+|`arcLabelFontSize`|`label font size of arcs`|`number`|`9`|
+|`arcLabelFontWeight`|` abel font weight of arcs`|`number`|`400`|
+|`arcLabelFontOpacity`|`label font opacity of arcs`|`number ([0, 1])`|`0.5`|
 |`animationDuration`|`duration of animation`|`number`|`1000`|
 |`delay`|`delay of animation (milliseconds)`|`number`|`50`|
 |`defaultColor`|`color will be used when there is only one item in array`|`string (rgb, hex, rgba, hsl...)`|`rgb(175, 240, 91)`|
+
+
+###d3VerticalBar
+
+This component is for showing scientific data in vertical bar chart. It takes an array of elements like `{key : 'key', value : 'value'}`, `key` will be
+used in tooltip, value will be used to calculate the height needed. By default when every `key` is of type date, brush will be enabled. You can chose a new range
+by using the brush or by clicking a bar if `options.axisXTimeInterval` has been settled.
+
+![d3VerticalBar](./images/d3-vertical-bar.PNG)
+
+
+`template`
+
+```vue
+<d3-vertical-bar
+    :data="data"
+    :options="options"
+    :margin="margin"
+    width="100%"
+    height="400px">
+</d3-vertical-bar>
+```
+
+`options`
+
+|key|description|type|default|
+|:---|:---|:---|:---|
+|`fill`|`bar internal color`|`string (rgb, hex, hsl...)`|`#6eadc1`|
+|`stroke`|`bar edge color`|`string (rgb, hex, hsl...)`|`#6eadc1`|
+|`fillOpacity`|`bar internal color opacity`|`number`|`0.6`|
+|`strokeOpacity`|`bar edge color opacity`|`number`|`1`|
+|`barTitle`|`tooltip`|`function`|`d => d.value`|
+|`tickSize`|`tick height/width of axis`|`number`|`10`|
+|`tickPadding`|`tick padding`|`number`|`8`|
+|`axisFontSize`|`axis text font size`|`number`|`12`|
+|`axisFontWeight`|`axis text font weight`|`number`|`400`|
+|`axisFontOpacity`|`axis text font opacity`|`number ([0, 1])`|`0.5`|
+|`axisXLabel`|`label of axis x`|`string or null`|`null`|
+|`axisYLabel`|`label of axis y`|`string or null`|`null`|
+|`axisLabelFontSize`|`label font size`|`number`|`12`|
+|`axisLabelFontWeight`|`label font weight`|`number`|`400`|
+|`axisLabelFontOpacity`|`label font opacity`|`number`|`0.5`|
+|`axisXLaneHeight`|`lane height of axis x`|`number`|`60`|
+|`axisYLaneWidth`|`lane width of axis y`|`number`|`60`|
+|`axisXTimeInterval`|`used when data is of type date_histogram, it will be used to decide the date format of axis x`|`number OR null`|`null`|
+|`isAxisPathShow`|`if the axis path will be shown`|`boolean`|`true`|
+|`animationDuration`|`duration of animation`|`number`|`1000`|
+|`delay`|`delay of animation (milliseconds)`|`number`|`50`|
+|`axisYTickFormat`|`d3-format support`|`string`|`.2s`|
+|`negative`|`the axis y should start at 0 or not`|`boolean`|`false`|
+|`nice`|`the tick number of axis should be rounded or not`|`false`|
+
+
+`events`
+
+|name|description|arguments|
+|:---|:---|:---|
+|`range-updated`|`new range has been chosen by using the brush or by clicking a bar`|`(dateTimeStart, dateTimeEnd)`|
+
+
+
+###d3HorizontalBar
+
+This component is for showing scientific data in horizontal bar chart. It takes an array of elements like `{key : 'key', value : 'value'}`, `key` will be
+used in tooltip, value will be used to calculate the width needed. By default when every `key` is of type date, brush will be enabled. You can chose a new range
+by using the brush or by clicking a bar if `options.axisYTimeInterval` has been settled.
+
+![d3HorizontalBar](./images/d3-horizontal-bar.PNG)
+
+`template`
+
+```vue
+<d3-horizontal-bar
+    :data="data"
+    :options="options"
+    :margin="margin"
+    width="100%"
+    height="400px">
+</d3-horizontal-bar>
+```
+
+`options`
+
+|key|description|type|default|
+|:---|:---|:---|:---|
+|`fill`|`bar internal color`|`string (rgb, hex, hsl...)`|`#6eadc1`|
+|`stroke`|`bar edge color`|`string (rgb, hex, hsl...)`|`#6eadc1`|
+|`fillOpacity`|`bar internal color opacity`|`number`|`0.6`|
+|`strokeOpacity`|`bar edge color opacity`|`number`|`1`|
+|`barTitle`|`tooltip`|`function`|`d => d.value`|
+|`tickSize`|`tick height/width of axis`|`number`|`10`|
+|`tickPadding`|`tick padding`|`number`|`8`|
+|`axisFontSize`|`axis text font size`|`number`|`12`|
+|`axisFontWeight`|`axis text font weight`|`number`|`400`|
+|`axisFontOpacity`|`axis text font opacity`|`number ([0, 1])`|`0.5`|
+|`axisXLabel`|`label of axis x`|`string or null`|`null`|
+|`axisYLabel`|`label of axis y`|`string or null`|`null`|
+|`axisLabelFontSize`|`label font size`|`number`|`12`|
+|`axisLabelFontWeight`|`label font weight`|`number`|`400`|
+|`axisLabelFontOpacity`|`label font opacity`|`number`|`0.5`|
+|`axisXLaneHeight`|`lane height of axis x`|`number`|`30`|
+|`axisYLaneWidth`|`lane width of axis y`|`number`|`120`|
+|`axisYTimeInterval`|`used when data is of type date_histogram, it will be used to decide the date format of axis y`|`number OR null`|`null`|
+|`isAxisPathShow`|`if the axis path will be shown`|`boolean`|`true`|
+|`animationDuration`|`duration of animation`|`number`|`1000`|
+|`delay`|`delay of animation (milliseconds)`|`number`|`50`|
+|`axisXTickFormat`|`d3-format support`|`string`|`.2s`|
+|`negative`|`the axis y should start at 0 or not`|`boolean`|`false`|
+|`nice`|`the tick number of axis should be rounded or not`|`false`|
+
+
+`events`
+
+|name|description|arguments|
+|:---|:---|:---|
+|`range-updated`|`new range has been chosen by using the brush or by clicking a bar`|`(dateTimeStart, dateTimeEnd)`|
+
+
+
 
 
 
@@ -167,13 +287,6 @@ in tooltip, `value` will be used to calculate the angle needed.
     height="400px">
 </d3-horizontal-bar>
 
-<d3-vertical-bar
-    :data="data"
-    :options="options"
-    :margin="margin"
-    width="100%"
-    height="400px">
-</d3-vertical-bar>
 
 <d3-area
     :data="data"
