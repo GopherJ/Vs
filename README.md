@@ -1094,34 +1094,6 @@ This component is for showing `pack` layout. It takes an object of `Hierarchical
 |`axisFontOpacity`|`axis text font opacity`|`number ([0, 1])`|`0.5`|
 
 
-`template`
-```vue
-<d3-l-choropleth
-    :data="data"
-    :options="options"
-    :indoorMaps="indoorMaps"
-    width="100%"
-    height="400px">
-</d3-l-choropleth>
-
-<d3-l-heat
-    :data="data"
-    :options="options"
-    :indoorMaps="indoorMaps"
-    width="100%"
-    height="400px">
-</d3-l-heat>
-```
-
-
-## Screenshots
-
-
-![d3LChoropleth](./images/d3-l-choropleth.PNG)
-
-![d3LHeat](./images/d3-l-heat.PNG)
-
-
 
 ## ToDo
 
