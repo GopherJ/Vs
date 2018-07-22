@@ -651,7 +651,6 @@ To specify an entry 'Interval':
 |`axisFontWeight`|`axis text font weight`|`number`|`400`|
 |`axisFontOpacity`|`axis text font opacity`|`number ([0, 1])`|`0.5`|
 |`axisXLabel`|`label of axis x`|`string or null`|`null`|
-|`axisYLabel`|`label of axis y`|`string or null`|`null`|
 |`axisLabelFontSize`|`label font size`|`number`|`12`|
 |`axisLabelFontWeight`|`label font weight`|`number`|`600`|
 |`axisLabelFontOpacity`|`label font opacity`|`number`|`0.5`|
@@ -663,6 +662,109 @@ To specify an entry 'Interval':
 |`boundingLineColor`|`bounding line color`|`string (rgb, hex, rgba, hesl...)`|`rgba(0, 0, 0, .125)`|
 |`currentTimeLineWidth`|`current time line width`|`number`|`2`|
 |`currentTimeLineColor`|`current time line color`|`string (rgb, hex, rgba, hsl...)`|`rgba(255, 56, 96, 1)`|
+
+
+
+## Functional
+
+*###d3Tracker*
+
+This component is like `d3Timeline`. The difference is that `d3Tracker` has no support for group and we can hit the `space` key in keyboard to start
+playing. It will also trigger an event to tell us the dateTime of the cursor and the entries it is now passing.
+
+![d3Tracker](./images/d3-tracker.PNG)
+
+`template`
+
+```vue
+<d3-tracker
+    :data="data"
+    :options="options"
+    :margin="margin"
+    width="100%"
+    height="400px"
+    @reference-updated="(dateTimeRange, entries) => yourMethod(dateTimeRange, entries)">
+</d3-tracker>
+```
+
+`options`
+
+|key|description|type|default|
+|:---|:---|:---|:---|
+|`intervalCornerRadius`|`corner radius of Interval entry `|`number`|`4`|
+|`symbolSize`|`symbol size of Point entry `|`number`|`400`|
+|`tickSize`|`tick size of axis`|`number`|`10`|
+|`tickPadding`|`tick size padding`|`number`|`8`|
+|`axisXLaneHeight`|`lane height of axis x`|`number`|`40`|
+|`axisFontSize`|`axis text font size`|`number`|`12`|
+|`axisFontWeight`|`axis text font weight`|`number`|`400`|
+|`axisFontOpacity`|`axis text font opacity`|`number ([0, 1])`|`0.5`|
+|`axisXLabel`|`label of axis x`|`string or null`|`null`|
+|`axisLabelFontSize`|`label font size`|`number`|`12`|
+|`axisLabelFontWeight`|`label font weight`|`number`|`600`|
+|`axisLabelFontOpacity`|`label font opacity`|`number`|`0.5`|
+|`backgroundColor`|`background color`|`string (rgb, hex, rgba, hsl...)`|`rgba(255, 255, 255, 0.125)`|
+|`borderRadius`|`border radius`|`number`|`0`|
+|`borderWidth`|`border width`|`number`|`2`|
+|`borderColor`|`border color`|`string (rgb, hex, rgba, hsl...)`|`rgba(0, 0, 0, .125)`|
+|`boundingLineWidth`|`bounding line width`|`number`|`2`|
+|`boundingLineColor`|`bounding line color`|`string (rgb, hex, rgba, hesl...)`|`rgba(0, 0, 0, .125)`|
+|`referenceLineWidth`|`current time line width`|`number`|`4`|
+|`referenceLineColor`|`current time line color`|`string (rgb, hex, rgba, hsl...)`|`rgba(255, 56, 96, 1)`|
+|`overlayWidth`|`cursor overlay rectangle width`|`number`|`30`|
+|`playDuration`|`play should be done in the duration`|`10000`|
+|`playJump`|`play jump should be enabled or not`|`boolean`|`false`|
+
+`events`
+
+|event|description|arguments|
+|:---|:---|:---|
+|`reference-updated`|`reference cursor move`|`(dateTimeRange, entries)`|
+
+
+*###d3Slider*
+
+This component is make it more simple to choose a value in a range. This range can be a range of color, date or number. It takes a `min` and `max`
+as data.
+
+![d3Slider](./images/d3-slider.PNG)
+
+`template`
+
+```vue
+<d3-slider
+    v-model="data"
+    :min="min"
+    :max="max"
+    :margin="margin"
+    :options="options"
+    width="100%"
+    height="100%">
+</d3-slider>
+```
+
+`options`
+
+|key|description|type|default|
+|:---|:---|:---|:---|
+|`trackStroke`|`track edge color`|`string (rgb, hex, rgba, hsl...)`|`#000`|
+|`trackStrokeWidth`|`track edge width`|`number`|`10`|
+|`trackStrokeOpacity`|`track edge opacity`|`number`|`0.3`|
+|`trackRounded`|`track round or not`|`boolean`|`true`|
+|`trackInsetStroke`|`inset track edge color`|`string (rgb, hex, rgba, hsl...)`|`#ddd`|
+|`trackInsetStrokeOpacity`|`inset track edge color opacity`|`number`|`1`|
+|`trackInsetStrokeWidth`|`inset track edge width`|`number`|`8`|
+|`circleFill`|`circle handler internal color`|`string (rgb, hex, rgba, hsl...)`|`#fff`|
+|`circleStroke`|`circle handler edge color`|`string (rgb, hex, rgba, hsl...)`|`#000`|
+|`circleStrokeOpacity`|`circle handler edge color opacity`|`number`|`0.5`|
+|`circleStrokeWidth`|`circle handler edge width`|`number`|`1.25`|
+|`isAxisShow`|`if axis will be shown`|`boolean`|`false`|
+|`axisFontSize`|`axis text font size`|`number`|`12`|
+|`axisFontWeight`|`axis text font weight`|`number`|`400`|
+|`axisFontOpacity`|`axis text font opacity`|`number ([0, 1])`|`0.5`|
+
+
+
 
 
 
@@ -693,53 +795,6 @@ To specify an entry 'Interval':
 
 
 
-
-
-<d3-timelion
-    :data="data"
-    :options="options"
-    :margin="margin"
-    width="100%"
-    height="400px"
-    @range-updated="(dateTimeStart, dateTimeEnd, interval) => fetchDataWithCurrentInterval(dateTimeStart, dateTimeEnd, interval)"
-    @interval-updated="interval => fetchDataWithInterval(interval)">
-</d3-timelion><d3-timelion
-    :data="data"
-    :options="options"
-    :margin="margin"
-    width="100%"
-    height="400px"
-    @range-updated="(dateTimeStart, dateTimeEnd, interval) => fetchDataWithCurrentInterval(dateTimeStart, dateTimeEnd, interval)"
-    @interval-updated="interval => fetchDataWithInterval(interval)">
-</d3-timelion>
-
-
-<d3-progress-arc
-    :data="data"
-    :options="options"
-    :margin="margin"
-    width="100%"
-    height="400px">
-</d3-progress-arc>
-
-<d3-tracker
-    :data="data"
-    :options="options"
-    :margin="margin"
-    width="100%"
-    height="400px"
-    @reference-updated="(dateTimeRange, entries) => yourMethod(dateTimeRange, entries)">
-</d3-tracker>
-
-<d3-slider
-    v-model="data"
-    :min="min"
-    :max="max"
-    :margin="margin"
-    :options="options"
-    width="100%"
-    height="100%">
-</d3-slider>
 
 <d3-icicle-horizontal
     :data="data"
@@ -811,22 +866,6 @@ To specify an entry 'Interval':
 ## Screenshots
 
 
-![d3Circle](./images/d3-circle.PNG)
-
-![d3HorizontalBar](./images/d3-horizontal-bar.PNG)
-
-![d3VerticalBar](./images/d3-vertical-bar.PNG)
-
-
-![d3Line](./images/d3-line.PNG)
-
-
-
-
-
-![d3Tracker](./images/d3-tracker.PNG)
-
-
 ![d3LChoropleth](./images/d3-l-choropleth.PNG)
 
 ![d3LHeat](./images/d3-l-heat.PNG)
@@ -843,7 +882,6 @@ To specify an entry 'Interval':
 
 ![d3Cluster](./images/d3-cluster.PNG)
 
-![d3Slider](./images/d3-slider.PNG)
 
 ![d3ProgressArc](./images/d3-progress-arc.gif)
 
