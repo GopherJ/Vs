@@ -5,7 +5,7 @@
 <script>
     import * as d3 from 'd3';
     import _ from 'lodash';
-    import {showTip, hideTip} from '../../utils/tooltip';
+    import { showTip, hideTip } from '../../utils/tooltip';
 
     export default {
         name: 'd3-metric',
@@ -38,9 +38,7 @@
             ifExistsSvgThenRemove() {
                 const svgSelection = d3.select(this.$el).select('svg');
 
-                if (svgSelection.empty()) {
-                    return;
-                }
+                if (svgSelection.empty()) return;
 
                 svgSelection.remove();
             },
@@ -70,9 +68,7 @@
                     g_w = w - left - right,
                     g_h = h - top - bottom - axisXLabelLaneHeight;
 
-                if (![g_w, g_h].every(el => el > 0)) {
-                    return;
-                }
+                if (![g_w, g_h].every(el => el > 0)) return;
 
                 const svg = d3.select(this.$el)
                     .append('svg')
@@ -176,10 +172,6 @@
             }
         },
         mounted() {
-            if (!this.getElWidthHeight().every(el => el > 0)) {
-                return;
-            }
-
             this._handleResize = _.debounce((e) => {
                 this.onResize();
             }, 500);
