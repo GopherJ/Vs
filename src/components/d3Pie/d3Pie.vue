@@ -56,9 +56,7 @@
                     g_h = h - top - bottom - axisXLabelHeight,
                     outerRadius = Math.min(g_w / 2, g_h / 2);
 
-                if (![g_w, g_h].every(el => el > 0) || outerRadius <= innerRadius) {
-                    return;
-                }
+                if (![g_w, g_h].every(el => el > 0) || outerRadius <= innerRadius) return;
 
                 const svg = d3.select(this.$el)
                     .append('svg')
