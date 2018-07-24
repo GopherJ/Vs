@@ -222,10 +222,15 @@
                     .attr('fill-opacity', fillOpacity)
                     .attr('stroke-opacity', strokeOpacity);
 
+                let lastI = 0;
                 rects
                     .transition()
                     .duration(_.isNumber(animationDuration) ? animationDuration : 0)
-                    .delay((d, i) => i * (d.value === 0 ? 0 : (_.isNumber(delay) ? delay : 0)))
+                    .delay(d => {
+                         return d. value !== 0
+                            ? (lastI++) * (_.isNumber(delay) ? delay : 0)
+                            : 0;
+                    })
                     .attr('y', d => yScale(d.value))
                     .attr('height', d => g_h - yScale(d.value));
 

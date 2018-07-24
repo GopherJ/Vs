@@ -36,6 +36,7 @@
     "leaflet.gridlayer.googlemutant": "^0.7.0",
     "lodash": "^4.17.5",
     "moment": "^2.22.0",
+    "uuid": "^3.3.2",
     "vue": "^2.5.13"
   },
   "devDependencies": {

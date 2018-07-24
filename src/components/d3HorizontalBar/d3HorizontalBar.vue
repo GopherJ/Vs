@@ -228,7 +228,8 @@
                     .on('mouseout', hideTip);
 
                 if (isAxisYTime && _.isNumber(axisYTimeInterval)) {
-                    rects.on('mousedown', d => {
+                    rects
+                        .on('mousedown', d => {
                             const dateTimeStart = d.key,
                                 dateTimeEnd = new Date(d.key.getTime() + axisYTimeInterval);
 
@@ -236,10 +237,15 @@
                         });
                 }
 
+                let lastI = 0;
                 rects
                     .transition()
                     .duration(_.isNumber(animationDuration) ? animationDuration : 0)
-                    .delay((d, i) => i * (d.value === 0 ? 0 : (_.isNumber(delay) ? delay : 0)))
+                    .delay(d => {
+                        return d. value !== 0
+                            ? (lastI++) * (_.isNumber(delay) ? delay : 0)
+                            : 0;
+                    })
                     .attr('width', d => xScale(d.value));
 
                 axisXLane
