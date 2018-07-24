@@ -16,7 +16,7 @@ const isAxisNumber = (data) => {
 
     data.sort((a, b) => {
         if (isNumber(a.key) && isNumber(b.key)) {
-            return a.key > b.key ?  1 : -1;
+            return a.key > b.key ? 1 : -1;
         } else {
             __isAxisNumber__ = false;
             return 0;

@@ -10,8 +10,11 @@ import * as d3 from 'd3';
 function wrap(texts, width) {
     texts.each(function () {
         let text = d3.select(this),
-            words = text.text().split(/\s+/).reverse(),
-            word,
+            words = text.text().split(/\s+/).reverse();
+
+        if (words.length <= 1) return;
+
+        let word,
             line = [],
             lineNumber = 0,
             lineHeight = 1.1,
@@ -22,6 +25,7 @@ function wrap(texts, width) {
         while (word = words.pop()) {
             line.push(word);
             tspan.text(line.join(' '));
+
             if (tspan.node().getComputedTextLength() > width) {
                 line.pop();
                 tspan.text(line.join(' '));
