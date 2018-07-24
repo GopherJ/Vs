@@ -19,7 +19,7 @@ const isAxisTime = (data) => {
             return a.key > b.key ? 1 : -1;
         } else {
             __isAxisTime__ = false;
-            return -1;
+            return 0;
         }
     });
 
