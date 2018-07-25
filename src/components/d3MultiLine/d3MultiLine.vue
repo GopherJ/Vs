@@ -22,7 +22,7 @@
     import emit from '../../utils/emit';
     import axisShow from '../../utils/axisShow';
     import '../../utils/hashCode';
-    import hashCode from '../../utils/hashCode';
+    import uuid from 'uuid/v1';
 
     export default {
         name: 'd3-multi-line',
@@ -90,7 +90,7 @@
                     __offsetRight__ = 10,
                     g_w = w - left - right - axisYLabelLaneWidth - axisYLaneWidth - __offsetRight__,
                     g_h = h - top - bottom - axisXLabelLaneHeight - axisXLaneHeight - axisXGroupLabelLaneHeight,
-                    clipPathId = `clip-multi-line-${new Date().valueOf().toString().hashCode()}`;
+                    clipPathId = uuid();
 
                 if (![g_w, g_h].every(el => el > 0)) return;
 

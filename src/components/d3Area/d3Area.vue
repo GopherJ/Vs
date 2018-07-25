@@ -5,13 +5,14 @@
 <script>
     import * as d3 from 'd3';
     import _ from 'lodash';
+    import uuid from 'uuid/v1';
     import mixins from '../../mixins';
     import { selectTicksNumY } from '../../utils/select';
     import { brushX } from '../../utils/brush';
     import isAxisTime from '../../utils/isAxisTime';
     import { responsiveAxisX } from '../../utils/responsiveAxis';
     import axisShow from '../../utils/axisShow';
-    import hashCode from '../../utils/hashCode';
+    import { drawReferenceLineX } from '../../utils/reference';
 
     export default {
         name: 'd3-area',
@@ -66,7 +67,7 @@
                     __offsetRight__ = 10,
                     g_w =  w - left - right - axisYLaneWidth - axisYLabelLaneWidth - __offsetRight__,
                     g_h = h -top - bottom - axisXLaneHeight - axisXLabelLaneHeight - __offsetTop__,
-                    clipPathId = `clip-area-${new Date().valueOf().toString().hashCode()}`;
+                    clipPathId = uuid();
 
                     if (![g_w, g_h].every(el => el > 0)) return;
 
@@ -94,7 +95,7 @@
                         .range([0, g_w]);
 
                     const yScale = d3.scaleLinear()
-                        .domain(negative ? d3.extent(data, d => d.valuel) : [0, d3.max(data, d => d.value)])
+                        .domain(negative ? d3.extent(data, d => d.value) : [0, d3.max(data, d => d.value)])
                         .range([g_h, 0]);
                     if (nice) yScale.nice();
 
@@ -192,6 +193,8 @@
                         .attr('transform', `translate(${left + axisYLaneWidth + axisYLabelLaneWidth}, ${top + __offsetTop__})`)
                         .attr('width', g_w)
                         .attr('height', g_h);
+
+                    svg.call(drawReferenceLineX, g, g_w, g_h, xScale);
 
                     const area = d3.area()
                         .x(d => xScale(d.key))

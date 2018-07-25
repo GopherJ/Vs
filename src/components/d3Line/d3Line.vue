@@ -17,7 +17,7 @@
     import { firstTickTextAnchorStart, lastTickTextAnchorEnd } from '../../utils/textAnchor';
     import axisShow from '../../utils/axisShow';
     import emit from '../../utils/emit';
-    import hashCode from '../../utils/hashCode';
+    import uuid from 'uuid/v1';
 
     export default {
         name: 'd3-line',
@@ -74,7 +74,7 @@
                     __offsetRight__ = 10,
                     g_w = w - left - right - axisYLabelLaneWidth - axisYLaneWidth - __offsetRight__,
                     g_h = h - top - bottom - axisXLabelLaneHeight - axisXLaneHeight - __offsetTop__,
-                    clipPathId = `clip-line-${new Date().valueOf().toString().hashCode()}`;
+                    clipPathId = uuid();
 
                 const isAxisXTime = isAxisTime(data),
                     isAxisXNumber = isAxisNumber(data),

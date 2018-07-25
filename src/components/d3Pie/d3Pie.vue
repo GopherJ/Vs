@@ -45,7 +45,6 @@
                         arcLabelFontOpacity = 0.5,
 
                         animationDuration = 1000,
-                        delay = 50,
 
                         defaultColor = 'rgb(175, 240, 91)'
                     } = this.options,
@@ -105,10 +104,9 @@
                 paths
                     .transition()
                     .duration(_.isNumber(animationDuration) ? animationDuration : 0)
-                    .delay((d,i) => (_.isNumber(delay) ? delay : 0) * i)
                     .attrTween('d', d => {
                         const startAngle = d.startAngle,
-                              interpolate = d3.interpolate({endAngle: startAngle}, d);
+                             interpolate = d3.interpolate({endAngle: startAngle}, d);
 
                         return t => pathGen(interpolate(t));
                     })
@@ -126,7 +124,6 @@
                     .attr('fill-opacity', 0)
                     .transition()
                     .duration(_.isNumber(animationDuration) ? animationDuration : 0)
-                    .delay((d,i) => (_.isNumber(delay) ? delay : 0) * i)
                     .attr('fill-opacity', arcLabelFontOpacity)
                     .text(arcLabel)
                     .attr('font-size', arcLabelFontSize)

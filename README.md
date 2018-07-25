@@ -169,7 +169,6 @@ in tooltip, `value` will be used to calculate the angle needed.
 |`arcLabelFontWeight`|` abel font weight of arcs`|`number`|`400`|
 |`arcLabelFontOpacity`|`label font opacity of arcs`|`number ([0, 1])`|`0.5`|
 |`animationDuration`|`duration of animation`|`number`|`1000`|
-|`delay`|`delay of animation (milliseconds)`|`number`|`50`|
 |`defaultColor`|`color will be used when there is only one item in array`|`string (rgb, hex, rgba, hsl...)`|`rgb(175, 240, 91)`|
 
 
