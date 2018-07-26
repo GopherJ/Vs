@@ -12,7 +12,6 @@
     import isAxisTime from '../../utils/isAxisTime';
     import { responsiveAxisX } from '../../utils/responsiveAxis';
     import axisShow from '../../utils/axisShow';
-    import { drawReferenceLineX } from '../../utils/reference';
 
     export default {
         name: 'd3-area',
@@ -193,8 +192,6 @@
                         .attr('transform', `translate(${left + axisYLaneWidth + axisYLabelLaneWidth}, ${top + __offsetTop__})`)
                         .attr('width', g_w)
                         .attr('height', g_h);
-
-                    svg.call(drawReferenceLineX, g, g_w, g_h, xScale);
 
                     const area = d3.area()
                         .x(d => xScale(d.key))
