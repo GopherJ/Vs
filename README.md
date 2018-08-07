@@ -8,7 +8,7 @@ Vue Visualisation Package using `d3.js` and `leaflet`. Package used in [Ubudu](h
 
 ## Installation
 
-```
+```javascript
 npm i -S d3-vs
 ```
 
@@ -24,7 +24,7 @@ Vue.use(Vs);
 
 // import only the components that you need and register it manually
 import {
-    // Flow transition
+    // Flow Of transition
     d3SankeyCircular,
 
     // Time Serie
@@ -39,6 +39,7 @@ import {
     d3HorizontalBar,
     d3VerticalBar,
     d3Area,
+    d3Circle,
 
     // Functional
     d3Tracker,
@@ -86,7 +87,7 @@ This component is for showing simple scientific data. It accepts the type `Numbe
 
 |key|description|type|default|
 |:---|:---|:---|:---|
-|`axisXLabel`|`label of horizontally which will be put above the data`|`string OR null`|`null`|
+|`axisXLabel`|`horizontal label which will be put above the data`|`string OR null`|`null`|
 |`axisLabelFontSize`|`label font size`|`number`|`12`|
 |`axisLabelFontWeight`|`label font weight`|`number`|`400`|
 |`axisLabelFontOpacity`|`label font opacity`|`number ([0, 1])`|`0.5`|

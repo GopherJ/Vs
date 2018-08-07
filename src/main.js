@@ -77,6 +77,7 @@ export {
     d3Pie,
     d3Line,
     d3Metric,
+    d3Circle,
     d3MultiLine,
     d3HorizontalBar,
     d3VerticalBar,
