@@ -1112,8 +1112,20 @@ This component is for showing `pack` layout. It takes an object of `Hierarchical
 - `d3JsonViewer`
 - `d3LReplay`
 
+ 
+ 
+## Contribute
+
+1. create your own branch on gitlab
+2. `git clone ssh://git@git.ubudu.com:10022/GopherJ/d3-vs.git`
+    1. `cd d3-vs`
+    2. `git checkout -b [branch name]`
+    3. `make changes`
+    4. `npm run build`
+    5. `git add . && git commit -m "[message]" && git push origin [branch name]`
+    6. `send PR`
+
 
 
 ## License
 MIT
-
