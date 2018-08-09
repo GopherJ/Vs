@@ -16,7 +16,7 @@ const isAxisTime = (data) => {
 
     data.sort((a, b) => {
         if (isDate(a.key) && isDate(b.key)) {
-            return a.key > b.key ? 1 : -1;
+            return a.key < b.key ? -1 : a.key > b.key ? 1 : a.key.valueOf() >= b.key.valueOf() ? 0 : NaN;
         } else {
             __isAxisTime__ = false;
             return 0;
