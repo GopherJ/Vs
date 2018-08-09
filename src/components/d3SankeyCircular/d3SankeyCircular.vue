@@ -4,7 +4,7 @@
 
 <script>
     import * as d3 from 'd3';
-    import _ from 'lodash';
+    import { isNull, cloneDeep, debounce } from 'lodash';
     import * as d3SankeyCircular from 'd3-sankey-circular';
     import pathArrows from './pathArrows';
     import emit from '../../utils/emit';
@@ -69,11 +69,9 @@
         },
         methods: {
             drawSankey() {
-                if (this.nodes.length === 0 || this.links.length === 0) {
-                    return;
-                }
+                if (!this.nodes.length || !this.links.length) return;
 
-                const data = _.cloneDeep({
+                const data = cloneDeep({
                     nodes: this.nodes,
                     links: this.links,
                 });
@@ -107,7 +105,7 @@
 
                 const [w, h] = this.getElWidthHeight(),
                     {
-                        axisXLabelLaneHeight = _.isNull(axisXLabel) ? 0 : 30,
+                        axisXLabelLaneHeight = isNull(axisXLabel) ? 0 : 30,
                     } = this.options,
                     __selectBoxLaneHeight__ = 40,
                     g_w = w,
@@ -196,18 +194,6 @@
                     .attr('font-size', axisXLabelFontSize)
                     .attr('font-weight', axisXLabelFontWeight);
 
-                const linkG = g
-                    .append('g')
-                    .attr('class', 'links')
-                    .attr('fill', 'none')
-                    .attr('stroke-opacity', 0.2)
-                    .selectAll('path');
-
-                const nodeG = g
-                    .append('g')
-                    .attr('class', 'nodes')
-                    .selectAll('g');
-
                 const sankeyData = sankey(data);
                 const sankeyNodes = sankeyData.nodes;
                 const sankeyLinks = sankeyData.links;
@@ -215,6 +201,33 @@
                 const nodeColour = d3
                     .scaleSequential(d3.interpolateCool)
                     .domain([0, g_w]);
+
+                const linkG = g
+                    .append('g')
+                    .attr('class', 'links')
+                    .attr('fill', 'none')
+                    .attr('opacity', 0.3)
+                    .selectAll('path');
+
+                const link = linkG
+                    .data(sankeyLinks)
+                    .enter()
+                    .append('g');
+
+                link
+                    .append('path')
+                    .attr('class', 'link')
+                    .attr('d', link => link.path)
+                    .attr('stroke-width', d => Math.max(1, d.width))
+                    .attr('stroke', link => (link.circular ? circularLinkColor : linkColor))
+                    .attr('stroke-opacity', 0.7)
+                    .on('mouseover', showTip(linkTitle))
+                    .on('mouseout', hideTip);
+
+                const nodeG = g
+                    .append('g')
+                    .attr('class', 'nodes')
+                    .selectAll('g');
 
                 const node = nodeG
                     .data(sankeyNodes)
@@ -228,7 +241,7 @@
                     .attr('y', d => d.y0)
                     .attr('height', d => d.y1 - d.y0)
                     .attr('width', d => d.x1 - d.x0)
-                    .style('fill', d => nodeColour(d.x0))
+                    .attr('fill', d => nodeColour(d.x0))
                     .attr('fill-opacity', 0.5)
                     .on('mouseover', function (d) {
                         const thisName = d.name;
@@ -236,19 +249,19 @@
                         showTip(nodeTitle)(d);
 
                         node.selectAll('.node')
-                            .style('opacity', d => highlightNodes(d, thisName));
+                            .attr('fill-opacity', d => highlightNodes(d, thisName));
 
-                        d3.selectAll('.link')
-                            .style('opacity', l => (l.source.name === thisName || l.target.name === thisName ? 1 : 0.3));
+                        link.selectAll('.link')
+                            .attr('stroke-opacity', l => (l.source.name === thisName || l.target.name === thisName ? 1 : 0.3));
                     })
                     .on('mouseout', () => {
                         hideTip();
 
-                        d3.selectAll('.node')
-                            .style('fill-opacity', 0.5);
+                        node.selectAll('.node')
+                            .attr('fill-opacity', 0.5);
 
-                        d3.selectAll('.link')
-                            .style('opacity', 0.7);
+                        link.selectAll('.link')
+                            .attr('stroke-opacity', 0.7);
                     });
 
                 node
@@ -261,21 +274,6 @@
                     .attr('font-size', nodeTextFontSize)
                     .attr('font-weight', nodeTextFontWeight)
                     .attr('fill-opacity', nodeTextFontOpacity);
-
-                const link = linkG
-                    .data(sankeyLinks)
-                    .enter()
-                    .append('g');
-
-                link
-                    .append('path')
-                    .attr('class', 'link')
-                    .attr('d', link => link.path)
-                    .style('stroke-width', d => Math.max(1, d.width))
-                    .style('opacity', 0.7)
-                    .style('stroke', link => (link.circular ? circularLinkColor : linkColor))
-                    .on('mouseover', showTip(linkTitle))
-                    .on('mouseout', hideTip);
 
                 const arrows = pathArrows()
                     .arrowLength(arrowLength)
@@ -304,10 +302,13 @@
                 return [selection.node().getBBox().x, selection.node().getBBox().y];
             },
             ifExistsSvgThenRemove() {
-                if (d3.select(this.$el).select('svg').empty()) {
+                const svgSelection = d3.select(this.$el).select('svg');
+
+                if (svgSelection.empty()) {
                     return;
                 }
-                d3.select(this.$el).select('svg').remove();
+
+                svgSelection.remove();
             },
             safeDraw() {
                 this.ifExistsSvgThenRemove();
