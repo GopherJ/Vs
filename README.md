@@ -720,6 +720,7 @@ playing. It will also trigger an event to tell us the dateTime of the cursor and
 |event|description|arguments|
 |:---|:---|:---|
 |`reference-updated`|`reference cursor move`|`(dateTimeRange, entries)`|
+|`range-updated`|`new range selected`|`(dateTimeStart, dateTimeEnd)`|
 
 
 *###d3Slider*
