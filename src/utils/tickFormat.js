@@ -23,7 +23,7 @@ const MAP = Object.freeze({
  * tick text format
  *
  * @param {Date} key
- * @param {number} interval
+ * @param {number|null} interval
  * @returns {string}
  */
 const tickFormat = (key, interval) => {

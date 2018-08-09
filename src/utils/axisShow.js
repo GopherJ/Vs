@@ -5,8 +5,8 @@ import * as d3 from 'd3';
  * control the visibility of axis's path and line
  *
  * @param {d3.Selection} axisLane
- * @param {Bolean} isAxisPathShow
- * @param {Bolean} isAxisTickShow
+ * @param {Boolean} isAxisPathShow
+ * @param {Boolean} isAxisTickShow
  * @return {void}
  */
 function axisShow (axisLane, isAxisPathShow, isAxisTickShow) {
