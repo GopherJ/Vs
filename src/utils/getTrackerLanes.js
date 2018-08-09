@@ -217,49 +217,6 @@ const chunk = (data) => {
  * @return {data, dateTimeStart, dateTimeEnd}
  */
 const getTrackerLanes = (data) => {
-    if (!data.length) {
-        return {
-            dateTimeStart: moment().startOf('year'),
-            dateTimeEnd: moment(),
-            lanes: [
-                []
-            ]
-        };
-    }
-
-    if (data.length === 1) {
-        const elem = first(data),
-            { from , to, at, label, title, className, symbol, payload } = elem;
-
-        if (isDate(from) && isDate(to) && from < to) {
-            return {
-                dateTimeStart: from,
-                dateTimeEnd: to,
-                lanes: [
-                    [new Interval(from, to, label, title, className, payload)]
-                ]
-            }
-        }
-
-        if (isDate(at)) {
-            return {
-                dateTimeStart: moment(at).subtract(6, 'months'),
-                dateTimeEnd: moment(at).add(6, 'months'),
-                lanes: [
-                    [new Point(at, title, symbol, className, payload)]
-                ]
-            };
-        }
-
-        return {
-            dateTimeStart: moment().startOf('year'),
-            dateTimeEnd: moment().endOf('year'),
-            lanes: [
-                []
-            ]
-        };
-    }
-
     const { result, dateTimeStart, dateTimeEnd } = transform(data);
     if (!result.length) {
         return {
@@ -273,11 +230,11 @@ const getTrackerLanes = (data) => {
 
     const lanes = chunk(result);
 
-    if (dateTimeStart.getTime() === dateTimeEnd.getTime()) {
+    if (dateTimeStart.valueOf() === dateTimeEnd.valueOf()) {
         return {
             lanes,
-            dateTimeStart: moment(dateTimeStart).startOf('year'),
-            dateTimeEnd: moment(dateTimeStart).endOf('year')
+            dateTimeStart: moment(dateTimeStart).subtract(6, 'months'),
+            dateTimeEnd: moment(dateTimeEnd).add(6, 'months')
         };
     }
 
