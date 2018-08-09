@@ -63,7 +63,8 @@ const toggleCrossInCircle = (container, circle, stroke, strokeWidth) => {
  * toggle class
  *
  * @param {d3.Selection} svg
- * @param {d3.Selection} className
+ * @param {String} className
+ * @return {void}
  */
 const toggleClass = (svg, className) => {
     svg.selectAll(className)

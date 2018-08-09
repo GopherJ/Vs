@@ -42,7 +42,7 @@ const GetOffsetLeft = (tooltip, target) => offset(target).left + target.getBBox(
  * show tooltip
  *
  * @param {(d) => string} title
- * @return {void}
+ * @return {function}
  */
 function showTip(title, t) {
 
@@ -58,6 +58,7 @@ function showTip(title, t) {
             tooltip
                 .style('top', `${top}px`)
                 .style('left', `${left}px`);
+
 
             tooltip
                 .style('visibility', 'visible');
