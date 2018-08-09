@@ -4,7 +4,8 @@
 
 <script>
     import * as d3 from 'd3';
-    import _ from 'lodash';
+    import { isBoolean, isNull, cloneDeep } from 'lodash';
+    import uuid from 'uuid/v1';
     import mixins from '../../mixins';
     import { showTip, hideTip } from '../../utils/tooltip';
     import { selectPaddingInnerOuterY } from '../../utils/select';
@@ -14,7 +15,7 @@
     import { brushX } from '../../utils/brush';
     import zoom from '../../utils/zoom';
     import cursor from '../../utils/cursor';
-    import uuid from 'uuid/v1';
+    import { isFirefox } from '../../utils/navigator';
 
     export default {
         name: 'd3-tracker',
@@ -41,7 +42,7 @@
                 return [dateTimeStart, reference];
             },
             setPause(n) {
-                if (_.isBoolean(n)) this.pause = n;
+                if (isBoolean(n)) this.pause = n;
                 else this.pause = !this.pause;
             },
             findPassingEntriesWhenPlay(lanes, dateTimeStart, dateTimeEnd, playDuration) {
@@ -142,7 +143,7 @@
                 const [w, h] = this.getElWidthHeight(),
                     self = this;
 
-                const { dateTimeStart, dateTimeEnd, lanes } = getTrackerLanes(_.cloneDeep(this.data)),
+                const { dateTimeStart, dateTimeEnd, lanes } = getTrackerLanes(cloneDeep(this.data)),
                       {
                         intervalCornerRadius = 4,
 
@@ -181,14 +182,13 @@
                         playJump = false
                     } = this.options,
                     {
-                        axisXLabelLaneHeight = _.isNull(axisXLabel) ? 0 : 30,
+                        axisXLabelLaneHeight = isNull(axisXLabel) ? 0 : 30,
                     } = this.options,
                     { left = 0, top = 0, right = 0, bottom = 0 } = this.margin,
                     __offset__  = borderWidth,
                     g_w = w - left - right - 2 * __offset__,
                     g_h = h - top - bottom - axisXLaneHeight - axisXLabelLaneHeight - 2 * __offset__,
                     [paddingInner, paddingOuter] = selectPaddingInnerOuterY(g_h),
-                    isFirefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1,
                     clipId = uuid();
                 self.reference = dateTimeStart;
 
