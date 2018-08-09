@@ -663,6 +663,12 @@ To specify an entry 'Interval':
 |`currentTimeLineWidth`|`current time line width`|`number`|`2`|
 |`currentTimeLineColor`|`current time line color`|`string (rgb, hex, rgba, hsl...)`|`rgba(255, 56, 96, 1)`|
 
+`events`
+
+|event|description|arguments|
+|:---|:---|:---|
+|`range-updated`|`new range selected`|`(dateTimeStart, dateTimeEnd)`|
+
 
 
 ## Functional
