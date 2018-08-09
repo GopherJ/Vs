@@ -17,9 +17,6 @@ export default {
         indoorMaps: {
             type: Array
         },
-        indoorZones: {
-            type: Object
-        },
         options: {
             type: Object,
             default: () => ({})
@@ -29,39 +26,29 @@ export default {
         data: {
             deep: true,
             handler(n) {
-                if (!this.safeDraw) return;
-
                 this.safeDraw();
             }
         },
         indoorMaps: {
             deep: true,
             handler(n) {
-                if (!this.safeDraw) return;
-
                 this.safeDraw();
             }
         },
         indoorZones: {
             deep: true,
             handler(n) {
-                if (!this.safeDraw) return;
-
                 this.safeDraw();
             }
         },
         options: {
             deep: true,
             handler(n) {
-                if (!this.safeDraw) return;
-
                 this.safeDraw();
             }
         }
     },
     mounted() {
-        if (!this.safeDraw) return;
-
         this.safeDraw();
     }
 };

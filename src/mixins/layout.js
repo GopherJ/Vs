@@ -1,6 +1,6 @@
 /* eslint-disable */
 import * as d3 from 'd3';
-import _ from 'lodash';
+import { debounce } from 'lodash';
 
 export default {
     props: {
@@ -38,11 +38,6 @@ export default {
         getElWidthHeight() {
             return [this.$el.clientWidth, this.$el.clientHeight];
         },
-        getChildElWidthHeight(selector) {
-            const childNode = this.$el.querySelector(selector);
-
-            return [this.$el.clientWidth - childNode.clientWidth, childNode.clientHeight];
-        },
         getSelectionWidthHeight(selection) {
             return [
                 selection.node().getBBox().width,
@@ -68,57 +63,39 @@ export default {
         height: {
             deep: false,
             handler(n) {
-                if(this.safeDraw) {
-                    this.$nextTick(() => {
-                        this.safeDraw();
-                    });
-                }
+                this.$nextTick(() => {
+                    this.safeDraw();
+                });
             }
         },
         margin: {
             deep: true,
             handler(n) {
-                if(this.safeDraw) {
-                    this.$nextTick(() => {
-                        this.safeDraw();
-                    });
-                }
+                this.$nextTick(() => {
+                    this.safeDraw();
+                });
             }
         },
         data: {
             deep: true,
             handler(n) {
-                if(this.safeDraw) {
-                    this.$nextTick(() => {
-                        this.safeDraw();
-                    });
-                }
+                this.$nextTick(() => {
+                    this.safeDraw();
+                });
             }
         },
         options: {
             deep: true,
             handler(n) {
-                if (this.safeDraw) {
-                    this.$nextTick(() => {
-                        this.safeDraw();
-                    });
-                }
+                this.$nextTick(() => {
+                    this.safeDraw();
+                });
             }
         }
     },
     mounted() {
-        if (!this.safeDraw) {
-            return;
-        }
-
-        if (!this.getElWidthHeight().every(el => el > 0)) {
-            return;
-        }
-
         this._handleResize = _.debounce((e) => {
-            if (this.onResize) {
-                this.onResize();
-            }
+            if (this.onResize) this.onResize();
         }, 500);
 
         this.safeDraw();

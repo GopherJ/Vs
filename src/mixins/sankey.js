@@ -4,6 +4,20 @@ import { debounce } from 'lodash';
 
 export default {
     props: {
+        nodes: {
+            type: Array,
+            required: true,
+            default: () => [],
+        },
+        links: {
+            type: Array,
+            required: true,
+            default: () => [],
+        },
+        options: {
+            type: Object,
+            default: () => ({}),
+        },
         width: {
             type: String,
             default: '100%'
@@ -12,17 +26,13 @@ export default {
             type: String,
             default: '400px'
         },
-        margin: {
-            type: Object,
-            default: () => ({})
+        nodeTitle: {
+            type: Function,
+            default: d => `${d.name}<br>${d.value}`,
         },
-        data: {
-            type: Array,
-            required: true
-        },
-        options: {
-            type: Object,
-            default: () => ({})
+        linkTitle: {
+            type: Function,
+            default: d => `${d.source.name} → ${d.target.name}<br>${d.value}`,
         }
     },
     methods: {
@@ -39,46 +49,24 @@ export default {
             return [this.$el.clientWidth, this.$el.clientHeight];
         },
         getSelectionWidthHeight(selection) {
-            return [
-                selection.node().getBBox().width,
-                selection.node().getBBox().height
-            ];
+            return [selection.node().getBoundingClientRect().width, selection.node().getBoundingClientRect().height];
         },
         getSelectionOffset(selection) {
-            return [
-                selection.node().getBBox().x,
-                selection.node().getBBox().y
-            ];
+            return [selection.node().getBBox().x, selection.node().getBBox().y];
         }
     },
     watch: {
-        width: {
-            deep: false,
-            handler(n) {
-                this.$nextTick(() => {
-                    this.safeDraw();
-                });
-            }
-        },
-        height: {
-            deep: false,
-            handler(n) {
-                this.$nextTick(() => {
-                    this.safeDraw();
-                });
-            }
-        },
-        margin: {
+        nodes: {
             deep: true,
-            handler(n) {
+            handler(n, o) {
                 this.$nextTick(() => {
                     this.safeDraw();
                 });
             }
         },
-        data: {
+        links: {
             deep: true,
-            handler(n) {
+            handler(n, o) {
                 this.$nextTick(() => {
                     this.safeDraw();
                 });
@@ -86,23 +74,33 @@ export default {
         },
         options: {
             deep: true,
-            handler(n) {
+            handler(n, o) {
                 this.$nextTick(() => {
                     this.safeDraw();
                 });
             }
+        },
+        width(n) {
+            this.$nextTick(() => {
+                this.safeDraw();
+            });
+        },
+        height(n) {
+            this.$nextTick(() => {
+                this.safeDraw();
+            });
         }
     },
     mounted() {
-        this._handleResize = debounce((e) => {
+        this.listener = _.debounce(() => {
             if (this.onResize) this.onResize();
         }, 500);
 
         this.safeDraw();
 
-        window.addEventListener('resize', this._handleResize);
+        window.addEventListener('resize', this.listener);
     },
     beforeDestroy() {
-        window.removeEventListener('resize', this._handleResize);
+        window.removeEventListener('resize', this.listener);
     }
 };
