@@ -14,6 +14,7 @@
     import { brushX } from '../../utils/brush';
     import zoom from '../../utils/zoom';
     import cursor from '../../utils/cursor';
+    import uuid from 'uuid/v1';
 
     export default {
         name: 'd3-tracker',
@@ -187,7 +188,8 @@
                     g_w = w - left - right - 2 * __offset__,
                     g_h = h - top - bottom - axisXLaneHeight - axisXLabelLaneHeight - 2 * __offset__,
                     [paddingInner, paddingOuter] = selectPaddingInnerOuterY(g_h),
-                    isFirefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
+                    isFirefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1,
+                    clipId = uuid();
                 self.reference = dateTimeStart;
 
                 if (![g_w, g_h].every(el => el > 0)) return;
@@ -199,7 +201,7 @@
 
                 svg.append('defs')
                     .append('clipPath')
-                    .attr('id', 'clip-tracker')
+                    .attr('id', clipId)
                     .append('rect')
                     .attr('x', 0)
                     .attr('y', 0)
@@ -319,7 +321,7 @@
                         .append('line')
                         .attr('pointer-events', 'none')
                         .attr('class', 'line--reference')
-                        .attr('clip-path', `url(#clip-tracker)`)
+                        .attr('clip-path', `url(#${clipId})`)
                         .attr('x1', x)
                         .attr('y1', 0)
                         .attr('x2', x)
@@ -331,7 +333,7 @@
                         .append('rect')
                         .attr('class', 'overlay')
                         .attr('pointer-events', 'all')
-                        .attr('clip-path', `url(#clip-tracker)`)
+                        .attr('clip-path', `url(#${clipId})`)
                         .attr('fill', 'none')
                         .attr('x', x - overlayWidth / 2)
                         .attr('y', 0)
@@ -370,7 +372,7 @@
                         .enter()
                         .append('line')
                         .attr('class', 'line--tick')
-                        .attr('clip-path', `url(#clip-tracker)`)
+                        .attr('clip-path', `url(#${clipId})`)
                         .attr('x1', d => xScale(d))
                         .attr('x2', d => xScale(d))
                         .attr('y1', 0)
@@ -394,7 +396,7 @@
                                 const point = g
                                     .append('g')
                                     .attr('class', 'entry')
-                                    .attr('clip-path', `url(#clip-tracker)`)
+                                    .attr('clip-path', `url(#${clipId})`)
                                     .append('path')
                                     .attr('transform', `translate(${xScale(entry.at)}, ${Y + H / 2})`)
                                     .attr('class', `entry--${entry.className ? entry.className : 'default'}`)
@@ -402,7 +404,7 @@
                                         const symbolGen = d3.symbol().size(symbolSize);
 
                                         return symbolGen.type(d3[entry.symbol] || d3['symbolCircle'])();
-                                    })
+                                    });
 
                                 if (entry.title) {
                                     point
@@ -418,7 +420,7 @@
                                 const interval = g
                                     .append('g')
                                     .attr('class', 'entry')
-                                    .attr('clip-path', `url(#clip-tracker)`)
+                                    .attr('clip-path', `url(#${clipId})`)
                                     .append('path')
                                     .attr('class', `entry--${entry.className ? entry.className : 'default'}`)
                                     .attr('d', roundedRect(X, Y, W, H, intervalCornerRadius, true, true, true, true));
@@ -431,7 +433,7 @@
 
                                 const text = g
                                     .append('text')
-                                    .attr('clip-path', `url(#clip-tracker)`)
+                                    .attr('clip-path', `url(#${clipId})`)
                                     .attr('class', 'entry entry--label')
                                     .attr('text-anchor', 'middle')
                                     .attr('pointer-events', 'none')
@@ -522,7 +524,7 @@
                             }
                         }
                     }, 16);
-                }
+                };
 
                 if (isFirefox) {
                     d3.select('body').on('keypress', () => {
