@@ -9,7 +9,6 @@
     import emit from '../../utils/emit';
     import axisShow from '../../utils/axisShow';
     import { showTip, hideTip } from '../../utils/tooltip';
-    import { lastTickTextAnchorEnd, firstTickTextAnchorStart } from '../../utils/textAnchor';
     import { responsiveAxisX } from '../../utils/responsiveAxis';
     import roundLine from '../../utils/roundLine';
 
@@ -62,12 +61,9 @@
             },
             drawSlider() {
                 const min = this.min,
-                    max = this.max;
+                      max = this.max;
 
-                if (!this.isTypeTheSame(min, max)) {
-                    console.warn('invalid min | max');
-                    return;
-                }
+                if (!this.isTypeTheSame(min, max)) return;
 
                 const [w, h] = this.getElWidthHeight(),
                     { left = 0, right = 0, top = 0, bottom = 0 } = this.margin,
@@ -107,7 +103,7 @@
                 if (g_h < 2 * circleRadius + circleStrokeWidth + axisXLaneHeight || g_w <= 4 * circleRadius + 2 * circleStrokeWidth) return;
 
                 const isAxisDate = isDate(min),
-                    isAxisColor = isString(min),
+                     isAxisColor = isString(min),
                     isAxisNumber = isNumber(min),
                     self = this;
 
@@ -227,12 +223,12 @@
 
                         emit(self, 'input', val);
                     }
-                };
+                }
 
                 function hue(x) {
                     if (x >= circleRadius + circleStrokeWidth / 2 && x <= g_w - circleStrokeWidth / 2 - circleRadius)
                     hueTarget = x, hueTimer.restart(hueTween);
-                };
+                }
 
                 const trackOverlay = g
                     .append('rect')
