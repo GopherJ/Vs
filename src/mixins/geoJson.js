@@ -26,25 +26,25 @@ export default {
         data: {
             deep: true,
             handler(n) {
-                this.safeDraw();
+                this.$nextTick(() => {
+                    this.safeDraw();
+                });
             }
         },
         indoorMaps: {
             deep: true,
             handler(n) {
-                this.safeDraw();
-            }
-        },
-        indoorZones: {
-            deep: true,
-            handler(n) {
-                this.safeDraw();
+                this.$nextTick(() => {
+                    this.safeDraw();
+                });
             }
         },
         options: {
             deep: true,
             handler(n) {
-                this.safeDraw();
+                this.$nextTick(() => {
+                    this.safeDraw();
+                });
             }
         }
     },

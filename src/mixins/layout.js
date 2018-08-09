@@ -94,7 +94,7 @@ export default {
         }
     },
     mounted() {
-        this._handleResize = _.debounce((e) => {
+        this._handleResize = debounce((e) => {
             if (this.onResize) this.onResize();
         }, 500);
 

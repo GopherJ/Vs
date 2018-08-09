@@ -92,7 +92,7 @@ export default {
         }
     },
     mounted() {
-        this.listener = _.debounce(() => {
+        this.listener = debounce(() => {
             if (this.onResize) this.onResize();
         }, 500);
 
