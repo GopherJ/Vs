@@ -683,6 +683,8 @@ playing. It will also trigger an event to tell us the dateTime of the cursor and
     :margin="margin"
     width="100%"
     height="400px"
+    @play-end="yourMethod"
+    @range-updated="(dateTimeStart, dateTimeEnd) => yourMethod(dateTimeStart, dateTimeEnd)"
     @reference-updated="(dateTimeRange, entries) => yourMethod(dateTimeRange, entries)">
 </d3-tracker>
 ```
