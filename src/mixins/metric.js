@@ -1,23 +1,9 @@
-/* eslint-disable */
 import * as d3 from 'd3';
 import { debounce } from 'lodash';
 
+
 export default {
     props: {
-        nodes: {
-            type: Array,
-            required: true,
-            default: () => [],
-        },
-        links: {
-            type: Array,
-            required: true,
-            default: () => [],
-        },
-        options: {
-            type: Object,
-            default: () => ({}),
-        },
         width: {
             type: String,
             default: '100%'
@@ -26,22 +12,24 @@ export default {
             type: String,
             default: '400px'
         },
-        nodeTitle: {
-            type: Function,
-            default: d => `${d.name}<br>${d.value}`,
+        margin: {
+            type: Object,
+            default: () => ({})
         },
-        linkTitle: {
-            type: Function,
-            default: d => `${d.source.name} → ${d.target.name}<br>${d.value}`,
+        data: {
+            type: [Number, String],
+            required: true
+        },
+        options: {
+            type: Object,
+            default: () => ({})
         }
     },
     methods: {
         ifExistsSvgThenRemove() {
             const svgSelection = d3.select(this.$el).select('svg');
 
-            if (svgSelection.empty()) {
-                return;
-            }
+            if (svgSelection.empty()) return;
 
             svgSelection.remove();
         },
@@ -50,8 +38,8 @@ export default {
         },
         getSelectionWidthHeight(selection) {
             return [
-                selection.node().getBoundingClientRect().width,
-                selection.node().getBoundingClientRect().height
+                selection.node().getBBox().width,
+                selection.node().getBBox().height
             ];
         },
         getSelectionOffset(selection) {
@@ -62,17 +50,33 @@ export default {
         }
     },
     watch: {
-        nodes: {
-            deep: true,
-            handler(n, o) {
+        width: {
+            deep: false,
+            handler(n) {
                 this.$nextTick(() => {
                     this.safeDraw();
                 });
             }
         },
-        links: {
+        height: {
+            deep: false,
+            handler(n) {
+                this.$nextTick(() => {
+                    this.safeDraw();
+                });
+            }
+        },
+        margin: {
             deep: true,
-            handler(n, o) {
+            handler(n) {
+                this.$nextTick(() => {
+                    this.safeDraw();
+                });
+            }
+        },
+        data: {
+            deep: false,
+            handler(n) {
                 this.$nextTick(() => {
                     this.safeDraw();
                 });
@@ -80,33 +84,23 @@ export default {
         },
         options: {
             deep: true,
-            handler(n, o) {
+            handler(n) {
                 this.$nextTick(() => {
                     this.safeDraw();
                 });
             }
-        },
-        width(n) {
-            this.$nextTick(() => {
-                this.safeDraw();
-            });
-        },
-        height(n) {
-            this.$nextTick(() => {
-                this.safeDraw();
-            });
         }
     },
     mounted() {
-        this.listener = debounce(() => {
+        this._handleResize = debounce((e) => {
             if (this.onResize) this.onResize();
         }, 500);
 
         this.safeDraw();
 
-        window.addEventListener('resize', this.listener);
+        window.addEventListener('resize', this._handleResize);
     },
     beforeDestroy() {
-        window.removeEventListener('resize', this.listener);
+        window.removeEventListener('resize', this._handleResize);
     }
 };
