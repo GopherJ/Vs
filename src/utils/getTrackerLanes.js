@@ -46,6 +46,18 @@ class Interval {
     }
 }
 
+
+/**
+ *
+ * asc sort order
+ *
+ * @param a
+ * @param b
+ * @returns {number}
+ */
+const ascending = (a, b) => a < b ? -1 : a > b ? 1 : a >= b ? 0 : NaN;
+
+
 /**
  *
  * transform data to Interval or Point and calculate the dateTimeStart and dateTimeEnd
@@ -99,7 +111,7 @@ const transform = (data) => {
  * check if two entries collide
  *
  * @param {Interval | Point} e1
- * @param {Intervval | Point} e2
+ * @param {Interval | Point} e2
  * @return {boolean}
  */
 const isCollided = (e1, e2) => {
@@ -129,24 +141,24 @@ const isCollided = (e1, e2) => {
 /**
  *
  * @param data
- * @return {void}
+ * @return {Array}
  */
 const sort = (data) => {
     return data.sort((a, b) => {
         if (a instanceof Point && b instanceof Interval) {
-            return a.at > b.from ? 1 : -1;
+            return ascending(a.at, b.from);
         }
 
         else if (a instanceof Interval && b instanceof Point) {
-            return a.from > b.at ? 1 : -1;
+            return ascending(a.from, b.at);
         }
 
         else if (a instanceof Interval && b instanceof Interval) {
-            return a.from > b.from ? 1 : -1;
+            return ascending(a.from, b.from);
         }
 
         else if (a instanceof Point && b instanceof Point) {
-            return a.at > b.at ? 1 : -1;
+            return ascending(a.at, b.at);
         }
     });
 };
@@ -207,8 +219,8 @@ const chunk = (data) => {
 const getTrackerLanes = (data) => {
     if (!data.length) {
         return {
-            dateTimeStart: moment(new Date()),
-            dateTimeEnd: moment().endOf('month'),
+            dateTimeStart: moment().startOf('year'),
+            dateTimeEnd: moment(),
             lanes: [
                 []
             ]
@@ -231,8 +243,8 @@ const getTrackerLanes = (data) => {
 
         if (isDate(at)) {
             return {
-                dateTimeStart: moment(at).startOf('month'),
-                dateTimeEnd: moment(at).endOf('month'),
+                dateTimeStart: moment(at).subtract(6, 'months'),
+                dateTimeEnd: moment(at).add(6, 'months'),
                 lanes: [
                     [new Point(at, title, symbol, className, payload)]
                 ]
@@ -240,8 +252,8 @@ const getTrackerLanes = (data) => {
         }
 
         return {
-            dateTimeStart: moment(new Date()),
-            dateTimeEnd: moment().endOf('month'),
+            dateTimeStart: moment().startOf('year'),
+            dateTimeEnd: moment().endOf('year'),
             lanes: [
                 []
             ]
@@ -251,24 +263,26 @@ const getTrackerLanes = (data) => {
     const { result, dateTimeStart, dateTimeEnd } = transform(data);
     if (!result.length) {
         return {
-            dateTimeStart: moment(new Date()),
-            dateTimeEnd: moment().endOf('month'),
+            dateTimeStart: moment().startOf('year'),
+            dateTimeEnd: moment(),
             lanes: [
                 []
             ]
         };
     }
 
+    const lanes = chunk(result);
+
     if (dateTimeStart.getTime() === dateTimeEnd.getTime()) {
         return {
-            lanes: chunk(result),
-            dateTimeStart: moment(dateTimeStart).startOf('month'),
-            dateTimeEnd: moment(dateTimeStart).endOf('month')
+            lanes,
+            dateTimeStart: moment(dateTimeStart).startOf('year'),
+            dateTimeEnd: moment(dateTimeStart).endOf('year')
         };
     }
 
     return {
-        lanes: chunk(result),
+        lanes,
         dateTimeStart,
         dateTimeEnd
     };
