@@ -1,5 +1,5 @@
-import { isDate } from 'lodash';
-/* eslint-disable */
+import { isDate, isString } from 'lodash';
+import moment from 'moment';
 
 /**
  *
@@ -59,12 +59,12 @@ const groupBy = (data) => {
         const entry = data[i],
             { group, from, to, label, at, title, className, symbol } = entry;
 
-        if (isDate(from) && isDate(to) && from < to) {
-            dateTimeStart = i === 0
+        if (isDate(from) && isDate(to) && from < to && isString(group)) {
+            dateTimeStart = !dateTimeStart
                 ? from
                 : (dateTimeStart > from ? from : dateTimeStart);
 
-            dateTimeEnd = i === 0
+            dateTimeEnd = !dateTimeEnd
                 ? to
                 : (dateTimeEnd < to ? to : dateTimeEnd);
 
@@ -77,12 +77,12 @@ const groupBy = (data) => {
             }
         }
 
-        else if (isDate(at)) {
-            dateTimeStart = i === 0
+        else if (isDate(at) && isString(group)) {
+            dateTimeStart = !dateTimeStart
                 ? at
                 : (dateTimeStart > at ? at : dateTimeStart);
 
-            dateTimeEnd = i === 0
+            dateTimeEnd = !dateTimeEnd
                 ? at
                 : (dateTimeEnd < at ? at : dateTimeEnd);
 
@@ -133,6 +133,15 @@ const isCollided = (e1, e2) => {
     }
 };
 
+/**
+ *
+ * asc sort order
+ *
+ * @param a
+ * @param b
+ * @returns {number}
+ */
+const ascending = (a, b) => a < b ? -1 : a > b ? 1 : a >= b ? 0 : NaN;
 
 /**
  *
@@ -142,19 +151,19 @@ const isCollided = (e1, e2) => {
 const sort = (data) => {
     return data.sort((a, b) => {
         if (a instanceof Point && b instanceof Interval) {
-            return a.at > b.from ? 1 : -1;
+            return ascending(a.at, b.from);
         }
 
         else if (a instanceof Interval && b instanceof Point) {
-            return a.from > b.at ? 1 : -1;
+            return ascending(a.from, b.at);
         }
 
         else if (a instanceof Interval && b instanceof Interval) {
-            return a.from > b.from ? 1 : -1;
+            return ascending(a.from, b.from);
         }
 
         else if (a instanceof Point && b instanceof Point) {
-            return a.at > b.at ? 1 : -1;
+            return ascending(a.at, b.at);
         }
     });
 };
@@ -207,16 +216,38 @@ const chunk = (data) => {
  * @param data
  */
 const getTimelineGroups = (data) => {
-    const {results, dateTimeStart, dateTimeEnd} = groupBy(data);
+    const {results, dateTimeStart, dateTimeEnd} = groupBy(data),
+        groups = Object.keys(results);
 
-    return Object.keys(results).reduce((ite, cur) => {
+    if (!groups.length) {
+        return {
+            dateTimeStart: moment().startOf('year'),
+            dateTimeEnd: moment(),
+            data: {},
+            groups,
+        }
+    }
+
+    if (dateTimeStart.valueOf() === dateTimeEnd.valueOf()) {
+        return groups.reduce((ite, cur) => {
+            ite.data[cur] = chunk(results[cur]);
+            return ite;
+        }, {
+            dateTimeStart: moment(dateTimeStart).subtract(6, 'months'),
+            dateTimeEnd: moment(dateTimeEnd).add(6, 'months'),
+            data: {},
+            groups
+        });
+    }
+
+    return groups.reduce((ite, cur) => {
         ite.data[cur] = chunk(results[cur]);
         return ite;
     }, {
         dateTimeStart,
         dateTimeEnd,
         data: {},
-        groups: Object.keys(results)
+        groups
     });
 };
 
