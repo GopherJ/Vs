@@ -4,7 +4,8 @@
 
 <script>
     import * as d3 from 'd3';
-    import _ from 'lodash';
+    import { isNull, cloneDeep } from 'lodash';
+    import uuid from 'uuid/v1';
     import mixins from '../../mixins';
     import { showTip, hideTip } from '../../utils/tooltip';
     import { selectPaddingInnerOuterY } from '../../utils/select';
@@ -24,7 +25,7 @@
         methods: {
             drawTimeline() {
                 const [w, h] = this.getElWidthHeight(),
-                    { dateTimeStart, dateTimeEnd, data, groups } = getTimelineGroups(_.cloneDeep(this.data));
+                    { dateTimeStart, dateTimeEnd, data, groups } = getTimelineGroups(cloneDeep(this.data));
 
                 if (!groups.length) return;
 
@@ -67,18 +68,18 @@
                         currentTimeLineColor = 'rgba(255, 56, 96, 1)'
                     } = this.options,
                     {
-                        axisXLabelLaneHeight = _.isNull(axisXLabel) ? 0 : 30,
+                        axisXLabelLaneHeight = isNull(axisXLabel) ? 0 : 30,
                     } = this.options,
                     { left = 0, top = 0, right = 0, bottom = 0 } = this.margin,
                     __offset__  = borderWidth,
                     g_w = w - left - right - groupLaneWidth - 2 * __offset__,
-                    g_h = h - top - bottom - axisXLaneHeight - axisXLabelLaneHeight - 2 * __offset__;
+                    g_h = h - top - bottom - axisXLaneHeight - axisXLabelLaneHeight - 2 * __offset__,
+                    clipId = uuid();
 
                 if (![g_w, g_h].every(el => el > 0)) return;
 
                 const groupHeight = g_h / groups.length,
-                    [paddingInner, paddingOuter] = selectPaddingInnerOuterY(groupHeight),
-                    self = this;
+                    [paddingInner, paddingOuter] = selectPaddingInnerOuterY(groupHeight);
 
                 const svg = d3.select(this.$el)
                     .append('svg')
@@ -87,7 +88,7 @@
 
                 svg.append('defs')
                     .append('clipPath')
-                    .attr('id', 'clip-timeline')
+                    .attr('id', clipId)
                     .append('rect')
                     .attr('x', 0)
                     .attr('y', 0)
@@ -234,7 +235,7 @@
                         .attr('y2', g_h)
                         .attr('stroke', currentTimeLineColor)
                         .attr('stroke-width', currentTimeLineWidth)
-                        .attr('clip-path', 'url(#clip-timeline)')
+                        .attr('clip-path', `url(#${clipId})`)
                         .attr('pointer-events', 'none');
                 }
 
@@ -248,7 +249,7 @@
                         .enter()
                         .append('line')
                         .attr('class', 'line--tick')
-                        .attr('clip-path', 'url(#clip-timeline)')
+                        .attr('clip-path', `url(#${clipId})`)
                         .attr('x1', d => xScale(d))
                         .attr('x2', d => xScale(d))
                         .attr('y1', 0)
@@ -278,7 +279,7 @@
                                     const G = g
                                         .append('g')
                                         .attr('class', 'entry')
-                                        .attr('clip-path', 'url(#clip-timeline)');
+                                        .attr('clip-path', `url(#${clipId})`);
 
                                     const symbolGen = d3.symbol().size(symbolSize);
 
@@ -303,7 +304,7 @@
                                     const interval = G.append('path')
                                         .attr('class', `${entry.className ? entry.className : 'entry--interval--default'}`)
                                         .attr('d', roundedRect(X, Y, W, H, intervalCornerRadius, true, true, true, true))
-                                        .attr('clip-path', 'url(#clip-timeline)');
+                                        .attr('clip-path', `url(#${clipId})`);
 
                                     if (entry.title) {
                                         interval
@@ -320,7 +321,7 @@
                                         .text(entry.label)
                                         .attr('fill', '#fff')
                                         .attr('dy', '0.32em')
-                                        .attr('clip-path', 'url(#clip-timeline)');
+                                        .attr('clip-path', `url(#${clipId})`);
 
                                     if (text.node().getComputedTextLength() > W) {
                                         text.remove();
