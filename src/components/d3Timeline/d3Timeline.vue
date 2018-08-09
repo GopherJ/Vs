@@ -11,8 +11,8 @@
     import { selectPaddingInnerOuterY } from '../../utils/select';
     import { Point, Interval, getTimelineGroups } from '../../utils/getTimelineGroups';
     import roundedRect from '../../utils/roundedRect';
-    import cursor from '../../utils/cursor';
     import zoom from '../../utils/zoom';
+    import { brushX } from '../../utils/brush';
 
     export default {
         name: 'd3-timeline',
@@ -75,6 +75,7 @@
                     g_w = w - left - right - groupLaneWidth - 2 * __offset__,
                     g_h = h - top - bottom - axisXLaneHeight - axisXLabelLaneHeight - 2 * __offset__,
                     clipId = uuid();
+                const self = this;
 
                 if (![g_w, g_h].every(el => el > 0)) return;
 
@@ -95,19 +96,6 @@
                     .attr('width', g_w)
                     .attr('height', g_h + axisXLaneHeight);
 
-                const g = svg
-                    .append('g')
-                    .attr('transform', `translate(${left + __offset__ + groupLaneWidth}, ${top + __offset__})`)
-                    .attr('width', g_w)
-                    .attr('height', g_h);
-
-                svg
-                    .call(cursor, g, [
-                        [0, 0],
-                        [g_w, g_h + axisXLaneHeight]
-                    ])
-                    .call(zoom, zooming);
-
                 svg.append('path')
                     .attr('d', roundedRect(left + __offset__ / 2, top + __offset__ / 2, g_w + groupLaneWidth + __offset__, g_h + axisXLaneHeight + __offset__, borderRadius, true, true, true, true))
                     .attr('fill', backgroundColor)
@@ -115,11 +103,26 @@
                     .attr('stroke-width', borderWidth)
                     .attr('pointer-events', 'none');
 
-                g.append('line')
-                    .attr('class', 'line--y')
-                    .attr('y2', g_h)
-                    .attr('stroke', boundingLineColor)
-                    .attr('stroke-width', boundingLineWidth);
+                svg
+                    .selectAll('.group--lane')
+                    .data(groups)
+                    .enter()
+                    .append('g')
+                    .attr('class', 'group--lane')
+                    .attr('transform', (d, i) => `translate(${left + __offset__}, ${top + __offset__ + i * groupHeight})`)
+                    .attr('width', groupLaneWidth)
+                    .attr('height', groupHeight)
+                    .attr('fill', 'none')
+                    .append('text')
+                    .attr('x', groupLaneWidth / 2)
+                    .attr('y', groupHeight / 2)
+                    .attr('dy', '0.32em')
+                    .attr('text-anchor', 'middle')
+                    .attr('font-size', groupLabelFontSize)
+                    .attr('font-weight', groupLabelFontWeight)
+                    .attr('fill-opacity', groupLabelFontOpacity)
+                    .text(d => d)
+                    .attr('fill', '#000');
 
                 svg.selectAll('.line--x')
                     .data(groups)
@@ -137,6 +140,7 @@
                 const xScale = d3.scaleTime()
                     .domain([dateTimeStart, dateTimeEnd])
                     .range([0, g_w]);
+                self.scale = xScale;
 
                 const yScale = (i) => d3.scaleBand()
                     .range([groupHeight * (i + 1), groupHeight * i])
@@ -182,32 +186,36 @@
                     .attr('font-weight', axisLabelFontWeight)
                     .attr('fill-opacity', axisLabelFontOpacity);
 
+                const extent = [
+                    [left + __offset__ + groupLaneWidth, top + __offset__],
+                    [w - right - __offset__, h - axisXLaneHeight - __offset__ - axisXLabelLaneHeight]
+                ];
+
                 svg
-                    .selectAll('.group--lane')
-                    .data(groups)
-                    .enter()
+                    .call(brushX.bind(self), extent, self.scale)
+                    .call(zoom, zooming);
+
+                const g = svg
                     .append('g')
-                    .attr('class', 'group--lane')
-                    .attr('transform', (d, i) => `translate(${left + __offset__}, ${top + __offset__ + i * groupHeight})`)
-                    .attr('width', groupLaneWidth)
-                    .attr('height', groupHeight)
-                    .attr('fill', 'none')
-                    .append('text')
-                    .attr('x', groupLaneWidth / 2)
-                    .attr('y', groupHeight / 2)
-                    .attr('dy', '0.32em')
-                    .attr('text-anchor', 'middle')
-                    .attr('font-size', groupLabelFontSize)
-                    .attr('font-weight', groupLabelFontWeight)
-                    .attr('fill-opacity', groupLabelFontOpacity)
-                    .text(d => d)
-                    .attr('fill', '#000');
+                    .attr('transform', `translate(${left + __offset__ + groupLaneWidth}, ${top + __offset__})`)
+                    .attr('width', g_w)
+                    .attr('height', g_h);
+
+                g.append('line')
+                    .attr('class', 'line--y')
+                    .attr('y2', g_h)
+                    .attr('stroke', boundingLineColor)
+                    .attr('stroke-width', boundingLineWidth);
 
                 function zooming() {
                     hideTip();
 
                     const newScale = d3.event
                         .transform.rescaleX(xScale);
+                    self.scale = newScale;
+
+                    svg
+                        .call(brushX.bind(self), extent, self.scale);
 
                     axisXLane
                         .call(xAxis.scale(newScale))
