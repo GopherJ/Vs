@@ -4,7 +4,9 @@
 
 <script>
     import * as d3 from 'd3';
-    import _ from 'lodash';
+    import { isNull, isNumber, isUndefined, cloneDeep } from 'lodash';
+    import uuid from 'uuid/v1';
+    import murmurHash3 from 'murmurhash3js';
     import { brushX } from '../../utils/brush';
     import mixins from '../../mixins';
     import groupBy from '../../utils/groupBy';
@@ -21,15 +23,15 @@
     import isAxisNumber from '../../utils/isAxisNumber';
     import emit from '../../utils/emit';
     import axisShow from '../../utils/axisShow';
-    import '../../utils/hashCode';
-    import uuid from 'uuid/v1';
+
+    const hash64 = d => 'd3-multi-line' + murmurHash3.x64.hash128(d);
 
     export default {
         name: 'd3-multi-line',
         mixins: [mixins],
         methods: {
             drawMultiLine() {
-                const _data = _.cloneDeep(this.data);
+                const _data = cloneDeep(this.data);
 
                 const {left = 0, top = 0, right = 0, bottom = 0} = this.margin,
                     {
@@ -48,7 +50,6 @@
                         tickPadding = 8,
 
                         axisXGroupLabelLaneHeight = 30,
-                        axisXGroupLabelWidth = 15,
                         axisXGroupLabelFillColorOpacity = 1,
                         axisXGroupLabelBorderColorOpacity = 0.6,
                         axisXGroupLabelGap = 10,
@@ -66,9 +67,6 @@
 
                         axisXTimeInterval = null,
 
-                        dashedGroups = [],
-                        strokeDashArray = 5,
-
                         isAxisPathShow = true,
 
                         curve = 'curveMonotoneX',
@@ -82,8 +80,8 @@
                         nice = false
                     } = this.options,
                     {
-                        axisXLabelLaneHeight = _.isNull(axisXLabel) ? 0 : 30,
-                        axisYLabelLaneWidth = _.isNull(axisYLabel) ? 0 : 30,
+                        axisXLabelLaneHeight = isNull(axisXLabel) ? 0 : 30,
+                        axisYLabelLaneWidth = isNull(axisYLabel) ? 0 : 30,
                     } = this.options;
 
                 const [w, h] = this.getElWidthHeight(),
@@ -104,7 +102,7 @@
 
                 const schemeCategory20 = d3.scaleOrdinal()
                     .domain(groups)
-                    .range(d3.schemeCategory20);
+                    .range(d3.schemeCategory20c);
 
                 const yScale = d3.scaleLinear()
                     .domain(negative ? d3.extent(data, d => d.value) : [0, d3.max(_data.map(d => d.value))])
@@ -118,36 +116,41 @@
                 const lineGen = d3.line()
                     .x(d => xScale(d.key))
                     .y(d => yScale(d.value))
-                    .defined(d => !_.isNull(d) && !_.isUndefined(d));
+                    .defined(d => !isNull(d) && !isUndefined(d));
 
-                if (!_.isNull(curve) && !_.isUndefined(d3[curve])) lineGen.curve(d3[curve]);
+                if (!isNull(curve) && !isUndefined(d3[curve])) lineGen.curve(d3[curve]);
 
                 const svg = d3.select(this.$el)
                     .append('svg')
                     .attr('width', w)
                     .attr('height', h);
 
-                const axisXGroupLabelLane = svg.append('g')
+                const axisXGroupLabelLane = svg
+                    .append('g')
                     .attr('transform', `translate(${left + axisYLabelLaneWidth + axisYLaneWidth}, ${top})`)
                     .attr('width', g_w)
                     .attr('height', axisXGroupLabelLaneHeight);
 
-                const axisYLabelLane = svg.append('g')
+                const axisYLabelLane = svg
+                    .append('g')
                     .attr('transform', `translate(${left}, ${top + axisXGroupLabelLaneHeight})`)
                     .attr('width', axisYLabelLaneWidth)
                     .attr('height', g_h);
 
-                const axisXLabelLane = svg.append('g')
+                const axisXLabelLane = svg
+                    .append('g')
                     .attr('transform', `translate(${left + axisYLabelLaneWidth + axisYLaneWidth}, ${top + axisXGroupLabelLaneHeight + g_h + axisXLaneHeight})`)
                     .attr('width', g_w)
                     .attr('height', axisXLabelLaneHeight);
 
-                const axisYLane = svg.append('g')
+                const axisYLane = svg
+                    .append('g')
                     .attr('transform', `translate(${left + axisYLabelLaneWidth}, ${top + axisXGroupLabelLaneHeight})`)
                     .attr('width', axisYLaneWidth)
                     .attr('height', g_h);
 
-                const axisXLane = svg.append('g')
+                const axisXLane = svg
+                    .append('g')
                     .attr('transform', `translate(${left + axisYLabelLaneWidth + axisYLaneWidth}, ${top + axisXGroupLabelLaneHeight + g_h})`)
                     .attr('width', g_w)
                     .attr('height', axisXLaneHeight);
@@ -164,17 +167,17 @@
                     .each(function (d, i) {
                         const _g = d3.select(this);
 
-                        let label;
-                        label = _g.append('rect')
-                            .attr('width', axisXGroupLabelWidth)
-                            .attr('height', axisXGroupLabelLaneHeight)
+                        let label = _g
+                            .append('circle')
+                            .attr('r', axisXGroupLabelLaneHeight / 2)
+                            .attr('cy', axisXGroupLabelLaneHeight / 2)
                             .attr('fill', d => schemeCategory20(d))
                             .attr('fill-opacity', axisXGroupLabelFillColorOpacity)
                             .attr('stroke', d => schemeCategory20(d))
                             .attr('stroke-opacity', axisXGroupLabelBorderColorOpacity)
                             .on('click', function (d) {
                                 toggleCross(_g, d3.select(this), crossColor, crossWidth);
-                                toggleClass(svg, `.d3-multi-line-${d.hashCode()}`);
+                                toggleClass(svg, hash64(d));
                             });
 
                         const labelPos = label.node().getBBox();
@@ -187,9 +190,7 @@
                             .attr('dy', '0.32em')
                             .text(d);
 
-                        if (i !== 0) {
-                            _g.attr('transform', `translate(${previousPos.x + previousPos.width + axisXGroupLabelGap}, 0)`);
-                        }
+                        if (i !== 0) _g.attr('transform', `translate(${previousPos.x + previousPos.width + axisXGroupLabelGap}, 0)`);
 
                         previousPos = realBBox(_g);
                     });
@@ -292,11 +293,10 @@
                     .data(groups)
                     .enter()
                     .append('path')
-                    .attr('class', d => `d3-multi-line-${d.hashCode()}`)
+                    .attr('class', d => hash64(d))
                     .attr('clip-path', `url(#${clipPathId})`)
                     .attr('d', d => lineGen(data[d]))
-                    .attr('stroke-dasharray', d => dashedGroups.some(el => el === d) ? (_.isNumber(strokeDashArray) ? strokeDashArray : 0) : 0)
-                    .attr('fill', 'transparent')
+                    .attr('fill', 'none')
                     .attr('pointer-events', 'none')
                     .attr('stroke', d => schemeCategory20(d))
                     .attr('stroke-width', strokeWidth);
@@ -305,7 +305,7 @@
                     .data(_data)
                     .enter()
                     .append('circle')
-                    .attr('class', d => `d3-multi-line-${d[groupKey].hashCode()}`)
+                    .attr('class', d => hash64(d[groupKey]))
                     .attr('clip-path', `url(#${clipPathId})`)
                     .attr('cx', d => xScale(d.key))
                     .attr('cy', d => yScale(d.value))
@@ -314,11 +314,11 @@
                     .on('mouseover', showTip(circleTitle))
                     .on('mouseout', hideTip);
 
-                if (isAxisXTime && _.isNumber(axisXTimeInterval)) {
-                        const dateTimeStart = d.key,
-                            dateTimeEnd = new Date(d.key.getTime() + axisXTimeInterval);
+                if (isAxisXTime && isNumber(axisXTimeInterval)) {
+                    const dateTimeStart = d.key,
+                        dateTimeEnd = new Date(d.key.valueOf() + axisXTimeInterval);
 
-                        emit(this, 'range-updated', dateTimeStart, dateTimeEnd);
+                    emit(this, 'range-updated', dateTimeStart, dateTimeEnd);
                 }
             },
             safeDraw() {

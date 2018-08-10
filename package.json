@@ -33,6 +33,7 @@
     "leaflet-fullscreen": "^1.0.2",
     "lodash": "^4.17.5",
     "moment": "^2.22.0",
+    "murmurhash3js": "^3.0.1",
     "uuid": "^3.3.2",
     "vue": "^2.5.13"
   },
