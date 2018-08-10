@@ -13,7 +13,7 @@
     import realBBox from '../../utils/realBBox';
     import { responsiveAxisX } from '../../utils/responsiveAxis';
     import tickFormat from '../../utils/tickFormat';
-    import { toggleCross, toggleClass } from '../../utils/toggle';
+    import { toggleCrossInCircle, toggleClass } from '../../utils/toggle';
     import { showTip, hideTip } from '../../utils/tooltip';
     import { selectTicksNumY } from '../../utils/select';
     import wrap from '../../utils/wrap';
@@ -41,7 +41,7 @@
                         circleTitle = d => `${d.value}`,
 
                         crossWidth = 2,
-                        crossColor = 'white',
+                        crossColor = 'red',
 
                         axisXLabel = null,
                         axisYLabel = null,
@@ -167,7 +167,7 @@
                     .each(function (d, i) {
                         const _g = d3.select(this);
 
-                        let label = _g
+                        const label = _g
                             .append('circle')
                             .attr('r', axisXGroupLabelLaneHeight / 2)
                             .attr('cy', axisXGroupLabelLaneHeight / 2)
@@ -176,13 +176,14 @@
                             .attr('stroke', d => schemeCategory20(d))
                             .attr('stroke-opacity', axisXGroupLabelBorderColorOpacity)
                             .on('click', function (d) {
-                                toggleCross(_g, d3.select(this), crossColor, crossWidth);
+                                toggleCrossInCircle(_g, d3.select(this), crossColor, crossWidth);
                                 toggleClass(svg, hash64(d));
                             });
 
                         const labelPos = label.node().getBBox();
 
-                        _g.append('text')
+                        _g
+                            .append('text')
                             .attr('class', 'label label--group')
                             .attr('text-anchor', 'start')
                             .attr('x', labelPos.x + labelPos.width)
