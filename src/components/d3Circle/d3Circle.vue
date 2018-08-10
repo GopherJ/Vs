@@ -4,59 +4,20 @@
 
 <script>
     import * as d3 from 'd3';
-    import {showTip, hideTip} from '../../utils/tooltip';
-    import _ from 'lodash';
+    import { showTip, hideTip } from '../../utils/tooltip';
+    import mixins from '../../mixins/circle';
 
     export default {
         name: 'd3-circle',
-        props: {
-            width: {
-                type: String,
-                default: '100%'
-            },
-            height: {
-                type: String,
-                default: '400px'
-            },
-            margin: {
-                type: Object,
-                default: () => ({})
-            },
-            data: {
-                type: Number,
-                required: true,
-                validator: val => val >= 0 && val <= 1
-            },
-            options: {
-                type: Object,
-                default: () => ({})
-            }
-        },
+        mixins: [mixins],
         methods: {
-            getElWidthHeight() {
-                return [this.$el.clientWidth, this.$el.clientHeight];
-            },
-            ifExistsSvgThenRemove() {
-                const svgSelection = d3.select(this.$el).select('svg');
-
-                if (svgSelection.empty()) {
-                    return;
-                }
-
-                svgSelection.remove();
-            },
             drawCircle() {
                 const data = this.data,
-                    {left = 0, top = 0, right = 0, bottom = 0} = this.margin,
+                    { left = 0, top = 0, right = 0, bottom = 0 } = this.margin,
                     [w, h] = this.getElWidthHeight(),
                     g_w = w - left - right,
-                    g_h = h - top - bottom;
-
-                if (![g_w, g_h].every(el => el > 0)) {
-                    return;
-                }
-
-                const outerRadius = Math.min(g_w, g_h) / 2,
+                    g_h = h - top - bottom,
+                    outerRadius = Math.min(g_w, g_h) / 2,
                     {
                         innerRadiusRatio = 0.8,
 
@@ -75,9 +36,9 @@
                         circleTitle = `${data}`
                     } = this.options;
 
-                if (innerRadiusRatio >= 1) {
-                    return;
-                }
+                if (![g_w, g_h].every(el => el > 0)) return;
+
+                if (innerRadiusRatio >= 1) return;
 
                 const label = d3.format(`.${precision}%`)(data),
                     innerRadius = innerRadiusRatio * outerRadius;
@@ -153,72 +114,6 @@
             onResize() {
                 this.safeDraw();
             }
-        },
-        watch: {
-            width: {
-                deep: false,
-                handler(n) {
-                    this.$nextTick(() => {
-                        this.safeDraw();
-                    });
-                }
-            },
-            height: {
-                deep: false,
-                handler(n) {
-                    if (this.safeDraw) {
-                        this.$nextTick(() => {
-                            this.safeDraw();
-                        });
-                    }
-                }
-            },
-            margin: {
-                deep: true,
-                handler(n) {
-                    if (this.safeDraw) {
-                        this.$nextTick(() => {
-                            this.safeDraw();
-                        });
-                    }
-                }
-            },
-            data: {
-                deep: false,
-                handler(n) {
-                    if (this.safeDraw) {
-                        this.$nextTick(() => {
-                            this.safeDraw();
-                        });
-                    }
-                }
-            },
-            options: {
-                deep: true,
-                handler(n) {
-                    if (this.safeDraw) {
-                        this.$nextTick(() => {
-                            this.safeDraw();
-                        });
-                    }
-                }
-            }
-        },
-        mounted() {
-            if (!this.getElWidthHeight().every(el => el > 0)) {
-                return;
-            }
-
-            this._handleResize = _.debounce((e) => {
-                this.onResize();
-            }, 500);
-
-            this.safeDraw();
-
-            window.addEventListener('resize', this._handleResize);
-        },
-        beforeDestroy() {
-            window.removeEventListener('resize', this._handleResize);
         }
     }
 </script>

@@ -4,7 +4,7 @@
 
 <script>
     import * as d3 from 'd3';
-    import _ from 'lodash';
+    import { cloneDeep, isNull, isString, isUndefined } from 'lodash';
     import uuid from 'uuid/v1';
     import mixins from '../../mixins';
     import { selectTicksNumY } from '../../utils/select';
@@ -18,17 +18,13 @@
         mixins: [mixins],
         methods: {
             drawArea() {
-                const data = _.cloneDeep(this.data),
-                    {
-                        left = 0, right = 0, top = 0, bottom = 0
-                    } = this.margin,
+                const data = cloneDeep(this.data),
+                    { left = 0, right = 0, top = 0, bottom = 0 } = this.margin,
                     {
                         fill = '#6eadc1',
                         stroke = '#6eadc1',
                         fillOpacity = 0.6,
                         strokeOpacity = 1,
-
-                        areaTitle = d => `${d.value}`,
 
                         tickSize = 10,
                         tickPadding = 8,
@@ -58,8 +54,8 @@
                         curve =  'curveLinear'
                     } = this.options,
                     {
-                        axisXLabelLaneHeight = _.isNull(axisXLabel) ? 0 : 30,
-                        axisYLabelLaneWidth = _.isNull(axisYLabel) ? 0 : 30
+                        axisXLabelLaneHeight = isNull(axisXLabel) ? 0 : 30,
+                        axisYLabelLaneWidth = isNull(axisYLabel) ? 0 : 30
                     } = this.options,
                     [w, h] = this.getElWidthHeight(),
                     __offsetTop__ = 10,
@@ -197,7 +193,7 @@
                         .x(d => xScale(d.key))
                         .y0(yScale(0))
                         .y1(d => yScale(d.value));
-                    if (_.isString(curve) && !_.isUndefined(d3[curve])) area.curve(d3[curve]);
+                    if (isString(curve) && !isUndefined(d3[curve])) area.curve(d3[curve]);
 
                     g
                         .append('path')

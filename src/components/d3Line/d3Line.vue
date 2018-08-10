@@ -4,7 +4,8 @@
 
 <script>
     import * as d3 from 'd3';
-    import _ from 'lodash';
+    import { cloneDeep, isNull, isUndefined, isNumber } from 'lodash';
+    import uuid from 'uuid/v1';
     import mixins from '../../mixins';
     import { showTip, hideTip } from '../../utils/tooltip';
     import { brushX } from '../../utils/brush';
@@ -17,17 +18,14 @@
     import { firstTickTextAnchorStart, lastTickTextAnchorEnd } from '../../utils/textAnchor';
     import axisShow from '../../utils/axisShow';
     import emit from '../../utils/emit';
-    import uuid from 'uuid/v1';
 
     export default {
         name: 'd3-line',
         mixins: [mixins],
         methods: {
             drawLine() {
-                const [w, h] = this.getElWidthHeight();
-
-                const data = _.cloneDeep(this.data),
-                    {left = 0, top = 0, right = 0, bottom = 0} = this.margin,
+                const data = cloneDeep(this.data),
+                    { left = 0, top = 0, right = 0, bottom = 0 } = this.margin,
                     {
                         stroke = 'rgb(188, 82, 188)',
                         strokeWidth = 2,
@@ -67,9 +65,10 @@
                         nice = false
                     } = this.options,
                     {
-                        axisXLabelLaneHeight = _.isNull(axisXLabel) ? 0 : 30,
-                        axisYLabelLaneWidth = _.isNull(axisYLabel) ? 0 : 30,
+                        axisXLabelLaneHeight = isNull(axisXLabel) ? 0 : 30,
+                        axisYLabelLaneWidth = isNull(axisYLabel) ? 0 : 30,
                     } = this.options,
+                    [w, h] = this.getElWidthHeight(),
                     __offsetTop__ = 10,
                     __offsetRight__ = 10,
                     g_w = w - left - right - axisYLabelLaneWidth - axisYLaneWidth - __offsetRight__,
@@ -93,9 +92,9 @@
                 const lineGen = d3.line()
                     .x(d => xScale(d.key))
                     .y(d => yScale(d.value))
-                    .defined(d => !_.isNull(d) && !_.isUndefined(d));
+                    .defined(d => !isNull(d) && !isUndefined(d));
 
-                if (!_.isNull(curve) && !_.isUndefined(d3[curve])) lineGen.curve(d3[curve]);
+                if (!isNull(curve) && !isUndefined(d3[curve])) lineGen.curve(d3[curve]);
 
                 const svg = d3.select(this.$el)
                     .append('svg')
@@ -235,14 +234,13 @@
                     .on('mouseover', showTip(circleTitle))
                     .on('mouseout', hideTip);
 
-                if (isAxisXTime && _.isNumber(axisXTimeInterval)) {
-                    circles
-                        .on('mousedown', (d) => {
-                            const dateTimeStart = d.key,
-                                dateTimeEnd = new Date(d.key.getTime() + axisXTimeInterval);
+                if (isAxisXTime && isNumber(axisXTimeInterval)) {
+                    circles .on('mousedown', (d) => {
+                        const dateTimeStart = d.key,
+                            dateTimeEnd = new Date(d.key.valueOf() + axisXTimeInterval);
 
-                            emit(this, 'range-updated', dateTimeStart, dateTimeEnd);
-                        });
+                        emit(this, 'range-updated', dateTimeStart, dateTimeEnd);
+                    });
                 }
             },
             safeDraw() {

@@ -8,7 +8,7 @@ const lastTickTextAnchorEnd = (axisLane) => {
     axisLane
         .select('.tick:last-child text')
         .attr('text-anchor', 'end');
-}
+};
 
 /**
  *
@@ -19,7 +19,7 @@ const firstTickTextAnchorStart = (axisLane) => {
     axisLane
         .select('.tick:first-of-type text')
         .attr('text-anchor', 'start');
-}
+};
 
 export {
     firstTickTextAnchorStart,
