@@ -343,22 +343,22 @@
 
                     overlay
                         .call(d3.drag()
-                            .on('drag', function() {
-                                  const x = d3.event.x,
-                                    oldX = +overlay.attr('x') + overlayWidth / 2;
+                        .on('drag', function() {
+                              const x = d3.event.x,
+                                oldX = +overlay.attr('x') + overlayWidth / 2;
 
-                                  overlay
-                                    .attr('x', x - overlayWidth / 2);
+                              overlay
+                                .attr('x', x - overlayWidth / 2);
 
-                                  line
-                                    .attr('x1', x)
-                                    .attr('x2', x);
+                              line
+                                .attr('x1', x)
+                                .attr('x2', x);
 
-                                  self.reference = self.scale.invert(x);
-                                  const entries = self.findPassingEntriesWhenDrag(lanes, dateTimeStart, dateTimeEnd, oldX);
+                              self.reference = self.scale.invert(x);
+                              const entries = self.findPassingEntriesWhenDrag(lanes, dateTimeStart, dateTimeEnd, oldX);
 
-                                  emit(self, 'reference-updated', self.getTimeRange(dateTimeStart, dateTimeEnd), entries);
-                            }));
+                              emit(self, 'reference-updated', self.getTimeRange(dateTimeStart, dateTimeEnd), entries);
+                        }));
                 }
 
                 function drawTicks(xScale) {
