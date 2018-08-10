@@ -4,7 +4,7 @@
 
 <script>
     import * as d3 from 'd3';
-    import _ from 'lodash';
+    import { cloneDeep, isNull, isNumber } from 'lodash';
     import mixins from '../../mixins';
     import { showTip, hideTip } from '../../utils/tooltip';
 
@@ -13,16 +13,8 @@
         mixins: [mixins],
         methods: {
             drawPie() {
-                const data = _.cloneDeep(this.data);
-
-                const [w, h] = this.getElWidthHeight();
-
-                const {
-                        left = 0,
-                        top = 0,
-                        right = 0,
-                        bottom = 0
-                    } = this.margin,
+                const data =  cloneDeep(this.data),
+                    { left = 0, top = 0, right = 0, bottom = 0 } = this.margin,
                     {
                         innerRadius = 50,
                         cornerRadius = 0,
@@ -49,8 +41,9 @@
                         defaultColor = 'rgb(175, 240, 91)'
                     } = this.options,
                     {
-                        axisXLabelHeight = _.isNull(axisXLabel) ? 0 : 30,
+                        axisXLabelHeight = isNull(axisXLabel) ? 0 : 30,
                     } = this.options,
+                    [w, h] = this.getElWidthHeight(),
                     g_w = w - left - right,
                     g_h = h - top - bottom - axisXLabelHeight,
                     outerRadius = Math.min(g_w / 2, g_h / 2);
@@ -123,7 +116,7 @@
                     .attr('pointer-events', 'none')
                     .attr('fill-opacity', 0)
                     .transition()
-                    .duration(_.isNumber(animationDuration) ? animationDuration : 0)
+                    .duration(isNumber(animationDuration) ? animationDuration : 0)
                     .attr('fill-opacity', arcLabelFontOpacity)
                     .text(arcLabel)
                     .attr('font-size', arcLabelFontSize)
