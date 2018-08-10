@@ -4,8 +4,9 @@
 
 <script>
     import * as d3 from 'd3';
-    import _ from 'lodash';
+    import { isNull, isNumber, cloneDeep } from 'lodash';
     import moment from 'moment';
+    import uuid from 'uuid/v1';
     import mixins from '../../mixins';
     import { showTip, hideTip } from '../../utils/tooltip';
     import tickFormat from '../../utils/tickFormat';
@@ -44,7 +45,7 @@
                     .text(() => this.getTimeRangeLabel(dateTimeStart, dateTimeEnd));
             },
             drawTimelion() {
-                const data = _.cloneDeep(this.data),
+                const data = cloneDeep(this.data),
                     [w, h] = this.getElWidthHeight(),
                     {left = 0, top = 0, right = 0, bottom = 0} = this.margin,
                     {
@@ -90,13 +91,14 @@
                         nice = true
                     } = this.options,
                     {
-                        axisXLabelLaneHeight = _.isNull(axisXLabel) ? 0 : 60,
-                        axisYLabelLaneWidth = _.isNull(axisYLabel) ? 0 : 60,
+                        axisXLabelLaneHeight = isNull(axisXLabel) ? 0 : 60,
+                        axisYLabelLaneWidth = isNull(axisYLabel) ? 0 : 60,
                     } = this.options,
                     __timeRangeLabelLaneHeight__ = 40,
                     __offsetRight__ = 10,
                     g_w = w - left - right - axisYLabelLaneWidth - axisYLaneWidth - __offsetRight__,
-                    g_h = h - top - bottom - axisXLaneHeight - axisXLabelLaneHeight - __timeRangeLabelLaneHeight__;
+                    g_h = h - top - bottom - axisXLaneHeight - axisXLabelLaneHeight - __timeRangeLabelLaneHeight__,
+                    clipPathId = uuid();
 
                 if (![g_w, g_h].every(el => el > 0)) return;
 
@@ -116,7 +118,7 @@
 
                 svg.append('defs')
                     .append('clipPath')
-                    .attr('id', 'clip-timelion')
+                    .attr('id', clipPathId)
                     .append('rect')
                     .attr('x', 0)
                     .attr('y', 0)
@@ -187,7 +189,8 @@
                     .attr('width', axisYLabelLaneWidth)
                     .attr('height', g_h);
 
-                const axisXLabelLane = svg.append('g')
+                const axisXLabelLane = svg
+                    .append('g')
                     .attr('transform', `translate(${left + axisYLabelLaneWidth + axisYLaneWidth}, ${top + g_h + axisXLaneHeight + __timeRangeLabelLaneHeight__})`)
                     .attr('width', g_w)
                     .attr('height', axisXLabelLaneHeight);
@@ -234,7 +237,7 @@
                     .attr('font-size', timeRangeLabelFontSize)
                     .attr('font-weight', timeRangeLabelFontWeight)
                     .attr('fill-opacity', timeRangeLabelFontOpacity)
-                    .attr('clip-path', 'url(#clip-timelion)')
+                    .attr('clip-path', `url(#${clipPathId})`)
                     .text(() => this.getTimeRangeLabel(dateTimeStart, dateTimeEnd));
 
                 if (!isMobile) {
@@ -293,9 +296,7 @@
 
                 rects
                     .on('mousedown', (d) => {
-                        if (!_.isNumber(axisXTimeInterval)) {
-                            return;
-                        }
+                        if (!isNumber(axisXTimeInterval)) return;
 
                         const dateTimeStart = d.key,
                             dateTimeEnd = new Date(d.key.getTime() + axisXTimeInterval);
@@ -308,10 +309,10 @@
                 let lastI = 0;
                 rects
                     .transition()
-                    .duration(_.isNumber(animationDuration) ? animationDuration : 0)
+                    .duration(isNumber(animationDuration) ? animationDuration : 0)
                     .delay(d => {
                         return d. value !== 0
-                            ? (lastI++) * (_.isNumber(delay) ? delay : 0)
+                            ? (lastI++) * (isNumber(delay) ? delay : 0)
                             : 0;
                     })
                     .attr('y', d => yScale(d.value))
