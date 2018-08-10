@@ -5,6 +5,7 @@
 <script>
     import * as d3 from 'd3';
     import _ from 'lodash';
+    import uuid from 'uuid/v1';
     import mixins from '../../mixins';
     import { showTip, hideTip } from '../../utils/tooltip';
     import tickFormat from '../../utils/tickFormat';
@@ -16,7 +17,6 @@
     import isAxisTime from '../../utils/isAxisTime';
     import isAxisNumber from '../../utils/isAxisNumber';
     import axisShow from '../../utils/axisShow';
-    import uuid from 'uuid/v1';
 
     export default {
         name: 'd3-horizontal-bar',
@@ -228,13 +228,12 @@
                     .on('mouseout', hideTip);
 
                 if (isAxisYTime && _.isNumber(axisYTimeInterval)) {
-                    rects
-                        .on('mousedown', d => {
-                            const dateTimeStart = d.key,
-                                dateTimeEnd = new Date(d.key.getTime() + axisYTimeInterval);
+                    rects.on('mousedown', d => {
+                        const dateTimeStart = d.key,
+                            dateTimeEnd = new Date(d.key.getTime() + axisYTimeInterval);
 
-                            emit(this, 'range-updated', dateTimeStart, dateTimeEnd);
-                        });
+                        emit(this, 'range-updated', dateTimeStart, dateTimeEnd);
+                    });
                 }
 
                 let lastI = 0;
