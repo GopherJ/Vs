@@ -235,7 +235,7 @@
                     .on('mouseout', hideTip);
 
                 if (isAxisXTime && isNumber(axisXTimeInterval)) {
-                    circles .on('mousedown', (d) => {
+                    circles.on('mousedown', (d) => {
                         const dateTimeStart = d.key,
                             dateTimeEnd = new Date(d.key.valueOf() + axisXTimeInterval);
 

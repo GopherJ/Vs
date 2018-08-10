@@ -302,7 +302,7 @@
                     .attr('stroke', d => schemeCategory20(d))
                     .attr('stroke-width', strokeWidth);
 
-                g.selectAll('circle')
+                const circles = g.selectAll('circle')
                     .data(_data)
                     .enter()
                     .append('circle')
@@ -316,10 +316,12 @@
                     .on('mouseout', hideTip);
 
                 if (isAxisXTime && isNumber(axisXTimeInterval)) {
-                    const dateTimeStart = d.key,
-                        dateTimeEnd = new Date(d.key.valueOf() + axisXTimeInterval);
+                    circles.on('mousedown', d => {
+                        const dateTimeStart = d.key,
+                            dateTimeEnd = new Date(d.key.valueOf() + axisXTimeInterval);
 
-                    emit(this, 'range-updated', dateTimeStart, dateTimeEnd);
+                        emit(this, 'range-updated', dateTimeStart, dateTimeEnd);
+                    });
                 }
             },
             safeDraw() {
