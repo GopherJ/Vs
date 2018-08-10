@@ -447,8 +447,6 @@ This component is for showing multiple lines together. It takes an array of elem
 |`axisXGroupLabelFillColorOpacity`|`group legend internal color opacity`|`number`|`1`|
 |`axisXGroupLabelBorderColorOpacity`|`group legend edge color opacity`|`number`|`0.6`|
 |`axisXGroupLabelGap`|`group legend gap`|`number`|`10`|
-|`dashedGroups`|`dash groups`|`Array<string>`|`[]`|
-|`strokeDashArray`|`dash array`|`number`|`5`|
 
 
 
@@ -630,7 +628,8 @@ To specify an entry 'Interval':
     :options="options"
     :margin="margin"
     width="100%"
-    height="400px">
+    height="400px"
+    @range-updated="(dateTimeStart, dateTimeEnd) => yourMethod(dateTimeStart, dateTimeEnd)">
 </d3-timeline>
 ```
 
