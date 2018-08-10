@@ -6,7 +6,6 @@
     import * as d3 from 'd3';
     import { isNull, isNumber, isUndefined, cloneDeep } from 'lodash';
     import uuid from 'uuid/v1';
-    import murmurHash3 from 'murmurhash3js';
     import { brushX } from '../../utils/brush';
     import mixins from '../../mixins';
     import groupBy from '../../utils/groupBy';
@@ -23,17 +22,15 @@
     import isAxisNumber from '../../utils/isAxisNumber';
     import emit from '../../utils/emit';
     import axisShow from '../../utils/axisShow';
-
-    const hash64 = d => 'd3-multi-line' + murmurHash3.x64.hash128(d);
+    import hash from '../../utils/hash';
 
     export default {
         name: 'd3-multi-line',
         mixins: [mixins],
         methods: {
             drawMultiLine() {
-                const _data = cloneDeep(this.data);
-
-                const {left = 0, top = 0, right = 0, bottom = 0} = this.margin,
+                const _data = cloneDeep(this.data),
+                    { left = 0, top = 0, right = 0, bottom = 0 } = this.margin,
                     {
                         strokeWidth = 2,
 
@@ -41,7 +38,7 @@
                         circleTitle = d => `${d.value}`,
 
                         crossWidth = 2,
-                        crossColor = 'red',
+                        crossColor = '#ffffff',
 
                         axisXLabel = null,
                         axisYLabel = null,
@@ -49,10 +46,15 @@
                         tickSize = 10,
                         tickPadding = 8,
 
-                        axisXGroupLabelLaneHeight = 30,
+                        axisXGroupLabelLaneHeight = 20,
                         axisXGroupLabelFillColorOpacity = 1,
                         axisXGroupLabelBorderColorOpacity = 0.6,
                         axisXGroupLabelGap = 10,
+
+                        axisXGroupLabelFontSize = 9,
+                        axisXGroupLabelFontWeight = 400,
+                        axisXGroupLabelFontOpacity = 0.5,
+
 
                         axisLabelFontSize = 12,
                         axisLabelFontWeight = 400,
@@ -177,7 +179,7 @@
                             .attr('stroke-opacity', axisXGroupLabelBorderColorOpacity)
                             .on('click', function (d) {
                                 toggleCrossInCircle(_g, d3.select(this), crossColor, crossWidth);
-                                toggleClass(svg, hash64(d));
+                                toggleClass(svg, hash(d));
                             });
 
                         const labelPos = label.node().getBBox();
@@ -189,7 +191,11 @@
                             .attr('x', labelPos.x + labelPos.width)
                             .attr('y', axisXGroupLabelLaneHeight / 2)
                             .attr('dy', '0.32em')
-                            .text(d);
+                            .text(d)
+                            .attr('fill', '#000')
+                            .attr('font-size', axisXGroupLabelFontSize)
+                            .attr('font-weight', axisXGroupLabelFontWeight)
+                            .attr('fill-opacity', axisXGroupLabelFontOpacity);
 
                         if (i !== 0) _g.attr('transform', `translate(${previousPos.x + previousPos.width + axisXGroupLabelGap}, 0)`);
 
@@ -198,7 +204,7 @@
 
                 const GroupLabelContainerPos = GroupLabelContainer.node().getBBox();
                 GroupLabelContainer
-                    .attr('transform', `translate(${(g_w - GroupLabelContainerPos.width) / 2}, 0)`);
+                    .attr('transform', `translate(${(g_w - GroupLabelContainerPos.width)}, 0)`);
 
                 axisXLabelLane
                     .append('text')
@@ -294,7 +300,7 @@
                     .data(groups)
                     .enter()
                     .append('path')
-                    .attr('class', d => hash64(d))
+                    .attr('class', d => hash(d))
                     .attr('clip-path', `url(#${clipPathId})`)
                     .attr('d', d => lineGen(data[d]))
                     .attr('fill', 'none')
@@ -306,7 +312,7 @@
                     .data(_data)
                     .enter()
                     .append('circle')
-                    .attr('class', d => hash64(d[groupKey]))
+                    .attr('class', d => hash(d[groupKey]))
                     .attr('clip-path', `url(#${clipPathId})`)
                     .attr('cx', d => xScale(d.key))
                     .attr('cy', d => yScale(d.value))
