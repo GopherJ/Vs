@@ -1,16 +1,32 @@
 /**
  *
- * align g element to center of the container
+ * align g element to the center of the container
  *
+ * @param container
  * @param g
- * @param w
  */
-const alignCenter = (g, w) => {
+const alignCenter = (container, g) => {
     const SVGRect = g.node().getBBox();
 
-    g.attr('transform', `translate(${w - SVGRect.width / 2}, 0)`);
+    g.attr('transform', `translate(${(container.node().getBBox().width - SVGRect.width) / 2}, 0)`);
 };
 
+/**
+ *
+ * align g element to the right of the container
+ *
+ * @param container
+ * @param g
+ */
+const alignRight = (container, g) => {
+    const SVGRect = g.node().getBBox();
+
+    g.attr('transform', `translate(${container.node().getBBox().width - SVGRect.width}, 0)`);
+};
+
+
+
 export  {
-    alignCenter
+    alignCenter,
+    alignRight
 };
