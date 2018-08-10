@@ -193,7 +193,7 @@
 
                 svg
                     .call(brushX.bind(self), extent, self.scale)
-                    .call(zoom, zooming);
+                    .call(zoom, zooming, zoomend);
 
                 const g = svg
                     .append('g')
@@ -228,6 +228,12 @@
                     drawEntries(newScale);
                 }
 
+                function zoomend() {
+                    const dateTimeStart = self.scale.invert(0),
+                        dateTimeEnd = self.scale.invert(g_w);
+
+                    self.$emit('range-updated', dateTimeStart, dateTimeEnd);
+                }
 
                 function drawReference(xScale) {
                     const referenceSelection = g.select('.line--reference');
