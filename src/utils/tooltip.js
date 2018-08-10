@@ -57,6 +57,7 @@ function showTip(title, t) {
 
             tooltip
                 .style('top', `${top}px`)
+                .style('background-color', '#000')
                 .style('left', `${left}px`);
 
 
