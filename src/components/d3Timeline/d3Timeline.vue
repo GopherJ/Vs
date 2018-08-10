@@ -7,12 +7,14 @@
     import { isNull, cloneDeep } from 'lodash';
     import uuid from 'uuid/v1';
     import mixins from '../../mixins';
-    import { showTip, hideTip } from '../../utils/tooltip';
     import { selectPaddingInnerOuterY } from '../../utils/select';
-    import { Point, Interval, getTimelineGroups } from '../../utils/getTimelineGroups';
+    import { getTimelineGroups } from '../../utils/getTimelineGroups';
     import roundedRect from '../../utils/roundedRect';
     import zoom from '../../utils/zoom';
     import { brushX } from '../../utils/brush';
+    import { drawCurrentReferenceX } from '../../utils/drawCurrentReference';
+    import { drawTicksX } from '../../utils/drawTicks';
+    import { drawEntriesMultiLaneX } from '../../utils/drawEntriesMultiLane';
 
     export default {
         name: 'd3-timeline',
@@ -24,12 +26,8 @@
         mixins: [mixins],
         methods: {
             drawTimeline() {
-                const [w, h] = this.getElWidthHeight(),
-                    { dateTimeStart, dateTimeEnd, data, groups } = getTimelineGroups(cloneDeep(this.data));
-
-                if (!groups.length) return;
-
-                const {
+                const { dateTimeStart, dateTimeEnd, data, groups } = getTimelineGroups(cloneDeep(this.data)),
+                    {
                         intervalCornerRadius = 4,
 
                         symbolSize = 400,
@@ -64,20 +62,20 @@
                         boundingLineWidth = 2,
                         boundingLineColor = 'rgba(0, 0, 0, .125)',
 
-                        currentTimeLineWidth = 2,
+                        currentTimeLineWidth = 4,
                         currentTimeLineColor = 'rgba(255, 56, 96, 1)'
                     } = this.options,
                     {
                         axisXLabelLaneHeight = isNull(axisXLabel) ? 0 : 30,
                     } = this.options,
                     { left = 0, top = 0, right = 0, bottom = 0 } = this.margin,
+                    [w, h] = this.getElWidthHeight(),
                     __offset__  = borderWidth,
                     g_w = w - left - right - groupLaneWidth - 2 * __offset__,
                     g_h = h - top - bottom - axisXLaneHeight - axisXLabelLaneHeight - 2 * __offset__,
-                    clipId = uuid();
-                const self = this;
+                    clipPathId = uuid(), self = this;
 
-                if (![g_w, g_h].every(el => el > 0)) return;
+                if (![g_w, g_h].every(el => el > 0) || !groups.length) return;
 
                 const groupHeight = g_h / groups.length,
                     [paddingInner, paddingOuter] = selectPaddingInnerOuterY(groupHeight);
@@ -89,7 +87,7 @@
 
                 svg.append('defs')
                     .append('clipPath')
-                    .attr('id', clipId)
+                    .attr('id', clipPathId)
                     .append('rect')
                     .attr('x', 0)
                     .attr('y', 0)
@@ -208,8 +206,6 @@
                     .attr('stroke-width', boundingLineWidth);
 
                 function zooming() {
-                    hideTip();
-
                     const newScale = d3.event
                         .transform.rescaleX(xScale);
                     self.scale = newScale;
@@ -223,9 +219,10 @@
                         .attr('stroke', boundingLineColor)
                         .attr('stroke-width', boundingLineWidth);
 
-                    drawReference(newScale);
-                    drawTickLines(newScale);
-                    drawEntries(newScale);
+                    g
+                        .call(drawCurrentReferenceX, newScale, g_h, clipPathId, currentTimeLineColor, currentTimeLineWidth )
+                        .call(drawTicksX, newScale, g_h, clipPathId, boundingLineColor, boundingLineWidth)
+                        .call(drawEntriesMultiLaneX, data, groups, newScale, yScale, clipPathId, symbolSize, intervalCornerRadius);
                 }
 
                 function zoomend() {
@@ -235,120 +232,10 @@
                     self.$emit('range-updated', dateTimeStart, dateTimeEnd);
                 }
 
-                function drawReference(xScale) {
-                    const referenceSelection = g.select('.line--reference');
-                    if (!referenceSelection.empty()) referenceSelection.remove();
-
-                    const date = new Date();
-                    g
-                        .append('line')
-                        .attr('class', 'line--reference')
-                        .attr('x1', xScale(date))
-                        .attr('x2', xScale(date))
-                        .attr('y1', 0)
-                        .attr('y2', g_h)
-                        .attr('stroke', currentTimeLineColor)
-                        .attr('stroke-width', currentTimeLineWidth)
-                        .attr('clip-path', `url(#${clipId})`)
-                        .attr('pointer-events', 'none');
-                }
-
-                function drawTickLines(xScale) {
-                    const ticksSelection = g.selectAll('.line--tick');
-                    if (!ticksSelection.empty()) ticksSelection.remove();
-
-                    const ticks = xScale.ticks();
-                    g.selectAll('.line--tick')
-                        .data(ticks)
-                        .enter()
-                        .append('line')
-                        .attr('class', 'line--tick')
-                        .attr('clip-path', `url(#${clipId})`)
-                        .attr('x1', d => xScale(d))
-                        .attr('x2', d => xScale(d))
-                        .attr('y1', 0)
-                        .attr('y2', g_h)
-                        .attr('stroke', boundingLineColor)
-                        .attr('stroke-width', boundingLineWidth)
-                        .attr('pointer-events', 'none');
-                }
-
-                function drawEntries(xScale) {
-                    const entriesSelection = g.selectAll('.entry');
-                    if (!entriesSelection.empty()) entriesSelection.remove();
-
-                    for (let i = 0, l = groups.length; i < l; i += 1) {
-                        const groupData = data[groups[i]];
-                        const scaleAxisY = yScale(i).domain(Object.keys(groupData));
-
-                        for (let j = 0; j < groupData.length; j += 1) {
-                            const Y = scaleAxisY(j.toString()),
-                                H = scaleAxisY.bandwidth(),
-                                entries = groupData[j];
-
-                            for (let k = 0; k < entries.length; k += 1) {
-                                const entry = entries[k];
-
-                                if (entry instanceof Point) {
-                                    const G = g
-                                        .append('g')
-                                        .attr('class', 'entry')
-                                        .attr('clip-path', `url(#${clipId})`);
-
-                                    const symbolGen = d3.symbol().size(symbolSize);
-
-                                    const symbol = G.append('path')
-                                        .attr('transform', `translate(${xScale(entry.at)}, ${Y + H / 2})`)
-                                        .attr('class', `${entry.className ? entry.className : 'entry--point--default'}`)
-                                        .attr('d', symbolGen.type(d3[entry.symbol] || d3['symbolCircle'])());
-
-                                    symbol
-                                        .on('mouseover', showTip(entry.title))
-                                        .on('mouseout', hideTip);
-                                }
-
-                                else if (entry instanceof Interval) {
-                                    const X = xScale(entry.from),
-                                        W = xScale(entry.to) - X;
-
-                                    const G = g
-                                        .append('g')
-                                        .attr('class', 'entry');
-
-                                    const interval = G.append('path')
-                                        .attr('class', `${entry.className ? entry.className : 'entry--interval--default'}`)
-                                        .attr('d', roundedRect(X, Y, W, H, intervalCornerRadius, true, true, true, true))
-                                        .attr('clip-path', `url(#${clipId})`);
-
-                                    if (entry.title) {
-                                        interval
-                                            .on('mouseover', showTip(entry.title))
-                                            .on('mouseout', hideTip);
-                                    }
-
-                                    const text = G.append('text')
-                                        .attr('class', 'entry--label')
-                                        .attr('text-anchor', 'middle')
-                                        .attr('pointer-events', 'none')
-                                        .attr('x', (X + W / 2))
-                                        .attr('y', (Y + H / 2))
-                                        .text(entry.label)
-                                        .attr('fill', '#fff')
-                                        .attr('dy', '0.32em')
-                                        .attr('clip-path', `url(#${clipId})`);
-
-                                    if (text.node().getComputedTextLength() > W) {
-                                        text.remove();
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-
-                drawReference(xScale);
-                drawTickLines(xScale);
-                drawEntries(xScale);
+                g
+                    .call(drawCurrentReferenceX, xScale, g_h, clipPathId, currentTimeLineColor, currentTimeLineWidth )
+                    .call(drawTicksX, xScale, g_h, clipPathId, boundingLineColor, boundingLineWidth)
+                    .call(drawEntriesMultiLaneX, data, groups, xScale, yScale, clipPathId, symbolSize, intervalCornerRadius);
             },
             safeDraw() {
                 this.ifExistsSvgThenRemove();
