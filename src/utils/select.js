@@ -7,10 +7,10 @@
  * @return {[number, number]}
  */
 const selectPaddingInnerOuterX = (width) => {
-    let paddingInner = 0.2, paddingOuter = 0.1;
+    let paddingInner = 0.5, paddingOuter = 0.1;
 
-    if (width > 560) paddingInner = 0.15;
-    if (width > 970) paddingInner = 0.1;
+    if (width > 560) paddingInner = 0.4;
+    if (width > 970) paddingInner = 0.3;
 
     return [paddingInner, paddingOuter];
 };
