@@ -10,6 +10,7 @@
     import emit from '../../utils/emit';
     import { showTip, hideTip } from '../../utils/tooltip';
     import highlightNodes from '../../utils/highlightNodes';
+    import mixins from '../../mixins/sankey';
 
     Object.assign(d3, d3SankeyCircular);
 
@@ -35,38 +36,7 @@
                 maxPeriod: 30000
             }
         },
-        props: {
-            nodes: {
-                type: Array,
-                required: true,
-                default: () => [],
-            },
-            links: {
-                type: Array,
-                required: true,
-                default: () => [],
-            },
-            options: {
-                type: Object,
-                default: () => ({}),
-            },
-            width: {
-                type: String,
-                default: '100%'
-            },
-            height: {
-                type: String,
-                default: '400px'
-            },
-            nodeTitle: {
-                type: Function,
-                default: d => `${d.name}<br>${d.value}`,
-            },
-            linkTitle: {
-                type: Function,
-                default: d => `${d.source.name} → ${d.target.name}<br>${d.value}`,
-            },
-        },
+        mixins: [mixins],
         methods: {
             drawSankey() {
                 if (!this.nodes.length || !this.links.length) return;
@@ -292,76 +262,13 @@
 
                 g.attr('transform', `translate(${(g_w - g_real_w) / 2 - offsetX}, ${(g_h - g_real_h) / 2 - offsetY + __selectBoxLaneHeight__})`);
             },
-            getElWidthHeight() {
-                return [this.$el.clientWidth, this.$el.clientHeight];
-            },
-            getSelectionWidthHeight(selection) {
-                return [selection.node().getBoundingClientRect().width, selection.node().getBoundingClientRect().height];
-            },
-            getSelectionOffset(selection) {
-                return [selection.node().getBBox().x, selection.node().getBBox().y];
-            },
-            ifExistsSvgThenRemove() {
-                const svgSelection = d3.select(this.$el).select('svg');
-
-                if (svgSelection.empty()) {
-                    return;
-                }
-
-                svgSelection.remove();
-            },
             safeDraw() {
                 this.ifExistsSvgThenRemove();
                 this.drawSankey();
-            }
-        },
-        watch: {
-            nodes: {
-                deep: true,
-                handler(n, o) {
-                    this.$nextTick(() => {
-                        this.safeDraw();
-                    });
-                }
             },
-            links: {
-                deep: true,
-                handler(n, o) {
-                    this.$nextTick(() => {
-                        this.safeDraw();
-                    });
-                }
-            },
-            options: {
-                deep: true,
-                handler(n, o) {
-                    this.$nextTick(() => {
-                        this.safeDraw();
-                    });
-                }
-            },
-            width(n) {
-                this.$nextTick(() => {
-                    this.safeDraw();
-                });
-            },
-            height(n) {
-                this.$nextTick(() => {
-                    this.safeDraw();
-                });
-            }
-        },
-        mounted() {
-            this.safeDraw();
-
-            this.listener = _.debounce(() => {
+            onResize() {
                 this.safeDraw();
-            }, 500);
-
-            window.addEventListener('resize', this.listener);
-        },
-        beforeDestroy() {
-            window.removeEventListener('resize', this.listener);
+            }
         }
     };
 </script>
