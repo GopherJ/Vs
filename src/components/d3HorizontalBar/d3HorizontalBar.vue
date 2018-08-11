@@ -4,7 +4,7 @@
 
 <script>
     import * as d3 from 'd3';
-    import _ from 'lodash';
+    import { isNumber, cloneDeep, isNull } from 'lodash';
     import uuid from 'uuid/v1';
     import mixins from '../../mixins';
     import { showTip, hideTip } from '../../plugins/tooltip';
@@ -24,7 +24,7 @@
         methods: {
             drawVerticalBar() {
                 const [w, h] = this.getElWidthHeight(),
-                    data = _.cloneDeep(this.data),
+                    data = cloneDeep(this.data),
                     {
                         fill = '#6eadc1',
                         stroke = '#6eadc1',
@@ -64,12 +64,11 @@
                         nice = false
                     } = this.options,
                     {
-                        axisXLabelLaneHeight = _.isNull(axisXLabel) ? 0 : 30,
-                        axisYLabelLaneWidth = _.isNull(axisYLabel) ? 0 : 30,
+                        axisXLabelLaneHeight = isNull(axisXLabel) ? 0 : 30,
+                        axisYLabelLaneWidth = isNull(axisYLabel) ? 0 : 30,
                     } = this.options,
                     { left = 0, right = 0, top = 0, bottom = 0 } = this.margin,
-                    __offsetRight__ = 10,
-                    __offsetBottom__ = 10,
+                    __offsetRight__ = 10, __offsetBottom__ = 10,
                     g_w = w - left - right - axisYLabelLaneWidth - axisYLaneWidth - __offsetRight__,
                     g_h = h - top - bottom - axisXLaneHeight - axisXLabelLaneHeight - __offsetBottom__,
                     clipPathId = uuid();
@@ -120,31 +119,24 @@
                     .attr('width', g_w)
                     .attr('height', g_h);
 
-                const axisXLabelLane = svg
-                    .append('g')
-                    .attr('transform', `translate(${left + axisYLabelLaneWidth + axisYLaneWidth}, ${top})`)
-                    .attr('width', g_w)
-                    .attr('height', axisXLabelLaneHeight);
-
-                const axisYLabelLane = svg
-                    .append('g')
-                    .attr('transform', `translate(${left}, ${top + axisXLaneHeight + axisXLabelLaneHeight})`)
-                    .attr('width', axisYLabelLaneWidth)
-                    .attr('height', g_h);
-
                 const axisXLane = svg
                     .append('g')
-                    .attr('transform', `translate(${left + axisYLabelLaneWidth + axisYLaneWidth},${top + axisXLabelLaneHeight})`)
-                    .attr('width', g_w)
-                    .attr('height', axisXLaneHeight);
+                    .attr('transform', `translate(${left + axisYLabelLaneWidth + axisYLaneWidth},${top + axisXLabelLaneHeight})`);
 
                 const axisYLane = svg
                     .append('g')
-                    .attr('transform', `translate(${left + axisYLabelLaneWidth}, ${top + axisXLabelLaneHeight + axisXLaneHeight})`)
-                    .attr('width', axisYLaneWidth)
-                    .attr('height', g_h);
+                    .attr('transform', `translate(${left + axisYLabelLaneWidth}, ${top + axisXLabelLaneHeight + axisXLaneHeight})`);
 
-                axisXLane.append('g')
+                const axisXLabelLane = svg
+                    .append('g')
+                    .attr('transform', `translate(${left + axisYLabelLaneWidth + axisYLaneWidth}, ${top})`);
+
+                const axisYLabelLane = svg
+                    .append('g')
+                    .attr('transform', `translate(${left}, ${top + axisXLaneHeight + axisXLabelLaneHeight})`);
+
+                axisXLane
+                    .append('g')
                     .attr('class', 'axis axis--x')
                     .attr('transform', `translate(0, ${axisXLaneHeight})`)
                     .call(xAxis)
@@ -153,7 +145,8 @@
                     .attr('font-weight', axisFontWeight)
                     .attr('fill-opacity', axisFontOpacity);
 
-                axisYLane.append('g')
+                axisYLane
+                    .append('g')
                     .attr('class', 'axis axis--y')
                     .attr('transform', `translate(${axisYLaneWidth}, 0)`)
                     .call(yAxis)
@@ -203,9 +196,7 @@
 
                 const g = svg
                     .append('g')
-                    .attr('transform', `translate(${left + axisXLabelLaneHeight + axisYLaneWidth}, ${top + axisXLabelLaneHeight + axisXLaneHeight})`)
-                    .attr('width', `${g_w}`)
-                    .attr('height', `${g_h}`);
+                    .attr('transform', `translate(${left + axisXLabelLaneHeight + axisYLaneWidth}, ${top + axisXLabelLaneHeight + axisXLaneHeight})`);
 
                 const enter = g.selectAll('rect')
                     .data(data)
@@ -227,10 +218,10 @@
                     .on('mouseover', showTip(barTitle))
                     .on('mouseout', hideTip);
 
-                if (isAxisYTime && _.isNumber(axisYTimeInterval)) {
+                if (isAxisYTime && isNumber(axisYTimeInterval)) {
                     rects.on('mousedown', d => {
                         const dateTimeStart = d.key,
-                            dateTimeEnd = new Date(d.key.getTime() + axisYTimeInterval);
+                            dateTimeEnd = new Date(d.key.valueOf() + axisYTimeInterval);
 
                         emit(this, 'range-updated', dateTimeStart, dateTimeEnd);
                     });
@@ -239,10 +230,10 @@
                 let lastI = 0;
                 rects
                     .transition()
-                    .duration(_.isNumber(animationDuration) ? animationDuration : 0)
+                    .duration(isNumber(animationDuration) ? animationDuration : 0)
                     .delay(d => {
                         return d. value !== 0
-                            ? (lastI++) * (_.isNumber(delay) ? delay : 0)
+                            ? (lastI++) * (isNumber(delay) ? delay : 0)
                             : 0;
                     })
                     .attr('width', d => xScale(d.value));
@@ -264,7 +255,7 @@
 <style>
     @import url(../../css/index.css);
 
-    .d3-horizontal-bar rect:hover {
+    .d3-horizontal-bar rect:not(.overlay):hover {
         cursor: pointer;
     }
 

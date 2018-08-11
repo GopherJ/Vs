@@ -4,7 +4,7 @@
 
 <script>
     import * as d3 from 'd3';
-    import _ from 'lodash';
+    import { isNull, isNumber, cloneDeep } from 'lodash';
     import uuid from 'uuid/v1';
     import mixins from '../../mixins';
     import { showTip, hideTip } from '../../plugins/tooltip';
@@ -23,7 +23,7 @@
         mixins: [mixins],
         methods: {
             drawVerticalBar() {
-                const data = _.cloneDeep(this.data),
+                const data = cloneDeep(this.data),
                     {
                         fill = '#6eadc1',
                         stroke = '#6eadc1',
@@ -63,8 +63,8 @@
                         nice = true
                     } = this.options,
                     {
-                        axisXLabelLaneHeight = _.isNull(axisXLabel) ? 0 : 30,
-                        axisYLabelLaneWidth = _.isNull(axisYLane) ? 0 : 30,
+                        axisXLabelLaneHeight = isNull(axisXLabel) ? 0 : 30,
+                        axisYLabelLaneWidth = isNull(axisYLane) ? 0 : 30,
                     } = this.options,
                     { left = 0, right = 0, top = 0, bottom = 0 } = this.margin,
                     __offsetTop__ = 10, __offsetRight__ = 10,
@@ -213,10 +213,10 @@
                 let lastI = 0;
                 rects
                     .transition()
-                    .duration(_.isNumber(animationDuration) ? animationDuration : 0)
+                    .duration(isNumber(animationDuration) ? animationDuration : 0)
                     .delay(d => {
                          return d. value !== 0
-                            ? (lastI++) * (_.isNumber(delay) ? delay : 0)
+                            ? (lastI++) * (isNumber(delay) ? delay : 0)
                             : 0;
                     })
                     .attr('y', d => yScale(d.value))
@@ -226,7 +226,7 @@
                     .on('mouseover', showTip(barTitle))
                     .on('mouseout', hideTip);
 
-                if (isAxisXTime && _.isNumber(axisXTimeInterval)) {
+                if (isAxisXTime && isNumber(axisXTimeInterval)) {
                     rects.on('mousedown', d => {
                         const dateTimeStart = d.key,
                             dateTimeEnd = new Date(d.key.getTime() + axisXTimeInterval);
