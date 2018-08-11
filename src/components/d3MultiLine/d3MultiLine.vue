@@ -37,7 +37,7 @@
                         circleTitle = d => `${d.value}`,
 
                         crossWidth = 2,
-                        crossColor = '#ffffff',
+                        crossColor = '#fff',
 
                         axisXLabel = null,
                         axisYLabel = null,
@@ -90,8 +90,8 @@
                     __offsetRight__ = 10,
                     g_w = w - left - right - axisYLabelLaneWidth - axisYLaneWidth - __offsetRight__,
                     g_h = h - top - bottom - axisXLabelLaneHeight - axisXLaneHeight - axisXGroupLabelLaneHeight,
-                    clipPathId = uuid(), data = groupBy(_data, groupKey), groups = Object.keys(data),
-                    isAxisXTime = isAxisTime(_data), isAxisXNumber = isAxisNumber(_data),
+                    clipPathId = uuid(), isAxisXTime = isAxisTime(_data), isAxisXNumber = isAxisNumber(_data),
+                    data = groupBy(_data, groupKey), groups = Object.keys(data),
                     axisXTickFormat = value => isAxisXTime ? tickFormat(value, axisXTimeInterval) : value;
 
                 if (![g_w, g_h].every(el => el > 0) || !groups.length) return;
