@@ -46,15 +46,11 @@
 
                 const axisXLabelLane = svg
                     .append('g')
-                    .attr('transform', `translate(${left}, ${top})`)
-                    .attr('width', g_w)
-                    .attr('height', axisXLabelLaneHeight);
+                    .attr('transform', `translate(${left}, ${top})`);
 
                 const g = svg
                     .append('g')
-                    .attr('transform', `translate(${left}, ${top + axisXLabelLaneHeight})`)
-                    .attr('width', g_w)
-                    .attr('height', g_h);
+                    .attr('transform', `translate(${left}, ${top + axisXLabelLaneHeight})`);
 
                 axisXLabelLane
                     .append('text')

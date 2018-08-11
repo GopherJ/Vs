@@ -58,16 +58,12 @@
                 const g = svg
                     .append('g')
                     .attr('transform', `translate(${left},${top})`)
-                    .attr('width', g_w)
-                    .attr('height', g_h)
                     .append('g')
                     .attr('transform', `translate(${g_w / 2},${g_h / 2})`);
 
                 const axisLabelLane = svg
                     .append('g')
-                    .attr('transform', `translate(${left}, ${top + g_h})`)
-                    .attr('width', g_w)
-                    .attr('height', axisXLabelHeight);
+                    .attr('transform', `translate(${left}, ${top + g_h})`);
 
                 const interpolateWarm = d3.scaleSequential()
                     .domain(d3.extent(data.map(d => d.value)))
