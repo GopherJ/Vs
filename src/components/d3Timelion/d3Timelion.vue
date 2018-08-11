@@ -220,7 +220,7 @@
                     .append('text')
                     .attr('class', 'label--time')
                     .attr('text-anchor', 'middle')
-                    .attr('x', g_w / 2)
+                    .attr('x', g_w / 2 - 75)
                     .attr('y', __timeRangeLabelLaneHeight__ / 2)
                     .attr('dy', '0.32em')
                     .attr('fill', '#000')
@@ -243,7 +243,6 @@
                     foreignObject
                         .attr('height', __timeRangeLabelLaneHeight__)
                         .append('xhtml:select')
-                        .style('float', 'left')
                         .attr('pointer-events', 'none')
                         .on('change', () => {
                             const targetVal = d3.event.target.value,
@@ -342,6 +341,9 @@
     }
 
     .d3-timelion select {
+        float: left;
+        width: 145px;
+        margin-left: 5px;
         height: 36px;
         padding: 5px 15px;
         background-color: #fff;
@@ -353,6 +355,7 @@
     }
 
     .d3-timelion select:focus {
+        cursor: pointer;
         border: 2px solid #ccc;
     }
 

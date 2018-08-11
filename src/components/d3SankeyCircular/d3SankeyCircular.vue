@@ -116,7 +116,7 @@
                 const selectBoxLabel = axisXSelectBoxLane
                     .append('text')
                     .attr('text-anchor', 'middle')
-                    .attr('x', g_w / 2)
+                    .attr('x', g_w / 2 - 75)
                     .attr('y', __selectBoxLaneHeight__ / 2)
                     .attr('dy', '0.32em')
                     .text(axisXSelectBoxLabel)
@@ -138,7 +138,6 @@
                     foreignObject
                         .attr('height', __selectBoxLaneHeight__)
                         .append('xhtml:select')
-                        .style('float', 'left')
                         .on('change', () => {
                             const targetVal = d3.event.target.value,
                                 val = Number.parseInt(targetVal, 10);
@@ -290,6 +289,9 @@
     }
 
     .d3-sankey-circular select {
+        float: left;
+        width: 145px;
+        margin-left: 5px;
         height: 36px;
         padding: 5px 15px;
         background-color: #fff;
@@ -301,6 +303,7 @@
     }
 
     .d3-sankey-circular select:focus {
+        cursor: pointer;
         border: 2px solid #ccc;
     }
 
