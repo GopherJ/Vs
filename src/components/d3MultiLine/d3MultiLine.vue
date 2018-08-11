@@ -124,33 +124,23 @@
 
                 const axisXGroupLabelLane = svg
                     .append('g')
-                    .attr('transform', `translate(${left + axisYLabelLaneWidth + axisYLaneWidth}, ${top})`)
-                    .attr('width', g_w)
-                    .attr('height', axisXGroupLabelLaneHeight);
+                    .attr('transform', `translate(${left + axisYLabelLaneWidth + axisYLaneWidth}, ${top})`);
 
                 const axisYLabelLane = svg
                     .append('g')
-                    .attr('transform', `translate(${left}, ${top + axisXGroupLabelLaneHeight})`)
-                    .attr('width', axisYLabelLaneWidth)
-                    .attr('height', g_h);
+                    .attr('transform', `translate(${left}, ${top + axisXGroupLabelLaneHeight})`);
 
                 const axisXLabelLane = svg
                     .append('g')
-                    .attr('transform', `translate(${left + axisYLabelLaneWidth + axisYLaneWidth}, ${top + axisXGroupLabelLaneHeight + g_h + axisXLaneHeight})`)
-                    .attr('width', g_w)
-                    .attr('height', axisXLabelLaneHeight);
+                    .attr('transform', `translate(${left + axisYLabelLaneWidth + axisYLaneWidth}, ${top + axisXGroupLabelLaneHeight + g_h + axisXLaneHeight})`);
 
                 const axisYLane = svg
                     .append('g')
-                    .attr('transform', `translate(${left + axisYLabelLaneWidth}, ${top + axisXGroupLabelLaneHeight})`)
-                    .attr('width', axisYLaneWidth)
-                    .attr('height', g_h);
+                    .attr('transform', `translate(${left + axisYLabelLaneWidth}, ${top + axisXGroupLabelLaneHeight})`);
 
                 const axisXLane = svg
                     .append('g')
-                    .attr('transform', `translate(${left + axisYLabelLaneWidth + axisYLaneWidth}, ${top + axisXGroupLabelLaneHeight + g_h})`)
-                    .attr('width', g_w)
-                    .attr('height', axisXLaneHeight);
+                    .attr('transform', `translate(${left + axisYLabelLaneWidth + axisYLaneWidth}, ${top + axisXGroupLabelLaneHeight + g_h})`);
 
                 axisXGroupLabelLane
                     .call(
@@ -309,7 +299,7 @@
     @import url(../../css/index.css);
 
     .d3-multi-line circle:hover,
-    .d3-multi-line rect:hover,
+    .d3-multi-line rect:not(.overlay):hover,
     .d3-multi-line text:hover {
         cursor: pointer;
     }

@@ -1,4 +1,5 @@
 import { Point, Interval } from '../utils/getTrackerLanes';
+import { isBoolean } from 'lodash';
 
 export default {
     data() {
