@@ -7,16 +7,16 @@
     import _ from 'lodash';
     import uuid from 'uuid/v1';
     import mixins from '../../mixins';
-    import { showTip, hideTip } from '../../utils/tooltip';
+    import { showTip, hideTip } from '../../plugins/tooltip';
     import tickFormat from '../../utils/tickFormat';
     import emit from '../../utils/emit';
     import { selectTicksNumX, selectPaddingInnerOuterY } from '../../utils/select';
-    import { lastTickTextAnchorEnd } from '../../utils/textAnchor';
-    import { responsiveAxisY } from '../../utils/responsiveAxis';
-    import { brushY } from '../../utils/brush';
+    import { lastTickTextAnchorEnd } from '../../plugins/textAnchor';
+    import { responsiveAxisY } from '../../plugins/responsiveAxis';
+    import { brushY } from '../../plugins/brush';
     import isAxisTime from '../../utils/isAxisTime';
     import isAxisNumber from '../../utils/isAxisNumber';
-    import axisShow from '../../utils/axisShow';
+    import axisShow from '../../plugins/axisShow';
 
     export default {
         name: 'd3-horizontal-bar',

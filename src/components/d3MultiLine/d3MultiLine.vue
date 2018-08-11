@@ -6,22 +6,22 @@
     import * as d3 from 'd3';
     import { isNull, isNumber, isUndefined, cloneDeep } from 'lodash';
     import uuid from 'uuid/v1';
-    import { brushX } from '../../utils/brush';
+    import { brushX } from '../../plugins/brush';
     import mixins from '../../mixins';
     import groupBy from '../../utils/groupBy';
-    import realBBox from '../../utils/realBBox';
-    import { responsiveAxisX } from '../../utils/responsiveAxis';
+    import realBBox from '../../plugins/realBBox';
+    import { responsiveAxisX } from '../../plugins/responsiveAxis';
     import tickFormat from '../../utils/tickFormat';
-    import { toggleCrossInCircle, toggleClass } from '../../utils/toggle';
-    import { showTip, hideTip } from '../../utils/tooltip';
+    import { toggleCrossInCircle, toggleClass } from '../../plugins/toggle';
+    import { showTip, hideTip } from '../../plugins/tooltip';
     import { selectTicksNumY } from '../../utils/select';
-    import wrap from '../../utils/wrap';
-    import { firstTickTextAnchorStart, lastTickTextAnchorEnd } from '../../utils/textAnchor';
+    import wrap from '../../plugins/wrap';
+    import { firstTickTextAnchorStart, lastTickTextAnchorEnd } from '../../plugins/textAnchor';
     import GetAllKeys from '../../utils/allKeys';
     import isAxisTime from '../../utils/isAxisTime';
     import isAxisNumber from '../../utils/isAxisNumber';
     import emit from '../../utils/emit';
-    import axisShow from '../../utils/axisShow';
+    import axisShow from '../../plugins/axisShow';
     import hash from '../../utils/hash';
 
     export default {

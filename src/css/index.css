@@ -64,7 +64,7 @@ text {
 
 .leaflet-control-fullscreen a {
     background-color:#fff;
-    background-image: url(../static/images/fullscreen.png);
+    background-image: url(../assets/images/fullscreen.png);
     background-repeat: no-repeat;
     background-size:26px 52px;
     background-position: 0px 0px;

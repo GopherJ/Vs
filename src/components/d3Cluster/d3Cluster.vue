@@ -6,7 +6,7 @@
     import * as d3 from 'd3';
     import _ from 'lodash';
     import mixins from '../../mixins/layout';
-    import { showTip, hideTip } from '../../utils/tooltip';
+    import { showTip, hideTip } from '../../plugins/tooltip';
 
     export default {
         name: 'd3-cluster',

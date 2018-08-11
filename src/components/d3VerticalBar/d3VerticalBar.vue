@@ -6,16 +6,16 @@
     import * as d3 from 'd3';
     import _ from 'lodash';
     import mixins from '../../mixins';
-    import { showTip, hideTip } from '../../utils/tooltip';
+    import { showTip, hideTip } from '../../plugins/tooltip';
     import emit from '../../utils/emit';
-    import { responsiveAxisX } from '../../utils/responsiveAxis';
+    import { responsiveAxisX } from '../../plugins/responsiveAxis';
     import tickFormat from '../../utils/tickFormat';
-    import { brushX } from '../../utils/brush';
-    import wrap from '../../utils/wrap';
+    import { brushX } from '../../plugins/brush';
+    import wrap from '../../plugins/wrap';
     import { selectPaddingInnerOuterX, selectTicksNumY } from '../../utils/select';
     import isAxisTime from '../../utils/isAxisTime';
     import isAxisNumber from '../../utils/isAxisNumber';
-    import axisShow from '../../utils/axisShow';
+    import axisShow from '../../plugins/axisShow';
     import uuid from 'uuid/v1';
 
     export default {

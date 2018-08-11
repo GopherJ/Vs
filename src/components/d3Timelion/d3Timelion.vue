@@ -8,16 +8,16 @@
     import moment from 'moment';
     import uuid from 'uuid/v1';
     import mixins from '../../mixins';
-    import { showTip, hideTip } from '../../utils/tooltip';
+    import { showTip, hideTip } from '../../plugins/tooltip';
     import tickFormat from '../../utils/tickFormat';
-    import { responsiveAxisX } from '../../utils/responsiveAxis';
-    import wrap from '../../utils/wrap';
+    import { responsiveAxisX } from '../../plugins/responsiveAxis';
+    import wrap from '../../plugins/wrap';
     import emit from '../../utils/emit';
     import INTERVAL from '../../utils/interval';
     import { selectPaddingInnerOuterX, selectTicksNumY } from '../../utils/select';
     import isAxisTime from '../../utils/isAxisTime';
-    import { brushX } from '../../utils/brush';
-    import axisShow from '../../utils/axisShow';
+    import { brushX } from '../../plugins/brush';
+    import axisShow from '../../plugins/axisShow';
 
     const tpl = `
                 <option value='Auto'>Auto</option>

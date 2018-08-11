@@ -1,5 +1,5 @@
 import * as d3 from 'd3';
-import { Point, Interval } from './getTrackerLanes';
+import { Point, Interval } from '../utils/getTrackerLanes';
 import { showTip, hideTip } from './tooltip';
 import roundedRect from './roundedRect';
 

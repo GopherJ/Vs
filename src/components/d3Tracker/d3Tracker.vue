@@ -6,143 +6,27 @@
     import * as d3 from 'd3';
     import { isBoolean, isNull, cloneDeep } from 'lodash';
     import uuid from 'uuid/v1';
+    import SWorker from 'simple-web-worker';
     import mixins from '../../mixins';
-    import { showTip, hideTip } from '../../utils/tooltip';
+    import tracker from '../../mixins/tracker';
     import { selectPaddingInnerOuterY } from '../../utils/select';
-    import { Point, Interval, getTrackerLanes } from '../../utils/getTrackerLanes';
-    import roundedRect from '../../utils/roundedRect';
+    import roundedRect from '../../plugins/roundedRect';
     import emit from '../../utils/emit';
-    import { brushX } from '../../utils/brush';
-    import zoom from '../../utils/zoom';
-    import cursor from '../../utils/cursor';
-    import { isFirefox } from '../../utils/navigator';
+    import zoom from '../../plugins/zoom';
+    import cursor from '../../plugins/cursor';
+    import { brushX } from '../../plugins/brush';
+    import { onspace } from '../../utils/keybinding';
+    import { drawTicksX } from '../../plugins/drawTicks';
+    import { drawEntriesX } from '../../plugins/drawEntries';
+    import { drawReferenceX } from '../../plugins/drawReference';
+    import { getTrackerLanes } from "../../utils/getTrackerLanes";
+    import nextEntryStart from '../../workers/nextEntryStart';
 
     export default {
         name: 'd3-tracker',
-        data() {
-            return {
-                timer: null,
-                reference: null,
-                scale: null,
-                pause: true,
-                play: null
-            }
-        },
-        mixins: [mixins],
+        mixins: [mixins, tracker],
         methods: {
-            getTimeRange(dateTimeStart, dateTimeEnd) {
-                const reference = this.reference;
-
-                if (reference > dateTimeEnd)
-                    return [dateTimeStart, reference];
-
-                if (reference < dateTimeStart)
-                    return [reference, dateTimeEnd];
-
-                return [dateTimeStart, reference];
-            },
-            setPause(n) {
-                if (isBoolean(n)) this.pause = n;
-                else this.pause = !this.pause;
-            },
-            findPassingEntriesWhenPlay(lanes, dateTimeStart, dateTimeEnd, playDuration) {
-                const entries = [],
-                    referenceTimestamp = this.reference.getTime();
-
-                for (let i = 0, l = lanes.length; i < l; i += 1) {
-                    const lane = lanes[i];
-
-                    for (let I = 0, L = lane.length; I < L; I += 1) {
-                        const entry = lane[I];
-
-                        if (entry instanceof Point) {
-                            const speed = (dateTimeEnd.getTime() - dateTimeStart.getTime()) / playDuration * 16,
-                                atTimestamp = entry.at.getTime();
-
-                            if (referenceTimestamp <= atTimestamp && (referenceTimestamp + speed) >= atTimestamp) {
-                                entries.push(entry);
-                            }
-                        }
-
-                        else {
-                            const fromTimestamp = entry.from.getTime(),
-                                toTimestamp = entry.to.getTime(),
-                                speed = (dateTimeEnd.getTime() - dateTimeStart.getTime()) / playDuration * 16;
-
-                            if ((referenceTimestamp >= fromTimestamp && referenceTimestamp <= toTimestamp)
-                                || (referenceTimestamp <= fromTimestamp && (referenceTimestamp + speed) >= toTimestamp)
-                            ) {
-                                entries.push(entry);
-                            }
-                        }
-                    }
-                }
-
-                return entries;
-            },
-            findPassingEntriesWhenDrag(lanes, dateTimeStart, dateTimeEnd, oldX) {
-                const entries = [],
-                    referenceTimestamp = this.reference.getTime(),
-                    oldReferenceTimestamp = this.scale.invert(oldX).getTime();
-
-                for (let i = 0, l = lanes.length; i < l; i += 1) {
-                    const lane = lanes[i];
-
-                    for (let I = 0, L = lane.length; I < L; I += 1) {
-                        const entry = lane[I];
-
-                        if (entry instanceof Point) {
-                            const atTimestamp = entry.at.getTime();
-
-                            if ((oldReferenceTimestamp < referenceTimestamp && oldReferenceTimestamp <= atTimestamp && referenceTimestamp >= atTimestamp)
-                                || (oldReferenceTimestamp > referenceTimestamp && referenceTimestamp <= atTimestamp && oldReferenceTimestamp >= atTimestamp)
-                            ) {
-                                entries.push(entry);
-                            }
-                        }
-
-                        else {
-                            const fromTimestamp = entry.from.getTime(),
-                                toTimestamp = entry.to.getTime();
-
-                            if (oldReferenceTimestamp < referenceTimestamp && !(oldReferenceTimestamp > toTimestamp || referenceTimestamp < fromTimestamp)
-                                || oldReferenceTimestamp > referenceTimestamp && !(referenceTimestamp > toTimestamp || oldReferenceTimestamp < fromTimestamp)
-                            ) {
-                                entries.push(entry);
-                            }
-                        }
-                    }
-                }
-
-                return entries;
-            },
-            getNextEntryFrom(lanes) {
-                let next;
-
-                for (let i = 0, l = lanes.length; i < l; i += 1) {
-                    const lane = lanes[i];
-
-                    for (let I = 0, L = lane.length; I < L; I += 1) {
-                        const entry = lane[I];
-
-                        if (entry instanceof Interval && entry.from > this.reference) {
-                            next = !next ? entry.from : (next > entry.from ? entry.from : next);
-                            break;
-                        }
-
-                        else if (entry instanceof Point && entry.at > this.reference) {
-                            next = !next ? entry.at : (next > entry.at ? entry.at : next);
-                            break;
-                        }
-                    }
-                }
-
-                return next;
-            },
             drawTracker() {
-                const [w, h] = this.getElWidthHeight(),
-                    self = this;
-
                 const { dateTimeStart, dateTimeEnd, lanes } = getTrackerLanes(cloneDeep(this.data)),
                       {
                         intervalCornerRadius = 4,
@@ -185,12 +69,14 @@
                         axisXLabelLaneHeight = isNull(axisXLabel) ? 0 : 30,
                     } = this.options,
                     { left = 0, top = 0, right = 0, bottom = 0 } = this.margin,
+                    [w, h] = this.getElWidthHeight(),
                     __offset__  = borderWidth,
                     g_w = w - left - right - 2 * __offset__,
                     g_h = h - top - bottom - axisXLaneHeight - axisXLabelLaneHeight - 2 * __offset__,
                     [paddingInner, paddingOuter] = selectPaddingInnerOuterY(g_h),
-                    clipId = uuid();
+                    clipPathId = uuid(), self = this;
                 self.reference = dateTimeStart;
+                self.worker = SWorker.create([nextEntryStart]);
 
                 if (![g_w, g_h].every(el => el > 0)) return;
 
@@ -201,7 +87,7 @@
 
                 svg.append('defs')
                     .append('clipPath')
-                    .attr('id', clipId)
+                    .attr('id', clipPathId)
                     .append('rect')
                     .attr('x', 0)
                     .attr('y', 0)
@@ -289,9 +175,8 @@
                     .attr('height', g_h);
 
                 function zooming() {
-                    hideTip();
-
-                    const newXScale = d3.event.transform.rescaleX(xScale);
+                    const newXScale = d3.event
+                        .transform.rescaleX(xScale);
                     self.scale = newXScale;
 
                     svg
@@ -303,152 +188,17 @@
                         .attr('stroke', boundingLineColor)
                         .attr('stroke-width', boundingLineWidth);
 
-                    drawTicks(newXScale);
-                    drawEntries(newXScale);
-                    drawReference(newXScale);
+                    g
+                        .call(drawTicksX, newXScale, g_h, clipPathId, boundingLineColor, boundingLineWidth)
+                        .call(drawEntriesX, lanes, newXScale, yScale, symbolSize, clipPathId, intervalCornerRadius)
+                        .call(drawReferenceX, newXScale(self.reference), clipPathId, g_h, overlayWidth, referenceLineColor, referenceLineWidth, ondrag);
                 }
 
-                function drawReference(xScale) {
-                    const x = xScale(self.reference);
+                function ondrag(n, o) {
+                    self.reference = self.scale.invert(n);
+                    const entries = self.findPassingEntriesWhenDrag(lanes, dateTimeStart, dateTimeEnd, o);
 
-                    const overlaySelection = g.select('.overlay'),
-                        lineReferenceSelection = g.select('.line--reference');
-
-                    if (!overlaySelection.empty()) overlaySelection.remove();
-                    if (!lineReferenceSelection.empty()) lineReferenceSelection.remove();
-
-                    const line = g
-                        .append('line')
-                        .attr('pointer-events', 'none')
-                        .attr('class', 'line--reference')
-                        .attr('clip-path', `url(#${clipId})`)
-                        .attr('x1', x)
-                        .attr('y1', 0)
-                        .attr('x2', x)
-                        .attr('y2', g_h)
-                        .attr('stroke', referenceLineColor)
-                        .attr('stroke-width', referenceLineWidth);
-
-                    const overlay = g
-                        .append('rect')
-                        .attr('class', 'overlay')
-                        .attr('pointer-events', 'all')
-                        .attr('clip-path', `url(#${clipId})`)
-                        .attr('fill', 'none')
-                        .attr('x', x - overlayWidth / 2)
-                        .attr('y', 0)
-                        .attr('width', overlayWidth)
-                        .attr('height', g_h)
-                        .attr('cursor', 'move');
-
-                    overlay
-                        .call(d3.drag()
-                        .on('drag', function() {
-                              const x = d3.event.x,
-                                oldX = +overlay.attr('x') + overlayWidth / 2;
-
-                              overlay
-                                .attr('x', x - overlayWidth / 2);
-
-                              line
-                                .attr('x1', x)
-                                .attr('x2', x);
-
-                              self.reference = self.scale.invert(x);
-                              const entries = self.findPassingEntriesWhenDrag(lanes, dateTimeStart, dateTimeEnd, oldX);
-
-                              emit(self, 'reference-updated', self.getTimeRange(dateTimeStart, dateTimeEnd), entries);
-                        }));
-                }
-
-                function drawTicks(xScale) {
-                    const ticks = xScale.ticks(),
-                        ticksSelection = g.selectAll('.line--tick');
-
-                    if (!ticksSelection.empty()) ticksSelection.remove();
-
-                    g.selectAll('.line--tick')
-                        .data(ticks)
-                        .enter()
-                        .append('line')
-                        .attr('class', 'line--tick')
-                        .attr('clip-path', `url(#${clipId})`)
-                        .attr('x1', d => xScale(d))
-                        .attr('x2', d => xScale(d))
-                        .attr('y1', 0)
-                        .attr('y2', g_h)
-                        .attr('stroke', boundingLineColor)
-                        .attr('stroke-width', boundingLineWidth)
-                        .attr('pointer-events', 'none');
-                }
-
-                function drawEntries(xScale) {
-                    const entriesSelection = g.selectAll('.entry');
-                    if (!entriesSelection.empty()) entriesSelection.remove();
-
-                    for (let i = 0, l = lanes.length; i < l; i += 1) {
-                        const lane = lanes[i],
-                            Y = yScale(i.toString()), H = yScale.bandwidth();
-
-                        for (let I = 0, L = lane.length; I < L; I += 1) {
-                            const entry = lane[I];
-                            if (entry instanceof Point) {
-                                const point = g
-                                    .append('g')
-                                    .attr('class', 'entry')
-                                    .attr('clip-path', `url(#${clipId})`)
-                                    .append('path')
-                                    .attr('transform', `translate(${xScale(entry.at)}, ${Y + H / 2})`)
-                                    .attr('class', `entry--${entry.className ? entry.className : 'default'}`)
-                                    .attr('d', () => {
-                                        const symbolGen = d3.symbol().size(symbolSize);
-
-                                        return symbolGen.type(d3[entry.symbol] || d3['symbolCircle'])();
-                                    });
-
-                                if (entry.title) {
-                                    point
-                                        .on('mouseover', showTip(entry.title))
-                                        .on('mouseout', hideTip);
-                                }
-                            }
-
-                            if (entry instanceof Interval) {
-                                const X = xScale(entry.from),
-                                    W = xScale(entry.to) - xScale(entry.from);
-
-                                const interval = g
-                                    .append('g')
-                                    .attr('class', 'entry')
-                                    .attr('clip-path', `url(#${clipId})`)
-                                    .append('path')
-                                    .attr('class', `entry--${entry.className ? entry.className : 'default'}`)
-                                    .attr('d', roundedRect(X, Y, W, H, intervalCornerRadius, true, true, true, true));
-
-                                if (entry.title) {
-                                    interval
-                                        .on('mouseover', showTip(entry.title))
-                                        .on('mouseout', hideTip);
-                                }
-
-                                const text = g
-                                    .append('text')
-                                    .attr('clip-path', `url(#${clipId})`)
-                                    .attr('class', 'entry entry--label')
-                                    .attr('text-anchor', 'middle')
-                                    .attr('pointer-events', 'none')
-                                    .attr('x', X + W / 2)
-                                    .attr('y', Y + H / 2)
-                                    .text(entry.label || null)
-                                    .attr('fill', '#fff')
-                                    .attr('dy', '0.32em');
-
-                                if (text.node().getComputedTextLength() > W) {
-                                    text.remove();
-                                }
-                            }
-                        }
-                    }
+                    emit(self, 'reference-updated', self.getTimeRange(dateTimeStart, dateTimeEnd), entries);
                 }
 
                 self.play = function play() {
@@ -526,29 +276,12 @@
                     }, 16);
                 };
 
-                if (isFirefox) {
-                    d3.select('body').on('keypress', () => {
-                        const ev = d3.event;
-                        if (ev.keyCode !== 0 || ev.shiftKey || ev.ctrlKey || ev.altKey) return;
+                onspace(self.setPause);
 
-                        if (ev.target === document.body) ev.preventDefault();
-
-                        self.pause = !self.pause;
-                    });
-                } else {
-                    d3.select('body').on('keydown', () => {
-                        const ev = d3.event;
-                        if (ev.keyCode !== 32) return;
-
-                        if (ev.target === document.body) ev.preventDefault();
-
-                        self.pause = !self.pause;
-                    });
-                }
-
-                drawTicks(xScale);
-                drawEntries(xScale);
-                drawReference(xScale);
+                g
+                    .call(drawTicksX, xScale, g_h, clipPathId, boundingLineColor, boundingLineWidth)
+                    .call(drawEntriesX,lanes, xScale, yScale, symbolSize, clipPathId, intervalCornerRadius)
+                    .call(drawReferenceX, xScale(self.reference), clipPathId, g_h, overlayWidth, referenceLineColor, referenceLineWidth, ondrag);
             },
             safeDraw() {
                 this.ifExistsSvgThenRemove();
@@ -556,14 +289,6 @@
             },
             onResize() {
                 this.safeDraw();
-            }
-        },
-        watch: {
-            pause(n, o) {
-                if (n) this.timer.stop();
-                if (!n) this.play();
-
-                this.$emit('change', n);
             }
         }
     }

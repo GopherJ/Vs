@@ -9,12 +9,12 @@
     import mixins from '../../mixins';
     import { selectPaddingInnerOuterY } from '../../utils/select';
     import { getTimelineGroups } from '../../utils/getTimelineGroups';
-    import roundedRect from '../../utils/roundedRect';
-    import zoom from '../../utils/zoom';
-    import { brushX } from '../../utils/brush';
-    import { drawCurrentReferenceX } from '../../utils/drawCurrentReference';
-    import { drawTicksX } from '../../utils/drawTicks';
-    import { drawEntriesMultiLaneX } from '../../utils/drawEntriesMultiLane';
+    import roundedRect from '../../plugins/roundedRect';
+    import zoom from '../../plugins/zoom';
+    import { brushX } from '../../plugins/brush';
+    import { drawCurrentReferenceX } from '../../plugins/drawCurrentReference';
+    import { drawTicksX } from '../../plugins/drawTicks';
+    import { drawEntriesMultiLaneX } from '../../plugins/drawEntriesMultiLane';
 
     export default {
         name: 'd3-timeline',

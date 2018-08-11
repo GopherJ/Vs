@@ -7,16 +7,16 @@
     import { cloneDeep, isNull, isUndefined, isNumber } from 'lodash';
     import uuid from 'uuid/v1';
     import mixins from '../../mixins';
-    import { showTip, hideTip } from '../../utils/tooltip';
-    import { brushX } from '../../utils/brush';
-    import { responsiveAxisX } from '../../utils/responsiveAxis';
-    import wrap from '../../utils/wrap';
+    import { showTip, hideTip } from '../../plugins/tooltip';
+    import { brushX } from '../../plugins/brush';
+    import { responsiveAxisX } from '../../plugins/responsiveAxis';
+    import wrap from '../../plugins/wrap';
     import tickFormat from '../../utils/tickFormat';
     import { selectTicksNumY } from '../../utils/select';
     import isAxisTime from '../../utils/isAxisTime';
     import isAxisNumber from '../../utils/isAxisNumber';
-    import { firstTickTextAnchorStart, lastTickTextAnchorEnd } from '../../utils/textAnchor';
-    import axisShow from '../../utils/axisShow';
+    import { firstTickTextAnchorStart, lastTickTextAnchorEnd } from '../../plugins/textAnchor';
+    import axisShow from '../../plugins/axisShow';
     import emit from '../../utils/emit';
 
     export default {

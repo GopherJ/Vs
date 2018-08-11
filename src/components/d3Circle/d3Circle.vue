@@ -4,7 +4,7 @@
 
 <script>
     import * as d3 from 'd3';
-    import { showTip, hideTip } from '../../utils/tooltip';
+    import { showTip, hideTip } from '../../plugins/tooltip';
     import mixins from '../../mixins/circle';
 
     export default {

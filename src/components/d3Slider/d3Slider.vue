@@ -7,10 +7,10 @@
     import { isNumber, isDate, isString, debounce } from 'lodash';
     import isValidColor from '../../utils/isValidColor';
     import emit from '../../utils/emit';
-    import axisShow from '../../utils/axisShow';
-    import { showTip, hideTip } from '../../utils/tooltip';
-    import { responsiveAxisX } from '../../utils/responsiveAxis';
-    import roundLine from '../../utils/roundLine';
+    import axisShow from '../../plugins/axisShow';
+    import { showTip, hideTip } from '../../plugins/tooltip';
+    import { responsiveAxisX } from '../../plugins/responsiveAxis';
+    import roundLine from '../../plugins/roundLine';
 
     export default {
         name: 'd3-slider',

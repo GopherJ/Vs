@@ -8,7 +8,7 @@
     import * as d3SankeyCircular from 'd3-sankey-circular';
     import pathArrows from './pathArrows';
     import emit from '../../utils/emit';
-    import { showTip, hideTip } from '../../utils/tooltip';
+    import { showTip, hideTip } from '../../plugins/tooltip';
     import highlightNodes from '../../utils/highlightNodes';
     import mixins from '../../mixins/sankey';
 

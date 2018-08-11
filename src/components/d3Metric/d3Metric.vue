@@ -5,7 +5,7 @@
 <script>
     import * as d3 from 'd3';
     import { isNull, isNumber } from 'lodash';
-    import { showTip, hideTip } from '../../utils/tooltip';
+    import { showTip, hideTip } from '../../plugins/tooltip';
     import mixins from '../../mixins/metric';
 
     export default {

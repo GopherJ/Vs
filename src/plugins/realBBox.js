@@ -5,7 +5,7 @@
  * @param g
  * @return {SVGRect}
  */
-const realBBox = (g) => {
+const realBBox = g => {
     const rect = g.node().getBBox(),
         t = g.attr('transform'),
         [tx, ty] = t !== null

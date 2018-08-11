@@ -8,10 +8,10 @@
     import uuid from 'uuid/v1';
     import mixins from '../../mixins';
     import { selectTicksNumY } from '../../utils/select';
-    import { brushX } from '../../utils/brush';
+    import { brushX } from '../../plugins/brush';
     import isAxisTime from '../../utils/isAxisTime';
-    import { responsiveAxisX } from '../../utils/responsiveAxis';
-    import axisShow from '../../utils/axisShow';
+    import { responsiveAxisX } from '../../plugins/responsiveAxis';
+    import axisShow from '../../plugins/axisShow';
 
     export default {
         name: 'd3-area',
