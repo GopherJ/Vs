@@ -31,7 +31,7 @@
                 const _data = cloneDeep(this.data),
                     { left = 0, top = 0, right = 0, bottom = 0 } = this.margin,
                     {
-                        strokeWidth = 2,
+                        strokeWidth = 4,
 
                         circleRadius = 5,
                         circleTitle = d => `${d.value}`,
@@ -66,13 +66,13 @@
 
                         axisFontSize = 12,
                         axisFontWeight = 400,
-                        axisFontOpacity = 1,
+                        axisFontOpacity = 0.5,
 
                         axisXTimeInterval = null,
 
                         isAxisPathShow = true,
 
-                        curve = 'curveMonotoneX',
+                        curve = 'curveLinear',
 
                         axisYTickFormat = '.2s',
 
@@ -91,8 +91,7 @@
                     g_w = w - left - right - axisYLabelLaneWidth - axisYLaneWidth - __offsetRight__,
                     g_h = h - top - bottom - axisXLabelLaneHeight - axisXLaneHeight - axisXGroupLabelLaneHeight,
                     clipPathId = uuid(), data = groupBy(_data, groupKey), groups = Object.keys(data),
-                    isAxisXTime = isAxisTime(_data),
-                    isAxisXNumber = isAxisNumber(_data),
+                    isAxisXTime = isAxisTime(_data), isAxisXNumber = isAxisNumber(_data),
                     axisXTickFormat = value => isAxisXTime ? tickFormat(value, axisXTimeInterval) : value;
 
                 if (![g_w, g_h].every(el => el > 0) || !groups.length) return;
@@ -228,7 +227,8 @@
                     axisXLane
                         .call(responsiveAxisX, xAxis, xScale);
 
-                    svg.call(brushX.bind(this), extent, xScale, _data);
+                    svg
+                        .call(brushX.bind(this), extent, xScale, _data);
                 }
 
                 axisXLane

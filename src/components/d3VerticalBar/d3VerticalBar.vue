@@ -37,7 +37,7 @@
 
                         axisFontSize = 12,
                         axisFontWeight = 400,
-                        axisFontOpacity = 1,
+                        axisFontOpacity = 0.5,
 
                         axisYLabel = null,
                         axisXLabel = null,

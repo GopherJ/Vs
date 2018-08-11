@@ -36,9 +36,7 @@
                         circleTitle = `${data}`
                     } = this.options;
 
-                if (![g_w, g_h].every(el => el > 0)) return;
-
-                if (innerRadiusRatio >= 1) return;
+                if (![g_w, g_h].every(el => el > 0) || innerRadiusRatio >= 1) return;
 
                 const label = d3.format(`.${precision}%`)(data),
                     innerRadius = innerRadiusRatio * outerRadius;
@@ -93,7 +91,6 @@
                     .attr('class', 'arc arc--background')
                     .attr('d', arcBackgroundPath)
                     .attr('fill', circleBackground);
-
 
                 o.append('g')
                     .append('path')

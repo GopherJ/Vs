@@ -46,8 +46,8 @@
                         axisXLaneHeight = 40,
 
                         axisFontSize = 12,
-                        axisFontWeight = 400,
-                        axisFontOpacity = 1,
+                        axisFontWeight = 600,
+                        axisFontOpacity = 0.5,
 
                         axisXLabel = null,
 

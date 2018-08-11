@@ -35,7 +35,7 @@
 
                         axisFontSize = 12,
                         axisFontWeight = 400,
-                        axisFontOpacity = 1,
+                        axisFontOpacity = 0.5,
 
                         tickSize = 10,
                         tickPadding = 8,

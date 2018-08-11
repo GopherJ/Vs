@@ -40,7 +40,7 @@
 
                         axisFontSize = 12,
                         axisFontWeight = 600,
-                        axisFontOpacity = 1,
+                        axisFontOpacity = 0.5,
 
                         axisXLabel = null,
 

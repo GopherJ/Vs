@@ -13,7 +13,6 @@
     import { responsiveAxisX } from '../../plugins/responsiveAxis';
     import wrap from '../../plugins/wrap';
     import emit from '../../utils/emit';
-    import cursor from '../../plugins/cursor';
     import INTERVAL from '../../utils/interval';
     import { selectPaddingInnerOuterX, selectTicksNumY } from '../../utils/select';
     import isAxisTime from '../../utils/isAxisTime';
@@ -68,7 +67,7 @@
 
                         axisFontSize = 12,
                         axisFontWeight = 400,
-                        axisFontOpacity = 1,
+                        axisFontOpacity = 0.5,
 
                         axisLabelFontSize = 12,
                         axisLabelFontWeight = 400,
