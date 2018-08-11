@@ -69,8 +69,7 @@
                         axisYLabelLaneWidth = isNull(axisYLabel) ? 0 : 30,
                     } = this.options,
                     [w, h] = this.getElWidthHeight(),
-                    __offsetTop__ = 10,
-                    __offsetRight__ = 10,
+                    __offsetTop__ = 10, __offsetRight__ = 10,
                     g_w = w - left - right - axisYLabelLaneWidth - axisYLaneWidth - __offsetRight__,
                     g_h = h - top - bottom - axisXLabelLaneHeight - axisXLaneHeight - __offsetTop__,
                     clipPathId = uuid();
@@ -116,15 +115,11 @@
 
                 const axisXLane = svg
                     .append('g')
-                    .attr('transform', `translate(${left + axisYLabelLaneWidth + axisYLaneWidth}, ${top + g_h + __offsetTop__})`)
-                    .attr('width', g_w)
-                    .attr('height', axisXLaneHeight);
+                    .attr('transform', `translate(${left + axisYLabelLaneWidth + axisYLaneWidth}, ${top + g_h + __offsetTop__})`);
 
                 const axisYLane = svg
                     .append('g')
-                    .attr('transform', `translate(${left + axisYLabelLaneWidth}, ${top + __offsetTop__})`)
-                    .attr('width', axisYLaneWidth)
-                    .attr('height', g_h);
+                    .attr('transform', `translate(${left + axisYLabelLaneWidth}, ${top + __offsetTop__})`);
 
                 axisXLane
                     .append('g')
@@ -148,15 +143,11 @@
 
                 const axisXLabelLane = svg
                     .append('g')
-                    .attr('transform', `translate(${left + axisYLabelLaneWidth + axisYLaneWidth}, ${top + g_h + axisXLaneHeight + __offsetTop__})`)
-                    .attr('width', g_w)
-                    .attr('height', axisXLabelLaneHeight);
+                    .attr('transform', `translate(${left + axisYLabelLaneWidth + axisYLaneWidth}, ${top + g_h + axisXLaneHeight + __offsetTop__})`);
 
                 const axisYLabelLane = svg
                     .append('g')
-                    .attr('transform', `translate(${left}, ${top + __offsetTop__})`)
-                    .attr('width', axisYLabelLaneWidth)
-                    .attr('height', g_h);
+                    .attr('transform', `translate(${left}, ${top + __offsetTop__})`);
 
                 axisXLabelLane
                     .append('text')
@@ -208,10 +199,9 @@
                     .attr('width', g_w)
                     .attr('height', g_h);
 
-                const g = svg.append('g')
-                    .attr('transform', `translate(${left + axisYLabelLaneWidth + axisYLaneWidth}, ${top + __offsetTop__})`)
-                    .attr('width', g_w)
-                    .attr('height', g_h);
+                const g = svg
+                    .append('g')
+                    .attr('transform', `translate(${left + axisYLabelLaneWidth + axisYLaneWidth}, ${top + __offsetTop__})`);
 
                 g.append('path')
                     .datum(data)
