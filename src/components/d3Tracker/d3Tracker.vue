@@ -6,7 +6,6 @@
     import * as d3 from 'd3';
     import { isBoolean, isNull, cloneDeep } from 'lodash';
     import uuid from 'uuid/v1';
-    import SWorker from 'simple-web-worker';
     import mixins from '../../mixins';
     import tracker from '../../mixins/tracker';
     import { selectPaddingInnerOuterY } from '../../utils/select';
@@ -20,7 +19,6 @@
     import { drawEntriesX } from '../../plugins/drawEntries';
     import { drawReferenceX } from '../../plugins/drawReference';
     import { getTrackerLanes } from "../../utils/getTrackerLanes";
-    import nextEntryStart from '../../workers/nextEntryStart';
 
     export default {
         name: 'd3-tracker',
@@ -76,7 +74,6 @@
                     [paddingInner, paddingOuter] = selectPaddingInnerOuterY(g_h),
                     clipPathId = uuid(), self = this;
                 self.reference = dateTimeStart;
-                self.worker = SWorker.create([nextEntryStart]);
 
                 if (![g_w, g_h].every(el => el > 0)) return;
 
@@ -276,7 +273,7 @@
                     }, 16);
                 };
 
-                onspace(self.setPause);
+                onspace(() => self.pause = !self.pause);
 
                 g
                     .call(drawTicksX, xScale, g_h, clipPathId, boundingLineColor, boundingLineWidth)
