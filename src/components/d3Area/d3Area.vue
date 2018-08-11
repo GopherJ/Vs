@@ -108,15 +108,11 @@
 
                     const axisYLane = svg
                         .append('g')
-                        .attr('transform', `translate(${left + axisYLabelLaneWidth}, ${top + __offsetTop__})`)
-                        .attr('width', axisYLaneWidth)
-                        .attr('height', g_h);
+                        .attr('transform', `translate(${left + axisYLabelLaneWidth}, ${top + __offsetTop__})`);
 
                     const axisXLane = svg
                         .append('g')
-                        .attr('transform', `translate(${left + axisYLaneWidth + axisYLabelLaneWidth}, ${top + g_h + __offsetTop__})`)
-                        .attr('width', g_w)
-                        .attr('height', axisXLaneHeight);
+                        .attr('transform', `translate(${left + axisYLaneWidth + axisYLabelLaneWidth}, ${top + g_h + __offsetTop__})`);
 
                     axisYLane
                         .append('g')
@@ -142,15 +138,11 @@
 
                     const axisXLabelLane = svg
                         .append('g')
-                        .attr('transform', `translate(${left + axisYLaneWidth + axisYLabelLaneWidth}, ${top + g_h + axisXLaneHeight + __offsetTop__})`)
-                        .attr('width', g_w)
-                        .attr('height', axisXLabelLaneHeight);
+                        .attr('transform', `translate(${left + axisYLaneWidth + axisYLabelLaneWidth}, ${top + g_h + axisXLaneHeight + __offsetTop__})`);
 
                     const axisYLabelLane = svg
                         .append('g')
-                        .attr('transform', `translate(${left}, ${top + __offsetTop__})`)
-                        .attr('width', axisYLabelLaneWidth)
-                        .attr('height', g_h);
+                        .attr('transform', `translate(${left}, ${top + __offsetTop__})`);
 
                     axisXLabelLane
                         .append('text')
@@ -185,9 +177,7 @@
 
                     const g = svg
                         .append('g')
-                        .attr('transform', `translate(${left + axisYLaneWidth + axisYLabelLaneWidth}, ${top + __offsetTop__})`)
-                        .attr('width', g_w)
-                        .attr('height', g_h);
+                        .attr('transform', `translate(${left + axisYLaneWidth + axisYLabelLaneWidth}, ${top + __offsetTop__})`);
 
                     const area = d3.area()
                         .x(d => xScale(d.key))
