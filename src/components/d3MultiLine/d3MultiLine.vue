@@ -9,10 +9,8 @@
     import { brushX } from '../../plugins/brush';
     import mixins from '../../mixins';
     import groupBy from '../../utils/groupBy';
-    import realBBox from '../../plugins/realBBox';
     import { responsiveAxisX } from '../../plugins/responsiveAxis';
     import tickFormat from '../../utils/tickFormat';
-    import { toggleCrossInCircle, toggleClass } from '../../plugins/toggle';
     import { showTip, hideTip } from '../../plugins/tooltip';
     import { selectTicksNumY } from '../../utils/select';
     import wrap from '../../plugins/wrap';
@@ -23,6 +21,7 @@
     import emit from '../../utils/emit';
     import axisShow from '../../plugins/axisShow';
     import hash from '../../utils/hash';
+    import legendGen from '../../plugins/legendGen';
 
     export default {
         name: 'd3-multi-line',
@@ -47,8 +46,10 @@
                         tickPadding = 8,
 
                         axisXGroupLabelLaneHeight = 20,
+
                         axisXGroupLabelFillColorOpacity = 1,
                         axisXGroupLabelBorderColorOpacity = 0.6,
+
                         axisXGroupLabelGap = 10,
 
                         axisXGroupLabelFontSize = 9,
@@ -84,25 +85,19 @@
                     {
                         axisXLabelLaneHeight = isNull(axisXLabel) ? 0 : 30,
                         axisYLabelLaneWidth = isNull(axisYLabel) ? 0 : 30,
-                    } = this.options;
-
-                const [w, h] = this.getElWidthHeight(),
+                    } = this.options,
+                    [w, h] = this.getElWidthHeight(),
                     __offsetRight__ = 10,
                     g_w = w - left - right - axisYLabelLaneWidth - axisYLaneWidth - __offsetRight__,
                     g_h = h - top - bottom - axisXLabelLaneHeight - axisXLaneHeight - axisXGroupLabelLaneHeight,
-                    clipPathId = uuid();
-
-                if (![g_w, g_h].every(el => el > 0)) return;
-
-                const isAxisXTime = isAxisTime(_data),
+                    clipPathId = uuid(), data = groupBy(_data, groupKey), groups = Object.keys(data),
+                    isAxisXTime = isAxisTime(_data),
                     isAxisXNumber = isAxisNumber(_data),
-                    axisXTickFormat = value => isAxisXTime ? tickFormat(value, axisXTimeInterval) : value,
-                    data = groupBy(_data, groupKey),
-                    groups = Object.keys(data);
+                    axisXTickFormat = value => isAxisXTime ? tickFormat(value, axisXTimeInterval) : value;
 
-                if (!groups.length) return;
+                if (![g_w, g_h].every(el => el > 0) || !groups.length) return;
 
-                const schemeCategory20 = d3.scaleOrdinal()
+                const schemeCategory20c = d3.scaleOrdinal()
                     .domain(groups)
                     .range(d3.schemeCategory20c);
 
@@ -157,54 +152,23 @@
                     .attr('width', g_w)
                     .attr('height', axisXLaneHeight);
 
-                const GroupLabelContainer = axisXGroupLabelLane
-                    .append('g');
-
-                let previousPos;
-                GroupLabelContainer
-                    .selectAll('.label .label--group')
-                    .data(groups)
-                    .enter()
-                    .append('g')
-                    .each(function (d, i) {
-                        const _g = d3.select(this);
-
-                        const label = _g
-                            .append('circle')
-                            .attr('r', axisXGroupLabelLaneHeight / 2)
-                            .attr('cy', axisXGroupLabelLaneHeight / 2)
-                            .attr('fill', d => schemeCategory20(d))
-                            .attr('fill-opacity', axisXGroupLabelFillColorOpacity)
-                            .attr('stroke', d => schemeCategory20(d))
-                            .attr('stroke-opacity', axisXGroupLabelBorderColorOpacity)
-                            .on('click', function (d) {
-                                toggleCrossInCircle(_g, d3.select(this), crossColor, crossWidth);
-                                toggleClass(svg, hash(d));
-                            });
-
-                        const labelPos = label.node().getBBox();
-
-                        _g
-                            .append('text')
-                            .attr('class', 'label label--group')
-                            .attr('text-anchor', 'start')
-                            .attr('x', labelPos.x + labelPos.width)
-                            .attr('y', axisXGroupLabelLaneHeight / 2)
-                            .attr('dy', '0.32em')
-                            .text(d)
-                            .attr('fill', '#000')
-                            .attr('font-size', axisXGroupLabelFontSize)
-                            .attr('font-weight', axisXGroupLabelFontWeight)
-                            .attr('fill-opacity', axisXGroupLabelFontOpacity);
-
-                        if (i !== 0) _g.attr('transform', `translate(${previousPos.x + previousPos.width + axisXGroupLabelGap}, 0)`);
-
-                        previousPos = realBBox(_g);
-                    });
-
-                const GroupLabelContainerPos = GroupLabelContainer.node().getBBox();
-                GroupLabelContainer
-                    .attr('transform', `translate(${(g_w - GroupLabelContainerPos.width)}, 0)`);
+                axisXGroupLabelLane
+                    .call(
+                        legendGen,
+                        svg,
+                        groups,
+                        g_w,
+                        schemeCategory20c,
+                        axisXGroupLabelLaneHeight,
+                        axisXGroupLabelFillColorOpacity,
+                        axisXGroupLabelBorderColorOpacity,
+                        crossColor,
+                        crossWidth,
+                        axisXGroupLabelFontSize,
+                        axisXGroupLabelFontWeight,
+                        axisXGroupLabelFontOpacity,
+                        axisXGroupLabelGap
+                    );
 
                 axisXLabelLane
                     .append('text')
@@ -305,7 +269,7 @@
                     .attr('d', d => lineGen(data[d]))
                     .attr('fill', 'none')
                     .attr('pointer-events', 'none')
-                    .attr('stroke', d => schemeCategory20(d))
+                    .attr('stroke', d => schemeCategory20c(d))
                     .attr('stroke-width', strokeWidth);
 
                 const circles = g.selectAll('circle')
@@ -317,7 +281,7 @@
                     .attr('cx', d => xScale(d.key))
                     .attr('cy', d => yScale(d.value))
                     .attr('r', circleRadius)
-                    .attr('fill', d => schemeCategory20(d.group))
+                    .attr('fill', d => schemeCategory20c(d.group))
                     .on('mouseover', showTip(circleTitle))
                     .on('mouseout', hideTip);
 
