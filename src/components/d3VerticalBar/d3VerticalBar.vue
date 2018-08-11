@@ -5,6 +5,7 @@
 <script>
     import * as d3 from 'd3';
     import _ from 'lodash';
+    import uuid from 'uuid/v1';
     import mixins from '../../mixins';
     import { showTip, hideTip } from '../../plugins/tooltip';
     import emit from '../../utils/emit';
@@ -16,17 +17,14 @@
     import isAxisTime from '../../utils/isAxisTime';
     import isAxisNumber from '../../utils/isAxisNumber';
     import axisShow from '../../plugins/axisShow';
-    import uuid from 'uuid/v1';
 
     export default {
         name: 'd3-vertical-bar',
         mixins: [mixins],
         methods: {
             drawVerticalBar() {
-                const [w, h] = this.getElWidthHeight(),
-                    data = _.cloneDeep(this.data);
-
-                const {
+                const data = _.cloneDeep(this.data),
+                    {
                         fill = '#6eadc1',
                         stroke = '#6eadc1',
                         fillOpacity = 0.6,
@@ -69,8 +67,8 @@
                         axisYLabelLaneWidth = _.isNull(axisYLane) ? 0 : 30,
                     } = this.options,
                     { left = 0, right = 0, top = 0, bottom = 0 } = this.margin,
-                    __offsetTop__ = 10,
-                    __offsetRight__ = 10,
+                    __offsetTop__ = 10, __offsetRight__ = 10,
+                    [w, h] = this.getElWidthHeight(),
                     g_w = w - left - right - axisYLabelLaneWidth - axisYLaneWidth - __offsetRight__,
                     g_h = h - top - bottom - axisXLaneHeight - axisXLabelLaneHeight - __offsetTop__,
                     clipPathId = uuid();
@@ -110,15 +108,11 @@
 
                 const axisXLane = svg
                     .append('g')
-                    .attr('transform', `translate(${left + axisYLabelLaneWidth + axisYLaneWidth},${top + g_h + __offsetTop__})`)
-                    .attr('width', g_w)
-                    .attr('height', axisXLaneHeight);
+                    .attr('transform', `translate(${left + axisYLabelLaneWidth + axisYLaneWidth},${top + g_h + __offsetTop__})`);
 
                 const axisYLane = svg
                     .append('g')
-                    .attr('transform', `translate(${left + axisYLabelLaneWidth}, ${top + __offsetTop__})`)
-                    .attr('width', axisYLaneWidth)
-                    .attr('height', g_h);
+                    .attr('transform', `translate(${left + axisYLabelLaneWidth}, ${top + __offsetTop__})`);
 
                 const xAxis = d3
                     .axisBottom(xScale)
@@ -151,15 +145,11 @@
 
                 const axisXLabelLane = svg
                     .append('g')
-                    .attr('transform', `translate(${left + axisYLabelLaneWidth + axisYLaneWidth}, ${top + g_h + axisXLaneHeight + __offsetTop__})`)
-                    .attr('width', g_w)
-                    .attr('height', axisXLabelLaneHeight);
+                    .attr('transform', `translate(${left + axisYLabelLaneWidth + axisYLaneWidth}, ${top + g_h + axisXLaneHeight + __offsetTop__})`);
 
                 const axisYLabelLane = svg
                     .append('g')
-                    .attr('transform', `translate(${left}, ${top + __offsetTop__})`)
-                    .attr('width', axisYLabelLaneWidth)
-                    .attr('height', g_h);
+                    .attr('transform', `translate(${left}, ${top + __offsetTop__})`);
 
                 axisXLabelLane
                     .append('text')
@@ -202,9 +192,7 @@
 
                 const g = svg
                     .append('g')
-                    .attr('transform', `translate(${left + axisYLabelLaneWidth + axisYLaneWidth}, ${top + __offsetTop__})`)
-                    .attr('width', g_w)
-                    .attr('height', g_h);
+                    .attr('transform', `translate(${left + axisYLabelLaneWidth + axisYLaneWidth}, ${top + __offsetTop__})`);
 
                 const enter = g.selectAll('rect')
                     .data(data)
@@ -266,7 +254,7 @@
 <style>
     @import url(../../css/index.css);
 
-    .d3-vertical-bar rect:hover {
+    .d3-vertical-bar rect:not(.overlay):hover {
         cursor: pointer;
     }
 
