@@ -67,7 +67,8 @@
                         currentTimeLineWidth = 4,
                         currentTimeLineColor = 'rgba(255, 56, 96, 1)',
 
-                        liveTimer = true
+                        liveTimer = true,
+                        liveTimerTick = 250
                     } = this.options,
                     {
                         axisXLabelLaneHeight = isNull(axisXLabel) ? 0 : 30,
@@ -77,7 +78,7 @@
                     __offset__  = borderWidth,
                     g_w = w - left - right - groupLaneWidth - 2 * __offset__,
                     g_h = h - top - bottom - axisXLaneHeight - axisXLabelLaneHeight - 2 * __offset__,
-                    clipPathId = uuid(), ctx = this;
+                    entryClipPathId = uuid(), groupLabelClipPathId = uuid(), ctx = this;
 
                 if (![g_w, g_h].every(el => el > 0) || !groups.length) return;
 
@@ -91,12 +92,21 @@
 
                 svg.append('defs')
                     .append('clipPath')
-                    .attr('id', clipPathId)
+                    .attr('id', entryClipPathId)
                     .append('rect')
                     .attr('x', 0)
                     .attr('y', 0)
                     .attr('width', g_w)
                     .attr('height', g_h + axisXLaneHeight);
+
+                svg.append('defs')
+                    .append('clipPath')
+                    .attr('id', groupLabelClipPathId)
+                    .append('rect')
+                    .attr('x', left + __offset__)
+                    .attr('y', top + __offset__)
+                    .attr('width', groupLaneWidth)
+                    .attr('height', g_h);
 
                 svg.append('path')
                     .attr('d', roundedRect(left + __offset__ / 2, top + __offset__ / 2, g_w + groupLaneWidth + __offset__, g_h + axisXLaneHeight + __offset__, borderRadius, true, true, true, true))
@@ -111,10 +121,8 @@
                     .enter()
                     .append('g')
                     .attr('class', 'group--lane')
+                    .attr('clip-path', `url(#${groupLabelClipPathId})`)
                     .attr('transform', (d, i) => `translate(${left + __offset__}, ${top + __offset__ + i * groupHeight})`)
-                    .attr('width', groupLaneWidth)
-                    .attr('height', groupHeight)
-                    .attr('fill', 'none')
                     .append('text')
                     .attr('x', groupLaneWidth / 2)
                     .attr('y', groupHeight / 2)
@@ -211,8 +219,8 @@
 
                 if (liveTimer)
                     ctx.timer = setInterval(() => {
-                        g.call(drawCurrentReferenceX, ctx.scale, g_h, clipPathId, currentTimeLineColor, currentTimeLineWidth);
-                    }, 250);
+                        g.call(drawCurrentReferenceX, ctx.scale, g_h, entryClipPathId, currentTimeLineColor, currentTimeLineWidth);
+                    }, liveTimerTick);
 
                 function zooming() {
                     const newScale = d3.event
@@ -240,9 +248,9 @@
 
                 function main(g, scale) {
                     g
-                        .call(drawCurrentReferenceX, scale, g_h, clipPathId, currentTimeLineColor, currentTimeLineWidth)
-                        .call(drawTicksX, scale, g_h, clipPathId, boundingLineColor, boundingLineWidth)
-                        .call(drawEntriesMultiLaneX, data, groups, scale, yScale, clipPathId, symbolSize, intervalCornerRadius);
+                        .call(drawCurrentReferenceX, scale, g_h, entryClipPathId, currentTimeLineColor, currentTimeLineWidth)
+                        .call(drawTicksX, scale, g_h, entryClipPathId, boundingLineColor, boundingLineWidth)
+                        .call(drawEntriesMultiLaneX, data, groups, scale, yScale, entryClipPathId, symbolSize, intervalCornerRadius);
                 }
             },
             safeDraw() {
