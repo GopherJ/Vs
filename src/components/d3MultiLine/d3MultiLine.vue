@@ -31,7 +31,7 @@
                 const _data = cloneDeep(this.data),
                     { left = 0, top = 0, right = 0, bottom = 0 } = this.margin,
                     {
-                        strokeWidth = 4,
+                        strokeWidth = 2,
 
                         circleRadius = 5,
                         circleTitle = d => `${d.value}`,

@@ -28,7 +28,7 @@
                     { left = 0, top = 0, right = 0, bottom = 0 } = this.margin,
                     {
                         stroke = 'rgb(188, 82, 188)',
-                        strokeWidth = 4,
+                        strokeWidth = 2,
 
                         axisXLaneHeight = 60,
                         axisYLaneWidth = 35,
