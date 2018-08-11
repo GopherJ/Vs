@@ -21,7 +21,8 @@
         name: 'd3-timeline',
         data() {
             return {
-                scale: null
+                scale: null,
+                timer: null
             }
         },
         mixins: [mixins],
@@ -64,7 +65,9 @@
                         boundingLineColor = 'rgba(0, 0, 0, .125)',
 
                         currentTimeLineWidth = 4,
-                        currentTimeLineColor = 'rgba(255, 56, 96, 1)'
+                        currentTimeLineColor = 'rgba(255, 56, 96, 1)',
+
+                        liveTimer = true
                     } = this.options,
                     {
                         axisXLabelLaneHeight = isNull(axisXLabel) ? 0 : 30,
@@ -206,6 +209,11 @@
 
                 g.call(main, xScale);
 
+                if (liveTimer)
+                    ctx.timer = setInterval(() => {
+                        g.call(drawCurrentReferenceX, ctx.scale, g_h, clipPathId, currentTimeLineColor, currentTimeLineWidth);
+                    }, 250);
+
                 function zooming() {
                     const newScale = d3.event
                         .transform.rescaleX(xScale);
@@ -232,7 +240,7 @@
 
                 function main(g, scale) {
                     g
-                        .call(drawCurrentReferenceX, scale, g_h, clipPathId, currentTimeLineColor, currentTimeLineWidth )
+                        .call(drawCurrentReferenceX, scale, g_h, clipPathId, currentTimeLineColor, currentTimeLineWidth)
                         .call(drawTicksX, scale, g_h, clipPathId, boundingLineColor, boundingLineWidth)
                         .call(drawEntriesMultiLaneX, data, groups, scale, yScale, clipPathId, symbolSize, intervalCornerRadius);
                 }
@@ -244,6 +252,9 @@
             onResize() {
                 this.safeDraw();
             }
+        },
+        beforeDestroy() {
+            clearInterval(this.timer);
         }
     }
 </script>
