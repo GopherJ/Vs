@@ -167,9 +167,7 @@
 
                 const axisXLabelLane = svg
                     .append('g')
-                    .attr('transform', `translate(${left + __offset__},${top + g_h + axisXLaneHeight + 2 * __offset__})`)
-                    .attr('width', g_w + groupLaneWidth)
-                    .attr('height', axisXLabelLaneHeight);
+                    .attr('transform', `translate(${left + __offset__},${top + g_h + axisXLaneHeight + 2 * __offset__})`);
 
                 axisXLabelLane
                     .append('text')
@@ -198,9 +196,7 @@
 
                 const g = svg
                     .append('g')
-                    .attr('transform', `translate(${left + __offset__ + groupLaneWidth}, ${top + __offset__})`)
-                    .attr('width', g_w)
-                    .attr('height', g_h);
+                    .attr('transform', `translate(${left + __offset__ + groupLaneWidth}, ${top + __offset__})`);
 
                 g.append('line')
                     .attr('class', 'line--y')
