@@ -11,6 +11,7 @@
     import { getTimelineGroups } from '../../utils/getTimelineGroups';
     import roundedRect from '../../plugins/roundedRect';
     import zoom from '../../plugins/zoom';
+    import cursor from '../../plugins/cursor';
     import { brushX } from '../../plugins/brush';
     import { drawCurrentReferenceX } from '../../plugins/drawCurrentReference';
     import { drawTicksX } from '../../plugins/drawTicks';
@@ -73,7 +74,7 @@
                     __offset__  = borderWidth,
                     g_w = w - left - right - groupLaneWidth - 2 * __offset__,
                     g_h = h - top - bottom - axisXLaneHeight - axisXLabelLaneHeight - 2 * __offset__,
-                    clipPathId = uuid(), self = this;
+                    clipPathId = uuid(), ctx = this;
 
                 if (![g_w, g_h].every(el => el > 0) || !groups.length) return;
 
@@ -138,7 +139,7 @@
                 const xScale = d3.scaleTime()
                     .domain([dateTimeStart, dateTimeEnd])
                     .range([0, g_w]);
-                self.scale = xScale;
+                ctx.scale = xScale;
 
                 const yScale = (i) => d3.scaleBand()
                     .range([groupHeight * (i + 1), groupHeight * i])
@@ -152,9 +153,7 @@
 
                 const axisXLane = svg
                     .append('g')
-                    .attr('transform', `translate(${left + groupLaneWidth + __offset__}, ${top + g_h + __offset__})`)
-                    .attr('width', g_w)
-                    .attr('height', axisXLaneHeight);
+                    .attr('transform', `translate(${left + groupLaneWidth + __offset__}, ${top + g_h + __offset__})`);
 
                 axisXLane
                     .call(xAxis)
@@ -190,7 +189,11 @@
                 ];
 
                 svg
-                    .call(brushX.bind(self), extent, self.scale)
+                    .call(brushX.bind(ctx), extent, ctx.scale)
+                    .call(cursor, axisXLane, [
+                        [0, 0],
+                        [g_w, axisXLaneHeight]
+                    ])
                     .call(zoom, zooming, zoomend);
 
                 const g = svg
@@ -205,13 +208,15 @@
                     .attr('stroke', boundingLineColor)
                     .attr('stroke-width', boundingLineWidth);
 
+                g.call(main, xScale);
+
                 function zooming() {
                     const newScale = d3.event
                         .transform.rescaleX(xScale);
-                    self.scale = newScale;
+                    ctx.scale = newScale;
 
                     svg
-                        .call(brushX.bind(self), extent, self.scale);
+                        .call(brushX.bind(ctx), extent, ctx.scale);
 
                     axisXLane
                         .call(xAxis.scale(newScale))
@@ -219,23 +224,22 @@
                         .attr('stroke', boundingLineColor)
                         .attr('stroke-width', boundingLineWidth);
 
-                    g
-                        .call(drawCurrentReferenceX, newScale, g_h, clipPathId, currentTimeLineColor, currentTimeLineWidth )
-                        .call(drawTicksX, newScale, g_h, clipPathId, boundingLineColor, boundingLineWidth)
-                        .call(drawEntriesMultiLaneX, data, groups, newScale, yScale, clipPathId, symbolSize, intervalCornerRadius);
+                    g.call(main, newScale);
                 }
 
                 function zoomend() {
-                    const dateTimeStart = self.scale.invert(0),
-                        dateTimeEnd = self.scale.invert(g_w);
+                    const dateTimeStart = ctx.scale.invert(0),
+                        dateTimeEnd = ctx.scale.invert(g_w);
 
-                    self.$emit('range-updated', dateTimeStart, dateTimeEnd);
+                    ctx.$emit('range-updated', dateTimeStart, dateTimeEnd);
                 }
 
-                g
-                    .call(drawCurrentReferenceX, xScale, g_h, clipPathId, currentTimeLineColor, currentTimeLineWidth )
-                    .call(drawTicksX, xScale, g_h, clipPathId, boundingLineColor, boundingLineWidth)
-                    .call(drawEntriesMultiLaneX, data, groups, xScale, yScale, clipPathId, symbolSize, intervalCornerRadius);
+                function main(g, scale) {
+                    g
+                        .call(drawCurrentReferenceX, scale, g_h, clipPathId, currentTimeLineColor, currentTimeLineWidth )
+                        .call(drawTicksX, scale, g_h, clipPathId, boundingLineColor, boundingLineWidth)
+                        .call(drawEntriesMultiLaneX, data, groups, scale, yScale, clipPathId, symbolSize, intervalCornerRadius);
+                }
             },
             safeDraw() {
                 this.ifExistsSvgThenRemove();

@@ -20,7 +20,7 @@
                         axisLabelFontWeight = 400,
                         axisLabelFontOpacity = 0.5,
 
-                        metricLabelColor = 'black',
+                        metricLabelColor = '#000000',
                         metricLabelFontSize = 120,
                         metricLabelFontWeight = 900,
                         metricLabelFontOpacity = 0.5,
@@ -31,9 +31,8 @@
                     } = this.options,
                     {
                         axisXLabelLaneHeight = isNull(axisXLabel) ? 0 : 30
-                    } = this.options;
-
-                const [w, h] = this.getElWidthHeight(),
+                    } = this.options,
+                    [w, h] = this.getElWidthHeight(),
                     {left = 0, top = 0, right = 0, bottom = 0} = this.margin,
                     g_w = w - left - right,
                     g_h = h - top - bottom - axisXLabelLaneHeight;
