@@ -13,6 +13,7 @@
     import { responsiveAxisX } from '../../plugins/responsiveAxis';
     import wrap from '../../plugins/wrap';
     import emit from '../../utils/emit';
+    import cursor from '../../plugins/cursor';
     import INTERVAL from '../../utils/interval';
     import { selectPaddingInnerOuterX, selectTicksNumY } from '../../utils/select';
     import isAxisTime from '../../utils/isAxisTime';
@@ -151,9 +152,7 @@
 
                 const axisXLane = svg
                     .append('g')
-                    .attr('transform', `translate(${left + axisXLabelLaneHeight + axisYLaneWidth}, ${top + g_h + __timeRangeLabelLaneHeight__})`)
-                    .attr('width', g_w)
-                    .attr('height', axisXLaneHeight);
+                    .attr('transform', `translate(${left + axisXLabelLaneHeight + axisYLaneWidth}, ${top + g_h + __timeRangeLabelLaneHeight__})`);
 
                 axisXLane
                     .append('g')
@@ -169,9 +168,7 @@
 
                 const axisYLane = svg
                     .append('g')
-                    .attr('transform', `translate(${left + axisYLabelLaneWidth}, ${top + __timeRangeLabelLaneHeight__})`)
-                    .attr('width', axisYLaneWidth)
-                    .attr('height', g_h);
+                    .attr('transform', `translate(${left + axisYLabelLaneWidth}, ${top + __timeRangeLabelLaneHeight__})`);
 
                 axisYLane
                     .append('g')
@@ -183,17 +180,13 @@
                     .attr('opacity', axisFontOpacity)
                     .attr('font-weight', axisFontWeight);
 
-                const axisYLabelLane = svg
-                    .append('g')
-                    .attr('transform', `translate(${left}, ${top + __timeRangeLabelLaneHeight__})`)
-                    .attr('width', axisYLabelLaneWidth)
-                    .attr('height', g_h);
-
                 const axisXLabelLane = svg
                     .append('g')
-                    .attr('transform', `translate(${left + axisYLabelLaneWidth + axisYLaneWidth}, ${top + g_h + axisXLaneHeight + __timeRangeLabelLaneHeight__})`)
-                    .attr('width', g_w)
-                    .attr('height', axisXLabelLaneHeight);
+                    .attr('transform', `translate(${left + axisYLabelLaneWidth + axisYLaneWidth}, ${top + g_h + axisXLaneHeight + __timeRangeLabelLaneHeight__})`);
+
+                const axisYLabelLane = svg
+                    .append('g')
+                    .attr('transform', `translate(${left}, ${top + __timeRangeLabelLaneHeight__})`);
 
                 axisXLabelLane
                     .append('text')
@@ -220,9 +213,7 @@
 
                 const timeRangeLabelLane = svg
                     .append('g')
-                    .attr('transform', `translate(${left + axisYLabelLaneWidth + axisYLaneWidth}, ${top})`)
-                    .attr('width', g_w)
-                    .attr('height', __timeRangeLabelLaneHeight__);
+                    .attr('transform', `translate(${left + axisYLabelLaneWidth + axisYLaneWidth}, ${top})`);
 
                 const [dateTimeStart, dateTimeEnd] = d3.extent(data.map(d => d.key));
 
@@ -275,9 +266,7 @@
 
                 const g = svg
                     .append('g')
-                    .attr('transform', `translate(${left + axisXLabelLaneHeight + axisYLaneWidth}, ${top + __timeRangeLabelLaneHeight__})`)
-                    .attr('width', g_w)
-                    .attr('height', g_h);
+                    .attr('transform', `translate(${left + axisXLabelLaneHeight + axisYLaneWidth}, ${top + __timeRangeLabelLaneHeight__})`);
 
                 const enter = g.selectAll('rect')
                     .data(data)
@@ -299,7 +288,7 @@
                         if (!isNumber(axisXTimeInterval)) return;
 
                         const dateTimeStart = d.key,
-                            dateTimeEnd = new Date(d.key.getTime() + axisXTimeInterval);
+                            dateTimeEnd = new Date(d.key.valueOf() + axisXTimeInterval);
 
                         emit(this, 'range-updated', dateTimeStart, dateTimeEnd);
                     })
@@ -341,7 +330,7 @@
         outline: none;
     }
 
-    .d3-timelion rect:hover {
+    .d3-timelion rect:not(.overlay):hover {
         cursor: pointer;
     }
 
