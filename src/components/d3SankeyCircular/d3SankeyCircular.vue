@@ -103,21 +103,18 @@
                     .attr('height', h);
 
                 const axisXSelectBoxLane = svg
-                    .append('g')
-                    .attr('width', g_w)
-                    .attr('height', __selectBoxLaneHeight__);
+                    .append('g');
 
                 const axisXLabelLane = svg
                     .append('g')
-                    .attr('transform', `translate(0, ${__selectBoxLaneHeight__ + g_h})`)
-                    .attr('width', g_w)
-                    .attr('height', axisXLabelLaneHeight);
+                    .attr('transform', `translate(0, ${__selectBoxLaneHeight__ + g_h})`);
 
                 const g = svg
                     .append('g')
                     .attr('transform', `translate(0, ${__selectBoxLaneHeight__})`);
 
-                const selectBoxLabel = axisXSelectBoxLane.append('text')
+                const selectBoxLabel = axisXSelectBoxLane
+                    .append('text')
                     .attr('text-anchor', 'middle')
                     .attr('x', g_w / 2)
                     .attr('y', __selectBoxLaneHeight__ / 2)
