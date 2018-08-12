@@ -15,6 +15,7 @@
     import groupBySum from '../../utils/groupBySum';
     import { lengendGenStatic } from '../../plugins/legendGen';
     import hash from '../../utils/hash';
+    import { yRuler } from '../../plugins/ruler';
 
     export default {
         name: 'd3-grouped-area',
@@ -62,7 +63,9 @@
 
                         axisYTickFormat = '.2s',
 
-                        curve =  'curveLinear'
+                        curve =  'curveLinear',
+
+                        yAxisRuler = true
                     } = this.options,
                     {
                         axisXLabelLaneHeight = isNull(axisXLabel) ? 0 : 30,
@@ -149,6 +152,7 @@
                     .attr('font-size', axisFontSize)
                     .attr('font-weight', axisFontWeight)
                     .attr('opacity', axisFontOpacity);
+                if (yAxisRuler) axisYLane.call(yRuler, yScale, g_w, d3.format(axisYTickFormat), ticks, tickSize, tickPadding);
 
                 axisXLane
                     .append('g')
