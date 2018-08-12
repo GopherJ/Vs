@@ -97,12 +97,16 @@
             },
             safeDraw() {
                 if (this.calculating) this.wordCloud.stop();
+
                 this.ifExistsSvgThenRemove();
                 this.drawWordCloud();
             },
             onResize() {
                 this.safeDraw();
             }
+        },
+        beforeDestroy() {
+            this.wordCloud.stop();
         }
     }
 </script>
