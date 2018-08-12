@@ -25,6 +25,7 @@
     "@turf/centroid": "^6.0.2",
     "d3": "^4.13.0",
     "d3-brush": "^1.0.4",
+    "d3-cloud": "^1.2.5",
     "d3-queue": "^3.0.7",
     "d3-sankey-circular": "^0.23.0",
     "document-offset": "^1.0.4",
