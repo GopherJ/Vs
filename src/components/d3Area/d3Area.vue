@@ -48,7 +48,7 @@
 
                         negative = false,
 
-                        nice = true,
+                        nice = false,
 
                         axisYTickFormat = '.2s',
 
