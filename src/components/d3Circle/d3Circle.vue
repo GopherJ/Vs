@@ -33,7 +33,7 @@
                         precision = 2,
 
                         animationDuration = 1000,
-                        circleTitle = `${data}`
+                        circleTitle = d =>`${d}`
                     } = this.options;
 
                 if (![g_w, g_h].every(el => el > 0) || innerRadiusRatio >= 1) return;
@@ -46,12 +46,12 @@
                     .attr('width', w)
                     .attr('height', h);
 
-                const g = svg.append('g')
-                    .attr('transform', `translate(${left}, ${top})`)
-                    .attr('width', g_w)
-                    .attr('height', g_h);
+                const g = svg
+                    .append('g')
+                    .attr('transform', `translate(${left}, ${top})`);
 
-                const o = g.append('g')
+                const o = g
+                    .append('g')
                     .attr('transform', `translate(${g_w / 2}, ${g_h / 2})`);
 
                 const arcGen = d3.arc()
@@ -74,6 +74,7 @@
                 });
 
                 o.append('text')
+                    .datum(data)
                     .attr('text-anchor', 'middle')
                     .attr('x', 0)
                     .attr('y', 0)
