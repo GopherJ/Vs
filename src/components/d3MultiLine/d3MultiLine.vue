@@ -58,11 +58,11 @@
                         axisXGroupLabelFontOpacity = 0.5,
 
 
-                        axisLabelFontSize = 12,
-                        axisLabelFontWeight = 400,
-                        axisLabelFontOpacity = 0.5,
+                        axisLabelFontSize = 14,
+                        axisLabelFontWeight = 600,
+                        axisLabelFontOpacity = 1,
 
-                        axisXLaneHeight = 60,
+                        axisXLaneHeight = 35,
                         axisYLaneWidth = 35,
 
                         axisFontSize = 12,
@@ -73,11 +73,9 @@
 
                         isAxisPathShow = true,
 
-                        curve = 'curveLinear',
+                        curve = 'curveCardinal',
 
                         axisYTickFormat = '.2s',
-
-                        groupKey = 'group',
 
                         negative = false,
 
@@ -86,15 +84,15 @@
                         yAxisRuler = true
                     } = this.options,
                     {
-                        axisXLabelLaneHeight = isNull(axisXLabel) ? 0 : 30,
-                        axisYLabelLaneWidth = isNull(axisYLabel) ? 0 : 30,
+                        axisXLabelLaneHeight = isNull(axisXLabel) ? 0 : 60,
+                        axisYLabelLaneWidth = isNull(axisYLabel) ? 0 : 60,
                     } = this.options,
                     [w, h] = this.getElWidthHeight(),
                     __offsetRight__ = 10,
                     g_w = w - left - right - axisYLabelLaneWidth - axisYLaneWidth - __offsetRight__,
                     g_h = h - top - bottom - axisXLabelLaneHeight - axisXLaneHeight - axisXGroupLabelLaneHeight,
                     clipPathId = uuid(), isAxisXTime = isAxisTime(_data), isAxisXNumber = isAxisNumber(_data),
-                    data = groupBy(_data, groupKey), groups = Object.keys(data),
+                    data = groupBy(_data), groups = Object.keys(data),
                     axisXTickFormat = value => isAxisXTime ? tickFormat(value, axisXTimeInterval) : value,
                     ticks = selectTicksNumY(g_h);
 
@@ -271,7 +269,7 @@
                     .data(_data)
                     .enter()
                     .append('circle')
-                    .attr('class', d => hash(d[groupKey]))
+                    .attr('class', d => hash(d.group))
                     .attr('clip-path', `url(#${clipPathId})`)
                     .attr('cx', d => xScale(d.key))
                     .attr('cy', d => yScale(d.value))

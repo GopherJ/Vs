@@ -43,9 +43,9 @@
                         axisXLabel = null,
                         axisYLabel = null,
 
-                        axisLabelFontSize = 12,
-                        axisLabelFontWeight = 400,
-                        axisLabelFontOpacity = 0.5,
+                        axisLabelFontSize = 14,
+                        axisLabelFontWeight = 600,
+                        axisLabelFontOpacity = 1,
 
                         axisXLaneHeight = 30,
                         axisYLaneWidth = 120,
@@ -64,22 +64,19 @@
                         nice = false
                     } = this.options,
                     {
-                        axisXLabelLaneHeight = isNull(axisXLabel) ? 0 : 30,
-                        axisYLabelLaneWidth = isNull(axisYLabel) ? 0 : 30,
+                        axisXLabelLaneHeight = isNull(axisXLabel) ? 0 : 35,
+                        axisYLabelLaneWidth = isNull(axisYLabel) ? 0 : 45,
                     } = this.options,
                     { left = 0, right = 0, top = 0, bottom = 0 } = this.margin,
                     __offsetRight__ = 10, __offsetBottom__ = 10,
                     g_w = w - left - right - axisYLabelLaneWidth - axisYLaneWidth - __offsetRight__,
                     g_h = h - top - bottom - axisXLaneHeight - axisXLabelLaneHeight - __offsetBottom__,
-                    clipPathId = uuid();
-
-                if (![g_w, g_h].every(el => el > 0)) return;
-
-                const isAxisYTime = isAxisTime(data),
-                    isAxisYNumber = isAxisNumber(data),
+                    clipPathId = uuid(),isAxisYTime = isAxisTime(data), isAxisYNumber = isAxisNumber(data),
                     axisYTickFormat = value => isAxisYTime ? tickFormat(value, axisYTimeInterval) : value,
                     ticks = selectTicksNumX(g_w),
                     [paddingInner, paddingOuter] = selectPaddingInnerOuterY(g_h);
+
+                if (![g_w, g_h].every(el => el > 0)) return;
 
                 const xScale = d3.scaleLinear()
                     .range([0, g_w])
@@ -141,6 +138,7 @@
                     .attr('transform', `translate(0, ${axisXLaneHeight})`)
                     .call(xAxis)
                     .call(lastTickTextAnchorEnd)
+                    .call(axisShow, isAxisPathShow, true)
                     .attr('font-size', axisFontSize)
                     .attr('font-weight', axisFontWeight)
                     .attr('fill-opacity', axisFontOpacity);
@@ -196,7 +194,7 @@
 
                 const g = svg
                     .append('g')
-                    .attr('transform', `translate(${left + axisXLabelLaneHeight + axisYLaneWidth}, ${top + axisXLabelLaneHeight + axisXLaneHeight})`);
+                    .attr('transform', `translate(${left + axisYLabelLaneWidth + axisYLaneWidth}, ${top + axisXLabelLaneHeight + axisXLaneHeight})`);
 
                 const enter = g.selectAll('rect')
                     .data(data)
@@ -237,9 +235,6 @@
                             : 0;
                     })
                     .attr('width', d => xScale(d.value));
-
-                axisXLane
-                    .call(axisShow, isAxisPathShow, true);
             },
             safeDraw() {
                 this.ifExistsSvgThenRemove();

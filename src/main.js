@@ -89,6 +89,7 @@ export {
     d3Area,
     d3Tracker,
     d3Slider,
+    d3WordCloud,
 
     d3Sunburst,
     d3Tree,
@@ -98,6 +99,6 @@ export {
     d3ICicleHorizontal,
 
     d3LChoropleth,
-    d3LHeat
+    d3LHeat,
 };
 

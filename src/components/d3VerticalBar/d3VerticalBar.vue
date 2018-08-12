@@ -43,12 +43,12 @@
                         axisYLabel = null,
                         axisXLabel = null,
 
-                        axisLabelFontSize = 12,
-                        axisLabelFontWeight = 400,
-                        axisLabelFontOpacity = 0.5,
+                        axisLabelFontSize = 14,
+                        axisLabelFontWeight = 600,
+                        axisLabelFontOpacity = 1,
 
                         axisXLaneHeight = 60,
-                        axisYLaneWidth = 60,
+                        axisYLaneWidth = 35,
 
                         axisXTimeInterval = null,
 
@@ -66,8 +66,8 @@
                         yAxisRuler = true
                     } = this.options,
                     {
-                        axisXLabelLaneHeight = isNull(axisXLabel) ? 0 : 30,
-                        axisYLabelLaneWidth = isNull(axisYLane) ? 0 : 30,
+                        axisXLabelLaneHeight = isNull(axisXLabel) ? 0 : 35,
+                        axisYLabelLaneWidth = isNull(axisYLane) ? 0 : 60,
                     } = this.options,
                     { left = 0, right = 0, top = 0, bottom = 0 } = this.margin,
                     __offsetTop__ = 10, __offsetRight__ = 10,

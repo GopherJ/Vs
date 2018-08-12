@@ -34,17 +34,17 @@
                         axisFontWeight = 400,
                         axisFontOpacity = 0.5,
 
-                        axisXLaneHeight = 60,
+                        axisXLaneHeight = 35,
                         axisYLaneWidth = 35,
 
                         axisXLabel = null,
                         axisYLabel = null,
 
-                        axisLabelFontSize = 12,
-                        axisLabelFontWeight = 400,
-                        axisLabelFontOpacity = 0.5,
+                        axisLabelFontSize = 14,
+                        axisLabelFontWeight = 600,
+                        axisLabelFontOpacity = 1,
 
-                        isAxisPathShow = true,
+                        isAxisPathShow = false,
 
                         negative = false,
 
@@ -58,7 +58,7 @@
                     } = this.options,
                     {
                         axisXLabelLaneHeight = isNull(axisXLabel) ? 0 : 30,
-                        axisYLabelLaneWidth = isNull(axisYLabel) ? 0 : 30
+                        axisYLabelLaneWidth = isNull(axisYLabel) ? 0 : 60
                     } = this.options,
                     [w, h] = this.getElWidthHeight(),
                     __offsetTop__ = 10, __offsetRight__ = 10,
@@ -151,7 +151,7 @@
                         .text(axisXLabel)
                         .attr('fill', '#000')
                         .attr('font-size', axisLabelFontSize)
-                        .attr('font-weight', axisFontWeight)
+                        .attr('font-weight', axisLabelFontWeight)
                         .attr('fill-opacity', axisLabelFontOpacity);
 
                     axisYLabelLane

@@ -53,10 +53,12 @@
                     nodeTextFontOpacity = 1,
 
                     circularLinkGap = 4,
+
                     circularLinkColor = 'red',
                     linkColor = 'black',
 
                     gapLength = 150,
+
                     arrowLength = 10,
                     arrowHeadSize = 4,
 

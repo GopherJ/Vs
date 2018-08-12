@@ -51,9 +51,9 @@
 
                         axisXLabel = null,
 
-                        axisLabelFontSize = 12,
+                        axisLabelFontSize = 14,
                         axisLabelFontWeight = 600,
-                        axisLabelFontOpacity = 0.5,
+                        axisLabelFontOpacity = 1,
 
                         backgroundColor = 'rgba(255, 255, 255, 0.125)',
 

@@ -4,7 +4,6 @@ import { toggleClass } from './toggle';
 import hash from '../utils/hash';
 import realBBox from './realBBox';
 
-const isFunction = f => typeof f === 'function';
 /**
  *
  * @param axisXGroupLabelLane

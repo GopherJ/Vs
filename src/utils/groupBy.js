@@ -1,22 +1,21 @@
 /**
  *
  * @param data
- * @param key
  */
-const groupBy = (data, key) => {
+const groupBy = (data) => {
     const results = {};
     for (let i = 0, l = data.length; i < l; i += 1) {
         const item = data[i];
-        if (!item[key]) {
+        if (!item.group) {
             continue;
         }
 
-        if (results[item[key]]) {
-            results[item[key]].push(item);
+        if (results[item.group]) {
+            results[item.group].push(item);
         }
 
         else {
-            results[item[key]] = [item];
+            results[item.group] = [item];
         }
     }
 

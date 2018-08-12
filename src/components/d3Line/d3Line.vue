@@ -46,7 +46,7 @@
 
                         circleTitle = d => `${d.value}`,
 
-                        curve = 'curveMonotoneX',
+                        curve = 'curveCardinal',
 
                         axisXLabel = null,
                         axisYLabel = null,
@@ -68,8 +68,8 @@
                         yAxisRuler = true
                     } = this.options,
                     {
-                        axisXLabelLaneHeight = isNull(axisXLabel) ? 0 : 30,
-                        axisYLabelLaneWidth = isNull(axisYLabel) ? 0 : 30,
+                        axisXLabelLaneHeight = isNull(axisXLabel) ? 0 : 60,
+                        axisYLabelLaneWidth = isNull(axisYLabel) ? 0 : 60,
                     } = this.options,
                     [w, h] = this.getElWidthHeight(),
                     __offsetTop__ = 10, __offsetRight__ = 10,

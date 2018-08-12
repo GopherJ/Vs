@@ -18,6 +18,7 @@
     import isAxisTime from '../../utils/isAxisTime';
     import { brushX } from '../../plugins/brush';
     import axisShow from '../../plugins/axisShow';
+    import { yRuler } from '../../plugins/ruler';
 
     const tpl = `
                 <option value='Auto'>Auto</option>
@@ -47,7 +48,7 @@
             drawTimelion() {
                 const data = cloneDeep(this.data),
                     [w, h] = this.getElWidthHeight(),
-                    {left = 0, top = 0, right = 0, bottom = 0} = this.margin,
+                    { left = 0, top = 0, right = 0, bottom = 0 } = this.margin,
                     {
                         fill = '#6eadc1',
                         stroke = '#6eadc1',
@@ -59,8 +60,8 @@
                         tickSize = 10,
                         tickPadding = 8,
 
-                        axisXLaneHeight = 90,
-                        axisYLaneWidth = 60,
+                        axisXLaneHeight = 35,
+                        axisYLaneWidth = 35,
 
                         axisXLabel = null,
                         axisYLabel = null,
@@ -69,9 +70,9 @@
                         axisFontWeight = 400,
                         axisFontOpacity = 0.5,
 
-                        axisLabelFontSize = 12,
-                        axisLabelFontWeight = 400,
-                        axisLabelFontOpacity = 0.5,
+                        axisLabelFontSize = 14,
+                        axisLabelFontWeight = 600,
+                        axisLabelFontOpacity = 1,
 
                         timeRangeLabelFontSize = 12,
                         timeRangeLabelFontWeight = 400,
@@ -79,7 +80,7 @@
 
                         axisXTimeInterval = null,
 
-                        isAxisPathShow = true,
+                        isAxisPathShow = false,
 
                         animationDuration = 1000,
                         delay = 50,
@@ -88,7 +89,9 @@
 
                         negative = false,
 
-                        nice = true
+                        nice = true,
+
+                        yAxisRuler = true
                     } = this.options,
                     {
                         axisXLabelLaneHeight = isNull(axisXLabel) ? 0 : 60,
@@ -178,6 +181,7 @@
                     .attr('font-size', axisFontSize)
                     .attr('opacity', axisFontOpacity)
                     .attr('font-weight', axisFontWeight);
+                if (yAxisRuler) axisYLane.call(yRuler, yScale, g_w, d3.format(axisYTickFormat), ticks, tickSize, tickPadding);
 
                 const axisXLabelLane = svg
                     .append('g')
