@@ -22,6 +22,7 @@
     import axisShow from '../../plugins/axisShow';
     import hash from '../../utils/hash';
     import legendGen from '../../plugins/legendGen';
+    import { yRuler } from '../../plugins/ruler';
 
     export default {
         name: 'd3-multi-line',
@@ -80,7 +81,9 @@
 
                         negative = false,
 
-                        nice = false
+                        nice = false,
+
+                        yAxisRuler = true
                     } = this.options,
                     {
                         axisXLabelLaneHeight = isNull(axisXLabel) ? 0 : 30,
@@ -92,7 +95,8 @@
                     g_h = h - top - bottom - axisXLabelLaneHeight - axisXLaneHeight - axisXGroupLabelLaneHeight,
                     clipPathId = uuid(), isAxisXTime = isAxisTime(_data), isAxisXNumber = isAxisNumber(_data),
                     data = groupBy(_data, groupKey), groups = Object.keys(data),
-                    axisXTickFormat = value => isAxisXTime ? tickFormat(value, axisXTimeInterval) : value;
+                    axisXTickFormat = value => isAxisXTime ? tickFormat(value, axisXTimeInterval) : value,
+                    ticks = selectTicksNumY(g_h);
 
                 if (![g_w, g_h].every(el => el > 0) || !groups.length) return;
 
@@ -193,7 +197,7 @@
 
                 const yAxis = d3
                     .axisLeft(yScale)
-                    .ticks(selectTicksNumY(g_h))
+                    .ticks(ticks)
                     .tickFormat(d3.format(axisYTickFormat))
                     .tickSize(tickSize)
                     .tickPadding(tickPadding);
@@ -217,6 +221,7 @@
                     .attr('opacity', axisFontOpacity)
                     .attr('font-size', axisFontSize)
                     .attr('font-weight', axisFontWeight);
+                if (yAxisRuler) axisYLane.call(yRuler, yScale, g_w, d3.format(axisYTickFormat), ticks, tickSize, tickPadding);
 
                 if (isAxisXTime || isAxisXNumber) {
                     const extent = [

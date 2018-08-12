@@ -17,6 +17,7 @@
     import isAxisTime from '../../utils/isAxisTime';
     import isAxisNumber from '../../utils/isAxisNumber';
     import axisShow from '../../plugins/axisShow';
+    import { yRuler } from '../../plugins/ruler';
 
     export default {
         name: 'd3-vertical-bar',
@@ -60,7 +61,9 @@
 
                         negative = false,
 
-                        nice = true
+                        nice = true,
+
+                        yAxisRuler = true
                     } = this.options,
                     {
                         axisXLabelLaneHeight = isNull(axisXLabel) ? 0 : 30,
@@ -71,15 +74,11 @@
                     [w, h] = this.getElWidthHeight(),
                     g_w = w - left - right - axisYLabelLaneWidth - axisYLaneWidth - __offsetRight__,
                     g_h = h - top - bottom - axisXLaneHeight - axisXLabelLaneHeight - __offsetTop__,
-                    clipPathId = uuid();
+                    clipPathId = uuid(), isAxisXTime = isAxisTime(data), isAxisXNumber = isAxisNumber(data),
+                    axisXTickFormat = value => isAxisXTime ? tickFormat(value, axisXTimeInterval) : value,
+                    ticks = selectTicksNumY(g_h), [paddingInner, paddingOuter] = selectPaddingInnerOuterX(g_w);
 
                 if (![g_w, g_h].every(el => el > 0)) return;
-
-                const isAxisXTime = isAxisTime(data),
-                    isAxisXNumber = isAxisNumber(data),
-                    axisXTickFormat = value => isAxisXTime ? tickFormat(value, axisXTimeInterval) : value,
-                    ticks = selectTicksNumY(g_h),
-                    [paddingInner, paddingOuter] = selectPaddingInnerOuterX(g_w);
 
                 const svg = d3.select(this.$el)
                     .append('svg')
@@ -142,6 +141,7 @@
                     .attr('font-size', axisFontSize)
                     .attr('font-weight', axisFontWeight)
                     .attr('opacity', axisFontOpacity);
+                if (yAxisRuler) axisYLane.call(yRuler, yScale, g_w, d3.format(axisYTickFormat), ticks, tickSize, tickPadding);
 
                 const axisXLabelLane = svg
                     .append('g')

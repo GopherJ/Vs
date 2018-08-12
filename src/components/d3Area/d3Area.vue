@@ -12,6 +12,7 @@
     import isAxisTime from '../../utils/isAxisTime';
     import { responsiveAxisX } from '../../plugins/responsiveAxis';
     import axisShow from '../../plugins/axisShow';
+    import { yRuler } from '../../plugins/ruler';
 
     export default {
         name: 'd3-area',
@@ -34,7 +35,7 @@
                         axisFontOpacity = 0.5,
 
                         axisXLaneHeight = 60,
-                        axisYLaneWidth = 60,
+                        axisYLaneWidth = 35,
 
                         axisXLabel = null,
                         axisYLabel = null,
@@ -51,7 +52,9 @@
 
                         axisYTickFormat = '.2s',
 
-                        curve =  'curveLinear'
+                        curve =  'curveLinear',
+
+                        yAxisRuler = true
                     } = this.options,
                     {
                         axisXLabelLaneHeight = isNull(axisXLabel) ? 0 : 30,
@@ -126,6 +129,7 @@
                         .attr('font-size', axisFontSize)
                         .attr('font-weight', axisFontWeight)
                         .attr('opacity', axisFontOpacity);
+                if (yAxisRuler) axisYLane.call(yRuler, yScale, g_w, d3.format(axisYTickFormat), ticks, tickSize, tickPadding);
 
                     axisXLane
                         .call(responsiveAxisX, xAxis, xScale);
