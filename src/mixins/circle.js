@@ -97,7 +97,7 @@ export default {
             if (this.onResize) this.onResize();
         }, 500);
 
-        this.safeDraw();
+        this.$nextTick(() => this.safeDraw());
 
         window.addEventListener('resize', this._handleResize);
     },

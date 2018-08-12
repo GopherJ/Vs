@@ -49,6 +49,6 @@ export default {
         }
     },
     mounted() {
-        this.safeDraw();
+        this.$nextTick(() => this.safeDraw());
     }
 };
