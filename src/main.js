@@ -11,6 +11,7 @@ import d3MultiLine from './components/d3MultiLine';
 import d3GroupedArea from './components/d3GroupedArea';
 import d3HorizontalBar from './components/d3HorizontalBar';
 import d3VerticalBar from './components/d3VerticalBar';
+import d3WordCloud from './components/d3WordCloud';
 import d3Area from './components/d3Area';
 import d3Tracker from './components/d3Tracker';
 import d3Slider from './components/d3Slider';
@@ -50,6 +51,7 @@ const install = (Vue, options = {}) => {
     Vue.component(d3GroupedArea.name, d3GroupedArea);
     Vue.component(d3HorizontalBar.name, d3HorizontalBar);
     Vue.component(d3VerticalBar.name, d3VerticalBar);
+    Vue.component(d3WordCloud.name, d3WordCloud);
     Vue.component(d3Area.name, d3Area);
     Vue.component(d3Tracker.name, d3Tracker);
     Vue.component(d3Slider.name, d3Slider);

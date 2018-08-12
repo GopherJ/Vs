@@ -67,6 +67,10 @@
                     .attr('font-size', axisLabelFontSize)
                     .attr('font-weight', axisLabelFontWeight);
 
+                const textColor = d3
+                    .scaleSequential(d3.interpolateCool)
+                    .domain(d3.extent(data, d => d.size));
+
                 this.wordCloud = d3.cloud()
                     .size([g_w, g_h])
                     .words(data)
@@ -74,10 +78,11 @@
                     .rotate(() => ~~(Math.random() * 2) * 90)
                     .font(wordFontFamily)
                     .fontSize(d => d.size)
-                    .on('start', function () {
+                    .on('word', () => {
                         this.calculating = true;
                     })
-                    .on('end', draw);
+                    .on('end', draw)
+                    .start();
 
                 function draw(words) {
                     self.calculating = false;
@@ -90,6 +95,7 @@
                         .append('text')
                         .attr('text-anchor', 'middle')
                         .style('font-size', d => `${d.size}px`)
+                        .attr('fill', d => textColor(d.size))
                         .style('font-family', wordFontFamily)
                         .attr('transform', d => `translate(${[d.x, d.y]})rotate(${d.rotate})`)
                         .text(d => d.text);
@@ -112,5 +118,11 @@
 </script>
 
 <style>
-
+    .d3-word-cloud text {
+        cursor: pointer;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+    }
 </style>
