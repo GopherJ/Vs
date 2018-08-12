@@ -65,5 +65,5 @@ function drawTicksY(g, yScale, g_w, clipPathId, stroke, strokeWidth) {
 
 export {
     drawTicksX,
-    drawTicksY
+    drawTicksY,
 };
