@@ -35,7 +35,7 @@
                         axisFontOpacity = 0.5,
 
                         axisXLaneHeight = 35,
-                        axisYLaneWidth = 35,
+                        axisYLaneWidth = 60,
 
                         axisXLabel = null,
                         axisYLabel = null,
@@ -57,7 +57,7 @@
                         yAxisRuler = true
                     } = this.options,
                     {
-                        axisXLabelLaneHeight = isNull(axisXLabel) ? 0 : 30,
+                        axisXLabelLaneHeight = isNull(axisXLabel) ? 0 : 35,
                         axisYLabelLaneWidth = isNull(axisYLabel) ? 0 : 60
                     } = this.options,
                     [w, h] = this.getElWidthHeight(),

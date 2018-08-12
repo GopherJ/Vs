@@ -63,7 +63,7 @@
                         axisLabelFontOpacity = 1,
 
                         axisXLaneHeight = 35,
-                        axisYLaneWidth = 35,
+                        axisYLaneWidth = 60,
 
                         axisFontSize = 12,
                         axisFontWeight = 400,

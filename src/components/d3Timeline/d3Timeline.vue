@@ -74,8 +74,7 @@
                         axisXLabelLaneHeight = isNull(axisXLabel) ? 0 : 30,
                     } = this.options,
                     { left = 0, top = 0, right = 0, bottom = 0 } = this.margin,
-                    [w, h] = this.getElWidthHeight(),
-                    __offset__  = borderWidth,
+                    [w, h] = this.getElWidthHeight(), __offset__  = borderWidth,
                     g_w = w - left - right - groupLaneWidth - 2 * __offset__,
                     g_h = h - top - bottom - axisXLaneHeight - axisXLabelLaneHeight - 2 * __offset__,
                     entryClipPathId = uuid(), groupLabelClipPathId = uuid(), ctx = this;

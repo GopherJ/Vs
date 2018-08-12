@@ -61,7 +61,7 @@
                         tickPadding = 8,
 
                         axisXLaneHeight = 35,
-                        axisYLaneWidth = 35,
+                        axisYLaneWidth = 60,
 
                         axisXLabel = null,
                         axisYLabel = null,

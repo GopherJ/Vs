@@ -66,8 +66,8 @@
                         yAxisRuler = true
                     } = this.options,
                     {
-                        axisXLabelLaneHeight = isNull(axisXLabel) ? 0 : 35,
-                        axisYLabelLaneWidth = isNull(axisYLane) ? 0 : 60,
+                        axisXLabelLaneHeight = isNull(axisXLabel) ? 0 : 60,
+                        axisYLabelLaneWidth = isNull(axisYLabel) ? 0 : 60,
                     } = this.options,
                     { left = 0, right = 0, top = 0, bottom = 0 } = this.margin,
                     __offsetTop__ = 10, __offsetRight__ = 10,

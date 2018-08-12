@@ -47,7 +47,7 @@
                         axisLabelFontWeight = 600,
                         axisLabelFontOpacity = 1,
 
-                        axisXLaneHeight = 30,
+                        axisXLaneHeight = 35,
                         axisYLaneWidth = 120,
 
                         animationDuration = 1000,
@@ -65,7 +65,7 @@
                     } = this.options,
                     {
                         axisXLabelLaneHeight = isNull(axisXLabel) ? 0 : 35,
-                        axisYLabelLaneWidth = isNull(axisYLabel) ? 0 : 45,
+                        axisYLabelLaneWidth = isNull(axisYLabel) ? 0 : 60,
                     } = this.options,
                     { left = 0, right = 0, top = 0, bottom = 0 } = this.margin,
                     __offsetRight__ = 10, __offsetBottom__ = 10,

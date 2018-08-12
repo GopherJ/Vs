@@ -32,11 +32,11 @@
                         strokeWidth = 2,
 
                         axisXLaneHeight = 60,
-                        axisYLaneWidth = 35,
+                        axisYLaneWidth = 60,
 
                         axisFontSize = 12,
                         axisFontWeight = 400,
-                        axisFontOpacity = 1,
+                        axisFontOpacity = 0.5,
 
                         tickSize = 10,
                         tickPadding = 8,
@@ -51,9 +51,9 @@
                         axisXLabel = null,
                         axisYLabel = null,
 
-                        axisLabelFontSize = 12,
-                        axisLabelFontWeight = 400,
-                        axisLabelFontOpacity = 0.5,
+                        axisLabelFontSize = 14,
+                        axisLabelFontWeight = 600,
+                        axisLabelFontOpacity = 1,
 
                         isAxisPathShow = true,
 
