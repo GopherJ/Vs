@@ -18,6 +18,7 @@
     import { firstTickTextAnchorStart, lastTickTextAnchorEnd } from '../../plugins/textAnchor';
     import axisShow from '../../plugins/axisShow';
     import emit from '../../utils/emit';
+    import { yRuler } from '../../plugins/ruler';
 
     export default {
         name: 'd3-line',
@@ -62,7 +63,9 @@
 
                         negative = false,
 
-                        nice = false
+                        nice = false,
+
+                        yAxisRuler = true
                     } = this.options,
                     {
                         axisXLabelLaneHeight = isNull(axisXLabel) ? 0 : 30,
@@ -72,10 +75,7 @@
                     __offsetTop__ = 10, __offsetRight__ = 10,
                     g_w = w - left - right - axisYLabelLaneWidth - axisYLaneWidth - __offsetRight__,
                     g_h = h - top - bottom - axisXLabelLaneHeight - axisXLaneHeight - __offsetTop__,
-                    clipPathId = uuid();
-
-                const isAxisXTime = isAxisTime(data),
-                    isAxisXNumber = isAxisNumber(data),
+                    clipPathId = uuid(), isAxisXTime = isAxisTime(data), isAxisXNumber = isAxisNumber(data),
                     axisXTickFormat = value => isAxisXTime ? tickFormat(value, axisXTimeInterval) : value,
                     ticks = selectTicksNumY(g_h);
 
@@ -140,6 +140,7 @@
                     .attr('font-size', axisFontSize)
                     .attr('opacity', axisFontOpacity)
                     .attr('font-weight', axisFontWeight);
+                if (yAxisRuler) axisYLane.call(yRuler, yScale, g_w, d3.format(axisYTickFormat), ticks, tickSize, tickPadding);
 
                 const axisXLabelLane = svg
                     .append('g')
@@ -182,7 +183,8 @@
                     axisXLane
                         .call(responsiveAxisX, xAxis, xScale);
 
-                    svg.call(brushX.bind(this), extent, xScale, data)
+                    svg
+                        .call(brushX.bind(this), extent, xScale, data)
                 }
 
                 axisXLane
