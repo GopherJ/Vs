@@ -40,14 +40,13 @@
         },
         mixins: [mixins],
         methods: {
-            updateTimeRangeLabel(dateTimeStart, dateTimeEnd) {
+            updateTimeRangeLabel({ start, end }) {
                 d3.select(this.$el)
                     .select('.label--time')
-                    .text(() => this.getTimeRangeLabel(dateTimeStart, dateTimeEnd));
+                    .text(() => this.getTimeRangeLabel(start, end));
             },
             drawTimelion() {
                 const data = cloneDeep(this.data),
-                    [w, h] = this.getElWidthHeight(),
                     { left = 0, top = 0, right = 0, bottom = 0 } = this.margin,
                     {
                         fill = '#6eadc1',
@@ -78,9 +77,10 @@
                         timeRangeLabelFontWeight = 400,
                         timeRangeLabelFontOpacity = 0.5,
 
-                        axisXTimeInterval = null,
+                        axisXInterval = null,
 
                         isAxisPathShow = false,
+                        isAxisTickShow = true,
 
                         animationDuration = 1000,
                         delay = 50,
@@ -97,22 +97,14 @@
                         axisXLabelLaneHeight = isNull(axisXLabel) ? 0 : 60,
                         axisYLabelLaneWidth = isNull(axisYLabel) ? 0 : 60,
                     } = this.options,
-                    __timeRangeLabelLaneHeight__ = 40,
-                    __offsetRight__ = 10,
+                    [w, h] = this.getElWidthHeight(), __timeRangeLabelLaneHeight__ = 40, __offsetRight__ = 10,
                     g_w = w - left - right - axisYLabelLaneWidth - axisYLaneWidth - __offsetRight__,
                     g_h = h - top - bottom - axisXLaneHeight - axisXLabelLaneHeight - __timeRangeLabelLaneHeight__,
-                    clipPathId = uuid();
+                    clipPathId = uuid(), isAxisXTime = isAxisTime(data), axisXTickFormat = value => tickFormat(value, axisXInterval),
+                    ticks = selectTicksNumY(g_h), [paddingInner, paddingOuter] = selectPaddingInnerOuterX(g_w), isMobile = g_w <= 560;
+                const self = this;
 
-                if (![g_w, g_h].every(el => el > 0)) return;
-
-                const isAxisXTime = isAxisTime(data);
-                if (!isAxisXTime) return;
-
-                const axisXTickFormat = value => tickFormat(value, axisXTimeInterval),
-                    ticks = selectTicksNumY(g_h),
-                    [paddingInner, paddingOuter] = selectPaddingInnerOuterX(g_w),
-                    isMobile = g_w <= 560,
-                    self = this;
+                if (![g_w, g_h].every(el => el > 0) || !isAxisXTime) return;
 
                 const svg = d3.select(this.$el)
                     .append('svg')
@@ -164,7 +156,7 @@
                     .attr('opacity', axisFontOpacity)
                     .attr('font-weight', axisFontWeight)
                     .call(responsiveAxisX, xAxis, xScale)
-                    .call(axisShow, isAxisPathShow, true)
+                    .call(axisShow, isAxisPathShow, isAxisTickShow)
                     .selectAll('text')
                     .call(wrap, xScale.bandwidth());
 
@@ -177,7 +169,7 @@
                     .attr('class', 'axis axis--y')
                     .attr('transform', `translate(${axisYLaneWidth}, 0)`)
                     .call(yAxis)
-                    .call(axisShow, isAxisPathShow, true)
+                    .call(axisShow, isAxisPathShow, isAxisTickShow)
                     .attr('font-size', axisFontSize)
                     .attr('opacity', axisFontOpacity)
                     .attr('font-weight', axisFontWeight);
@@ -264,7 +256,9 @@
                     [w - right - __offsetRight__, g_h + top + __timeRangeLabelLaneHeight__]
                 ];
 
-                svg.call(brushX.bind(this), extent, xScale, data, this.updateTimeRangeLabel);
+                const brushed = ({ start, end }) => emit(this, 'range-updated', start, end);
+
+                svg.call(brushX, extent, xScale, data, brushed, this.updateTimeRangeLabel);
 
                 const g = svg
                     .append('g')
@@ -287,12 +281,12 @@
 
                 rects
                     .on('mousedown', (d) => {
-                        if (!isNumber(axisXTimeInterval)) return;
+                        if (!isNumber(axisXInterval)) return;
 
-                        const dateTimeStart = d.key,
-                            dateTimeEnd = new Date(d.key.valueOf() + axisXTimeInterval);
+                        const start = d.key,
+                            end = new Date(d.key.valueOf() + axisXInterval);
 
-                        emit(this, 'range-updated', dateTimeStart, dateTimeEnd);
+                        emit(this, 'range-updated', start, end);
                     })
                     .on('mouseover', showTip(barTitle))
                     .on('mouseout', hideTip);
