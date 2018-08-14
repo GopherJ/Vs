@@ -50,9 +50,10 @@
                         axisXLaneHeight = 60,
                         axisYLaneWidth = 35,
 
-                        axisXTimeInterval = null,
+                        axisXInterval = null,
 
                         isAxisPathShow = true,
+                        isAxisTickShow = true,
 
                         animationDuration = 1000,
                         delay = 50,
@@ -70,12 +71,11 @@
                         axisYLabelLaneWidth = isNull(axisYLabel) ? 0 : 60,
                     } = this.options,
                     { left = 0, right = 0, top = 0, bottom = 0 } = this.margin,
-                    __offsetTop__ = 10, __offsetRight__ = 10,
-                    [w, h] = this.getElWidthHeight(),
+                    __offsetTop__ = 10, __offsetRight__ = 10, [w, h] = this.getElWidthHeight(),
                     g_w = w - left - right - axisYLabelLaneWidth - axisYLaneWidth - __offsetRight__,
                     g_h = h - top - bottom - axisXLaneHeight - axisXLabelLaneHeight - __offsetTop__,
                     clipPathId = uuid(), isAxisXTime = isAxisTime(data), isAxisXNumber = isAxisNumber(data),
-                    axisXTickFormat = value => isAxisXTime ? tickFormat(value, axisXTimeInterval) : value,
+                    axisXTickFormat = value => isAxisXTime ? tickFormat(value, axisXInterval) : value,
                     ticks = selectTicksNumY(g_h), [paddingInner, paddingOuter] = selectPaddingInnerOuterX(g_w);
 
                 if (![g_w, g_h].every(el => el > 0)) return;
@@ -137,7 +137,7 @@
                     .attr('class', 'axis axis--y')
                     .attr('transform', `translate(${axisYLaneWidth}, 0)`)
                     .call(yAxis)
-                    .call(axisShow, isAxisPathShow, true)
+                    .call(axisShow, isAxisPathShow, isAxisTickShow)
                     .attr('font-size', axisFontSize)
                     .attr('font-weight', axisFontWeight)
                     .attr('opacity', axisFontOpacity);
@@ -183,11 +183,13 @@
                         [w - right - __offsetRight__, h - axisXLaneHeight - axisXLabelLaneHeight]
                     ];
 
+                    const brushed = ({ start, end }) => emit(this, 'range-updated', start, end);
+
                     axisXLane
                         .call(responsiveAxisX, xAxis, xScale);
 
                     svg
-                        .call(brushX.bind(this), extent, xScale, data);
+                        .call(brushX, extent, xScale, data, brushed);
                 }
 
                 const g = svg
@@ -226,17 +228,17 @@
                     .on('mouseover', showTip(barTitle))
                     .on('mouseout', hideTip);
 
-                if (isAxisXTime && isNumber(axisXTimeInterval)) {
+                if ((isAxisXTime || isAxisXNumber) && isNumber(axisXInterval)) {
                     rects.on('mousedown', d => {
-                        const dateTimeStart = d.key,
-                            dateTimeEnd = new Date(d.key.valueOf() + axisXTimeInterval);
+                        const start = d.key,
+                            end = isAxisXTime ? new Date(d.key.valueOf() + axisXInterval) : (d.key + axisXInterval);
 
-                        emit(this, 'range-updated', dateTimeStart, dateTimeEnd);
+                        emit(this, 'range-updated', start, end);
                     });
                 }
 
                 axisXLane
-                    .call(axisShow, isAxisPathShow, true)
+                    .call(axisShow, isAxisPathShow, isAxisTickShow)
                     .selectAll('text')
                     .call(wrap, xScale.bandwidth());
             },
