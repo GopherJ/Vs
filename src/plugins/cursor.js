@@ -8,13 +8,15 @@ import * as d3 from 'd3';
  * @param {[[number, number], [number, number]]} extent
  * @param {string} cursor
  */
-function cursor(svg, g, extent, cursor) {
+function cursor(svg, g, extent, cursor = 'pointer') {
+    let coordinates = [0, 0], [[x0, y0], [x1, y1]] = extent;
+
     svg.on('mousemove', function () {
-        const [cx, cy] = d3.mouse(g.node()),
-            [[x0, y0], [x1, y1]] = extent;
+        coordinates = d3.mouse(g.node());
+        const [cx, cy] = coordinates;
 
         if (cx > x0 && cx < x1 && cy > y0 && cy < y1) {
-            svg.attr('cursor', cursor || 'pointer');
+            svg.attr('cursor', cursor);
         }
 
         else {

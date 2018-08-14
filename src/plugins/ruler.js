@@ -1,5 +1,17 @@
 import * as d3 from 'd3';
 
+/**
+ *
+ * y axis tick ruler generator
+ *
+ * @param axisYLane
+ * @param yScale
+ * @param g_w
+ * @param tickFormat
+ * @param ticks
+ * @param tickSize
+ * @param tickPadding
+ */
 const yRuler = (axisYLane, yScale, g_w, tickFormat, ticks, tickSize, tickPadding) => {
     const ruler = d3
         .axisRight(yScale)
