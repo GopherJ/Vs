@@ -56,8 +56,9 @@
                         axisLabelFontOpacity = 1,
 
                         isAxisPathShow = true,
+                        isAxisTickShow = true,
 
-                        axisXTimeInterval = null,
+                        axisXInterval = null,
 
                         axisYTickFormat = '.2s',
 
@@ -71,12 +72,11 @@
                         axisXLabelLaneHeight = isNull(axisXLabel) ? 0 : 60,
                         axisYLabelLaneWidth = isNull(axisYLabel) ? 0 : 60,
                     } = this.options,
-                    [w, h] = this.getElWidthHeight(),
-                    __offsetTop__ = 10, __offsetRight__ = 10,
+                    [w, h] = this.getElWidthHeight(), __offsetTop__ = 10, __offsetRight__ = 10,
                     g_w = w - left - right - axisYLabelLaneWidth - axisYLaneWidth - __offsetRight__,
                     g_h = h - top - bottom - axisXLabelLaneHeight - axisXLaneHeight - __offsetTop__,
                     clipPathId = uuid(), isAxisXTime = isAxisTime(data), isAxisXNumber = isAxisNumber(data),
-                    axisXTickFormat = value => isAxisXTime ? tickFormat(value, axisXTimeInterval) : value,
+                    axisXTickFormat = value => isAxisXTime ? tickFormat(value, axisXInterval) : value,
                     ticks = selectTicksNumY(g_h);
 
                 const xScale = d3.scalePoint()
@@ -136,7 +136,7 @@
                     .attr('transform', `translate(${axisYLaneWidth}, 0)`)
                     .attr('class', 'axis axis--y')
                     .call(yAxis)
-                    .call(axisShow, isAxisPathShow, true)
+                    .call(axisShow, isAxisPathShow, isAxisTickShow)
                     .attr('font-size', axisFontSize)
                     .attr('opacity', axisFontOpacity)
                     .attr('font-weight', axisFontWeight);
@@ -180,15 +180,17 @@
                         [w - right - __offsetRight__, h - axisXLaneHeight - axisXLabelLaneHeight]
                     ];
 
+                    const brushed = ({ start, end }) => emit(this, 'range-updated', start, end);
+
                     axisXLane
                         .call(responsiveAxisX, xAxis, xScale);
 
                     svg
-                        .call(brushX.bind(this), extent, xScale, data)
+                        .call(brushX, extent, xScale, data, brushed);
                 }
 
                 axisXLane
-                    .call(axisShow, isAxisPathShow, true)
+                    .call(axisShow, isAxisPathShow, isAxisTickShow)
                     .selectAll('text')
                     .call(wrap, xScale.step());
 
@@ -226,12 +228,12 @@
                     .on('mouseover', showTip(circleTitle))
                     .on('mouseout', hideTip);
 
-                if (isAxisXTime && isNumber(axisXTimeInterval)) {
+                if ((isAxisXTime || isAxisXNumber) && isNumber(axisXInterval)) {
                     circles.on('mousedown', (d) => {
-                        const dateTimeStart = d.key,
-                            dateTimeEnd = new Date(d.key.valueOf() + axisXTimeInterval);
+                        const start = d.key,
+                            end = isAxisXTime ? new Date(d.key.valueOf() + axisXInterval) : (d.key + axisXInterval);
 
-                        emit(this, 'range-updated', dateTimeStart, dateTimeEnd);
+                        emit(this, 'range-updated', start, end);
                     });
                 }
             },
