@@ -67,8 +67,7 @@
                         axisXLabelLaneHeight = isNull(axisXLabel) ? 0 : 30,
                     } = this.options,
                     { left = 0, top = 0, right = 0, bottom = 0 } = this.margin,
-                    [w, h] = this.getElWidthHeight(),
-                    __offset__  = borderWidth,
+                    [w, h] = this.getElWidthHeight(), __offset__  = borderWidth,
                     g_w = w - left - right - 2 * __offset__,
                     g_h = h - top - bottom - axisXLaneHeight - axisXLabelLaneHeight - 2 * __offset__,
                     [paddingInner, paddingOuter] = selectPaddingInnerOuterY(g_h),
@@ -136,9 +135,7 @@
 
                 const axisXLabelLane = svg
                     .append('g')
-                    .attr('transform', `translate(${left + __offset__},${top + g_h + axisXLaneHeight + __offset__})`)
-                    .attr('width', g_w)
-                    .attr('height', axisXLabelLaneHeight);
+                    .attr('transform', `translate(${left + __offset__},${top + g_h + axisXLaneHeight + __offset__})`);
 
                 axisXLabelLane
                     .append('text')
@@ -167,9 +164,7 @@
 
                 const g = svg
                     .append('g')
-                    .attr('transform', `translate(${left + __offset__}, ${top + __offset__})`)
-                    .attr('width', g_w)
-                    .attr('height', g_h);
+                    .attr('transform', `translate(${left + __offset__}, ${top + __offset__})`);
 
                 function zooming() {
                     const newXScale = d3.event

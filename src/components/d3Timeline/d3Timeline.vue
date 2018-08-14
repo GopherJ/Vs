@@ -107,6 +107,21 @@
                     .attr('width', groupLaneWidth)
                     .attr('height', g_h);
 
+                const xScale = d3.scaleTime()
+                    .domain([dateTimeStart, dateTimeEnd])
+                    .range([0, g_w]);
+                ctx.scale = xScale;
+
+                const yScale = (i) => d3.scaleBand()
+                    .range([groupHeight * (i + 1), groupHeight * i])
+                    .paddingInner(paddingInner)
+                    .paddingOuter(paddingOuter);
+
+                const xAxis = d3
+                    .axisBottom(xScale)
+                    .tickSize(tickSize)
+                    .tickPadding(tickPadding);
+
                 svg.append('path')
                     .attr('d', roundedRect(left + __offset__ / 2, top + __offset__ / 2, g_w + groupLaneWidth + __offset__, g_h + axisXLaneHeight + __offset__, borderRadius, true, true, true, true))
                     .attr('fill', backgroundColor)
@@ -145,21 +160,6 @@
                     .attr('y1', (d, i) => (i + 1) * groupHeight)
                     .attr('y2', (d, i) => (i + 1) * groupHeight)
                     .attr('x2', g_w + groupLaneWidth);
-
-                const xScale = d3.scaleTime()
-                    .domain([dateTimeStart, dateTimeEnd])
-                    .range([0, g_w]);
-                ctx.scale = xScale;
-
-                const yScale = (i) => d3.scaleBand()
-                    .range([groupHeight * (i + 1), groupHeight * i])
-                    .paddingInner(paddingInner)
-                    .paddingOuter(paddingOuter);
-
-                const xAxis = d3
-                    .axisBottom(xScale)
-                    .tickSize(tickSize)
-                    .tickPadding(tickPadding);
 
                 const axisXLane = svg
                     .append('g')

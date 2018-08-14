@@ -229,7 +229,7 @@
                 if (isAxisXTime && isNumber(axisXTimeInterval)) {
                     rects.on('mousedown', d => {
                         const dateTimeStart = d.key,
-                            dateTimeEnd = new Date(d.key.getTime() + axisXTimeInterval);
+                            dateTimeEnd = new Date(d.key.valueOf() + axisXTimeInterval);
 
                         emit(this, 'range-updated', dateTimeStart, dateTimeEnd);
                     });
