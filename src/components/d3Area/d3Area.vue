@@ -13,6 +13,7 @@
     import { responsiveAxisX } from '../../plugins/responsiveAxis';
     import axisShow from '../../plugins/axisShow';
     import { yRuler } from '../../plugins/ruler';
+    import emit from '../../utils/emit';
 
     export default {
         name: 'd3-area',
@@ -45,6 +46,7 @@
                         axisLabelFontOpacity = 1,
 
                         isAxisPathShow = false,
+                        isAxisTickShow = true,
 
                         negative = false,
 
@@ -60,8 +62,7 @@
                         axisXLabelLaneHeight = isNull(axisXLabel) ? 0 : 35,
                         axisYLabelLaneWidth = isNull(axisYLabel) ? 0 : 60
                     } = this.options,
-                    [w, h] = this.getElWidthHeight(),
-                    __offsetTop__ = 10, __offsetRight__ = 10,
+                    __offsetTop__ = 10, __offsetRight__ = 10, [w, h] = this.getElWidthHeight(),
                     g_w =  w - left - right - axisYLaneWidth - axisYLabelLaneWidth - __offsetRight__,
                     g_h = h -top - bottom - axisXLaneHeight - axisXLabelLaneHeight - __offsetTop__,
                     clipPathId = uuid(), isAxisXTime = isAxisTime(data), ticks = selectTicksNumY(g_h);
@@ -103,33 +104,33 @@
                         .tickFormat(d3.format(axisYTickFormat))
                         .tickPadding(tickPadding);
 
+                    const axisXLane = svg
+                        .append('g')
+                        .attr('transform', `translate(${left + axisYLaneWidth + axisYLabelLaneWidth}, ${top + g_h + __offsetTop__})`);
+
                     const axisYLane = svg
                         .append('g')
                         .attr('transform', `translate(${left + axisYLabelLaneWidth}, ${top + __offsetTop__})`);
 
-                    const axisXLane = svg
+                    axisXLane
                         .append('g')
-                        .attr('transform', `translate(${left + axisYLaneWidth + axisYLabelLaneWidth}, ${top + g_h + __offsetTop__})`);
+                        .attr('class', 'axis axis--x')
+                        .call(xAxis)
+                        .call(axisShow, isAxisPathShow, isAxisTickShow)
+                        .attr('font-size', axisFontSize)
+                        .attr('font-weight', axisFontWeight)
+                        .attr('opacity', axisFontOpacity);
 
                     axisYLane
                         .append('g')
                         .attr('transform', `translate(${axisYLaneWidth}, 0)`)
                         .attr('class', 'axis axis--y')
                         .call(yAxis)
-                        .call(axisShow, isAxisPathShow, true)
+                        .call(axisShow, isAxisPathShow, isAxisTickShow)
                         .attr('font-size', axisFontSize)
                         .attr('font-weight', axisFontWeight)
                         .attr('opacity', axisFontOpacity);
-
-                    axisXLane
-                        .append('g')
-                        .attr('class', 'axis axis--x')
-                        .call(xAxis)
-                        .call(axisShow, isAxisPathShow, true)
-                        .attr('font-size', axisFontSize)
-                        .attr('font-weight', axisFontWeight)
-                        .attr('opacity', axisFontOpacity);
-                if (yAxisRuler) axisYLane.call(yRuler, yScale, g_w, d3.format(axisYTickFormat), ticks, tickSize, tickPadding);
+                    if (yAxisRuler) axisYLane.call(yRuler, yScale, g_w, d3.format(axisYTickFormat), ticks, tickSize, tickPadding);
 
                     axisXLane
                         .call(responsiveAxisX, xAxis, xScale);
@@ -171,8 +172,10 @@
                         [w - right - __offsetRight__, h - axisXLaneHeight - axisXLabelLaneHeight]
                     ];
 
+                    const brushed = ({ start, end }) => emit(this, 'range-updated', start, end);
+
                     svg
-                        .call(brushX.bind(this), extent, xScale, data);
+                        .call(brushX, extent, xScale, data, brushed);
 
                     const g = svg
                         .append('g')

@@ -16,6 +16,7 @@
     import { lengendGenStatic } from '../../plugins/legendGen';
     import hash from '../../utils/hash';
     import { yRuler } from '../../plugins/ruler';
+    import emit from '../../utils/emit';
 
     export default {
         name: 'd3-grouped-area',
@@ -37,7 +38,7 @@
                         axisFontWeight = 400,
                         axisFontOpacity = 0.5,
 
-                        axisXLaneHeight = 60,
+                        axisXLaneHeight = 35,
                         axisYLaneWidth = 60,
 
                         axisXLabel = null,
@@ -51,11 +52,13 @@
                         axisXGroupLabelFontWeight = 400,
                         axisXGroupLabelFontOpacity = 0.5,
 
-                        axisLabelFontSize = 12,
-                        axisLabelFontWeight = 400,
-                        axisLabelFontOpacity = 0.5,
+                        axisLabelFontSize = 14,
+                        axisLabelFontWeight = 600,
+                        axisLabelFontOpacity = 1,
 
-                        isAxisPathShow = true,
+                        isAxisPathShow = false,
+
+                        isAxisTickShow = true,
 
                         negative = false,
 
@@ -68,11 +71,10 @@
                         yAxisRuler = true
                     } = this.options,
                     {
-                        axisXLabelLaneHeight = isNull(axisXLabel) ? 0 : 30,
-                        axisYLabelLaneWidth = isNull(axisYLabel) ? 0 : 30
+                        axisXLabelLaneHeight = isNull(axisXLabel) ? 0 : 35,
+                        axisYLabelLaneWidth = isNull(axisYLabel) ? 0 : 60
                     } = this.options,
-                    [w, h] = this.getElWidthHeight(),
-                    __offsetRight__ = 10,
+                    [w, h] = this.getElWidthHeight(), __offsetRight__ = 10,
                     g_w =  w - left - right - axisYLaneWidth - axisYLabelLaneWidth - __offsetRight__,
                     g_h = h -top - bottom - axisXLaneHeight - axisXLabelLaneHeight - axisXGroupLabelLaneHeight,
                     clipPathId = uuid(), isAxisXTime = isAxisTime(_data), ticks = selectTicksNumY(g_h),
@@ -148,7 +150,7 @@
                     .attr('transform', `translate(${axisYLaneWidth}, 0)`)
                     .attr('class', 'axis axis--y')
                     .call(yAxis)
-                    .call(axisShow, isAxisPathShow, true)
+                    .call(axisShow, isAxisPathShow, isAxisTickShow)
                     .attr('font-size', axisFontSize)
                     .attr('font-weight', axisFontWeight)
                     .attr('opacity', axisFontOpacity);
@@ -158,7 +160,7 @@
                     .append('g')
                     .attr('class', 'axis axis--x')
                     .call(xAxis)
-                    .call(axisShow, isAxisPathShow, true)
+                    .call(axisShow, isAxisPathShow, isAxisTickShow)
                     .attr('font-size', axisFontSize)
                     .attr('font-weight', axisFontWeight)
                     .attr('opacity', axisFontOpacity);
@@ -203,8 +205,10 @@
                     [w - right - __offsetRight__, h - axisXLaneHeight - axisXLabelLaneHeight]
                 ];
 
+                const brushed = ({ start, end }) => emit(this, 'range-updated', start, end);
+
                 svg
-                    .call(brushX.bind(this), extent, xScale, data);
+                    .call(brushX, extent, xScale, data, brushed);
 
                 const g = svg
                     .append('g')
