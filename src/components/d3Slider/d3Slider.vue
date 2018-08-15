@@ -6,11 +6,9 @@
     import * as d3 from 'd3';
     import { isNumber, isDate, isString } from 'lodash';
     import emit from '../../utils/emit';
-    import axisShow from '../../plugins/axisShow';
     import mixins from '../../mixins/slider';
     import roundLine from '../../plugins/roundLine';
     import { showTip, hideTip } from '../../plugins/tooltip';
-    import { responsiveAxisX } from '../../plugins/responsiveAxis';
 
     export default {
         name: 'd3-slider',
@@ -19,8 +17,6 @@
             drawSlider() {
                 const min = this.min,
                       max = this.max;
-
-                if (!this.isTypeTheSame(min, max)) return;
 
                 const { left = 0, right = 0, top = 0, bottom = 0 } = this.margin,
                     {
@@ -39,16 +35,7 @@
                         circleStrokeOpacity = 0.5,
                         circleStrokeWidth = 1.25,
 
-                        isAxisShow = false,
-
-                        axisFontSize = 12,
-                        axisFontWeight = 400,
-                        axisFontOpacity = 1,
-
                         hueAlpha = 0.2
-                    } = this.options,
-                    {
-                        axisXLaneHeight = isAxisShow ? 30 : 0
                     } = this.options,
                     circleRadius = trackStrokeWidth,
                     [w, h] = this.getElWidthHeight(),
@@ -56,7 +43,7 @@
                     g_w = w - left - right - __offsetLeft__ - __offsetRight__,
                     g_h = h - top - bottom;
 
-                if (g_h < 2 * circleRadius + circleStrokeWidth + axisXLaneHeight || g_w <= 4 * circleRadius + 2 * circleStrokeWidth) return;
+                if (!this.isTypeTheSame(min, max) || g_h < 2 * circleRadius + circleStrokeWidth || g_w <= 4 * circleRadius + 2 * circleStrokeWidth) return;
 
                 const isAxisDate = isDate(min),
                      isAxisColor = isString(min),
@@ -134,24 +121,6 @@
                     }
                 })(isAxisDate, isAxisColor, isAxisNumber);
 
-                if (isAxisShow) {
-                    const xAxis = d3
-                        .axisBottom(xScale);
-
-                    const axisXLane = svg
-                        .append('g')
-                        .attr('class', 'axis axis--x')
-                        .attr('transform',  `translate(${left + __offsetLeft__ + circleStrokeWidth / 2 + circleRadius}, ${top + g_h / 2 + circleRadius + circleStrokeWidth / 2})`);
-
-                    axisXLane
-                        .call(xAxis)
-                        .call(responsiveAxisX, xAxis, xScale)
-                        .call(axisShow, false, false)
-                        .attr('font-size', axisFontSize)
-                        .attr('opacity', axisFontOpacity)
-                        .attr('font-weight', axisFontWeight);
-                }
-
                 function hueTween(x) {
                     const hueError = hueTarget - hueActual;
 
@@ -171,7 +140,7 @@
                         circle
                             .attr('cx', hueActual);
 
-                            showTip(typeof val === 'number'? val.toFixed(2) : val, circle.node())();
+                            showTip(isNumber(val) ? val.toFixed(2) : val, circle.node())();
 
                         emit(self, 'input', val);
                     }
@@ -205,7 +174,7 @@
                             ? d3.interpolate(min, max)((hueActual - hueMin) / (hueMax - hueMin))
                             : xScale.invert(hueActual - circleRadius - circleStrokeWidth / 2);
 
-                        showTip(typeof val === 'number' ? val.toFixed(2) : val, circle.node())();
+                        showTip(isNumber(val) ? val.toFixed(2) : val, circle.node())();
                     })
                     .on('mouseout', hideTip);
             },
