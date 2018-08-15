@@ -1,24 +1,22 @@
 import * as d3 from 'd3';
 import { isNumber, isDate, isString, debounce } from 'lodash';
-import isValidColor from '../utils/isValidColor';
 import { hideTip } from '../plugins/tooltip';
 
 export default {
     data() {
         return {
-            observer: null
+            observer: null,
+            val: null
         }
     },
     props: {
         min: {
             type: [Number, Date, String],
-            default: 1,
-            validator: val => typeof val !== 'string' || isValidColor(val)
+            default: 1
         },
         max: {
             type: [Number, Date, String],
-            default: 10,
-            validator:  val => typeof val !== 'string' || isValidColor(val)
+            default: 10
         },
         width: {
             type: String,
@@ -38,7 +36,7 @@ export default {
         }
     },
     methods: {
-        isTypeTheSame(a, b) {
+        isTheSameType(a, b) {
             return isNumber(a) && isNumber(b)
                 || isDate(a) && isDate(b)
                 || isString(a) && isString(b);

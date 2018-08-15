@@ -1,5 +1,6 @@
 import * as d3 from 'd3';
 import offset from 'document-offset';
+import { isFunction } from 'lodash';
 
 /**
  * get tooltip div
@@ -50,12 +51,11 @@ const GetOffsetLeft = (tooltip, target) => offset(target).left + target.getBBox(
  * @return {Function}
  */
 function showTip(title, el) {
-
     return function (d) {
         const target  = el || d3.event.target;
 
             tooltip
-                .html(typeof title === 'function' ? title(d) : title);
+                .html(isFunction(title) ? title(d) : title);
 
             const top = GetOffsetTop(tooltip, target),
                  left = GetOffsetLeft(tooltip, target);
