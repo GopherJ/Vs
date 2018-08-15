@@ -1,8 +1,14 @@
 /* eslint-disable */
 import * as d3 from 'd3';
 import { debounce } from 'lodash';
+import { hideTip } from '../plugins/tooltip';
 
 export default {
+    data() {
+        return {
+            observer: null
+        }
+    },
     props: {
         nodes: {
             type: Array,
@@ -98,6 +104,10 @@ export default {
         }
     },
     mounted() {
+        this.observer = new MutationObserver(_ => {
+            hideTip();
+        }).observe(this.$el, { childList: true });
+
         this.listener = debounce(() => {
             if (this.onResize) this.onResize();
         }, 500);
@@ -108,5 +118,7 @@ export default {
     },
     beforeDestroy() {
         window.removeEventListener('resize', this.listener);
+
+        this.observer.disconnect();
     }
 };

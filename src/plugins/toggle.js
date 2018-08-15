@@ -2,7 +2,7 @@ import * as d3 from 'd3';
 
 /**
  *
- * toggle cross
+ * toggle cross in rect
  *
  * @param {d3.Selection} container
  * @param {d3.Selection} rect

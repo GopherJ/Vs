@@ -18,36 +18,39 @@ const tooltip = (function (body) {
     }
 })(d3.select('body'));
 
+
 /**
  *
- * calculate tooltip offset top
+ * calculate tooltip offset left
  *
- * @param {d3.Selection} tooltip
- * @param {HTMLElement} target
+ * @param tooltip
+ * @param target
+ * @return {number}
+ * @constructor
  */
 const GetOffsetTop = (tooltip, target) => offset(target).top - tooltip.node().getBoundingClientRect().height - 10;
 
 
 /**
  *
- * calculate tooltip offset left
- *
- * @param {d3.Selection} tooltip
- * @param {HTMLElement} target
+ * @param tooltip
+ * @param target
+ * @return {number}
+ * @constructor
  */
 const GetOffsetLeft = (tooltip, target) => offset(target).left + target.getBBox().width / 2 - tooltip.node().getBoundingClientRect().width / 2;
 
+
 /**
  *
- * show tooltip
- *
- * @param {(d) => string} title
- * @return {function}
+ * @param title
+ * @param el
+ * @return {Function}
  */
-function showTip(title, t) {
+function showTip(title, el) {
 
     return function (d) {
-        const target  = t || d3.event.target;
+        const target  = el || d3.event.target;
 
             tooltip
                 .html(typeof title === 'function' ? title(d) : title);

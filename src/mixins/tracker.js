@@ -1,5 +1,6 @@
 import { Point, Interval } from '../utils/getTrackerLanes';
 import { isBoolean } from 'lodash';
+import {hideTip} from "../plugins/tooltip";
 
 export default {
     data() {
@@ -9,7 +10,8 @@ export default {
             scale: null,
             pause: true,
             play: null,
-            worker: null
+            worker: null,
+            observer: null
         }
     },
     methods: {
@@ -130,5 +132,13 @@ export default {
 
             this.$emit('change', n);
         }
+    },
+    mounted() {
+        this.observer = new MutationObserver(_ => {
+            hideTip();
+        }).observe(this.$el, { childList: true });
+    },
+    beforeDestroy() {
+        this.observer.disconnect();
     }
 };
