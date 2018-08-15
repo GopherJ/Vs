@@ -17,7 +17,7 @@ const groupBySum = data => {
        const data = groups[i];
        res[i] = {
            data,
-           sum: data.reduce((ite, cur) => ite += cur.value, 0)
+           sum: data.reduce((ite, cur) => (ite += cur.value, ite), 0)
        };
 
        min = min === undefined || min > res[i].sum
