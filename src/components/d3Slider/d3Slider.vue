@@ -4,69 +4,25 @@
 
 <script>
     import * as d3 from 'd3';
-    import { isNumber, isDate, isString, debounce } from 'lodash';
-    import isValidColor from '../../utils/isValidColor';
+    import { isNumber, isDate, isString } from 'lodash';
     import emit from '../../utils/emit';
     import axisShow from '../../plugins/axisShow';
+    import mixins from '../../mixins/slider';
+    import roundLine from '../../plugins/roundLine';
     import { showTip, hideTip } from '../../plugins/tooltip';
     import { responsiveAxisX } from '../../plugins/responsiveAxis';
-    import roundLine from '../../plugins/roundLine';
 
     export default {
         name: 'd3-slider',
-        props: {
-            min: {
-                type: [Number, Date, String],
-                default: 1,
-                validator: val => typeof val !== 'string' || isValidColor(val)
-            },
-            max: {
-                type: [Number, Date, String],
-                default: 10,
-                validator:  val => typeof val !== 'string' || isValidColor(val)
-            },
-            width: {
-                type: String,
-                default: '100%'
-            },
-            height: {
-                type: String,
-                default: '100px'
-            },
-            margin: {
-                type: Object,
-                default: () => ({})
-            },
-            options: {
-                type: Object,
-                default: () => ({})
-            }
-        },
+        mixins: [mixins],
         methods: {
-            isTypeTheSame(a, b) {
-                return isNumber(a) && isNumber(b)
-                    || isDate(a) && isDate(b)
-                    || isString(a) && isString(b);
-            },
-            ifExistsSvgThenRemove() {
-                const svgSelection = d3.select(this.$el).select('svg');
-                if (svgSelection.empty()) {
-                    return;
-                }
-
-                svgSelection.remove();
-            },
-            getElWidthHeight() {
-                return [this.$el.clientWidth, this.$el.clientHeight];
-            },
             drawSlider() {
                 const min = this.min,
                       max = this.max;
 
                 if (!this.isTypeTheSame(min, max)) return;
 
-                const [w, h] = this.getElWidthHeight(),
-                    { left = 0, right = 0, top = 0, bottom = 0 } = this.margin,
+                const { left = 0, right = 0, top = 0, bottom = 0 } = this.margin,
                     {
                         trackStroke = '#000',
                         trackStrokeWidth = 10,
@@ -95,8 +51,8 @@
                         axisXLaneHeight = isAxisShow ? 30 : 0
                     } = this.options,
                     circleRadius = trackStrokeWidth,
-                    __offsetLeft__ = 20,
-                    __offsetRight__ = 20,
+                    [w, h] = this.getElWidthHeight(),
+                    __offsetLeft__ = 20, __offsetRight__ = 20,
                     g_w = w - left - right - __offsetLeft__ - __offsetRight__,
                     g_h = h - top - bottom;
 
@@ -120,11 +76,9 @@
 
                 const g = svg
                     .append('g')
-                    .attr('transform', `translate(${left + __offsetLeft__}, ${top})`)
-                    .attr('width', g_w)
-                    .attr('height', g_h);
+                    .attr('transform', `translate(${left + __offsetLeft__}, ${top})`);
 
-                const track = g
+                g
                     .append('line')
                     .attr('class', 'track')
                     .attr('x1', circleRadius + circleStrokeWidth / 2)
@@ -136,7 +90,7 @@
                     .attr('stroke-width', trackStrokeWidth)
                     .call(roundLine, trackRounded);
 
-                const trackInset = g
+                g
                     .append('line')
                     .attr('class', 'track track--inset')
                     .attr('x1', circleRadius + circleStrokeWidth / 2)
@@ -186,10 +140,8 @@
 
                     const axisXLane = svg
                         .append('g')
-                        .attr('transform',  `translate(${left + __offsetLeft__ + circleStrokeWidth / 2 + circleRadius}, ${top + g_h / 2 + circleRadius + circleStrokeWidth / 2})`)
                         .attr('class', 'axis axis--x')
-                        .attr('width', g_w - circleStrokeWidth - 2 * circleRadius)
-                        .attr('height', axisXLaneHeight);
+                        .attr('transform',  `translate(${left + __offsetLeft__ + circleStrokeWidth / 2 + circleRadius}, ${top + g_h / 2 + circleRadius + circleStrokeWidth / 2})`);
 
                     axisXLane
                         .call(xAxis)
@@ -264,48 +216,6 @@
             onResize() {
                 this.safeDraw();
             }
-        },
-        watch: {
-            width() {
-                this.$nextTick(() => {
-                    this.safeDraw();
-                });
-            },
-            height() {
-                this.$nextTick(() => {
-                    this.safeDraw();
-                });
-            },
-            min() {
-                this.$nextTick(() => {
-                    this.safeDraw();
-                });
-            },
-            max() {
-                this.$nextTick(() => {
-                    this.safeDraw();
-                });
-            },
-            margin: {
-                deep: true,
-                handler() {
-                    this.$nextTick(() => {
-                        this.safeDraw();
-                    });
-                }
-            }
-        },
-        mounted() {
-            this.safeDraw();
-
-            this._handler = debounce((e) => {
-                this.onResize();
-            }, 500);
-
-            window.addEventListener('resize', this._handler);
-        },
-        beforeDestroy() {
-            window.removeEventListener('resize', this._handler);
         }
     }
 </script>

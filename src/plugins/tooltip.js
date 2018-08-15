@@ -33,6 +33,8 @@ const GetOffsetTop = (tooltip, target) => offset(target).top - tooltip.node().ge
 
 /**
  *
+ * calculate tooltip offset top
+ *
  * @param tooltip
  * @param target
  * @return {number}
