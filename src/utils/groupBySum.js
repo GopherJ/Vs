@@ -12,7 +12,7 @@ const groupBySum = data => {
        return ite;
    }, {});
 
-   let min, max, sum, res = {};
+   let min = undefined, max = undefined, sum = undefined, res = {};
    for(let i in groups) {
        const data = groups[i];
        res[i] = {

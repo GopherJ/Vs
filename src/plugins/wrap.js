@@ -1,11 +1,10 @@
 import * as d3 from 'd3';
 
+
 /**
  *
- * wrap long tick text
- *
- * @param {d3.Selection} texts
- * @param {number} width
+ * @param texts
+ * @param width
  */
 function wrap(texts, width) {
     texts.each(function () {

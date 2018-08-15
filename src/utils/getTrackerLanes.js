@@ -1,4 +1,3 @@
-
 import { isDate, first } from 'lodash';
 import moment from 'moment';
 

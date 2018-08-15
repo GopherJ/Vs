@@ -1,4 +1,3 @@
-
 /**
  *
  * select the correct paddingInner and paddingOuter for axis x
@@ -68,6 +67,7 @@ const selectTicksNumX = (width) => {
 export {
     selectPaddingInnerOuterX,
     selectPaddingInnerOuterY,
+
     selectTicksNumX,
     selectTicksNumY
 };
