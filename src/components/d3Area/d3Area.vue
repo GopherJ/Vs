@@ -175,7 +175,7 @@
                     const brushed = ({ start, end }) => emit(this, 'range-updated', start, end);
 
                     svg
-                        .call(brushX, extent, xScale, data, brushed);
+                        .call(brushX, extent, xScale, { brushed });
 
                     const g = svg
                         .append('g')

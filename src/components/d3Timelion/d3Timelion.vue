@@ -257,8 +257,9 @@
                 ];
 
                 const brushed = ({ start, end }) => emit(this, 'range-updated', start, end);
+                const brushing = this.updateTimeRangeLabel;
 
-                svg.call(brushX, extent, xScale, data, brushed, this.updateTimeRangeLabel);
+                svg.call(brushX, extent, xScale, { brushed, brushing }, data);
 
                 const g = svg
                     .append('g')

@@ -83,7 +83,7 @@ const brushInvertY = (extent, scale, data) => {
  * @param brushed
  * @param brushing
  */
-function brushX(svg, extent, scale, data, brushed, brushing) {
+function brushX(svg, extent, scale, { brushed, brushing }, data) {
     const brushSelection = svg.select('.brush');
     let b = !brushSelection.empty()
         ? brushSelection
@@ -121,11 +121,11 @@ function brushX(svg, extent, scale, data, brushed, brushing) {
  * @param svg
  * @param extent
  * @param scale
- * @param data
  * @param brushed
  * @param brushing
+ * @param data
  */
-function brushY(svg, extent, scale, data, brushed, brushing) {
+function brushY(svg, extent, scale, { brushed, brushing }, data) {
     const brushSelection = svg.select('.brush');
     let b = !brushSelection.empty()
         ? brushSelection

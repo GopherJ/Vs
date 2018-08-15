@@ -29,7 +29,7 @@
         mixins: [mixins],
         methods: {
             drawMultiLine() {
-                const _data = cloneDeep(this.data),
+                const __data__ = cloneDeep(this.data),
                     { left = 0, top = 0, right = 0, bottom = 0 } = this.margin,
                     {
                         strokeWidth = 2,
@@ -91,8 +91,8 @@
                     [w, h] = this.getElWidthHeight(), __offsetRight__ = 10,
                     g_w = w - left - right - axisYLabelLaneWidth - axisYLaneWidth - __offsetRight__,
                     g_h = h - top - bottom - axisXLabelLaneHeight - axisXLaneHeight - axisXGroupLabelLaneHeight,
-                    clipPathId = uuid(), isAxisXTime = isAxisTime(_data), isAxisXNumber = isAxisNumber(_data),
-                    data = groupBy(_data), groups = Object.keys(data), ticks = selectTicksNumY(g_h),
+                    clipPathId = uuid(), isAxisXTime = isAxisTime(__data__), isAxisXNumber = isAxisNumber(__data__),
+                    data = groupBy(__data__), groups = Object.keys(data), ticks = selectTicksNumY(g_h),
                     axisXTickFormat = value => isAxisXTime ? tickFormat(value, axisXInterval) : value;
 
                 if (![g_w, g_h].every(el => el > 0) || !groups.length) return;
@@ -102,12 +102,12 @@
                     .range(d3.schemeCategory20c);
 
                 const yScale = d3.scaleLinear()
-                    .domain(negative ? d3.extent(data, d => d.value) : [0, d3.max(_data.map(d => d.value))])
+                    .domain(negative ? d3.extent(data, d => d.value) : [0, d3.max(__data__.map(d => d.value))])
                     .range([g_h, 0]);
                 if (nice) yScale.nice();
 
                 const xScale = d3.scalePoint()
-                    .domain(GetAllKeys(_data))
+                    .domain(GetAllKeys(__data__))
                     .range([0, g_w]);
 
                 const lineGen = d3.line()
@@ -232,7 +232,7 @@
                         .call(responsiveAxisX, xAxis, xScale);
 
                     svg
-                        .call(brushX, extent, xScale, _data, brushed);
+                        .call(brushX, extent, xScale, { brushed }, __data__);
                 }
 
                 axisXLane
@@ -267,7 +267,7 @@
                     .attr('stroke-width', strokeWidth);
 
                 const circles = g.selectAll('circle')
-                    .data(_data)
+                    .data(__data__)
                     .enter()
                     .append('circle')
                     .attr('class', d => hash(d.group))

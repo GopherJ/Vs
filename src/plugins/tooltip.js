@@ -47,13 +47,13 @@ const GetOffsetLeft = (tooltip, target) => offset(target).left + target.getBBox(
 function showTip(title, t) {
 
     return function (d) {
-        const target = t || d3.event.target;
+        const target  = t || d3.event.target;
 
             tooltip
                 .html(typeof title === 'function' ? title(d) : title);
 
             const top = GetOffsetTop(tooltip, target),
-                left = GetOffsetLeft(tooltip, target);
+                 left = GetOffsetLeft(tooltip, target);
 
             tooltip
                 .style('top', `${top}px`)

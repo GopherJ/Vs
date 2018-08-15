@@ -189,7 +189,7 @@
                         .call(responsiveAxisX, xAxis, xScale);
 
                     svg
-                        .call(brushX, extent, xScale, data, brushed);
+                        .call(brushX, extent, xScale, { brushed }, data);
                 }
 
                 const g = svg

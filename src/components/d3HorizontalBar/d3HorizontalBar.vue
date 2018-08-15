@@ -23,8 +23,7 @@
         mixins: [mixins],
         methods: {
             drawVerticalBar() {
-                const [w, h] = this.getElWidthHeight(),
-                    data = cloneDeep(this.data),
+                const data = cloneDeep(this.data),
                     {
                         fill = '#6eadc1',
                         stroke = '#6eadc1',
@@ -54,8 +53,9 @@
                         delay = 50,
 
                         isAxisPathShow = true,
+                        isAxisTickShow = true,
 
-                        axisYTimeInterval = null,
+                        axisYInterval = null,
 
                         axisXTickFormat = '.2s',
 
@@ -69,12 +69,12 @@
                     } = this.options,
                     { left = 0, right = 0, top = 0, bottom = 0 } = this.margin,
                     __offsetRight__ = 10, __offsetBottom__ = 10,
+                    [w, h] = this.getElWidthHeight(),
                     g_w = w - left - right - axisYLabelLaneWidth - axisYLaneWidth - __offsetRight__,
                     g_h = h - top - bottom - axisXLaneHeight - axisXLabelLaneHeight - __offsetBottom__,
-                    clipPathId = uuid(),isAxisYTime = isAxisTime(data), isAxisYNumber = isAxisNumber(data),
-                    axisYTickFormat = value => isAxisYTime ? tickFormat(value, axisYTimeInterval) : value,
-                    ticks = selectTicksNumX(g_w),
-                    [paddingInner, paddingOuter] = selectPaddingInnerOuterY(g_h);
+                    clipPathId = uuid(), isAxisYTime = isAxisTime(data), isAxisYNumber = isAxisNumber(data),
+                    axisYTickFormat = value => isAxisYTime ? tickFormat(value, axisYInterval) : value,
+                    ticks = selectTicksNumX(g_w), [paddingInner, paddingOuter] = selectPaddingInnerOuterY(g_h);
 
                 if (![g_w, g_h].every(el => el > 0)) return;
 
@@ -138,7 +138,7 @@
                     .attr('transform', `translate(0, ${axisXLaneHeight})`)
                     .call(xAxis)
                     .call(lastTickTextAnchorEnd)
-                    .call(axisShow, isAxisPathShow, true)
+                    .call(axisShow, isAxisPathShow, isAxisTickShow)
                     .attr('font-size', axisFontSize)
                     .attr('font-weight', axisFontWeight)
                     .attr('fill-opacity', axisFontOpacity);
@@ -148,7 +148,7 @@
                     .attr('class', 'axis axis--y')
                     .attr('transform', `translate(${axisYLaneWidth}, 0)`)
                     .call(yAxis)
-                    .call(axisShow, isAxisPathShow, true)
+                    .call(axisShow, isAxisPathShow, isAxisTickShow)
                     .attr('font-size', axisFontSize)
                     .attr('font-weight', axisFontWeight)
                     .attr('fill-opacity', axisFontOpacity);
@@ -185,11 +185,13 @@
                         [w - right - __offsetRight__, h - bottom - __offsetBottom__]
                     ];
 
+                    const brushed = ({ start, end }) => emit(this, 'range-update', start, end);
+
                     axisYLane
                         .call(responsiveAxisY, yAxis, yScale);
 
                     svg
-                        .call(brushY.bind(this), extent, yScale, data);
+                        .call(brushY, extent, yScale, { brushed }, data);
                 }
 
                 const g = svg
@@ -216,12 +218,12 @@
                     .on('mouseover', showTip(barTitle))
                     .on('mouseout', hideTip);
 
-                if (isAxisYTime && isNumber(axisYTimeInterval)) {
+                if ((isAxisYTime || isAxisYNumber) && isNumber(axisYInterval)) {
                     rects.on('mousedown', d => {
-                        const dateTimeStart = d.key,
-                            dateTimeEnd = new Date(d.key.valueOf() + axisYTimeInterval);
+                        const start = d.key,
+                            end = isAxisYTime ? new Date(d.key.valueOf() + axisYInterval) : (d.key + axisYInterval);
 
-                        emit(this, 'range-updated', dateTimeStart, dateTimeEnd);
+                        emit(this, 'range-updated', start, end);
                     });
                 }
 

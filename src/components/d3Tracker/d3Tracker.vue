@@ -167,8 +167,7 @@
                     .attr('transform', `translate(${left + __offset__}, ${top + __offset__})`);
 
                 function zooming() {
-                    const newXScale = d3.event
-                        .transform.rescaleX(xScale);
+                    const newXScale = d3.event.transform.rescaleX(xScale);
                     self.scale = newXScale;
 
                     svg
