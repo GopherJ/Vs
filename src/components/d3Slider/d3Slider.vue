@@ -5,7 +5,6 @@
 <script>
     import * as d3 from 'd3';
     import { isNumber, isDate, isString } from 'lodash';
-    import emit from '../../utils/emit';
     import mixins from '../../mixins/slider';
     import roundLine from '../../plugins/roundLine';
     import { showTip, hideTip } from '../../plugins/tooltip';
@@ -39,7 +38,7 @@
                     } = this.options,
                     circleRadius = trackStrokeWidth,
                     [w, h] = this.getElWidthHeight(),
-                    __offsetLeft__ = 20, __offsetRight__ = 20,
+                    __offsetLeft__ = 0, __offsetRight__ = 0,
                     g_w = w - left - right - __offsetLeft__ - __offsetRight__,
                     g_h = h - top - bottom;
 
@@ -131,7 +130,7 @@
                     if (Math.abs(hueError) < 1e-3) {
                         hueActual = hueTarget, hueTimer.stop(), hideTip();
 
-                        emit(self, 'input', val);
+                        self.$emit('input', val);
                     }
 
                     else {
@@ -142,7 +141,7 @@
 
                             showTip(isNumber(val) ? val.toFixed(2) : val, circle.node())();
 
-                        emit(self, 'input', val);
+                        self.$emit('input', val);
                     }
                 }
 
