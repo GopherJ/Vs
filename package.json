@@ -36,6 +36,7 @@
     "moment": "^2.22.0",
     "murmurhash3js": "^3.0.1",
     "simple-web-worker": "^1.2.0",
+    "spin.js": "^4.0.0",
     "uuid": "^3.3.2",
     "vue": "^2.5.13"
   },
