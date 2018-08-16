@@ -12,6 +12,7 @@
     import roundedRect from '../../plugins/roundedRect';
     import zoom from '../../plugins/zoom';
     import emit from '../../utils/emit';
+    import cursor from '../../plugins/cursor';
     import draw from './draw';
     import { brushX } from '../../plugins/brush';
     import { drawCurrentReferenceX } from '../../plugins/drawCurrentReference';
@@ -195,11 +196,17 @@
                     [w - right - __offset__, h - axisXLaneHeight - __offset__ - axisXLabelLaneHeight]
                 ];
 
+                const scaleExtent = [0.2, Infinity];
+
                 const brushed = ({ start, end }) => emit(this, 'range-updated', start, end);
 
                 svg
                     .call(brushX, extent, xScale, { brushed })
-                    .call(zoom, zooming, zoomend);
+                    .call(cursor, axisXLane, [
+                        [0, 0],
+                        [g_w, axisXLaneHeight]
+                    ])
+                    .call(zoom, { zooming, zoomend }, scaleExtent);
 
 
                 const g = svg.append('g')
