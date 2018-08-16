@@ -11,11 +11,10 @@
     import { getTimelineGroups } from '../../utils/getTimelineGroups';
     import roundedRect from '../../plugins/roundedRect';
     import zoom from '../../plugins/zoom';
-    import cursor from '../../plugins/cursor';
     import emit from '../../utils/emit';
     import draw from './draw';
     import { brushX } from '../../plugins/brush';
-    import { moveCurrentReferenceX } from '../../plugins/moveCurrentReference';
+    import { drawCurrentReferenceX } from '../../plugins/drawCurrentReference';
 
     export default {
         name: 'd3-timeline',
@@ -28,9 +27,8 @@
         mixins: [mixins],
         methods: {
             drawTimeline() {
-                const __data__ = cloneDeep(this.data),
-                    { dateTimeStart, dateTimeEnd, data, groups } = getTimelineGroups(__data__),
-                    {
+                const { dateTimeStart, dateTimeEnd, data, groups } = getTimelineGroups(cloneDeep(this.data)),
+                      {
                         intervalCornerRadius = 4,
 
                         symbolSize = 400,
@@ -72,7 +70,7 @@
                         liveTimerTick = 250
                     } = this.options,
                     {
-                        axisXLabelLaneHeight = isNull(axisXLabel) ? 0 : 30,
+                      axisXLabelLaneHeight = isNull(axisXLabel) ? 0 : 30,
                     } = this.options,
                     { left = 0, top = 0, right = 0, bottom = 0 } = this.margin,
                     [w, h] = this.getElWidthHeight(), __offset__  = borderWidth,
@@ -201,11 +199,8 @@
 
                 svg
                     .call(brushX, extent, xScale, { brushed })
-                    .call(cursor, axisXLane, [
-                        [0, 0],
-                        [g_w, axisXLaneHeight]
-                    ])
                     .call(zoom, zooming, zoomend);
+
 
                 const g = svg.append('g')
                     .attr('transform', `translate(${left + __offset__ + groupLaneWidth}, ${top + __offset__})`);
@@ -219,7 +214,7 @@
 
                 if (liveTimer)
                     self.timer = setInterval(() => {
-                        g.call(moveCurrentReferenceX, self.scale);
+                        g.call(drawCurrentReferenceX, self.scale, g_h, groupLabelClipPathId, currentTimeLineColor, currentTimeLineWidth);
                     }, liveTimerTick);
 
                 function zooming() {

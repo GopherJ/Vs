@@ -8,7 +8,7 @@
     import mixins from '../../mixins/slider';
     import roundLine from '../../plugins/roundLine';
     import { showTip, hideTip } from '../../plugins/tooltip';
-    import { smoothMoveCircleX } from '../../plugins/smoothMove';
+    import { smoothMoveX } from '../../plugins/smoothMove';
 
     export default {
         name: 'd3-slider',
@@ -97,7 +97,7 @@
                     if (self.val !== null) self.$emit('input', self.val);
                 };
 
-                const hue = smoothMoveCircleX(circle, hueMin, hueMax, onMoving, onMoved);
+                const hue = smoothMoveX(circle, hueMin, hueMax, onMoving, onMoved);
 
                 const trackOverlay = g
                     .append('rect')
@@ -107,7 +107,7 @@
                     .attr('height', circleRadius * 2 + circleStrokeWidth)
                     .attr('fill', 'none')
                     .attr('pointer-events', 'all')
-                    .attr('cursor', 'pointer')
+                    .attr('cursor', 'crosshair')
                     .call(d3.drag()
                         .on('start.interrupt', () => trackOverlay.interrupt())
                         .on('start drag', () =>  hue(d3.event.x))
