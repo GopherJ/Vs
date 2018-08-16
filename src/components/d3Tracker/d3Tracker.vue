@@ -75,7 +75,7 @@
                     g_w = w - left - right - 2 * __offset__,
                     g_h = h - top - bottom - axisXLaneHeight - axisXLabelLaneHeight - 2 * __offset__,
                     [paddingInner, paddingOuter] = selectPaddingInnerOuterY(g_h),
-                    clipPathId = uuid(), self = this, interval = Math.round(tickLen / speed);
+                    clipPathId = uuid(), self = this, interval = Math.max(tickLen / speed, 16);
                 self.reference = dateTimeStart;
 
                 if (![g_w, g_h].every(el => el > 0)) return;
@@ -203,7 +203,7 @@
                 function onDrag(n, o) {
                     self.reference = self.scale.invert(n);
 
-                    const entries = getPassingEntries(lanes, self.scale.invert(n), Math.abs(self.scale.invert(n) - self.scale.invert(o)), n > o);
+                    const entries = getPassingEntries(lanes, self.reference, Math.abs(self.scale.invert(n) - self.scale.invert(o)), n > o);
 
                     emit(self, 'reference-updated', clampRange(dateTimeStart, dateTimeEnd, self.reference), entries);
                 }

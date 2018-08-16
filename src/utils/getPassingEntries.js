@@ -55,8 +55,8 @@ const isPassingInterval = (x, entry, tickLen, isLTR) => {
         : [x.valueOf(), x.valueOf() + tickLen];
 
     return isLTR
-        ? range[1] >= from && range[1] <= to
-        : range[0] >= from && range[0] <= to;
+        ? (range[1] >= from && range[1] <= to) || tickLen >= to - from
+        : (range[0] >= from && range[0] <= to) || tickLen >= to - from;
 };
 
 /**
