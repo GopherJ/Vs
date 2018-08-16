@@ -30,7 +30,7 @@
                       {
                         intervalCornerRadius = 4,
 
-                        symbolSize = 400,
+                        symbolSize = 200,
 
                         tickSize = 10,
                         tickPadding = 8,
@@ -65,7 +65,9 @@
 
                         speed = 1,
 
-                        playJump = true
+                        playJump = false,
+
+                        scaleExtent = [-Infinity, Infinity]
                     } = this.options,
                     {
                         axisXLabelLaneHeight = isNull(axisXLabel) ? 0 : 30,
@@ -166,7 +168,7 @@
                         [0, 0],
                         [g_w, axisXLaneHeight]
                     ])
-                    .call(zoom, zooming);
+                    .call(zoom, { zooming }, scaleExtent);
 
                 const g = svg
                     .append('g')
@@ -205,7 +207,7 @@
 
                     const entries = getPassingEntries(lanes, self.reference, Math.abs(self.scale.invert(n) - self.scale.invert(o)), n > o);
 
-                    emit(self, 'reference-updated', clampRange(dateTimeStart, dateTimeEnd, self.reference), entries);
+                    emit(self, 'reference-updated', clampRange(dateTimeStart, dateTimeEnd, self.reference), entries)
                 }
 
                 function onSpace() {
@@ -222,7 +224,7 @@
                 }
 
                 self.play = function play() {
-                    self.timer = d3.timer(function(_) {
+                    self.timer = d3.interval(function(_) {
                         const line = g.select('.line--reference'),
                             overlay = g.select('.overlay'),
                             xStart = self.scale(dateTimeStart),

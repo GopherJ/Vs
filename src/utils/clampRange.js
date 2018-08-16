@@ -6,10 +6,9 @@
  * @return {*[]}
  */
 const clampRange = (start, end, x) => {
-    return [
-        x < start ? start: x,
-        x > end ? end : x
-    ];
+    if (x < start) return [x, end];
+    if (x > end) return [start, x];
+    return [start, x];
 };
 
 export default clampRange;
