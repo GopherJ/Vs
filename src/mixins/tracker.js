@@ -1,6 +1,6 @@
 import { Point, Interval } from '../utils/getTrackerLanes';
 import { isBoolean } from 'lodash';
-import {hideTip} from "../plugins/tooltip";
+import { hideTip } from '../plugins/tooltip';
 
 export default {
     data() {
@@ -10,8 +10,10 @@ export default {
             scale: null,
             pause: true,
             play: null,
-            worker: null,
-            observer: null
+            observer: null,
+            dragWorker: null,
+            playWorker: null,
+            jumpWorker: null
         }
     },
     methods: {
@@ -22,7 +24,7 @@ export default {
                 return [dateTimeStart, reference];
 
             if (reference < dateTimeStart)
-                return [reference, dateTimeEnd];
+                return [dateTimeStart, dateTimeEnd];
 
             return [dateTimeStart, reference];
         },

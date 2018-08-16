@@ -9,7 +9,7 @@ import { isFunction } from 'lodash';
  * @param zoomstart
  */
 function zoom(svg, zooming, zoomend, zoomstart) {
-    const zoom = d3.zoom().scaleExtent([0.2, Infinity]);
+    const zoom = d3.zoom();
 
     if (isFunction(zooming))   zoom.on('zoom', zooming);
     if (isFunction(zoomend))   zoom.on('end', zoomend);

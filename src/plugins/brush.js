@@ -2,6 +2,12 @@ import * as d3 from 'd3';
 import { isNull, isFunction, } from 'lodash';
 import { map } from '../utils/array';
 
+/*
+    ToDo: check if it's user-driven event
+
+    https://github.com/d3/d3-selection/issues/122
+ */
+
 /**
  *
  * @param extent

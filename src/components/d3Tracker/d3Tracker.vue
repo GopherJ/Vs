@@ -8,17 +8,18 @@
     import uuid from 'uuid/v1';
     import mixins from '../../mixins';
     import tracker from '../../mixins/tracker';
-    import { selectPaddingInnerOuterY } from '../../utils/select';
     import roundedRect from '../../plugins/roundedRect';
     import emit from '../../utils/emit';
     import zoom from '../../plugins/zoom';
     import cursor from '../../plugins/cursor';
     import { brushX } from '../../plugins/brush';
-    import { onspace } from '../../utils/keybinding';
-    import { drawTicksX } from '../../plugins/drawTicks';
-    import { drawEntriesX } from '../../plugins/drawEntries';
-    import { drawReferenceX } from '../../plugins/drawReference';
-    import { getTrackerLanes } from "../../utils/getTrackerLanes";
+    import keybinding from '../../utils/keybinding';
+    import { getTrackerLanes } from '../../utils/getTrackerLanes';
+    import { selectPaddingInnerOuterY } from '../../utils/select';
+    import getNextEntry from '../../utils/getNextEntry';
+    import getPassingEntries from '../../utils/getPassingEntries';
+    import clampRange from '../../utils/clampRange';
+    import draw from './draw';
 
     export default {
         name: 'd3-tracker',
@@ -60,8 +61,11 @@
 
                         overlayWidth = 30,
 
-                        playDuration = 10000,
-                        playJump = false
+                        tickLen = 250,
+
+                        speed = 1,
+
+                        playJump = true
                     } = this.options,
                     {
                         axisXLabelLaneHeight = isNull(axisXLabel) ? 0 : 30,
@@ -71,7 +75,7 @@
                     g_w = w - left - right - 2 * __offset__,
                     g_h = h - top - bottom - axisXLaneHeight - axisXLabelLaneHeight - 2 * __offset__,
                     [paddingInner, paddingOuter] = selectPaddingInnerOuterY(g_h),
-                    clipPathId = uuid(), self = this;
+                    clipPathId = uuid(), self = this, interval = Math.round(tickLen / speed);
                 self.reference = dateTimeStart;
 
                 if (![g_w, g_h].every(el => el > 0)) return;
@@ -154,8 +158,10 @@
                     [w - right - __offset__, h - axisXLaneHeight - __offset__ - axisXLabelLaneHeight]
                 ];
 
+                const brushed = ({ start, end }) => emit(self, 'range-updated', start, end);
+
                 svg
-                    .call(brushX.bind(self), extent, self.scale)
+                    .call(brushX, extent, self.scale, { brushed })
                     .call(cursor, axisXLane, [
                         [0, 0],
                         [g_w, axisXLaneHeight]
@@ -167,61 +173,72 @@
                     .attr('transform', `translate(${left + __offset__}, ${top + __offset__})`);
 
                 function zooming() {
-                    const newXScale = d3.event.transform.rescaleX(xScale);
-                    self.scale = newXScale;
+                    self.scale = d3.event.transform.rescaleX(xScale);
 
                     svg
-                        .call(brushX.bind(self), extent, self.scale);
-
-                    axisXLane
-                        .call(xAxis.scale(newXScale))
-                        .selectAll('line')
-                        .attr('stroke', boundingLineColor)
-                        .attr('stroke-width', boundingLineWidth);
+                        .call(brushX, extent, self.scale, { brushed });
 
                     g
-                        .call(drawTicksX, newXScale, g_h, clipPathId, boundingLineColor, boundingLineWidth)
-                        .call(drawEntriesX, lanes, newXScale, yScale, symbolSize, clipPathId, intervalCornerRadius)
-                        .call(drawReferenceX, newXScale(self.reference), clipPathId, g_h, overlayWidth, referenceLineColor, referenceLineWidth, ondrag);
+                        .call(
+                            draw,
+                            axisXLane,
+                            xAxis,
+                            self.scale,
+                            yScale,
+                            lanes,
+                            self.reference,
+                            g_h,
+                            clipPathId,
+                            symbolSize,
+                            intervalCornerRadius,
+                            overlayWidth,
+                            referenceLineColor,
+                            referenceLineWidth,
+                            boundingLineColor,
+                            boundingLineWidth,
+                            onDrag
+                    );
                 }
 
-                function ondrag(n, o) {
+                function onDrag(n, o) {
                     self.reference = self.scale.invert(n);
-                    const entries = self.findPassingEntriesWhenDrag(lanes, dateTimeStart, dateTimeEnd, o);
 
-                    emit(self, 'reference-updated', self.getTimeRange(dateTimeStart, dateTimeEnd), entries);
+                    const entries = getPassingEntries(lanes, self.scale.invert(n), Math.abs(self.scale.invert(n) - self.scale.invert(o)), n > o);
+
+                    emit(self, 'reference-updated', clampRange(dateTimeStart, dateTimeEnd, self.reference), entries);
+                }
+
+                function onSpace() {
+                    self.pause = !self.pause;
+                }
+
+                function onPlayEnd() {
+                    self.reference = dateTimeStart;
+
+                    self.pause = true;
+                    self.timer.stop();
+
+                    emit(self, 'play-end');
                 }
 
                 self.play = function play() {
-                    let start = self.scale(dateTimeStart),
-                        end = self.scale(dateTimeEnd),
-                        speed = (end - start) / playDuration * 16;
-
-                    self.timer = d3.timer(function(elapsed) {
+                    self.timer = d3.timer(function(_) {
                         const line = g.select('.line--reference'),
-                            overlay = g.select('.overlay');
+                            overlay = g.select('.overlay'),
+                            xStart = self.scale(dateTimeStart),
+                            xEnd = self.scale(dateTimeEnd),
+                            xNext = self.scale(new Date(self.reference.valueOf() + tickLen));
 
-                        const xPrevious = +line.attr('x1'),
-                            start = self.scale(dateTimeStart),
-                            end = self.scale(dateTimeEnd);
-
-                        if (xPrevious >= end) {
+                        if (xNext >= xEnd) {
                             line
-                                .attr('x1', start)
-                                .attr('x2', start);
+                                .attr('x1', xStart)
+                                .attr('x2', xStart);
 
                             overlay
-                                .attr('x', start - overlayWidth / 2);
+                                .attr('x', xStart - overlayWidth / 2);
 
-                            self.reference = self.scale.invert(start);
-                            self.pause = true;
-
-                            self.timer.stop();
-
-                            emit(self, 'play-end');
+                            onPlayEnd();
                         } else {
-                            const xNext = xPrevious + speed;
-
                             line
                                 .attr('x1', xNext)
                                 .attr('x2', xNext);
@@ -230,13 +247,13 @@
                                 .attr('x', xNext - overlayWidth / 2);
 
                             self.reference = self.scale.invert(xNext);
-                            const entries = self.findPassingEntriesWhenPlay(lanes, dateTimeStart, dateTimeEnd, playDuration);
+
+                            const entries = getPassingEntries(lanes, self.reference, tickLen);
 
                             if (!entries.length && playJump) {
-                                const nextEntryFrom = self.getNextEntryFrom(lanes);
+                                const nextEntryFrom = getNextEntry(lanes, self.reference);
 
                                 if (!nextEntryFrom) {
-                                    self.reference = dateTimeStart;
                                     const xNext = self.scale(self.reference);
 
                                     line
@@ -246,11 +263,10 @@
                                     overlay
                                         .attr('x', xNext - overlayWidth / 2);
 
-                                    self.pause = true;
-
-                                    self.timer.stop();
+                                    onPlayEnd();
                                 } else {
                                     self.reference = nextEntryFrom;
+
                                     const xNext = self.scale(self.reference);
 
                                     line
@@ -261,18 +277,34 @@
                                         .attr('x', xNext - overlayWidth / 2);
                                 }
                             } else {
-                                emit(self, 'reference-updated', self.getTimeRange(dateTimeStart, dateTimeEnd), entries);
+                                emit(self, 'reference-updated', clampRange(dateTimeStart, dateTimeEnd, self.reference), entries);
                             }
                         }
-                    }, 16);
+                    }, interval);
                 };
 
-                onspace(() => self.pause = !self.pause);
+                keybinding.onspace(onSpace);
 
                 g
-                    .call(drawTicksX, xScale, g_h, clipPathId, boundingLineColor, boundingLineWidth)
-                    .call(drawEntriesX,lanes, xScale, yScale, symbolSize, clipPathId, intervalCornerRadius)
-                    .call(drawReferenceX, xScale(self.reference), clipPathId, g_h, overlayWidth, referenceLineColor, referenceLineWidth, ondrag);
+                    .call(
+                        draw,
+                        axisXLane,
+                        xAxis,
+                        self.scale,
+                        yScale,
+                        lanes,
+                        self.reference,
+                        g_h,
+                        clipPathId,
+                        symbolSize,
+                        intervalCornerRadius,
+                        overlayWidth,
+                        referenceLineColor,
+                        referenceLineWidth,
+                        boundingLineColor,
+                        boundingLineWidth,
+                        onDrag
+                    );
             },
             safeDraw() {
                 this.ifExistsSvgThenRemove();

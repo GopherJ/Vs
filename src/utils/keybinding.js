@@ -7,29 +7,29 @@ import { isFirefox } from './navigator';
  */
 const onspace = callback => {
     if (isFirefox) {
-        d3.select('body').on('keypress', () => {
-            const ev = d3.event;
-            if (ev.keyCode !== 0 || ev.shiftKey || ev.ctrlKey || ev.altKey) return;
+        d3.select('body')
+            .on('keypress', () => {
+                const ev = d3.event;
+                if (ev.keyCode !== 0 || ev.shiftKey || ev.ctrlKey || ev.altKey) return;
+                if (ev.target === document.body) ev.preventDefault();
 
-            if (ev.target === document.body) ev.preventDefault();
-
-            callback();
+                callback();
         });
     }
 
     else {
-        d3.select('body').on('keydown', () => {
-            const ev = d3.event;
-            if (ev.keyCode !== 32) return;
+        d3.select('body')
+            .on('keydown', () => {
+                const ev = d3.event;
+                if (ev.keyCode !== 32) return;
+                if (ev.target === document.body) ev.preventDefault();
 
-            if (ev.target === document.body) ev.preventDefault();
-
-            callback();
+                callback();
         });
     }
 };
 
-export {
+export default {
     onspace
 };
 

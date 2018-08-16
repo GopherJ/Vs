@@ -43,9 +43,9 @@ const draw = (
         .attr('stroke', boundingLineColor)
         .attr('stroke-width', boundingLineWidth);
 
-    g.call(drawCurrentReferenceX, xScale, g_h, entryClipPathId, currentTimeLineColor, currentTimeLineWidth)
-     .call(drawTicksX, xScale, g_h, entryClipPathId, boundingLineColor, boundingLineWidth)
-     .call(drawEntriesMultiLaneX, data, groups, xScale, yScale, entryClipPathId, symbolSize, intervalCornerRadius);
+    g.call(drawTicksX, xScale, g_h, entryClipPathId, boundingLineColor, boundingLineWidth)
+     .call(drawEntriesMultiLaneX, data, groups, xScale, yScale, entryClipPathId, symbolSize, intervalCornerRadius)
+     .call(drawCurrentReferenceX, xScale, g_h, entryClipPathId, currentTimeLineColor, currentTimeLineWidth);
 };
 
 export default draw;
