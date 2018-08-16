@@ -4,7 +4,6 @@ import { isNumber, isDate, isString, debounce } from 'lodash';
 export default {
     data() {
         return {
-            observer: null,
             val: null
         }
     },
