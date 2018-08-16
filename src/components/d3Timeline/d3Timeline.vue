@@ -68,7 +68,9 @@
                         currentTimeLineColor = 'rgba(255, 56, 96, 1)',
 
                         liveTimer = true,
-                        liveTimerTick = 250
+                        liveTimerTick = 250,
+
+                        scaleExtent = [0.05, Infinity]
                     } = this.options,
                     {
                       axisXLabelLaneHeight = isNull(axisXLabel) ? 0 : 30,
@@ -195,8 +197,6 @@
                     [left + __offset__ + groupLaneWidth, top + __offset__],
                     [w - right - __offset__, h - axisXLaneHeight - __offset__ - axisXLabelLaneHeight]
                 ];
-
-                const scaleExtent = [0.2, Infinity];
 
                 const brushed = ({ start, end }) => emit(this, 'range-updated', start, end);
 
