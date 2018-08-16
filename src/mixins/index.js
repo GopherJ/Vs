@@ -102,7 +102,7 @@ export default {
     mounted() {
         this.observer = new MutationObserver(_ => {
             hideTip();
-        }).observe(this.$el, { childList: true });
+        }).observe(this.$el, { childList: true, subtree: true });
 
         this._handleResize = debounce((e) => {
             if (this.onResize) this.onResize();

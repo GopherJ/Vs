@@ -136,7 +136,7 @@ export default {
     mounted() {
         this.observer = new MutationObserver(_ => {
             hideTip();
-        }).observe(this.$el, { childList: true });
+        }).observe(this.$el, { childList: true, subtree: true });
     },
     beforeDestroy() {
         this.observer.disconnect();
