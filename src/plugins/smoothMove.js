@@ -1,7 +1,15 @@
 import * as d3 from 'd3';
 import { isFunction } from 'lodash';
 
-function smoothMoveCircleX(circle, hueMin, hueMax, onMoving, onMoved) {
+const moveX = (selection, x) => {
+    switch (selection.node().tagName.toLowerCase()) {
+        case 'circle':
+            selection.attr('cx', x);
+            break;
+    }
+};
+
+const smoothMoveX = (selection, hueMin, hueMax, onMoving, onMoved) => {
         let hueActual = hueMin,
             hueTarget = hueMin,
             hueAlpha = 0.2,
@@ -17,13 +25,14 @@ function smoothMoveCircleX(circle, hueMin, hueMax, onMoving, onMoved) {
             if (hueError < 1e-3) hueActual = hueTarget, hueTimer.stop(), isFunction(onMoved) && onMoved(hueActual);
             else hueActual += hueAlpha * hueError;
 
-            circle
-                .attr('cx', hueActual);
+            selection.call(moveX, hueActual);
 
             isFunction(onMoving) && onMoving(hueActual);
         }
-}
+};
+
+
 
 export {
-    smoothMoveCircleX,
+    smoothMoveX,
 };
