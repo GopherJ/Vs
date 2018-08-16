@@ -86,15 +86,18 @@
                     .attr('fill', circleFill)
                     .attr('stroke', circleStroke)
                     .attr('stroke-width', circleStrokeWidth)
-                    .attr('stroke-opacity', circleStrokeOpacity);
+                    .attr('stroke-opacity', circleStrokeOpacity)
+                    .attr('pointer-events', 'none');
 
-                const onMoved = hueActual => {
+                const onMoving = hueActual => {
                     self.val = interpolate(hueActual);
-
-                    self.$emit('input', self.val);
                 };
 
-                const hue = smoothMoveCircleX(circle, hueMin, hueMax, onMoved);
+                const onMoved = () => {
+                    if (self.val !== null) self.$emit('input', self.val);
+                };
+
+                const hue = smoothMoveCircleX(circle, hueMin, hueMax, onMoving, onMoved);
 
                 const trackOverlay = g
                     .append('rect')
