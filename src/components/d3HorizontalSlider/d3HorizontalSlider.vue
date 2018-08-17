@@ -1,5 +1,5 @@
 <template>
-    <div class="d3-slider" :style="{ 'width' : width, 'height': height }"></div>
+    <div class="d3-horizontal-slider" :style="{ 'width' : width, 'height': height }"></div>
 </template>
 
 <script>
@@ -11,10 +11,10 @@
     import { smoothMoveX } from '../../plugins/smoothMove';
 
     export default {
-        name: 'd3-slider',
+        name: 'd3-horizontal-slider',
         mixins: [mixins],
         methods: {
-            drawSlider() {
+            drawHorizontalSlider() {
                 const min = this.min, max = this.max,
                     { left = 0, right = 0, top = 0, bottom = 0 } = this.margin,
                     {
@@ -119,7 +119,7 @@
             },
             safeDraw() {
                 this.ifExistsSvgThenRemove();
-                this.drawSlider();
+                this.drawHorizontalSlider();
             },
             onResize() {
                 this.safeDraw();
@@ -129,7 +129,7 @@
 </script>
 
 <style>
-    .d3-slider text {
+    .d3-horizontal-slider text {
         -webkit-user-select: none;
         -moz-user-select: none;
         -ms-user-select: none;

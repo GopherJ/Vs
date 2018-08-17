@@ -14,7 +14,8 @@ import d3VerticalBar from './components/d3VerticalBar';
 import d3WordCloud from './components/d3WordCloud';
 import d3Area from './components/d3Area';
 import d3Tracker from './components/d3Tracker';
-import d3Slider from './components/d3Slider';
+import d3HorizontalSlider from './components/d3HorizontalSlider';
+import d3VerticalSlider from './components/d3VerticalSlider';
 import d3ICicleVertical from './components/d3ICicleVertical';
 import d3ICicleHorizontal from './components/d3ICicleHorizontal';
 import d3Sunburst from './components/d3Sunburst';
@@ -54,7 +55,8 @@ const install = (Vue, options = {}) => {
     Vue.component(d3WordCloud.name, d3WordCloud);
     Vue.component(d3Area.name, d3Area);
     Vue.component(d3Tracker.name, d3Tracker);
-    Vue.component(d3Slider.name, d3Slider);
+    Vue.component(d3HorizontalSlider.name, d3HorizontalSlider);
+    Vue.component(d3VerticalSlider.name, d3VerticalSlider);
 
     Vue.component(d3ICicleVertical.name, d3ICicleVertical);
     Vue.component(d3ICicleHorizontal.name, d3ICicleHorizontal);
@@ -88,7 +90,8 @@ export {
     d3VerticalBar,
     d3Area,
     d3Tracker,
-    d3Slider,
+    d3VerticalSlider,
+    d3HorizontalSlider,
     d3WordCloud,
 
     d3Sunburst,
