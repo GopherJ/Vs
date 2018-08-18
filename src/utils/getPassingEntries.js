@@ -4,14 +4,15 @@ import { Point, Interval } from './getTrackerLanes';
  *
  * @param a
  * @param x
+ * @param isLTR
  * @return {number}
  */
-const bisecRight = (a, x) => {
+const bisecRight = (a, x, isLTR) => {
     let lo = 0, hi = a.length;
 
     while (lo < hi) {
         const mid = lo + hi >>> 1;
-        if ((a[mid] instanceof Point && a[mid].at.valueOf() > x) || (a[mid] instanceof Interval && a[mid].from.valueOf() > x)) hi = mid;
+        if ((a[mid] instanceof Point && a[mid].at.valueOf() > x) || (a[mid] instanceof Interval && (isLTR ? a[mid].from : a[mid].to) > x)) hi = mid;
         else lo = mid + 1;
     }
 
@@ -32,7 +33,6 @@ const isPassingPoint = (x, entry, tickLen, isLTR) => {
     const range = isLTR
         ?  [x.valueOf() - tickLen, x.valueOf()]
         : [x.valueOf(), x.valueOf() + tickLen];
-
 
     return isLTR
         ? (timestamp <= range[1] && timestamp > range[0])
@@ -55,8 +55,8 @@ const isPassingInterval = (x, entry, tickLen, isLTR) => {
         : [x.valueOf(), x.valueOf() + tickLen];
 
     return isLTR
-        ? (range[1] >= from && range[1] <= to) || tickLen >= to - from
-        : (range[0] >= from && range[0] <= to) || tickLen >= to - from;
+        ? (range[1] >= from && range[1] <= to) || (range[1] > to && range[0] <= from)
+        : (range[0] >= from && range[0] <= to) || (range[0] < from && range[1] >= to);
 };
 
 /**
@@ -68,15 +68,13 @@ const isPassingInterval = (x, entry, tickLen, isLTR) => {
  * @return {*}
  */
 const getPassingEntry = (lane, reference, tickLen, isLTR = true) => {
-    const idx = bisecRight(lane, reference), entry = lane[idx - 1];
+    const idx = bisecRight(lane, reference, isLTR), entry = isLTR ? lane[idx - 1] : lane[idx];
 
-    if (entry instanceof Point && isPassingPoint(reference, entry, tickLen, isLTR)) {
+    if (entry instanceof Point && isPassingPoint(reference, entry, tickLen, isLTR))
         return entry;
-    }
 
-    if (entry instanceof Interval && isPassingInterval(reference, entry, tickLen, isLTR)) {
+    if (entry instanceof Interval && isPassingInterval(reference, entry, tickLen, isLTR))
         return entry;
-    }
 
     return undefined;
 };
