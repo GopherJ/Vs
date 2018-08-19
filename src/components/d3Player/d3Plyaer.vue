@@ -6,6 +6,7 @@
     import * as d3 from 'd3';
     import { isBoolean, isNull, cloneDeep } from 'lodash';
     import uuid from 'uuid/v1';
+    import moment from 'moment';
     import mixins from '../../mixins';
     import tracker from '../../mixins/tracker';
     import roundedRect from '../../plugins/roundedRect';
@@ -19,10 +20,10 @@
     import getNextEntry from '../../utils/getNextEntry';
     import getPassingEntries from '../../utils/getPassingEntries';
     import clampRange from '../../utils/clampRange';
-    import shape from '../../plugins/shape';
     import roundLine from '../../plugins/roundLine';
+    import shape from '../../plugins/shape';
     import { smoothMoveX } from '../../plugins/smoothMove';
-    import playBtn from '../../plugins/playBtn';
+    import { showTip, hideTip } from '../../plugins/tooltip';
     import draw from './draw';
 
     export default {
@@ -66,9 +67,9 @@
 
                         scaleExtent = [-Infinity, Infinity],
 
-                        axisXControlLaneHeight = 60,
+                        axisXControlLaneHeight = 40,
                         axisXControlLaneMarginTop = 10,
-                        axisXControlLaneGap = 10,
+                        axisXControlLaneGap = 20,
 
                         trackStroke = '#000',
                         trackStrokeWidth = 10,
@@ -85,8 +86,8 @@
                         circleStrokeOpacity = 0.5,
                         circleStrokeWidth = 1.25,
 
+                        timeLabelWidth = 400,
                         playBtnWidth = 100,
-                        dateTimeLabelWidth = 200,
                         speedBtnWidth = 100,
                     } = this.options,
                     circleRadius = trackStrokeWidth,
@@ -95,11 +96,14 @@
                     g_w = w - left - right - 2 * __offset__,
                     g_h = h - top - bottom - axisXLaneHeight - axisXControlLaneHeight - 2 * __offset__ - axisXControlLaneMarginTop,
                     [paddingInner, paddingOuter] = selectPaddingInnerOuterY(g_h),
-                    clipPathId = uuid(), self = this, interval = Math.max(tickLen / speed, 16),
-                    min = dateTimeStart, max = dateTimeEnd;
+                    clipPathId = uuid(), self = this, interval = Math.max(tickLen / speed, 16);
                 self.reference = dateTimeStart;
 
                 if (![g_w, g_h].every(el => el > 0)) return;
+
+                const hueMin = circleStrokeWidth / 2 + circleRadius,
+                      hueMax = g_w - 3 * axisXControlLaneGap - __offset__ - playBtnWidth - timeLabelWidth - speedBtnWidth - circleStrokeWidth / 2 - circleRadius,
+                    interpolate = hueActual => d3.interpolate(dateTimeStart, dateTimeEnd)((hueActual - hueMin) / (hueMax - hueMin));
 
                 const svg = d3.select(this.$el)
                     .append('svg')
@@ -158,24 +162,35 @@
 
                 const axisXControlLane = svg
                     .append('g')
-                    .attr('transform', `translate(${left + __offset__ / 2}, ${top + g_h + axisXLaneHeight + __offset__})`);
+                    .attr('transform', `translate(${left + __offset__ / 2}, ${top + g_h + axisXLaneHeight + 2 * __offset__ + axisXControlLaneMarginTop + __offset__ / 2})`);
 
-                axisXControlLane
-                    .append('path')
-                    .attr('fill', 'none')
-                    .attr('stroke', '#ccc')
-                    .attr('d', roundedRect(0, 10, playBtnWidth, 36, 2, true, true, true, true));
-
-                axisXControlLane
+                const btn = axisXControlLane
                     .append('g')
-                    .attr('transform', `translate(${(playBtnWidth - 36) / 2}, 10)`)
+                    .attr('transform', `translate(${(playBtnWidth - axisXControlLaneHeight) / 2}, 0)`)
                     .append('path')
+                    .attr('data-state', 'PAUSE')
+                    .attr('pointer-events', 'none')
                     .attr('fill', '#000')
-                    .attr('d', shape.triangle(36, 36));
+                    .attr('d', shape.triangle(axisXControlLaneHeight - __offset__, axisXControlLaneHeight - __offset__));
+
+                axisXControlLane
+                    .append('path')
+                    .attr('fill', boundingLineColor)
+                    .attr('stroke', boundingLineColor)
+                    .attr('stroke-width', boundingLineWidth)
+                    .attr('d', roundedRect(0, 0, playBtnWidth, axisXControlLaneHeight - __offset__, borderRadius, true, true, true, true))
+                    .on('click', function () {
+                        const state = btn.attr('data-state');
+                        btn.attr('data-state', state === 'PAUSE' ? 'PLAYING' : 'PAUSE');
+                        btn.transition().duration(360).attr('d', state === 'PAUSE'
+                            ? shape.pause(axisXControlLaneHeight - __offset__, axisXControlLaneHeight - __offset__)
+                            : shape.triangle(axisXControlLaneHeight - __offset__, axisXControlLaneHeight - __offset__)
+                        );
+                    });
 
                 const sliderLane = axisXControlLane
                     .append('g')
-                    .attr('transform', `translate(${playBtnWidth + 5}, 0)`);
+                    .attr('transform', `translate(${playBtnWidth + axisXControlLaneGap + __offset__ / 2}, 0)`);
 
                 sliderLane
                     .append('line')
@@ -212,36 +227,61 @@
                    .attr('stroke-opacity', circleStrokeOpacity)
                    .attr('pointer-events', 'none');
 
-                //
-                // const onMoving = hueActual => {
-                //     self.val = interpolate(hueActual);
-                // };
-                //
-                // const onMoved = () => {
-                //     if (self.val !== null) self.$emit('input', self.val);
-                // };
-                //
-                // const hue = smoothMoveX(circle, hueMin, hueMax, onMoving, onMoved);
-                //
-                // const trackOverlay = sliderLane
-                //     .append('rect')
-                //     .attr('x', 0)
-                //     .attr('y', axisXControlLaneHeight / 2 - circleRadius - circleStrokeWidth / 2)
-                //     .attr('width', g_w)
-                //     .attr('height', circleRadius * 2 + circleStrokeWidth)
-                //     .attr('fill', 'none')
-                //     .attr('pointer-events', 'all')
-                //     .attr('cursor', 'crosshair')
-                //     .call(d3.drag()
-                //         .on('start.interrupt', () => trackOverlay.interrupt())
-                //         .on('start drag', () =>  hue(d3.event.x))
-                //     );
-                //
-                // trackOverlay
-                //     .on('mouseover', () => showTip(self.val, circle.node())())
-                //     .on('mouseout', hideTip);
+                const onMoving = hueActual => {
+                    self.val = new Date(Math.round(interpolate(hueActual)));
+                    self.updateTimeLabel();
+                };
 
+                const onMoved = () => {
+                    if (self.val !== null) self.$emit('input', self.val);
+                };
 
+                const hue = smoothMoveX(circle, hueMin, hueMax, onMoving, onMoved);
+
+                const trackOverlay = sliderLane
+                    .append('rect')
+                    .attr('x', 0)
+                    .attr('y', axisXControlLaneHeight / 2 - circleRadius - circleStrokeWidth / 2)
+                    .attr('width', g_w - playBtnWidth - __offset__ / 2 - 3 * axisXControlLaneGap - timeLabelWidth - speedBtnWidth)
+                    .attr('height', circleRadius * 2 + circleStrokeWidth)
+                    .attr('fill', 'none')
+                    .attr('pointer-events', 'all')
+                    .attr('cursor', 'crosshair')
+                    .call(d3.drag()
+                        .on('start.interrupt', () => trackOverlay.interrupt())
+                        .on('start drag', () =>  hue(d3.event.x))
+                    );
+
+                trackOverlay
+                    .on('mouseover', () => showTip(self.val, circle.node())())
+                    .on('mouseout', hideTip);
+
+                axisXControlLane
+                    .append('g')
+                    .attr('transform', `translate(${g_w - speedBtnWidth - axisXControlLaneGap - timeLabelWidth}, 0)`)
+                    .append('path')
+                    .attr('fill', boundingLineColor)
+                    .attr('stroke', boundingLineColor)
+                    .attr('stroke-width', boundingLineWidth)
+                    .attr('d', roundedRect(0, 0, timeLabelWidth, axisXControlLaneHeight - __offset__, borderRadius, true, true, true, true));
+
+                axisXControlLane
+                    .append('text')
+                    .attr('class', 'label--time')
+                    .attr('text-anchor', 'middle')
+                    .attr('dy', '0.32em')
+                    .attr('x', g_w - timeLabelWidth / 2 - speedBtnWidth - axisXControlLaneGap)
+                    .attr('y', axisXControlLaneHeight / 2)
+                    .text(self.getTimeLabel());
+
+                axisXControlLane
+                    .append('g')
+                    .attr('transform', `translate(${g_w - speedBtnWidth}, 0)`)
+                    .append('path')
+                    .attr('fill', boundingLineColor)
+                    .attr('stroke', boundingLineColor)
+                    .attr('stroke-width', boundingLineWidth)
+                    .attr('d', roundedRect(0, 0, speedBtnWidth, axisXControlLaneHeight - __offset__, borderRadius, true, true, true, true));
 
                 const extent = [
                     [left + __offset__, top + __offset__],
@@ -395,6 +435,16 @@
                         boundingLineWidth,
                         onDrag
                     );
+            },
+            updateTimeLabel() {
+                d3.select(this.$el)
+                    .select('.label--time')
+                    .text(() => this.getTimeLabel());
+            },
+            getTimeLabel() {
+                const FORMAT = 'YYYY-MM-DD HH:mm:ss.SSS';
+
+                return moment(this.val).format(FORMAT);
             },
             safeDraw() {
                 this.ifExistsSvgThenRemove();

@@ -49,11 +49,11 @@ const playBtn = (g, w, h, r, stroke, strokeWidth, { onPlaying, onPause }) => {
             .duration(360)
             .attr('d', function () {
                 if (state === STATE.PAUSE) {
-                    onPlaying();
+                    if (isFunction(onPlaying)) onPlaying();
                     return shape.triangle(h, h);
                 }
 
-                onPause();
+                if (isFunction(onPause)) onPause();
                 return shape.pause(h. h);
             });
     });
