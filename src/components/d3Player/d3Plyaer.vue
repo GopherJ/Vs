@@ -7,8 +7,7 @@
     import { isBoolean, isNull, cloneDeep } from 'lodash';
     import uuid from 'uuid/v1';
     import moment from 'moment';
-    import mixins from '../../mixins';
-    import tracker from '../../mixins/tracker';
+    import player from '../../mixins/player';
     import roundedRect from '../../plugins/roundedRect';
     import emit from '../../utils/emit';
     import zoom from '../../plugins/zoom';
@@ -28,7 +27,7 @@
 
     export default {
         name: 'd3-player',
-        mixins: [mixins, tracker],
+        mixins: [player],
         methods: {
             drawPlayer() {
                 const { dateTimeStart, dateTimeEnd, lanes } = getTrackerLanes(cloneDeep(this.data)),
@@ -61,7 +60,6 @@
                         overlayWidth = 30,
 
                         tickLen = 250,
-                        speed = 1,
 
                         playJump = false,
 
@@ -96,7 +94,7 @@
                     g_w = w - left - right - 2 * __offset__,
                     g_h = h - top - bottom - axisXLaneHeight - axisXControlLaneHeight - 2 * __offset__ - axisXControlLaneMarginTop,
                     [paddingInner, paddingOuter] = selectPaddingInnerOuterY(g_h),
-                    clipPathId = uuid(), self = this, interval = Math.max(tickLen / speed, 16);
+                    clipPathId = uuid(), self = this, interval = Math.max(tickLen / this.speed, 16);
                 self.reference = dateTimeStart;
 
                 if (![g_w, g_h].every(el => el > 0)) return;
@@ -283,20 +281,25 @@
                     .attr('stroke-width', boundingLineWidth)
                     .attr('d', roundedRect(0, 0, speedBtnWidth, axisXControlLaneHeight - __offset__, borderRadius, true, true, true, true));
 
-                const extent = [
+                const brushExtent = [
                     [left + __offset__, top + __offset__],
-                    [w - right - __offset__, h - axisXLaneHeight - __offset__ - axisXControlLaneHeight]
+                    [w - right - __offset__, h - axisXLaneHeight - __offset__ - axisXControlLaneHeight - axisXControlLaneMarginTop]
+                ];
+
+                const zoomExtent = [
+                    [left + __offset__, top + __offset__],
+                    [w - right - __offset__, h - __offset__ - axisXControlLaneHeight - axisXControlLaneMarginTop]
                 ];
 
                 const brushed = ({ start, end }) => emit(self, 'range-updated', start, end);
 
                 svg
-                    .call(brushX, extent, self.scale, { brushed })
+                    .call(brushX, brushExtent, self.scale, { brushed })
                     .call(cursor, axisXLane, [
                         [0, 0],
                         [g_w, axisXLaneHeight]
                     ])
-                    .call(zoom, { zooming }, scaleExtent);
+                    .call(zoom, { zooming }, scaleExtent, zoomExtent);
 
                 const g = svg
                     .append('g')
@@ -306,7 +309,7 @@
                     self.scale = d3.event.transform.rescaleX(xScale);
 
                     svg
-                        .call(brushX, extent, self.scale, { brushed });
+                        .call(brushX, brushExtent, self.scale, { brushed });
 
                     g
                         .call(

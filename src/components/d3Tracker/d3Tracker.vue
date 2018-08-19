@@ -41,7 +41,7 @@
                         axisFontWeight = 600,
                         axisFontOpacity = 0.5,
 
-                        axisXLabel = null,
+                        axisXLabel = 'abcdefg',
 
                         axisLabelFontSize = 14,
                         axisLabelFontWeight = 600,
@@ -112,7 +112,7 @@
                     .tickPadding(tickPadding);
 
                 svg.append('path')
-                    .attr('d', roundedRect(left + __offset__ / 2, top + __offset__ / 2, g_w + __offset__, g_h + axisXLaneHeight + axisXLabelLaneHeight +  __offset__, borderRadius, true, true, true, true))
+                    .attr('d', roundedRect(left + __offset__ / 2, top + __offset__ / 2, g_w + __offset__, g_h + axisXLaneHeight +  __offset__, borderRadius, true, true, true, true))
                     .attr('fill', backgroundColor)
                     .attr('stroke', borderColor)
                     .attr('stroke-width', borderWidth)
@@ -138,12 +138,13 @@
 
                 const axisXLabelLane = svg
                     .append('g')
-                    .attr('transform', `translate(${left + __offset__},${top + g_h + axisXLaneHeight + __offset__})`);
+                    .attr('transform', `translate(${left + __offset__},${top + g_h + axisXLaneHeight + 2 * __offset__})`)
 
                 axisXLabelLane
                     .append('text')
                     .attr('text-anchor', 'middle')
                     .attr('x', g_w / 2)
+                    .attr('y', axisXLabelLaneHeight / 2)
                     .attr('fill', '#000')
                     .attr('dy', '0.32em')
                     .text(axisXLabel)
@@ -151,20 +152,25 @@
                     .attr('font-weight', axisLabelFontWeight)
                     .attr('fill-opacity', axisLabelFontOpacity);
 
-                const extent = [
+                const brushExtent = [
                     [left + __offset__, top + __offset__],
                     [w - right - __offset__, h - axisXLaneHeight - __offset__ - axisXLabelLaneHeight]
+                ];
+
+                const zoomExtent = [
+                    [left + __offset__, top + __offset__],
+                    [w - right - __offset__, h - axisXLabelLaneHeight - __offset__]
                 ];
 
                 const brushed = ({ start, end }) => emit(self, 'range-updated', start, end);
 
                 svg
-                    .call(brushX, extent, self.scale, { brushed })
+                    .call(brushX, brushExtent, self.scale, { brushed })
                     .call(cursor, axisXLane, [
                         [0, 0],
                         [g_w, axisXLaneHeight]
                     ])
-                    .call(zoom, { zooming }, scaleExtent);
+                    .call(zoom, { zooming }, scaleExtent, zoomExtent);
 
                 const g = svg
                     .append('g')
@@ -174,7 +180,7 @@
                     self.scale = d3.event.transform.rescaleX(xScale);
 
                     svg
-                        .call(brushX, extent, self.scale, { brushed });
+                        .call(brushX, brushExtent, self.scale, { brushed });
 
                     g
                         .call(

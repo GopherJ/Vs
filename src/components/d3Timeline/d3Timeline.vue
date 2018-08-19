@@ -193,21 +193,25 @@
                     .attr('font-weight', axisLabelFontWeight)
                     .attr('fill-opacity', axisLabelFontOpacity);
 
-                const extent = [
+                const brushExtent = [
                     [left + __offset__ + groupLaneWidth, top + __offset__],
                     [w - right - __offset__, h - axisXLaneHeight - __offset__ - axisXLabelLaneHeight]
+                ];
+
+                const zoomExtent = [
+                    [left + __offset__ + groupLaneWidth, top + __offset__],
+                    [w - right - __offset__, h - __offset__ - axisXLabelLaneHeight]
                 ];
 
                 const brushed = ({ start, end }) => emit(this, 'range-updated', start, end);
 
                 svg
-                    .call(brushX, extent, xScale, { brushed })
+                    .call(brushX, brushExtent, xScale, { brushed })
                     .call(cursor, axisXLane, [
                         [0, 0],
                         [g_w, axisXLaneHeight]
                     ])
-                    .call(zoom, { zooming, zoomend }, scaleExtent);
-
+                    .call(zoom, { zooming, zoomend }, scaleExtent, zoomExtent);
 
                 const g = svg.append('g')
                     .attr('transform', `translate(${left + __offset__ + groupLaneWidth}, ${top + __offset__})`);
@@ -228,7 +232,7 @@
                     self.scale = d3.event.transform.rescaleX(xScale);
 
                     svg
-                        .call(brushX, extent, self.scale, { brushed });
+                        .call(brushX, brushExtent, self.scale, { brushed });
 
                     g.call(
                         draw,
