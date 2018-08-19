@@ -1,5 +1,4 @@
 import { drawCurrentReferenceX } from '../../plugins/drawCurrentReference';
-import { drawTicksX } from '../../plugins/drawTicks';
 import { drawEntriesMultiLaneX } from '../../plugins/drawEntriesMultiLane';
 
 /**
@@ -40,10 +39,11 @@ const draw = (
     axisXLane
         .call(xAxis.scale(xScale))
         .selectAll('line')
+        .attr('y1', -g_h)
         .attr('stroke', boundingLineColor)
         .attr('stroke-width', boundingLineWidth);
 
-    g.call(drawTicksX, xScale, g_h, entryClipPathId, boundingLineColor, boundingLineWidth)
+    g
      .call(drawEntriesMultiLaneX, data, groups, xScale, yScale, entryClipPathId, symbolSize, intervalCornerRadius)
      .call(drawCurrentReferenceX, xScale, g_h, entryClipPathId, currentTimeLineColor, currentTimeLineWidth);
 };

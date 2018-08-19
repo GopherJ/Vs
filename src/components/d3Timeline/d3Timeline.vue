@@ -91,7 +91,10 @@
                     .attr('width', w)
                     .attr('height', h);
 
-                svg.append('defs')
+                const defs = svg
+                    .append('defs');
+
+                defs
                     .append('clipPath')
                     .attr('id', entryClipPathId)
                     .append('rect')
@@ -100,7 +103,7 @@
                     .attr('width', g_w)
                     .attr('height', g_h + axisXLaneHeight);
 
-                svg.append('defs')
+                defs
                     .append('clipPath')
                     .attr('id', groupLabelClipPathId)
                     .append('rect')
