@@ -213,7 +213,6 @@
                         [0, 0],
                         [g_w, axisXLaneHeight]
                     ]);
-
                 self.zoom = zoom(svg, { zooming, zoomend }, scaleExtent, zoomExtent);
 
                 const g = svg.append('g')
@@ -240,7 +239,6 @@
                         data,
                         groups,
                         g_h,
-                        entryClipPathId,
                         symbolSize,
                         intervalCornerRadius,
                         currentTimeLineColor,
@@ -266,7 +264,6 @@
                     data,
                     groups,
                     g_h,
-                    entryClipPathId,
                     symbolSize,
                     intervalCornerRadius,
                     currentTimeLineColor,

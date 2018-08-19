@@ -10,11 +10,10 @@ import roundedRect from './roundedRect';
  * @param groups
  * @param xScale
  * @param yScale
- * @param clipPathId
  * @param symbolSize
  * @param intervalCornerRadius
  */
-const drawEntriesMultiLaneX = (g, data, groups, xScale, yScale, clipPathId, symbolSize, intervalCornerRadius) => {
+const drawEntriesMultiLaneX = (g, data, groups, xScale, yScale, symbolSize, intervalCornerRadius) => {
     const entriesSelection = g.selectAll('.entry');
     if (!entriesSelection.empty()) entriesSelection.remove();
 

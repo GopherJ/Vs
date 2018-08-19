@@ -11,7 +11,6 @@ import { drawEntriesMultiLaneX } from '../../plugins/drawEntriesMultiLane';
  * @param data
  * @param groups
  * @param g_h
- * @param entryClipPathId
  * @param symbolSize
  * @param intervalCornerRadius
  * @param currentTimeLineColor
@@ -20,21 +19,20 @@ import { drawEntriesMultiLaneX } from '../../plugins/drawEntriesMultiLane';
  * @param boundingLineWidth
  */
 const draw = (
-        g,
-        axisXLane,
-        xAxis,
-        xScale,
-        yScale,
-        data,
-        groups,
-        g_h,
-        entryClipPathId,
-        symbolSize,
-        intervalCornerRadius,
-        currentTimeLineColor,
-        currentTimeLineWidth,
-        boundingLineColor,
-        boundingLineWidth
+    g,
+    axisXLane,
+    xAxis,
+    xScale,
+    yScale,
+    data,
+    groups,
+    g_h,
+    symbolSize,
+    intervalCornerRadius,
+    currentTimeLineColor,
+    currentTimeLineWidth,
+    boundingLineColor,
+    boundingLineWidth
 ) => {
     axisXLane
         .call(xAxis.scale(xScale))
@@ -44,8 +42,8 @@ const draw = (
         .attr('stroke-width', boundingLineWidth);
 
     g
-        .call(drawEntriesMultiLaneX, data, groups, xScale, yScale, entryClipPathId, symbolSize, intervalCornerRadius)
-        .call(drawCurrentReferenceX, xScale, g_h, entryClipPathId, currentTimeLineColor, currentTimeLineWidth);
+        .call(drawEntriesMultiLaneX, data, groups, xScale, yScale, symbolSize, intervalCornerRadius)
+        .call(drawCurrentReferenceX, xScale, g_h, currentTimeLineColor, currentTimeLineWidth);
 };
 
 export default draw;

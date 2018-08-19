@@ -3,11 +3,10 @@
  * @param g
  * @param xScale
  * @param g_h
- * @param clipPathId
  * @param currentTimeLineColor
  * @param currentTimeLineWidth
  */
-const drawCurrentReferenceX = (g, xScale, g_h, clipPathId, currentTimeLineColor, currentTimeLineWidth) => {
+const drawCurrentReferenceX = (g, xScale, g_h, currentTimeLineColor, currentTimeLineWidth) => {
     const date = new Date(),
         referenceSelection = g.select('.line--reference');
 
@@ -25,7 +24,6 @@ const drawCurrentReferenceX = (g, xScale, g_h, clipPathId, currentTimeLineColor,
             .attr('stroke-width', currentTimeLineWidth)
             .attr('pointer-events', 'none');
     }
-
     // if (!referenceSelection.empty()) referenceSelection.remove();
     //
     // g.append('line')
