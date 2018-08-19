@@ -127,7 +127,8 @@
                     .tickSize(tickSize)
                     .tickPadding(tickPadding);
 
-                svg.append('path')
+                svg
+                    .append('path')
                     .attr('d', roundedRect(left + __offset__ / 2, top + __offset__ / 2, g_w + groupLaneWidth + __offset__, g_h + axisXLaneHeight + __offset__, borderRadius, true, true, true, true))
                     .attr('fill', backgroundColor)
                     .attr('stroke', borderColor)
@@ -135,16 +136,16 @@
                     .attr('pointer-events', 'none');
 
                 svg
-                    .selectAll('.group--lane')
+                    .append('g')
+                    .attr('class', 'label--group')
+                    .attr('clip-path', `url(#${groupLabelClipPathId})`)
+                    .attr('transform', `translate(${left + __offset__}, ${top + __offset__})`)
+                    .selectAll('text')
                     .data(groups)
                     .enter()
-                    .append('g')
-                    .attr('class', 'group--lane')
-                    .attr('clip-path', `url(#${groupLabelClipPathId})`)
-                    .attr('transform', (d, i) => `translate(${left + __offset__}, ${top + __offset__ + i * groupHeight})`)
                     .append('text')
                     .attr('x', groupLaneWidth / 2)
-                    .attr('y', groupHeight / 2)
+                    .attr('y', (d, i) =>  (2 * i + 1) * groupHeight / 2 )
                     .attr('dy', '0.32em')
                     .attr('text-anchor', 'middle')
                     .attr('font-size', groupLabelFontSize)
@@ -153,32 +154,34 @@
                     .text(d => d)
                     .attr('fill', '#000');
 
-                svg.selectAll('.line--x')
+                svg.append('g')
+                    .attr('class', 'line--x')
+                    .attr('transform', `translate(${left + __offset__}, ${top + __offset__})`)
+                    .selectAll('line')
                     .data(groups)
                     .enter()
-                    .append('g')
-                    .attr('transform', `translate(${left + __offset__}, ${top + __offset__})`)
                     .append('line')
-                    .attr('class', 'line--x')
-                    .attr('stroke', boundingLineColor)
-                    .attr('stroke-width', boundingLineWidth)
                     .attr('y1', (d, i) => (i + 1) * groupHeight)
                     .attr('y2', (d, i) => (i + 1) * groupHeight)
-                    .attr('x2', g_w + groupLaneWidth);
+                    .attr('x2', g_w + groupLaneWidth)
+                    .attr('stroke', boundingLineColor)
+                    .attr('stroke-width', boundingLineWidth);
+
+                svg.append('g')
+                    .attr('class', 'line--y')
+                    .attr('transform', `translate(${left + __offset__ + groupLaneWidth}, ${top + __offset__})`)
+                    .append('line')
+                    .attr('y2', g_h)
+                    .attr('stroke', boundingLineColor)
+                    .attr('stroke-width', boundingLineWidth);
 
                 const axisXLane = svg
                     .append('g')
-                    .attr('transform', `translate(${left + groupLaneWidth + __offset__}, ${top + g_h + __offset__})`);
-
-                axisXLane
-                    .call(xAxis)
+                    .attr('transform', `translate(${left + groupLaneWidth + __offset__}, ${top + g_h + __offset__})`)
                     .attr('class', 'axis axis--x')
                     .attr('font-size', axisFontSize)
                     .attr('font-weight', axisFontWeight)
-                    .attr('fill-opacity', axisFontOpacity)
-                    .selectAll('line')
-                    .attr('stroke', boundingLineColor)
-                    .attr('stroke-width', boundingLineWidth);
+                    .attr('fill-opacity', axisFontOpacity);
 
                 const axisXLabelLane = svg
                     .append('g')
@@ -218,13 +221,6 @@
 
                 const g = svg.append('g')
                     .attr('transform', `translate(${left + __offset__ + groupLaneWidth}, ${top + __offset__})`);
-
-                g
-                    .append('line')
-                    .attr('class', 'line--y')
-                    .attr('y2', g_h)
-                    .attr('stroke', boundingLineColor)
-                    .attr('stroke-width', boundingLineWidth);
 
                 if (liveTimer)
                     self.timer = setInterval(() => {
