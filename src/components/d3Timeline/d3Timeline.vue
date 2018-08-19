@@ -16,13 +16,16 @@
     import draw from './draw';
     import { brushX } from '../../plugins/brush';
     import { drawCurrentReferenceX } from '../../plugins/drawCurrentReference';
+    import { zoomToXK } from '../../plugins/zoomTo';
 
     export default {
         name: 'd3-timeline',
         data() {
             return {
                 scale: null,
-                timer: null
+                timer: null,
+                w: null,
+                svg: null
             }
         },
         mixins: [mixins],
@@ -80,6 +83,7 @@
                     g_w = w - left - right - groupLaneWidth - 2 * __offset__,
                     g_h = h - top - bottom - axisXLaneHeight - axisXLabelLaneHeight - 2 * __offset__,
                     entryClipPathId = uuid(), groupLabelClipPathId = uuid(), self = this;
+                self.w = g_w;
 
                 if (![g_w, g_h].every(el => el > 0) || !groups.length) return;
 
@@ -90,6 +94,7 @@
                     .append('svg')
                     .attr('width', w)
                     .attr('height', h);
+                self.svg = svg;
 
                 const defs = svg
                     .append('defs');
@@ -221,7 +226,7 @@
 
                 if (liveTimer)
                     self.timer = setInterval(() => {
-                        g.call(drawCurrentReferenceX, self.scale, g_h, entryClipPathId, currentTimeLineColor, currentTimeLineWidth);
+                        g.call(drawCurrentReferenceX, self.scale, g_h, currentTimeLineColor, currentTimeLineWidth);
                     }, liveTimerTick);
 
                 function zooming() {
@@ -271,6 +276,9 @@
                     boundingLineColor,
                     boundingLineWidth
                 );
+            },
+            updateTimeRange(dateTimeStart, dateTimeEnd) {
+                zoomToXK(this.svg, this.w, this.zoom)(this.scale, dateTimeStart, dateTimeEnd);
             },
             safeDraw() {
                 this.ifExistsSvgThenRemove();
