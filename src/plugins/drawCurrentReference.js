@@ -23,7 +23,6 @@ const drawCurrentReferenceX = (g, xScale, g_h, clipPathId, currentTimeLineColor,
             .attr('y2', g_h)
             .attr('stroke', currentTimeLineColor)
             .attr('stroke-width', currentTimeLineWidth)
-            .attr('clip-path', `url(#${clipPathId})`)
             .attr('pointer-events', 'none');
     }
 

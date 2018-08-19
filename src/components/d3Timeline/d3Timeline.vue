@@ -217,6 +217,7 @@
                 self.zoom = zoom(svg, { zooming, zoomend }, scaleExtent, zoomExtent);
 
                 const g = svg.append('g')
+                    .attr('clip-path', `url(#${entryClipPathId})`)
                     .attr('transform', `translate(${left + __offset__ + groupLaneWidth}, ${top + __offset__})`);
 
                 if (liveTimer)
