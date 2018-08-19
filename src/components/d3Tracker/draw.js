@@ -45,11 +45,11 @@ const draw = (
     axisXLane
         .call(xAxis.scale(xScale))
         .selectAll('line')
+        .attr('y1', -g_h)
         .attr('stroke', boundingLineColor)
         .attr('stroke-width', boundingLineWidth);
 
     g
-        .call(drawTicksX, xScale, g_h, clipPathId, boundingLineColor, boundingLineWidth)
         .call(drawEntriesX, lanes, xScale, yScale, symbolSize, clipPathId, intervalCornerRadius)
         .call(drawReferenceX, xScale(reference), clipPathId, g_h, overlayWidth, referenceLineColor, referenceLineWidth, onDrag);
 };

@@ -44,8 +44,8 @@ const draw = (
         .attr('stroke-width', boundingLineWidth);
 
     g
-     .call(drawEntriesMultiLaneX, data, groups, xScale, yScale, entryClipPathId, symbolSize, intervalCornerRadius)
-     .call(drawCurrentReferenceX, xScale, g_h, entryClipPathId, currentTimeLineColor, currentTimeLineWidth);
+        .call(drawEntriesMultiLaneX, data, groups, xScale, yScale, entryClipPathId, symbolSize, intervalCornerRadius)
+        .call(drawCurrentReferenceX, xScale, g_h, entryClipPathId, currentTimeLineColor, currentTimeLineWidth);
 };
 
 export default draw;

@@ -97,20 +97,14 @@
                 defs
                     .append('clipPath')
                     .attr('id', entryClipPathId)
-                    .append('rect')
-                    .attr('x', 0)
-                    .attr('y', 0)
-                    .attr('width', g_w)
-                    .attr('height', g_h + axisXLaneHeight);
+                    .append('path')
+                    .attr('d', roundedRect(0, 0, g_w, g_h + axisXLaneHeight, borderRadius - __offset__ / 2, false, true, false, true));
 
                 defs
                     .append('clipPath')
                     .attr('id', groupLabelClipPathId)
-                    .append('rect')
-                    .attr('x', left + __offset__)
-                    .attr('y', top + __offset__)
-                    .attr('width', groupLaneWidth)
-                    .attr('height', g_h);
+                    .append('path')
+                    .attr('d', roundedRect(0, 0, groupLaneWidth, g_h + axisXLaneHeight, borderRadius - __offset__ / 2, true, false, true, false));
 
                 const xScale = d3.scaleTime()
                     .domain([dateTimeStart, dateTimeEnd])
@@ -154,7 +148,8 @@
                     .text(d => d)
                     .attr('fill', '#000');
 
-                svg.append('g')
+                svg
+                    .append('g')
                     .attr('class', 'line--x')
                     .attr('transform', `translate(${left + __offset__}, ${top + __offset__})`)
                     .selectAll('line')
@@ -167,7 +162,8 @@
                     .attr('stroke', boundingLineColor)
                     .attr('stroke-width', boundingLineWidth);
 
-                svg.append('g')
+                svg
+                    .append('g')
                     .attr('class', 'line--y')
                     .attr('transform', `translate(${left + __offset__ + groupLaneWidth}, ${top + __offset__})`)
                     .append('line')
@@ -216,15 +212,16 @@
                     .call(cursor, axisXLane, [
                         [0, 0],
                         [g_w, axisXLaneHeight]
-                    ])
-                    .call(zoom, { zooming, zoomend }, scaleExtent, zoomExtent);
+                    ]);
+
+                self.zoom = zoom(svg, { zooming, zoomend }, scaleExtent, zoomExtent);
 
                 const g = svg.append('g')
                     .attr('transform', `translate(${left + __offset__ + groupLaneWidth}, ${top + __offset__})`);
 
                 if (liveTimer)
                     self.timer = setInterval(() => {
-                        g.call(drawCurrentReferenceX, self.scale, g_h, groupLabelClipPathId, currentTimeLineColor, currentTimeLineWidth);
+                        g.call(drawCurrentReferenceX, self.scale, g_h, entryClipPathId, currentTimeLineColor, currentTimeLineWidth);
                     }, liveTimerTick);
 
                 function zooming() {
