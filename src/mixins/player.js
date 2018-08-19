@@ -1,11 +1,18 @@
 /* eslint-disable */
 import * as d3 from 'd3';
-import { debounce } from 'lodash';
+import {debounce, isBoolean} from 'lodash';
 import { hideTip } from '../plugins/tooltip';
 
 export default {
     data() {
         return {
+            timer: null,
+            reference: null,
+            scale: null,
+            pause: true,
+            val: null,
+            play: null,
+            speed: 1,
             observer: null
         }
     },
@@ -55,6 +62,10 @@ export default {
                 selection.node().getBBox().x,
                 selection.node().getBBox().y
             ];
+        },
+        setPause(n) {
+            if (isBoolean(n)) this.pause = n;
+            else this.pause = !this.pause;
         }
     },
     watch: {
@@ -97,6 +108,12 @@ export default {
                     this.safeDraw();
                 });
             }
+        },
+        pause(n) {
+            if (n) this.timer.stop();
+            if (!n) this.play();
+
+            this.$emit('change', n);
         }
     },
     mounted() {
