@@ -47,8 +47,8 @@
 
                         backgroundColor = 'rgba(255, 255, 255, 0.125)',
 
-                        borderRadius = 30,
-                        borderWidth = 20,
+                        borderRadius = 0,
+                        borderWidth = 2,
                         borderColor = 'rgba(0, 0, 0, .125)',
 
                         boundingLineWidth = 2,
@@ -89,7 +89,8 @@
                         btnBorderRadius = 2,
 
                         btnFillColor = '#ccc',
-                        btnFontSize = 12,
+
+                        btnFontSize = 14,
                         btnFontWeight = 400,
                         btnFontColor = '#000',
 
@@ -297,6 +298,12 @@
                     .attr('stroke', btnBorderLineColor)
                     .attr('stroke-width', btnBorderLineWidth)
                     .attr('d', roundedRect(0, 0, speedBtnWidth, axisXControlLaneHeight - btnBorderLineWidth, btnBorderRadius, true, true, true, true));
+
+                axisXControlLane
+                    .append('g')
+                    .attr('transform', `translate(${w - left - right - btnBorderLineWidth / 2 - speedBtnWidth / 2 - 12}, ${(axisXControlLaneHeight - btnBorderLineWidth) / 2 - 12})`)
+                    .append('path')
+                    .attr('d', shape.speed());
 
                 const brushExtent = [
                     [left + __offset__, top + __offset__],
