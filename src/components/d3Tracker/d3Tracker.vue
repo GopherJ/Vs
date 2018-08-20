@@ -89,11 +89,8 @@
                 svg.append('defs')
                     .append('clipPath')
                     .attr('id', clipPathId)
-                    .append('rect')
-                    .attr('x', 0)
-                    .attr('y', 0)
-                    .attr('width', g_w)
-                    .attr('height', g_h + axisXLaneHeight);
+                    .append('path')
+                    .attr('d', roundedRect(0, 0, g_w, g_h + axisXLaneHeight, borderRadius - __offset__ / 2, true, true, true, true));
 
                 const xScale = d3.scaleTime()
                     .domain([dateTimeStart, dateTimeEnd])
@@ -118,6 +115,14 @@
                     .attr('stroke-width', borderWidth)
                     .attr('pointer-events', 'none');
 
+                svg.append('g')
+                    .attr('class', 'line--x')
+                    .attr('transform', `translate(${left + __offset__}, ${top + __offset__ + g_h})`)
+                    .append('line')
+                    .attr('x1', g_w)
+                    .attr('stroke', boundingLineColor)
+                    .attr('stroke-width', boundingLineWidth);
+
                 const axisXLane = svg
                     .append('g')
                     .attr('transform', `translate(${left + __offset__}, ${top + g_h + __offset__})`);
@@ -127,18 +132,11 @@
                     .attr('class', 'axis axis--x')
                     .attr('font-size', axisFontSize)
                     .attr('font-weight', axisFontWeight)
-                    .attr('fill-opacity', axisFontOpacity)
-                    .append('line')
-                    .attr('x2', g_w);
-
-                axisXLane
-                    .selectAll('line')
-                    .attr('stroke', boundingLineColor)
-                    .attr('stroke-width', boundingLineWidth);
+                    .attr('fill-opacity', axisFontOpacity);
 
                 const axisXLabelLane = svg
                     .append('g')
-                    .attr('transform', `translate(${left + __offset__},${top + g_h + axisXLaneHeight + 2 * __offset__})`)
+                    .attr('transform', `translate(${left + __offset__},${top + g_h + axisXLaneHeight + 2 * __offset__})`);
 
                 axisXLabelLane
                     .append('text')
@@ -174,6 +172,7 @@
 
                 const g = svg
                     .append('g')
+                    .attr('clip-path', `url(#${clipPathId})`)
                     .attr('transform', `translate(${left + __offset__}, ${top + __offset__})`);
 
                 function zooming() {
@@ -192,7 +191,6 @@
                             lanes,
                             self.reference,
                             g_h,
-                            clipPathId,
                             symbolSize,
                             intervalCornerRadius,
                             overlayWidth,
@@ -299,7 +297,6 @@
                         lanes,
                         self.reference,
                         g_h,
-                        clipPathId,
                         symbolSize,
                         intervalCornerRadius,
                         overlayWidth,

@@ -5,14 +5,13 @@ import * as d3 from 'd3';
  *
  * @param g
  * @param x
- * @param clipPathId
  * @param h
  * @param overlayWidth
  * @param referenceLineColor
  * @param referenceLineWidth
  * @param ondrag
  */
-const drawReferenceX = (g, x, clipPathId, h, overlayWidth, referenceLineColor, referenceLineWidth, ondrag) => {
+const drawReferenceX = (g, x, h, overlayWidth, referenceLineColor, referenceLineWidth, ondrag) => {
     let overlaySelection = g.select('.overlay'),
         lineReferenceSelection = g.select('.line--reference');
     /*
@@ -52,7 +51,6 @@ const drawReferenceX = (g, x, clipPathId, h, overlayWidth, referenceLineColor, r
     //         .attr('height', h)
     //         .attr('cursor', 'move');
     // }
-
     if (!lineReferenceSelection.empty()) lineReferenceSelection.remove();
     if (!overlaySelection.empty()) overlaySelection.remove();
 
@@ -60,9 +58,7 @@ const drawReferenceX = (g, x, clipPathId, h, overlayWidth, referenceLineColor, r
         .append('line')
         .attr('pointer-events', 'none')
         .attr('class', 'line--reference')
-        .attr('clip-path', `url(#${clipPathId})`)
         .attr('x1', x)
-        .attr('y1', 0)
         .attr('x2', x)
         .attr('y2', h)
         .attr('stroke', referenceLineColor)
@@ -72,7 +68,6 @@ const drawReferenceX = (g, x, clipPathId, h, overlayWidth, referenceLineColor, r
         .append('rect')
         .attr('class', 'overlay')
         .attr('pointer-events', 'all')
-        .attr('clip-path', `url(#${clipPathId})`)
         .attr('fill', 'none')
         .attr('x', x - overlayWidth / 2)
         .attr('y', 0)

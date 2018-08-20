@@ -1,5 +1,4 @@
 import { drawReferenceX } from '../../plugins/drawReference';
-import { drawTicksX } from '../../plugins/drawTicks';
 import { drawEntriesX } from '../../plugins/drawEntries';
 
 
@@ -13,7 +12,6 @@ import { drawEntriesX } from '../../plugins/drawEntries';
  * @param lanes
  * @param reference
  * @param g_h
- * @param clipPathId
  * @param symbolSize
  * @param intervalCornerRadius
  * @param overlayWidth
@@ -32,7 +30,6 @@ const draw = (
     lanes,
     reference,
     g_h,
-    clipPathId,
     symbolSize,
     intervalCornerRadius,
     overlayWidth,
@@ -50,8 +47,8 @@ const draw = (
         .attr('stroke-width', boundingLineWidth);
 
     g
-        .call(drawEntriesX, lanes, xScale, yScale, symbolSize, clipPathId, intervalCornerRadius)
-        .call(drawReferenceX, xScale(reference), clipPathId, g_h, overlayWidth, referenceLineColor, referenceLineWidth, onDrag);
+        .call(drawEntriesX, lanes, xScale, yScale, symbolSize, intervalCornerRadius)
+        .call(drawReferenceX, xScale(reference), g_h, overlayWidth, referenceLineColor, referenceLineWidth, onDrag);
 };
 
 export default draw;

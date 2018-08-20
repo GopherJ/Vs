@@ -10,10 +10,9 @@ import roundedRect from './roundedRect';
  * @param xScale
  * @param yScale
  * @param symbolSize
- * @param clipPathId
  * @param intervalCornerRadius
  */
-const drawEntriesX = (g, lanes, xScale, yScale, symbolSize, clipPathId, intervalCornerRadius) => {
+const drawEntriesX = (g, lanes, xScale, yScale, symbolSize, intervalCornerRadius) => {
     const entriesSelection = g.selectAll('.entry');
     if (!entriesSelection.empty()) entriesSelection.remove();
 
@@ -26,12 +25,9 @@ const drawEntriesX = (g, lanes, xScale, yScale, symbolSize, clipPathId, interval
 
             if (entry instanceof Point) {
                 const point = g
-                    .append('g')
-                    .attr('class', 'entry')
-                    .attr('clip-path', `url(#${clipPathId})`)
                     .append('path')
                     .attr('transform', `translate(${xScale(entry.at)}, ${Y + H / 2})`)
-                    .attr('class', `entry--${entry.className ? entry.className : 'default'}`)
+                    .attr('class', `entry entry--${entry.className ? entry.className : 'default'}`)
                     .attr('d', () => {
                         const symbolGen = d3.symbol().size(symbolSize);
 
@@ -50,11 +46,8 @@ const drawEntriesX = (g, lanes, xScale, yScale, symbolSize, clipPathId, interval
                     W = xScale(entry.to) - xScale(entry.from);
 
                 const interval = g
-                    .append('g')
-                    .attr('class', 'entry')
-                    .attr('clip-path', `url(#${clipPathId})`)
                     .append('path')
-                    .attr('class', `entry--${entry.className ? entry.className : 'default'}`)
+                    .attr('class', `entry entry--${entry.className ? entry.className : 'default'}`)
                     .attr('d', roundedRect(X, Y, W, H, intervalCornerRadius, true, true, true, true));
 
                 if (entry.title) {
@@ -65,7 +58,6 @@ const drawEntriesX = (g, lanes, xScale, yScale, symbolSize, clipPathId, interval
 
                 const text = g
                     .append('text')
-                    .attr('clip-path', `url(#${clipPathId})`)
                     .attr('class', 'entry entry--label')
                     .attr('text-anchor', 'middle')
                     .attr('pointer-events', 'none')
