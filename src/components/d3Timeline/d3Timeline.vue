@@ -24,6 +24,7 @@
             return {
                 scale: null,
                 timer: null,
+                zoom: null,
                 w: null,
                 svg: null
             }
