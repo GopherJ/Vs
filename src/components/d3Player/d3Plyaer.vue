@@ -47,8 +47,8 @@
 
                         backgroundColor = 'rgba(255, 255, 255, 0.125)',
 
-                        borderRadius = 0,
-                        borderWidth = 2,
+                        borderRadius = 30,
+                        borderWidth = 20,
                         borderColor = 'rgba(0, 0, 0, .125)',
 
                         boundingLineWidth = 2,
@@ -84,8 +84,19 @@
                         circleStrokeOpacity = 0.5,
                         circleStrokeWidth = 1.25,
 
+                        btnBorderLineWidth = 2,
+                        btnBorderLineColor = 'rgba(0, 0, 0, .125)',
+                        btnBorderRadius = 2,
+
+                        btnFillColor = '#ccc',
+                        btnFontSize = 12,
+                        btnFontWeight = 400,
+                        btnFontColor = '#000',
+
                         timeLabelWidth = 400,
+
                         playBtnWidth = 100,
+
                         speedBtnWidth = 100,
                     } = this.options,
                     circleRadius = trackStrokeWidth,
@@ -100,7 +111,7 @@
                 if (![g_w, g_h].every(el => el > 0)) return;
 
                 const hueMin = circleStrokeWidth / 2 + circleRadius,
-                      hueMax = g_w - 3 * axisXControlLaneGap - __offset__ - playBtnWidth - timeLabelWidth - speedBtnWidth - circleStrokeWidth / 2 - circleRadius,
+                      hueMax = w - left - right - 3 * axisXControlLaneGap - 3 * btnBorderLineWidth - playBtnWidth - timeLabelWidth - speedBtnWidth - circleStrokeWidth / 2 - circleRadius,
                     interpolate = hueActual => d3.interpolate(dateTimeStart, dateTimeEnd)((hueActual - hueMin) / (hueMax - hueMin));
 
                 const svg = d3.select(this.$el)
@@ -111,11 +122,8 @@
                 svg.append('defs')
                     .append('clipPath')
                     .attr('id', clipPathId)
-                    .append('rect')
-                    .attr('x', 0)
-                    .attr('y', 0)
-                    .attr('width', g_w)
-                    .attr('height', g_h + axisXLaneHeight);
+                    .append('path')
+                    .attr('d', roundedRect(0, 0, g_w, g_h + axisXLaneHeight, borderRadius - __offset__ / 2, true, true, true, true));
 
                 const xScale = d3.scaleTime()
                     .domain([dateTimeStart, dateTimeEnd])
@@ -140,6 +148,14 @@
                     .attr('stroke-width', borderWidth)
                     .attr('pointer-events', 'none');
 
+                svg.append('g')
+                    .attr('class', 'line--x')
+                    .attr('transform', `translate(${left + __offset__}, ${top + __offset__ + g_h})`)
+                    .append('line')
+                    .attr('x1', g_w)
+                    .attr('stroke', boundingLineColor)
+                    .attr('stroke-width', boundingLineWidth);
+
                 const axisXLane = svg
                     .append('g')
                     .attr('transform', `translate(${left + __offset__}, ${top + g_h + __offset__})`);
@@ -149,54 +165,53 @@
                     .attr('class', 'axis axis--x')
                     .attr('font-size', axisFontSize)
                     .attr('font-weight', axisFontWeight)
-                    .attr('fill-opacity', axisFontOpacity)
-                    .append('line')
-                    .attr('x2', g_w);
-
-                axisXLane
-                    .selectAll('line')
-                    .attr('stroke', boundingLineColor)
-                    .attr('stroke-width', boundingLineWidth);
+                    .attr('fill-opacity', axisFontOpacity);
 
                 const axisXControlLane = svg
                     .append('g')
-                    .attr('transform', `translate(${left + __offset__ / 2}, ${top + g_h + axisXLaneHeight + 2 * __offset__ + axisXControlLaneMarginTop + __offset__ / 2})`);
+                    .attr('transform', `translate(${left + btnBorderLineWidth / 2}, ${top + g_h + axisXLaneHeight + 2 * __offset__ + axisXControlLaneMarginTop + btnBorderLineWidth / 2})`);
 
-                const btn = axisXControlLane
+                const playBtnRect = axisXControlLane
+                    .append('path')
+                    .attr('fill', btnFillColor)
+                    .attr('stroke', btnBorderLineColor)
+                    .attr('stroke-width', btnBorderLineWidth)
+                    .attr('d', roundedRect(0, 0, playBtnWidth, axisXControlLaneHeight - btnBorderLineWidth, btnBorderRadius, true, true, true, true));
+
+                const playBtn = axisXControlLane
                     .append('g')
-                    .attr('transform', `translate(${(playBtnWidth - axisXControlLaneHeight) / 2}, 0)`)
+                    .attr('transform', `translate(${(playBtnWidth - (axisXControlLaneHeight - btnBorderLineWidth)) / 2}, 0)`)
                     .append('path')
                     .attr('data-state', 'PAUSE')
                     .attr('pointer-events', 'none')
-                    .attr('fill', '#000')
-                    .attr('d', shape.triangle(axisXControlLaneHeight - __offset__, axisXControlLaneHeight - __offset__));
+                    .attr('fill', btnFontColor)
+                    .attr('d', shape.triangle(axisXControlLaneHeight - btnBorderLineWidth, axisXControlLaneHeight - btnBorderLineWidth));
 
-                axisXControlLane
-                    .append('path')
-                    .attr('fill', boundingLineColor)
-                    .attr('stroke', boundingLineColor)
-                    .attr('stroke-width', boundingLineWidth)
-                    .attr('d', roundedRect(0, 0, playBtnWidth, axisXControlLaneHeight - __offset__, borderRadius, true, true, true, true))
-                    .on('click', function () {
-                        const state = btn.attr('data-state');
-                        btn.attr('data-state', state === 'PAUSE' ? 'PLAYING' : 'PAUSE');
-                        btn.transition().duration(360).attr('d', state === 'PAUSE'
-                            ? shape.pause(axisXControlLaneHeight - __offset__, axisXControlLaneHeight - __offset__)
-                            : shape.triangle(axisXControlLaneHeight - __offset__, axisXControlLaneHeight - __offset__)
+                playBtnRect
+                    .on('click', () => {
+                        const state = playBtn.attr('data-state'),
+                            w = axisXControlLaneHeight - btnBorderLineWidth,
+                            h = w;
+
+                        playBtn.attr('data-state', state === 'PAUSE' ? 'PLAYING' : 'PAUSE');
+
+                        playBtn.transition().duration(360).attr('d', state === 'PAUSE'
+                            ? shape.pause(w, h)
+                            : shape.triangle(w, h)
                         );
                     });
 
                 const sliderLane = axisXControlLane
                     .append('g')
-                    .attr('transform', `translate(${playBtnWidth + axisXControlLaneGap + __offset__ / 2}, 0)`);
+                    .attr('transform', `translate(${playBtnWidth + axisXControlLaneGap + btnBorderLineWidth / 2}, 0)`);
 
                 sliderLane
                     .append('line')
                     .attr('class', 'track')
                     .attr('x1', hueMin)
                     .attr('x2', hueMax)
-                    .attr('y1', axisXControlLaneHeight / 2)
-                    .attr('y2', axisXControlLaneHeight / 2)
+                    .attr('y1', (axisXControlLaneHeight - btnBorderLineWidth) / 2)
+                    .attr('y2', (axisXControlLaneHeight - btnBorderLineWidth) / 2)
                     .attr('stroke', trackStroke)
                     .attr('stroke-opacity', trackStrokeOpacity)
                     .attr('stroke-width', trackStrokeWidth)
@@ -207,8 +222,8 @@
                    .attr('class', 'track track--inset')
                    .attr('x1', hueMin)
                    .attr('x2', hueMax)
-                   .attr('y1', axisXControlLaneHeight / 2)
-                   .attr('y2', axisXControlLaneHeight / 2)
+                   .attr('y1', (axisXControlLaneHeight - btnBorderLineWidth) / 2)
+                   .attr('y2', (axisXControlLaneHeight - btnBorderLineWidth) / 2)
                    .attr('stroke', trackInsetStroke)
                    .attr('stroke-opacity', trackInsetStrokeOpacity)
                    .attr('stroke-width', trackInsetStrokeWidth)
@@ -217,7 +232,7 @@
                const circle = sliderLane
                    .append('circle')
                    .attr('cx', hueMin)
-                   .attr('cy', axisXControlLaneHeight / 2)
+                   .attr('cy', (axisXControlLaneHeight - btnBorderLineWidth) / 2)
                    .attr('r', circleRadius)
                    .attr('fill', circleFill)
                    .attr('stroke', circleStroke)
@@ -238,9 +253,8 @@
 
                 const trackOverlay = sliderLane
                     .append('rect')
-                    .attr('x', 0)
-                    .attr('y', axisXControlLaneHeight / 2 - circleRadius - circleStrokeWidth / 2)
-                    .attr('width', g_w - playBtnWidth - __offset__ / 2 - 3 * axisXControlLaneGap - timeLabelWidth - speedBtnWidth)
+                    .attr('y', (axisXControlLaneHeight - btnBorderLineWidth) / 2 - circleRadius - circleStrokeWidth / 2)
+                    .attr('width', w - left - right - 3 * btnBorderLineWidth - playBtnWidth - 3 * axisXControlLaneGap - timeLabelWidth - speedBtnWidth)
                     .attr('height', circleRadius * 2 + circleStrokeWidth)
                     .attr('fill', 'none')
                     .attr('pointer-events', 'all')
@@ -256,30 +270,33 @@
 
                 axisXControlLane
                     .append('g')
-                    .attr('transform', `translate(${g_w - speedBtnWidth - axisXControlLaneGap - timeLabelWidth}, 0)`)
+                    .attr('transform', `translate(${w - left - right  - 3 * btnBorderLineWidth / 2 - axisXControlLaneGap - timeLabelWidth - speedBtnWidth}, 0)`)
                     .append('path')
-                    .attr('fill', boundingLineColor)
-                    .attr('stroke', boundingLineColor)
-                    .attr('stroke-width', boundingLineWidth)
-                    .attr('d', roundedRect(0, 0, timeLabelWidth, axisXControlLaneHeight - __offset__, borderRadius, true, true, true, true));
+                    .attr('fill', btnFillColor)
+                    .attr('stroke', btnBorderLineColor)
+                    .attr('stroke-width', btnBorderLineWidth)
+                    .attr('d', roundedRect(0, 0, timeLabelWidth, axisXControlLaneHeight - btnBorderLineWidth, btnBorderRadius, true, true, true, true));
 
                 axisXControlLane
                     .append('text')
                     .attr('class', 'label--time')
                     .attr('text-anchor', 'middle')
                     .attr('dy', '0.32em')
-                    .attr('x', g_w - timeLabelWidth / 2 - speedBtnWidth - axisXControlLaneGap)
-                    .attr('y', axisXControlLaneHeight / 2)
-                    .text(self.getTimeLabel());
+                    .attr('x', w - left - right  - 3 * btnBorderLineWidth / 2 - axisXControlLaneGap - timeLabelWidth / 2 - speedBtnWidth)
+                    .attr('y', (axisXControlLaneHeight - btnBorderLineWidth) / 2)
+                    .text(self.getTimeLabel())
+                    .attr('font-size', btnFontSize)
+                    .attr('font-weight', btnFontWeight)
+                    .attr('fill', btnFontColor);
 
                 axisXControlLane
                     .append('g')
-                    .attr('transform', `translate(${g_w - speedBtnWidth}, 0)`)
+                    .attr('transform', `translate(${w - left - right - btnBorderLineWidth / 2 - speedBtnWidth}, 0)`)
                     .append('path')
-                    .attr('fill', boundingLineColor)
-                    .attr('stroke', boundingLineColor)
-                    .attr('stroke-width', boundingLineWidth)
-                    .attr('d', roundedRect(0, 0, speedBtnWidth, axisXControlLaneHeight - __offset__, borderRadius, true, true, true, true));
+                    .attr('fill', btnFillColor)
+                    .attr('stroke', btnBorderLineColor)
+                    .attr('stroke-width', btnBorderLineWidth)
+                    .attr('d', roundedRect(0, 0, speedBtnWidth, axisXControlLaneHeight - btnBorderLineWidth, btnBorderRadius, true, true, true, true));
 
                 const brushExtent = [
                     [left + __offset__, top + __offset__],
@@ -303,6 +320,7 @@
 
                 const g = svg
                     .append('g')
+                    .attr('clip-path', `url(#${clipPathId})`)
                     .attr('transform', `translate(${left + __offset__}, ${top + __offset__})`);
 
                 function zooming() {
@@ -321,7 +339,6 @@
                             lanes,
                             self.reference,
                             g_h,
-                            clipPathId,
                             symbolSize,
                             intervalCornerRadius,
                             overlayWidth,
@@ -428,7 +445,6 @@
                         lanes,
                         self.reference,
                         g_h,
-                        clipPathId,
                         symbolSize,
                         intervalCornerRadius,
                         overlayWidth,

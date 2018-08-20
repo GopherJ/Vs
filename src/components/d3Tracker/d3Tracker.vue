@@ -41,7 +41,7 @@
                         axisFontWeight = 600,
                         axisFontOpacity = 0.5,
 
-                        axisXLabel = 'abcdefg',
+                        axisXLabel = null,
 
                         axisLabelFontSize = 14,
                         axisLabelFontWeight = 600,

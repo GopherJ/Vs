@@ -1,7 +1,6 @@
 import { drawReferenceX } from '../../plugins/drawReference';
 import { drawEntriesX } from '../../plugins/drawEntries';
 
-
 /**
  *
  * @param g
