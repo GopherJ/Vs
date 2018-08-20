@@ -1,13 +1,12 @@
 /* eslint-disable */
 import * as d3 from 'd3';
-import {debounce, isBoolean} from 'lodash';
+import { debounce, isBoolean } from 'lodash';
 import { hideTip } from '../plugins/tooltip';
 
 export default {
     data() {
         return {
             timer: null,
-            reference: null,
             scale: null,
             pause: true,
             val: null,
@@ -42,9 +41,7 @@ export default {
         ifExistsSvgThenRemove() {
             const svgSelection = d3.select(this.$el).select('svg');
 
-            if (svgSelection.empty()) {
-                return;
-            }
+            if (svgSelection.empty()) return;
 
             svgSelection.remove();
         },
@@ -112,8 +109,6 @@ export default {
         pause(n) {
             if (n) this.timer.stop();
             if (!n) this.play();
-
-            this.$emit('change', n);
         }
     },
     mounted() {

@@ -10,7 +10,8 @@ const disableZoomOn = (svg, extent) => {
         const [cx, cy] = d3.mouse(svg.node()),
             [[x0, y0], [x1, y1]] = extent;
 
-        if (cx < x0 || cx > x1 || cy > y1 || cy < y0) d3.event.stopImmediatePropagation();
+        if (cx < x0 || cx > x1 || cy > y1 || cy < y0)
+            d3.event.stopImmediatePropagation();
     });
 };
 

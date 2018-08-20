@@ -21,8 +21,9 @@
     import clampRange from '../../utils/clampRange';
     import roundLine from '../../plugins/roundLine';
     import shape from '../../plugins/shape';
-    import { smoothMoveX } from '../../plugins/smoothMove';
+    import { smoothMoveX, smoothMoveY } from '../../plugins/smoothMove';
     import { showTip, hideTip } from '../../plugins/tooltip';
+    import diagbox from '../../plugins/diagbox';
     import draw from './draw';
 
     export default {
@@ -30,6 +31,11 @@
         mixins: [player],
         methods: {
             drawPlayer() {
+
+                ////////////////////////////////////////////////////////////////////////////////
+                ////                          initialisation                                ////
+                ////////////////////////////////////////////////////////////////////////////////
+
                 const { dateTimeStart, dateTimeEnd, lanes } = getTrackerLanes(cloneDeep(this.data)),
                     {
                         intervalCornerRadius = 4,
@@ -99,32 +105,46 @@
                         playBtnWidth = 100,
 
                         speedBtnWidth = 100,
+
+                        speedSliderLaneWidth = 40,
+                        speedSliderLaneHeight = 200,
+                        speedSliderTriangleLength = 10
                     } = this.options,
                     circleRadius = trackStrokeWidth,
                     { left = 0, top = 0, right = 0, bottom = 0 } = this.margin,
                     [w, h] = this.getElWidthHeight(), __offset__  = borderWidth,
                     g_w = w - left - right - 2 * __offset__,
                     g_h = h - top - bottom - axisXLaneHeight - axisXControlLaneHeight - 2 * __offset__ - axisXControlLaneMarginTop,
+                    c_w = w - left - right - btnBorderLineWidth,
+                    c_h = axisXControlLaneHeight - btnBorderLineWidth,
                     [paddingInner, paddingOuter] = selectPaddingInnerOuterY(g_h),
                     clipPathId = uuid(), self = this, interval = Math.max(tickLen / this.speed, 16);
                 self.reference = dateTimeStart;
 
                 if (![g_w, g_h].every(el => el > 0)) return;
 
-                const hueMin = circleStrokeWidth / 2 + circleRadius,
-                      hueMax = w - left - right - 3 * axisXControlLaneGap - 3 * btnBorderLineWidth - playBtnWidth - timeLabelWidth - speedBtnWidth - circleStrokeWidth / 2 - circleRadius,
-                    interpolate = hueActual => d3.interpolate(dateTimeStart, dateTimeEnd)((hueActual - hueMin) / (hueMax - hueMin));
+                ////////////////////////////////////////////////////////////////////////////////
+                ////                             svg container                              ////
+                ////////////////////////////////////////////////////////////////////////////////
 
                 const svg = d3.select(this.$el)
                     .append('svg')
                     .attr('width', w)
                     .attr('height', h);
 
+                ////////////////////////////////////////////////////////////////////////////////
+                ////                               clip path                                ////
+                ////////////////////////////////////////////////////////////////////////////////
+
                 svg.append('defs')
                     .append('clipPath')
                     .attr('id', clipPathId)
                     .append('path')
                     .attr('d', roundedRect(0, 0, g_w, g_h + axisXLaneHeight, borderRadius - __offset__ / 2, true, true, true, true));
+
+                ////////////////////////////////////////////////////////////////////////////////
+                ////                              xScale, yScale                            ////
+                ////////////////////////////////////////////////////////////////////////////////
 
                 const xScale = d3.scaleTime()
                     .domain([dateTimeStart, dateTimeEnd])
@@ -142,12 +162,22 @@
                     .tickSize(tickSize)
                     .tickPadding(tickPadding);
 
-                svg.append('path')
+                ////////////////////////////////////////////////////////////////////////////////
+                ////                                   border                               ////
+                ////////////////////////////////////////////////////////////////////////////////
+
+                svg.append('g')
+                    .attr('class', 'border--path')
+                    .append('path')
                     .attr('d', roundedRect(left + __offset__ / 2, top + __offset__ / 2, g_w + __offset__, g_h + axisXLaneHeight + __offset__, borderRadius, true, true, true, true))
                     .attr('fill', backgroundColor)
                     .attr('stroke', borderColor)
                     .attr('stroke-width', borderWidth)
                     .attr('pointer-events', 'none');
+
+                ////////////////////////////////////////////////////////////////////////////////
+                ////                              domain line                               ////
+                ////////////////////////////////////////////////////////////////////////////////
 
                 svg.append('g')
                     .attr('class', 'line--x')
@@ -157,83 +187,108 @@
                     .attr('stroke', boundingLineColor)
                     .attr('stroke-width', boundingLineWidth);
 
+                ////////////////////////////////////////////////////////////////////////////////
+                ////                                   xAxis                                ////
+                ////////////////////////////////////////////////////////////////////////////////
+
                 const axisXLane = svg
                     .append('g')
+                    .attr('class', 'axis axis--x')
                     .attr('transform', `translate(${left + __offset__}, ${top + g_h + __offset__})`);
 
                 axisXLane
                     .call(xAxis)
-                    .attr('class', 'axis axis--x')
                     .attr('font-size', axisFontSize)
                     .attr('font-weight', axisFontWeight)
                     .attr('fill-opacity', axisFontOpacity);
 
+                ////////////////////////////////////////////////////////////////////////////////
+                ////                            control lane                                ////
+                ////////////////////////////////////////////////////////////////////////////////
+
                 const axisXControlLane = svg
                     .append('g')
+                    .attr('class', 'lane--control')
                     .attr('transform', `translate(${left + btnBorderLineWidth / 2}, ${top + g_h + axisXLaneHeight + 2 * __offset__ + axisXControlLaneMarginTop + btnBorderLineWidth / 2})`);
 
-                const playBtnRect = axisXControlLane
+               ////////////////////////////////////////////////////////////////////////////////
+               ////                                play btn                                ////
+               ////////////////////////////////////////////////////////////////////////////////
+
+
+                const playBtnLane = axisXControlLane
+                    .append('g')
+                    .attr('class', 'btn--play');
+
+                const playBtnRect = playBtnLane
                     .append('path')
                     .attr('fill', btnFillColor)
                     .attr('stroke', btnBorderLineColor)
                     .attr('stroke-width', btnBorderLineWidth)
                     .attr('d', roundedRect(0, 0, playBtnWidth, axisXControlLaneHeight - btnBorderLineWidth, btnBorderRadius, true, true, true, true));
 
-                const playBtn = axisXControlLane
-                    .append('g')
-                    .attr('transform', `translate(${(playBtnWidth - (axisXControlLaneHeight - btnBorderLineWidth)) / 2}, 0)`)
+                const playBtnIcon = playBtnLane
                     .append('path')
+                    .attr('transform', `translate(${(playBtnWidth - c_h) / 2}, 0)`)
                     .attr('data-state', 'PAUSE')
                     .attr('pointer-events', 'none')
                     .attr('fill', btnFontColor)
-                    .attr('d', shape.triangle(axisXControlLaneHeight - btnBorderLineWidth, axisXControlLaneHeight - btnBorderLineWidth));
+                    .attr('d', shape.triangle(c_h, c_h));
 
                 playBtnRect
                     .on('click', () => {
-                        const state = playBtn.attr('data-state'),
-                            w = axisXControlLaneHeight - btnBorderLineWidth,
-                            h = w;
+                        const state = playBtnIcon.attr('data-state');
 
-                        playBtn.attr('data-state', state === 'PAUSE' ? 'PLAYING' : 'PAUSE');
+                        playBtnIcon.attr('data-state', state === 'PAUSE' ? 'PLAYING' : 'PAUSE');
 
-                        playBtn.transition().duration(360).attr('d', state === 'PAUSE'
-                            ? shape.pause(w, h)
-                            : shape.triangle(w, h)
+                        playBtnIcon.transition().duration(360).attr('d', state === 'PAUSE'
+                            ? shape.pause(c_h, c_h)
+                            : shape.triangle(c_h, c_h)
                         );
                     });
 
-                const sliderLane = axisXControlLane
+                ////////////////////////////////////////////////////////////////////////////////
+                ////                                time slider                             ////
+                ////////////////////////////////////////////////////////////////////////////////
+
+                const timeSliderHueMin = circleStrokeWidth / 2 + circleRadius,
+                      timeSliderHueMax = c_w - 3 * axisXControlLaneGap - 2 * btnBorderLineWidth - playBtnWidth - timeLabelWidth - speedBtnWidth - circleStrokeWidth / 2 - circleRadius,
+                    timeSliderInterpolate = timeSliderHueActual => d3.interpolateDate(dateTimeStart, dateTimeEnd)((timeSliderHueActual - timeSliderHueMin) / (timeSliderHueMax - timeSliderHueMin)),
+                    timeSliderInterpolateInvert = date => d3.interpolate(timeSliderHueMin. timeSliderHueMax)((date - dateTimeStart) / (dateTimeEnd - dateTimeStart));
+
+                const timeSliderLane = axisXControlLane
                     .append('g')
+                    .attr('class', 'slider--time')
                     .attr('transform', `translate(${playBtnWidth + axisXControlLaneGap + btnBorderLineWidth / 2}, 0)`);
 
-                sliderLane
+                timeSliderLane
                     .append('line')
                     .attr('class', 'track')
-                    .attr('x1', hueMin)
-                    .attr('x2', hueMax)
-                    .attr('y1', (axisXControlLaneHeight - btnBorderLineWidth) / 2)
-                    .attr('y2', (axisXControlLaneHeight - btnBorderLineWidth) / 2)
+                    .attr('x1', timeSliderHueMin)
+                    .attr('x2', timeSliderHueMax)
+                    .attr('y1', c_h / 2)
+                    .attr('y2', c_h / 2)
                     .attr('stroke', trackStroke)
                     .attr('stroke-opacity', trackStrokeOpacity)
                     .attr('stroke-width', trackStrokeWidth)
                     .call(roundLine, trackRounded);
 
-               sliderLane
+               timeSliderLane
                    .append('line')
                    .attr('class', 'track track--inset')
-                   .attr('x1', hueMin)
-                   .attr('x2', hueMax)
-                   .attr('y1', (axisXControlLaneHeight - btnBorderLineWidth) / 2)
-                   .attr('y2', (axisXControlLaneHeight - btnBorderLineWidth) / 2)
+                   .attr('x1', timeSliderHueMin)
+                   .attr('x2', timeSliderHueMax)
+                   .attr('y1', c_h / 2)
+                   .attr('y2', c_h / 2)
                    .attr('stroke', trackInsetStroke)
                    .attr('stroke-opacity', trackInsetStrokeOpacity)
                    .attr('stroke-width', trackInsetStrokeWidth)
                    .call(roundLine, trackRounded);
 
-               const circle = sliderLane
+               const timeSliderHandler = timeSliderLane
                    .append('circle')
-                   .attr('cx', hueMin)
-                   .attr('cy', (axisXControlLaneHeight - btnBorderLineWidth) / 2)
+                   .attr('cx', timeSliderHueMin)
+                   .attr('cy', c_h / 2)
                    .attr('r', circleRadius)
                    .attr('fill', circleFill)
                    .attr('stroke', circleStroke)
@@ -241,74 +296,187 @@
                    .attr('stroke-opacity', circleStrokeOpacity)
                    .attr('pointer-events', 'none');
 
-                const onMoving = hueActual => {
-                    self.val = new Date(Math.round(interpolate(hueActual)));
+                const onTimeSliderHanderMoving = timeSliderHueActual => {
+                    self.val = timeSliderInterpolate(timeSliderHueActual);
                     self.updateTimeLabel();
                 };
 
-                const onMoved = () => {
+                const onTimeSliderHandlerMoved = () => {
                     if (self.val !== null) self.$emit('input', self.val);
                 };
 
-                const hue = smoothMoveX(circle, hueMin, hueMax, onMoving, onMoved);
+                const timeSliderHue = smoothMoveX(timeSliderHandler, timeSliderHueMin, timeSliderHueMax, onTimeSliderHanderMoving, onTimeSliderHandlerMoved);
 
-                const trackOverlay = sliderLane
+                const timeSliderHandlerOverlay = timeSliderLane
                     .append('rect')
-                    .attr('y', (axisXControlLaneHeight - btnBorderLineWidth) / 2 - circleRadius - circleStrokeWidth / 2)
-                    .attr('width', w - left - right - 3 * btnBorderLineWidth - playBtnWidth - 3 * axisXControlLaneGap - timeLabelWidth - speedBtnWidth)
-                    .attr('height', circleRadius * 2 + circleStrokeWidth)
+                    .attr('class', 'track track--overlay')
+                    .attr('y', c_h / 2 - timeSliderHueMin)
+                    .attr('width', c_w - 2 * btnBorderLineWidth - playBtnWidth - 3 * axisXControlLaneGap - timeLabelWidth - speedBtnWidth)
+                    .attr('height', 2 * timeSliderHueMin)
                     .attr('fill', 'none')
                     .attr('pointer-events', 'all')
                     .attr('cursor', 'crosshair')
                     .call(d3.drag()
-                        .on('start.interrupt', () => trackOverlay.interrupt())
-                        .on('start drag', () =>  hue(d3.event.x))
+                        .on('start.interrupt', () => timeSliderHandlerOverlay.interrupt())
+                        .on('start drag', () =>  timeSliderHue(d3.event.x))
                     );
 
-                trackOverlay
-                    .on('mouseover', () => showTip(self.val, circle.node())())
+                timeSliderHandlerOverlay
+                    .on('mouseover', () => showTip(self.val, timeSliderHandler.node())())
                     .on('mouseout', hideTip);
 
-                axisXControlLane
+                ////////////////////////////////////////////////////////////////////////////////
+                ////                                time label                              ////
+                ////////////////////////////////////////////////////////////////////////////////
+
+                const timeLabelLane = axisXControlLane
                     .append('g')
-                    .attr('transform', `translate(${w - left - right  - 3 * btnBorderLineWidth / 2 - axisXControlLaneGap - timeLabelWidth - speedBtnWidth}, 0)`)
+                    .attr('class', 'label--time')
+                    .attr('transform', `translate(${c_w - 3 * btnBorderLineWidth / 2 - axisXControlLaneGap - timeLabelWidth - speedBtnWidth}, 0)`);
+
+                const timeLabelRect = timeLabelLane
                     .append('path')
                     .attr('fill', btnFillColor)
                     .attr('stroke', btnBorderLineColor)
                     .attr('stroke-width', btnBorderLineWidth)
-                    .attr('d', roundedRect(0, 0, timeLabelWidth, axisXControlLaneHeight - btnBorderLineWidth, btnBorderRadius, true, true, true, true));
+                    .attr('d', roundedRect(0, 0, timeLabelWidth, c_h, btnBorderRadius, true, true, true, true));
 
-                axisXControlLane
+                const timeLabelText = timeLabelLane
                     .append('text')
-                    .attr('class', 'label--time')
                     .attr('text-anchor', 'middle')
                     .attr('dy', '0.32em')
-                    .attr('x', w - left - right  - 3 * btnBorderLineWidth / 2 - axisXControlLaneGap - timeLabelWidth / 2 - speedBtnWidth)
-                    .attr('y', (axisXControlLaneHeight - btnBorderLineWidth) / 2)
+                    .attr('x', timeLabelWidth / 2)
+                    .attr('y', c_h / 2)
                     .text(self.getTimeLabel())
                     .attr('font-size', btnFontSize)
                     .attr('font-weight', btnFontWeight)
                     .attr('fill', btnFontColor);
 
-                axisXControlLane
+                ////////////////////////////////////////////////////////////////////////////////
+                ////                                speed btn                               ////
+                ////////////////////////////////////////////////////////////////////////////////
+
+                const speedBtnLane = axisXControlLane
                     .append('g')
-                    .attr('transform', `translate(${w - left - right - btnBorderLineWidth / 2 - speedBtnWidth}, 0)`)
+                    .attr('class', 'btn--speed')
+                    .attr('transform', `translate(${c_w - speedBtnWidth}, 0)`);
+
+                const speedBtnRect = speedBtnLane
                     .append('path')
                     .attr('fill', btnFillColor)
                     .attr('stroke', btnBorderLineColor)
                     .attr('stroke-width', btnBorderLineWidth)
-                    .attr('d', roundedRect(0, 0, speedBtnWidth, axisXControlLaneHeight - btnBorderLineWidth, btnBorderRadius, true, true, true, true));
+                    .attr('d', roundedRect(0, 0, speedBtnWidth, c_h, btnBorderRadius, true, true, true, true));
 
-                axisXControlLane
-                    .append('g')
-                    .attr('transform', `translate(${w - left - right - btnBorderLineWidth / 2 - speedBtnWidth / 2 - 12}, ${(axisXControlLaneHeight - btnBorderLineWidth) / 2 - 12})`)
+                speedBtnRect
+                    .on('click', () => {
+                        const speedSliderLineSelection = axisXControlLane.select('.slider--speed'),
+                            DISPLAY = speedSliderLineSelection.style('display');
+
+                        speedSliderLineSelection
+                            .style('display', DISPLAY === 'inline' ? 'none' : 'inline');
+                    });
+
+                const speedBtnIcon =  speedBtnLane
                     .append('path')
+                    .attr('pointer-events', 'none')
+                    .attr('transform', `translate(${speedBtnWidth / 2 - 12}, ${c_h / 2 - 12})`)
+                    .attr('fill', btnFontColor)
                     .attr('d', shape.speed());
+
+                ////////////////////////////////////////////////////////////////////////////////
+                ////                             speed slider                               ////
+                ////////////////////////////////////////////////////////////////////////////////
+
+                const speedSliderPaddingTop = 20,
+                    speedSliderPaddingBottom = 20,
+                    speedSliderHueMin = circleStrokeWidth / 2 + circleRadius + speedSliderPaddingTop,
+                    speedSliderHueMax = speedSliderLaneHeight - circleStrokeWidth / 2 - circleRadius - speedSliderPaddingBottom,
+                    speedSliderInterpolate = speedSliderHueActual => d3.interpolateRound(0, 15)((speedSliderHueActual - speedSliderHueMin) / (speedSliderHueMax - speedSliderHueMin));
+
+                const speedSliderLane = axisXControlLane
+                    .append('g')
+                    .attr('class', 'slider--speed')
+                    .style('display', 'none')
+                    .attr('transform', `translate(${c_w - speedBtnWidth / 2 - speedSliderLaneWidth / 2}, ${-(speedSliderTriangleLength * Math.sqrt(3) / 2 + speedSliderLaneHeight)})`);
+
+                const speedSliderDiagbox = speedSliderLane
+                    .append('path')
+                    .attr('fill', '#fff')
+                    .attr('stroke', btnBorderLineColor)
+                    .attr('stroke-width', btnBorderLineWidth)
+                    .attr('d', diagbox(0, 0, speedSliderLaneWidth, speedSliderLaneHeight, speedSliderTriangleLength, btnBorderRadius, true, true, true, true));
+
+                speedSliderLane
+                    .append('line')
+                    .attr('class', 'track')
+                    .attr('y1', speedSliderHueMin)
+                    .attr('y2', speedSliderHueMax)
+                    .attr('x1', speedSliderLaneWidth / 2)
+                    .attr('x2', speedSliderLaneWidth / 2)
+                    .attr('stroke', trackStroke)
+                    .attr('stroke-opacity', trackStrokeOpacity)
+                    .attr('stroke-width', trackStrokeWidth)
+                    .call(roundLine, trackRounded);
+
+                speedSliderLane
+                    .append('line')
+                    .attr('class', 'track track--inset')
+                    .attr('y1', speedSliderHueMin)
+                    .attr('y2', speedSliderHueMax)
+                    .attr('x1', speedSliderLaneWidth / 2)
+                    .attr('x2', speedSliderLaneWidth / 2)
+                    .attr('stroke', trackInsetStroke)
+                    .attr('stroke-opacity', trackInsetStrokeOpacity)
+                    .attr('stroke-width', trackInsetStrokeWidth)
+                    .call(roundLine, trackRounded);
+
+                const speedSliderHandler = speedSliderLane
+                    .append('circle')
+                    .attr('cy', speedSliderHueMin)
+                    .attr('cx', speedSliderLaneWidth / 2)
+                    .attr('r', circleRadius)
+                    .attr('fill', circleFill)
+                    .attr('stroke', circleStroke)
+                    .attr('stroke-width', circleStrokeWidth)
+                    .attr('stroke-opacity', circleStrokeOpacity)
+                    .attr('pointer-events', 'none');
+
+                const onSpeedSliderMoving = hueActual => {
+                    self.speed = speedSliderInterpolate(hueActual);
+                };
+
+                const speedSliderHue = smoothMoveY(speedSliderHandler, speedSliderHueMin, speedSliderHueMax, onSpeedSliderMoving);
+
+                const speedSliderTrackOverlay = speedSliderLane
+                    .append('rect')
+                    .attr('x', speedSliderLaneWidth / 2 - speedSliderHueMin)
+                    .attr('width', 2 * speedSliderHueMin)
+                    .attr('height', speedSliderLaneHeight)
+                    .attr('fill', 'none')
+                    .attr('pointer-events', 'all')
+                    .attr('cursor', 'crosshair')
+                    .call(d3.drag()
+                        .on('start.interrupt', () => speedSliderTrackOverlay.interrupt())
+                        .on('start drag', () =>  speedSliderHue(d3.event.y))
+                    );
+
+                speedSliderTrackOverlay
+                    .on('mouseover', () => showTip(self.speed, speedSliderHandler.node())())
+                    .on('mouseout', hideTip);
+
+                ////////////////////////////////////////////////////////////////////////////////
+                ////                                 brush                                  ////
+                ////////////////////////////////////////////////////////////////////////////////
 
                 const brushExtent = [
                     [left + __offset__, top + __offset__],
                     [w - right - __offset__, h - axisXLaneHeight - __offset__ - axisXControlLaneHeight - axisXControlLaneMarginTop]
                 ];
+
+                ////////////////////////////////////////////////////////////////////////////////
+                ////                                  zoom                                  ////
+                ////////////////////////////////////////////////////////////////////////////////
 
                 const zoomExtent = [
                     [left + __offset__, top + __offset__],
@@ -325,146 +493,21 @@
                     ])
                     .call(zoom, { zooming }, scaleExtent, zoomExtent);
 
+                ////////////////////////////////////////////////////////////////////////////////
+                ////                                main lane                               ////
+                ////////////////////////////////////////////////////////////////////////////////
+
                 const g = svg
                     .append('g')
                     .attr('clip-path', `url(#${clipPathId})`)
+                    .attr('class', 'entries')
                     .attr('transform', `translate(${left + __offset__}, ${top + __offset__})`);
 
-                function zooming() {
-                    self.scale = d3.event.transform.rescaleX(xScale);
 
-                    svg
-                        .call(brushX, brushExtent, self.scale, { brushed });
-
-                    g
-                        .call(
-                            draw,
-                            axisXLane,
-                            xAxis,
-                            self.scale,
-                            yScale,
-                            lanes,
-                            self.reference,
-                            g_h,
-                            symbolSize,
-                            intervalCornerRadius,
-                            overlayWidth,
-                            referenceLineColor,
-                            referenceLineWidth,
-                            boundingLineColor,
-                            boundingLineWidth,
-                            onDrag
-                        );
-                }
-
-                function onDrag(n, o) {
-                    self.reference = self.scale.invert(n);
-
-                    const entries = getPassingEntries(lanes, self.reference, Math.abs(self.scale.invert(n) - self.scale.invert(o)), n > o);
-
-                    emit(self, 'reference-updated', clampRange(dateTimeStart, dateTimeEnd, self.reference), entries)
-                }
-
-                function onSpace() {
-                    self.pause = !self.pause;
-                }
-
-                function onPlayEnd() {
-                    self.reference = dateTimeStart;
-
-                    self.pause = true;
-                    self.timer.stop();
-
-                    emit(self, 'play-end');
-                }
-
-                self.play = function play() {
-                    self.timer = d3.interval(function(_) {
-                        const line = g.select('.line--reference'),
-                            overlay = g.select('.overlay'),
-                            xStart = self.scale(dateTimeStart),
-                            xEnd = self.scale(dateTimeEnd),
-                            xNext = self.scale(new Date(self.reference.valueOf() + tickLen));
-
-                        if (xNext >= xEnd) {
-                            line
-                                .attr('x1', xStart)
-                                .attr('x2', xStart);
-
-                            overlay
-                                .attr('x', xStart - overlayWidth / 2);
-
-                            onPlayEnd();
-                        } else {
-                            line
-                                .attr('x1', xNext)
-                                .attr('x2', xNext);
-
-                            overlay
-                                .attr('x', xNext - overlayWidth / 2);
-
-                            self.reference = self.scale.invert(xNext);
-
-                            const entries = getPassingEntries(lanes, self.reference, tickLen);
-
-                            if (!entries.length && playJump) {
-                                const nextEntryFrom = getNextEntry(lanes, self.reference);
-
-                                if (!nextEntryFrom) {
-                                    const xNext = self.scale(self.reference);
-
-                                    line
-                                        .attr('x1', xNext)
-                                        .attr('x2', xNext);
-
-                                    overlay
-                                        .attr('x', xNext - overlayWidth / 2);
-
-                                    onPlayEnd();
-                                } else {
-                                    self.reference = nextEntryFrom;
-
-                                    const xNext = self.scale(self.reference);
-
-                                    line
-                                        .attr('x1', xNext)
-                                        .attr('x2', xNext);
-
-                                    overlay
-                                        .attr('x', xNext - overlayWidth / 2);
-                                }
-                            } else {
-                                emit(self, 'reference-updated', clampRange(dateTimeStart, dateTimeEnd, self.reference), entries);
-                            }
-                        }
-                    }, interval);
-                };
-
-                keybinding.onspace(onSpace);
-
-                g
-                    .call(
-                        draw,
-                        axisXLane,
-                        xAxis,
-                        self.scale,
-                        yScale,
-                        lanes,
-                        self.reference,
-                        g_h,
-                        symbolSize,
-                        intervalCornerRadius,
-                        overlayWidth,
-                        referenceLineColor,
-                        referenceLineWidth,
-                        boundingLineColor,
-                        boundingLineWidth,
-                        onDrag
-                    );
             },
             updateTimeLabel() {
                 d3.select(this.$el)
-                    .select('.label--time')
+                    .select('.label--time text')
                     .text(() => this.getTimeLabel());
             },
             getTimeLabel() {

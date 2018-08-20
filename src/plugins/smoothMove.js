@@ -11,6 +11,16 @@ const moveX = (selection, x) => {
         case 'circle':
             selection.attr('cx', x);
             break;
+        case 'line':
+            selection.attr({
+                x1: x,
+                x2: x
+            });
+            break;
+        case 'rect':
+            const w = +selection.node().getBBox().width;
+            selection.attr('x',  x - w / 2);
+            break;
     }
 };
 
