@@ -25,14 +25,15 @@
                 timer: null,
                 zoom: null,
                 w: null,
-                svg: null
+                svg: null,
+                transform: null
             }
         },
         mixins: [mixins],
         methods: {
              updateTimeRange(dateTimeStart, dateTimeEnd) {
-                const k = this.w / (this.scale(dateTimeEnd) - this.scale(dateTimeStart));
-                const translateX = -this.scale(dateTimeStart);
+                const k = this.w / (this.scale(dateTimeEnd) - this.scale(dateTimeStart)) * this.transform.k;
+                const translateX = this.transform.x - this.scale(dateTimeStart);
 
                 this.svg
                     .transition()
@@ -247,6 +248,8 @@
                         .call(brushX, brushExtent, self.scale, { brushed });
 
                     g.call(drawFn, self.scale);
+
+                    self.transform = d3.event.transform;
                 };
 
                 const zoomend = () => {
