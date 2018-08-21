@@ -4,19 +4,18 @@
 
 <script>
     import * as d3 from 'd3';
-    import { isNull, cloneDeep } from 'lodash';
     import uuid from 'uuid/v1';
+    import { isNull, cloneDeep } from 'lodash';
     import mixins from '../../mixins';
-    import { selectPaddingInnerOuterY } from '../../utils/select';
-    import { getTimelineGroups } from '../../utils/getTimelineGroups';
     import roundedRect from '../../plugins/roundedRect';
     import zoom from '../../plugins/zoom';
     import emit from '../../utils/emit';
     import cursor from '../../plugins/cursor';
-    import draw from './draw';
+    import drawGen from './drawGen';
+    import { selectPaddingInnerOuterY } from '../../utils/select';
+    import { getTimelineGroups } from '../../utils/getTimelineGroups';
     import { brushX } from '../../plugins/brush';
     import { drawCurrentReferenceX } from '../../plugins/drawCurrentReference';
-    import { zoomToXK } from '../../plugins/zoomTo';
 
     export default {
         name: 'd3-timeline',
@@ -31,6 +30,19 @@
         },
         mixins: [mixins],
         methods: {
+             updateTimeRange(dateTimeStart, dateTimeEnd) {
+                const k = this.w / (this.scale(dateTimeEnd) - this.scale(dateTimeStart));
+                const translateX = -this.scale(dateTimeStart);
+
+                this.svg
+                    .transition()
+                    .duration(750)
+                    .call(this.zoom.transform, () => {
+                        return d3.zoomIdentity
+                            .scale(k)
+                            .translate(translateX, 0);
+                    });
+            },
             drawTimeline() {
                 const { dateTimeStart, dateTimeEnd, data, groups } = getTimelineGroups(cloneDeep(this.data)),
                       {
@@ -211,7 +223,38 @@
                     [w - right - __offset__, h - __offset__ - axisXLabelLaneHeight]
                 ];
 
+                const drawFn = drawGen(
+                    axisXLane,
+                    xAxis,
+                    yScale,
+                    data,
+                    groups,
+                    g_h,
+                    symbolSize,
+                    intervalCornerRadius,
+                    currentTimeLineColor,
+                    currentTimeLineWidth,
+                    boundingLineColor,
+                    boundingLineWidth
+                );
+
                 const brushed = ({ start, end }) => emit(this, 'range-updated', start, end);
+
+                const zooming = () => {
+                    self.scale = d3.event.transform.rescaleX(xScale);
+
+                    svg
+                        .call(brushX, brushExtent, self.scale, { brushed });
+
+                    g.call(drawFn, self.scale);
+                };
+
+                const zoomend = () => {
+                    const start = self.scale.invert(0),
+                        end = self.scale.invert(g_w);
+
+                    self.$emit('range-updated', start, end);
+                };
 
                 svg
                     .call(brushX, brushExtent, xScale, { brushed })
@@ -230,56 +273,7 @@
                         g.call(drawCurrentReferenceX, self.scale, g_h, currentTimeLineColor, currentTimeLineWidth);
                     }, liveTimerTick);
 
-                function zooming() {
-                    self.scale = d3.event.transform.rescaleX(xScale);
-
-                    svg
-                        .call(brushX, brushExtent, self.scale, { brushed });
-
-                    g.call(
-                        draw,
-                        axisXLane,
-                        xAxis,
-                        self.scale,
-                        yScale,
-                        data,
-                        groups,
-                        g_h,
-                        symbolSize,
-                        intervalCornerRadius,
-                        currentTimeLineColor,
-                        currentTimeLineWidth,
-                        boundingLineColor,
-                        boundingLineWidth
-                    );
-                }
-
-                function zoomend() {
-                    const start = self.scale.invert(0),
-                        end = self.scale.invert(g_w);
-
-                    self.$emit('range-updated', start, end);
-                }
-
-                g.call(
-                    draw,
-                    axisXLane,
-                    xAxis,
-                    self.scale,
-                    yScale,
-                    data,
-                    groups,
-                    g_h,
-                    symbolSize,
-                    intervalCornerRadius,
-                    currentTimeLineColor,
-                    currentTimeLineWidth,
-                    boundingLineColor,
-                    boundingLineWidth
-                );
-            },
-            updateTimeRange(dateTimeStart, dateTimeEnd) {
-                zoomToXK(this.svg, this.w, this.zoom)(this.scale, dateTimeStart, dateTimeEnd);
+                g.call(drawFn, self.scale);
             },
             safeDraw() {
                 this.ifExistsSvgThenRemove();

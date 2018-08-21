@@ -24,6 +24,7 @@
     import { smoothMoveX, smoothMoveY } from '../../plugins/smoothMove';
     import { showTip, hideTip } from '../../plugins/tooltip';
     import diagbox from '../../plugins/diagbox';
+    import disableZoomOn from '../../plugins/disableZoomOn';
     import draw from './draw';
 
     export default {
@@ -465,6 +466,7 @@
                     .on('mouseover', () => showTip(self.speed, speedSliderHandler.node())())
                     .on('mouseout', hideTip);
 
+
                 ////////////////////////////////////////////////////////////////////////////////
                 ////                                 brush                                  ////
                 ////////////////////////////////////////////////////////////////////////////////
@@ -500,9 +502,7 @@
                 const g = svg
                     .append('g')
                     .attr('clip-path', `url(#${clipPathId})`)
-                    .attr('class', 'entries')
                     .attr('transform', `translate(${left + __offset__}, ${top + __offset__})`);
-
 
             },
             updateTimeLabel() {
