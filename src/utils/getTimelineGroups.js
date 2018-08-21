@@ -1,4 +1,4 @@
-import { isDate, isString } from 'lodash';
+import { isDate, isString, isFunction } from 'lodash';
 import moment from 'moment';
 
 /**
@@ -59,7 +59,7 @@ const groupBy = (data) => {
         const entry = data[i],
             { group, from, to, label, at, title, className, symbol } = entry;
 
-        if (isDate(from) && isDate(to) && from < to && isString(group)) {
+        if (isDate(from) && isDate(to) && from < to && (isString(group) || isFunction(group.toString))) {
             dateTimeStart = !dateTimeStart
                 ? from
                 : (dateTimeStart > from ? from : dateTimeStart);
@@ -77,7 +77,7 @@ const groupBy = (data) => {
             }
         }
 
-        else if (isDate(at) && isString(group)) {
+        else if (isDate(at) && (isString(group) || isFunction(group.toString))) {
             dateTimeStart = !dateTimeStart
                 ? at
                 : (dateTimeStart > at ? at : dateTimeStart);

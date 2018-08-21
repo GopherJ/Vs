@@ -268,12 +268,13 @@
                     .attr('clip-path', `url(#${entryClipPathId})`)
                     .attr('transform', `translate(${left + __offset__ + groupLaneWidth}, ${top + __offset__})`);
 
-                if (liveTimer)
+                g.call(drawFn, self.scale);
+
+                if (liveTimer) {
                     self.timer = setInterval(() => {
                         g.call(drawCurrentReferenceX, self.scale, g_h, currentTimeLineColor, currentTimeLineWidth);
                     }, liveTimerTick);
-
-                g.call(drawFn, self.scale);
+                }
             },
             safeDraw() {
                 this.ifExistsSvgThenRemove();
