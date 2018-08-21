@@ -32,8 +32,8 @@
         mixins: [mixins],
         methods: {
              updateTimeRange(dateTimeStart, dateTimeEnd) {
-                const k = this.w / (this.scale(dateTimeEnd) - this.scale(dateTimeStart)) * this.transform.k;
-                const translateX = this.transform.x - this.scale(dateTimeStart);
+                const k = this.w / (this.scale(dateTimeEnd) - this.scale(dateTimeStart)) * (this.transform ? this.transform.k : 1);
+                const translateX = (this.transform ? this.transform.x : 0) - this.scale(dateTimeStart);
 
                 this.svg
                     .transition()
