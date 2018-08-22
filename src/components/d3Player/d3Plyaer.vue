@@ -119,8 +119,8 @@
                     c_w = w - left - right - btnBorderLineWidth,
                     c_h = axisXControlLaneHeight - btnBorderLineWidth,
                     [paddingInner, paddingOuter] = selectPaddingInnerOuterY(g_h),
-                    clipPathId = uuid(), self = this, interval = Math.max(tickLen / this.speed, 16);
-                self.reference = dateTimeStart;
+                    clipPathId = uuid(), self = this;
+                self.reference = moment(dateTimeStart);
 
                 if (![g_w, g_h].every(el => el > 0)) return;
 
@@ -212,50 +212,14 @@
                     .attr('class', 'lane--control')
                     .attr('transform', `translate(${left + btnBorderLineWidth / 2}, ${top + g_h + axisXLaneHeight + 2 * __offset__ + axisXControlLaneMarginTop + btnBorderLineWidth / 2})`);
 
-               ////////////////////////////////////////////////////////////////////////////////
-               ////                                play btn                                ////
-               ////////////////////////////////////////////////////////////////////////////////
-
-
-                const playBtnLane = axisXControlLane
-                    .append('g')
-                    .attr('class', 'btn--play');
-
-                const playBtnRect = playBtnLane
-                    .append('path')
-                    .attr('fill', btnFillColor)
-                    .attr('stroke', btnBorderLineColor)
-                    .attr('stroke-width', btnBorderLineWidth)
-                    .attr('d', roundedRect(0, 0, playBtnWidth, axisXControlLaneHeight - btnBorderLineWidth, btnBorderRadius, true, true, true, true));
-
-                const playBtnIcon = playBtnLane
-                    .append('path')
-                    .attr('transform', `translate(${(playBtnWidth - c_h) / 2}, 0)`)
-                    .attr('data-state', 'PAUSE')
-                    .attr('pointer-events', 'none')
-                    .attr('fill', btnFontColor)
-                    .attr('d', shape.triangle(c_h, c_h));
-
-                playBtnRect
-                    .on('click', () => {
-                        const state = playBtnIcon.attr('data-state');
-
-                        playBtnIcon.attr('data-state', state === 'PAUSE' ? 'PLAYING' : 'PAUSE');
-
-                        playBtnIcon.transition().duration(360).attr('d', state === 'PAUSE'
-                            ? shape.pause(c_h, c_h)
-                            : shape.triangle(c_h, c_h)
-                        );
-                    });
-
                 ////////////////////////////////////////////////////////////////////////////////
                 ////                                time slider                             ////
                 ////////////////////////////////////////////////////////////////////////////////
 
                 const timeSliderHueMin = circleStrokeWidth / 2 + circleRadius,
-                      timeSliderHueMax = c_w - 3 * axisXControlLaneGap - 2 * btnBorderLineWidth - playBtnWidth - timeLabelWidth - speedBtnWidth - circleStrokeWidth / 2 - circleRadius,
+                    timeSliderHueMax = c_w - 3 * axisXControlLaneGap - 2 * btnBorderLineWidth - playBtnWidth - timeLabelWidth - speedBtnWidth - circleStrokeWidth / 2 - circleRadius,
                     timeSliderInterpolate = timeSliderHueActual => d3.interpolateDate(dateTimeStart, dateTimeEnd)((timeSliderHueActual - timeSliderHueMin) / (timeSliderHueMax - timeSliderHueMin)),
-                    timeSliderInterpolateInvert = date => d3.interpolate(timeSliderHueMin. timeSliderHueMax)((date - dateTimeStart) / (dateTimeEnd - dateTimeStart));
+                    timeSliderInterpolateInvert = date => d3.interpolate(timeSliderHueMin, timeSliderHueMax)((date - dateTimeStart) / (dateTimeEnd - dateTimeStart));
 
                 const timeSliderLane = axisXControlLane
                     .append('g')
@@ -274,28 +238,28 @@
                     .attr('stroke-width', trackStrokeWidth)
                     .call(roundLine, trackRounded);
 
-               timeSliderLane
-                   .append('line')
-                   .attr('class', 'track track--inset')
-                   .attr('x1', timeSliderHueMin)
-                   .attr('x2', timeSliderHueMax)
-                   .attr('y1', c_h / 2)
-                   .attr('y2', c_h / 2)
-                   .attr('stroke', trackInsetStroke)
-                   .attr('stroke-opacity', trackInsetStrokeOpacity)
-                   .attr('stroke-width', trackInsetStrokeWidth)
-                   .call(roundLine, trackRounded);
+                timeSliderLane
+                    .append('line')
+                    .attr('class', 'track track--inset')
+                    .attr('x1', timeSliderHueMin)
+                    .attr('x2', timeSliderHueMax)
+                    .attr('y1', c_h / 2)
+                    .attr('y2', c_h / 2)
+                    .attr('stroke', trackInsetStroke)
+                    .attr('stroke-opacity', trackInsetStrokeOpacity)
+                    .attr('stroke-width', trackInsetStrokeWidth)
+                    .call(roundLine, trackRounded);
 
-               const timeSliderHandler = timeSliderLane
-                   .append('circle')
-                   .attr('cx', timeSliderHueMin)
-                   .attr('cy', c_h / 2)
-                   .attr('r', circleRadius)
-                   .attr('fill', circleFill)
-                   .attr('stroke', circleStroke)
-                   .attr('stroke-width', circleStrokeWidth)
-                   .attr('stroke-opacity', circleStrokeOpacity)
-                   .attr('pointer-events', 'none');
+                const timeSliderHandler = timeSliderLane
+                    .append('circle')
+                    .attr('cx', timeSliderHueMin)
+                    .attr('cy', c_h / 2)
+                    .attr('r', circleRadius)
+                    .attr('fill', circleFill)
+                    .attr('stroke', circleStroke)
+                    .attr('stroke-width', circleStrokeWidth)
+                    .attr('stroke-opacity', circleStrokeOpacity)
+                    .attr('pointer-events', 'none');
 
                 const onTimeSliderHanderMoving = timeSliderHueActual => {
                     self.val = timeSliderInterpolate(timeSliderHueActual);
@@ -325,6 +289,69 @@
                 timeSliderHandlerOverlay
                     .on('mouseover', () => showTip(self.val, timeSliderHandler.node())())
                     .on('mouseout', hideTip);
+
+               ////////////////////////////////////////////////////////////////////////////////
+               ////                                play btn                                ////
+               ////////////////////////////////////////////////////////////////////////////////
+
+
+                const playBtnLane = axisXControlLane
+                    .append('g')
+                    .attr('class', 'btn--play');
+
+                const playBtnRect = playBtnLane
+                    .append('path')
+                    .attr('fill', btnFillColor)
+                    .attr('stroke', btnBorderLineColor)
+                    .attr('stroke-width', btnBorderLineWidth)
+                    .attr('d', roundedRect(0, 0, playBtnWidth, axisXControlLaneHeight - btnBorderLineWidth, btnBorderRadius, true, true, true, true));
+
+                const playBtnIcon = playBtnLane
+                    .append('path')
+                    .attr('transform', `translate(${(playBtnWidth - c_h) / 2}, 0)`)
+                    .attr('data-state', 'PAUSE')
+                    .attr('pointer-events', 'none')
+                    .attr('fill', btnFontColor)
+                    .attr('d', shape.triangle(c_h, c_h));
+
+
+                const onPlaying = () => {
+                    const interval = Math.max(tickLen / this.speed, 16);
+
+                    self.timer = d3.interval(() => {
+                        if (dateTimeEnd.diff(self.reference) >= tickLen) {
+                            self.reference.add(tickLen, 'milliseconds');
+                        } else {
+                            self.reference = moment(dateTimeStart);
+                            self.timer.stop();
+                        }
+
+                        timeSliderHue(timeSliderInterpolateInvert(self.reference));
+                    }, interval);
+                };
+
+                playBtnRect
+                    .on('click', () => {
+                        const state = playBtnIcon.attr('data-state');
+
+                        if (state === 'PLAYING') {
+                            playBtnIcon
+                                .attr('data-state', 'PAUSE')
+                                .transition()
+                                .duration(360)
+                                .attr('d', shape.triangle(c_h, c_h));
+
+                            self.timer.stop();
+                        } else {
+                            playBtnIcon
+                                .attr('data-state', 'PLAYING')
+                                .transition()
+                                .duration(360)
+                                .attr('d', shape.pause(c_h, c_h));
+
+                            onPlaying();
+                        }
+                    });
 
                 ////////////////////////////////////////////////////////////////////////////////
                 ////                                time label                              ////
@@ -393,7 +420,7 @@
                     speedSliderPaddingBottom = 20,
                     speedSliderHueMin = circleStrokeWidth / 2 + circleRadius + speedSliderPaddingTop,
                     speedSliderHueMax = speedSliderLaneHeight - circleStrokeWidth / 2 - circleRadius - speedSliderPaddingBottom,
-                    speedSliderInterpolate = speedSliderHueActual => d3.interpolateRound(0, 15)((speedSliderHueActual - speedSliderHueMin) / (speedSliderHueMax - speedSliderHueMin));
+                    speedSliderInterpolate = speedSliderHueActual => d3.interpolateRound(1, 15)((speedSliderHueActual - speedSliderHueMin) / (speedSliderHueMax - speedSliderHueMin));
 
                 const speedSliderLane = axisXControlLane
                     .append('g')

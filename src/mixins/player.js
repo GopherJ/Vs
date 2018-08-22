@@ -10,6 +10,7 @@ export default {
             scale: null,
             pause: true,
             val: null,
+            reference: null,
             play: null,
             speed: 1,
             observer: null

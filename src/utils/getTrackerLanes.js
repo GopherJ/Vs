@@ -239,8 +239,8 @@ const getTrackerLanes = (data) => {
 
     return {
         lanes,
-        dateTimeStart,
-        dateTimeEnd
+        dateTimeStart: moment(dateTimeStart),
+        dateTimeEnd: moment(dateTimeEnd)
     };
 };
 
