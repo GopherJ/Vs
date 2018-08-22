@@ -25,7 +25,7 @@
     import { showTip, hideTip } from '../../plugins/tooltip';
     import diagbox from '../../plugins/diagbox';
     import disableZoomOn from '../../plugins/disableZoomOn';
-    import draw from './draw';
+    import drawGen from './drawGen';
 
     export default {
         name: 'd3-player',
@@ -66,7 +66,7 @@
 
                         overlayWidth = 30,
 
-                        tickLen = 250,
+                        tickLen = 1000000,
 
                         playJump = false,
 
@@ -267,7 +267,7 @@
                 };
 
                 const onTimeSliderHandlerMoved = () => {
-                    if (self.val !== null) self.$emit('input', self.val);
+                    if (self.val !== null) self.$emit('reference-updated', self.val);
                 };
 
                 const timeSliderHue = smoothMoveX(timeSliderHandler, timeSliderHueMin, timeSliderHueMax, onTimeSliderHanderMoving, onTimeSliderHandlerMoved);
@@ -314,44 +314,52 @@
                     .attr('fill', btnFontColor)
                     .attr('d', shape.triangle(c_h, c_h));
 
+                self.play = () => {
+                    if (dateTimeEnd.diff(self.reference) >= tickLen) {
+                        self.reference.add(tickLen, 'milliseconds');
+                    } else {
+                        self.reference = moment(dateTimeStart);
+                        self.timer.stop();
+                    }
+
+                    timeSliderHue(timeSliderInterpolateInvert(self.reference));
+                };
 
                 const onPlaying = () => {
-                    const interval = Math.max(tickLen / this.speed, 16);
+                    const interval = Math.max(tickLen / this.speed, 16),
+                        curVal = moment(self.val);
 
-                    self.timer = d3.interval(() => {
-                        if (dateTimeEnd.diff(self.reference) >= tickLen) {
-                            self.reference.add(tickLen, 'milliseconds');
-                        } else {
-                            self.reference = moment(dateTimeStart);
-                            self.timer.stop();
-                        }
+                    if (self.reference.diff(curVal) !== 0) self.reference = curVal;
 
-                        timeSliderHue(timeSliderInterpolateInvert(self.reference));
-                    }, interval);
+                    self.timer = d3.interval(self.play, interval);
+                };
+
+                const onPlayBtnClicked = () => {
+                    const state = playBtnIcon.attr('data-state');
+
+                    if (state === 'PLAYING') {
+                        playBtnIcon
+                            .attr('data-state', 'PAUSE')
+                            .transition()
+                            .duration(360)
+                            .attr('d', shape.triangle(c_h, c_h));
+
+                        self.timer.stop();
+                    }
+
+                    else {
+                        playBtnIcon
+                            .attr('data-state', 'PLAYING')
+                            .transition()
+                            .duration(360)
+                            .attr('d', shape.pause(c_h, c_h));
+
+                        onPlaying();
+                    }
                 };
 
                 playBtnRect
-                    .on('click', () => {
-                        const state = playBtnIcon.attr('data-state');
-
-                        if (state === 'PLAYING') {
-                            playBtnIcon
-                                .attr('data-state', 'PAUSE')
-                                .transition()
-                                .duration(360)
-                                .attr('d', shape.triangle(c_h, c_h));
-
-                            self.timer.stop();
-                        } else {
-                            playBtnIcon
-                                .attr('data-state', 'PLAYING')
-                                .transition()
-                                .duration(360)
-                                .attr('d', shape.pause(c_h, c_h));
-
-                            onPlaying();
-                        }
-                    });
+                    .on('click', onPlayBtnClicked);
 
                 ////////////////////////////////////////////////////////////////////////////////
                 ////                                time label                              ////
@@ -420,7 +428,7 @@
                     speedSliderPaddingBottom = 20,
                     speedSliderHueMin = circleStrokeWidth / 2 + circleRadius + speedSliderPaddingTop,
                     speedSliderHueMax = speedSliderLaneHeight - circleStrokeWidth / 2 - circleRadius - speedSliderPaddingBottom,
-                    speedSliderInterpolate = speedSliderHueActual => d3.interpolateRound(1, 15)((speedSliderHueActual - speedSliderHueMin) / (speedSliderHueMax - speedSliderHueMin));
+                    speedSliderInterpolate = speedSliderHueActual => d3.interpolateRound(1, Math.floor(tickLen / 16))((speedSliderHueActual - speedSliderHueMin) / (speedSliderHueMax - speedSliderHueMin));
 
                 const speedSliderLane = axisXControlLane
                     .append('g')
@@ -474,7 +482,16 @@
                     self.speed = speedSliderInterpolate(hueActual);
                 };
 
-                const speedSliderHue = smoothMoveY(speedSliderHandler, speedSliderHueMin, speedSliderHueMax, onSpeedSliderMoving);
+                const onSpeedSliderMoved = (_) => {
+                    const interval = Math.max(tickLen / this.speed, 16);
+
+                    if (self.timer !== null) {
+                        self.timer.stop();
+                        self.timer = d3.interval(self.play, interval);
+                    }
+                };
+
+                const speedSliderHue = smoothMoveY(speedSliderHandler, speedSliderHueMin, speedSliderHueMax, onSpeedSliderMoving, onSpeedSliderMoved);
 
                 const speedSliderTrackOverlay = speedSliderLane
                     .append('rect')
@@ -495,7 +512,7 @@
 
 
                 ////////////////////////////////////////////////////////////////////////////////
-                ////                                 brush                                  ////
+                ////                                 main                                   ////
                 ////////////////////////////////////////////////////////////////////////////////
 
                 const brushExtent = [
@@ -503,16 +520,37 @@
                     [w - right - __offset__, h - axisXLaneHeight - __offset__ - axisXControlLaneHeight - axisXControlLaneMarginTop]
                 ];
 
-                ////////////////////////////////////////////////////////////////////////////////
-                ////                                  zoom                                  ////
-                ////////////////////////////////////////////////////////////////////////////////
-
                 const zoomExtent = [
                     [left + __offset__, top + __offset__],
                     [w - right - __offset__, h - __offset__ - axisXControlLaneHeight - axisXControlLaneMarginTop]
                 ];
 
+                const drawFn = drawGen(
+                    axisXLane,
+                    xAxis,
+                    yScale,
+                    lanes,
+                    self.reference,
+                    g_h,
+                    symbolSize,
+                    intervalCornerRadius,
+                    overlayWidth,
+                    referenceLineColor,
+                    referenceLineWidth,
+                    boundingLineColor,
+                    boundingLineWidth
+                );
+
                 const brushed = ({ start, end }) => emit(self, 'range-updated', start, end);
+
+                const zooming = () => {
+                    self.scale = d3.event.transform.rescaleX(xScale);
+
+                    svg
+                        .call(brushX, brushExtent, self.scale, { brushed });
+
+                    g.call(drawFn, self.scale);
+                };
 
                 svg
                     .call(brushX, brushExtent, self.scale, { brushed })
@@ -522,15 +560,12 @@
                     ])
                     .call(zoom, { zooming }, scaleExtent, zoomExtent);
 
-                ////////////////////////////////////////////////////////////////////////////////
-                ////                                main lane                               ////
-                ////////////////////////////////////////////////////////////////////////////////
-
                 const g = svg
                     .append('g')
                     .attr('clip-path', `url(#${clipPathId})`)
                     .attr('transform', `translate(${left + __offset__}, ${top + __offset__})`);
 
+                g.call(drawFn, self.scale);
             },
             updateTimeLabel() {
                 d3.select(this.$el)

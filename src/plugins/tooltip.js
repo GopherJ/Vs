@@ -64,7 +64,6 @@ function showTip(title, el) {
                 .style('top', `${top}px`)
                 .style('left', `${left}px`);
 
-
             tooltip
                 .style('visibility', 'visible');
 

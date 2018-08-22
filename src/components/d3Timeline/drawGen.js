@@ -30,7 +30,7 @@ const draw = (
     boundingLineColor,
     boundingLineWidth
 ) => {
-    return function drawFn(g, xScale) {
+    return (g, xScale) => {
         axisXLane
             .call(xAxis.scale(xScale))
             .selectAll('line')

@@ -13,13 +13,12 @@
     import zoom from '../../plugins/zoom';
     import cursor from '../../plugins/cursor';
     import { brushX } from '../../plugins/brush';
-    import keybinding from '../../utils/keybinding';
     import { getTrackerLanes } from '../../utils/getTrackerLanes';
     import { selectPaddingInnerOuterY } from '../../utils/select';
     import getNextEntry from '../../utils/getNextEntry';
     import getPassingEntries from '../../utils/getPassingEntries';
     import clampRange from '../../utils/clampRange';
-    import draw from './draw';
+    import drawGen from './drawGen';
 
     export default {
         name: 'd3-tracker',
@@ -160,7 +159,50 @@
                     [w - right - __offset__, h - axisXLabelLaneHeight - __offset__]
                 ];
 
+                const onDrag = (n, o) => {
+                    self.reference = self.scale.invert(n);
+
+                    const tickLen = Math.abs(self.scale.invert(n) - self.scale.invert(o)),
+                        isLTR = n > o, entries = getPassingEntries(lanes, self.reference, tickLen, isLTR);
+
+                    emit(self, 'reference-updated', clampRange(dateTimeStart, dateTimeEnd, self.reference), entries)
+                };
+
+                const drawFn = drawGen(
+                    axisXLane,
+                    xAxis,
+                    yScale,
+                    lanes,
+                    g_h,
+                    symbolSize,
+                    intervalCornerRadius,
+                    overlayWidth,
+                    referenceLineColor,
+                    referenceLineWidth,
+                    boundingLineColor,
+                    boundingLineWidth,
+                    onDrag
+                );
+
                 const brushed = ({ start, end }) => emit(self, 'range-updated', start, end);
+
+                const zooming = () => {
+                    self.scale = d3.event.transform.rescaleX(xScale);
+
+                    svg
+                        .call(brushX, brushExtent, self.scale, { brushed });
+
+                    g.call(drawFn, self.reference, self.scale);
+                };
+
+                const onPlayEnd = () => {
+                    self.reference = dateTimeStart;
+
+                    self.pause = true;
+                    self.timer.stop();
+
+                    emit(self, 'play-end');
+                };
 
                 svg
                     .call(brushX, brushExtent, self.scale, { brushed })
@@ -174,54 +216,6 @@
                     .append('g')
                     .attr('clip-path', `url(#${clipPathId})`)
                     .attr('transform', `translate(${left + __offset__}, ${top + __offset__})`);
-
-                function zooming() {
-                    self.scale = d3.event.transform.rescaleX(xScale);
-
-                    svg
-                        .call(brushX, brushExtent, self.scale, { brushed });
-
-                    g
-                        .call(
-                            draw,
-                            axisXLane,
-                            xAxis,
-                            self.scale,
-                            yScale,
-                            lanes,
-                            self.reference,
-                            g_h,
-                            symbolSize,
-                            intervalCornerRadius,
-                            overlayWidth,
-                            referenceLineColor,
-                            referenceLineWidth,
-                            boundingLineColor,
-                            boundingLineWidth,
-                            onDrag
-                    );
-                }
-
-                function onDrag(n, o) {
-                    self.reference = self.scale.invert(n);
-
-                    const entries = getPassingEntries(lanes, self.reference, Math.abs(self.scale.invert(n) - self.scale.invert(o)), n > o);
-
-                    emit(self, 'reference-updated', clampRange(dateTimeStart, dateTimeEnd, self.reference), entries)
-                }
-
-                function onSpace() {
-                    self.pause = !self.pause;
-                }
-
-                function onPlayEnd() {
-                    self.reference = dateTimeStart;
-
-                    self.pause = true;
-                    self.timer.stop();
-
-                    emit(self, 'play-end');
-                }
 
                 self.play = function play() {
                     self.timer = d3.interval(function(_) {
@@ -285,27 +279,8 @@
                     }, interval);
                 };
 
-                keybinding.onspace(onSpace);
+                g.call(drawFn, self.reference, self.scale);
 
-                g
-                    .call(
-                        draw,
-                        axisXLane,
-                        xAxis,
-                        self.scale,
-                        yScale,
-                        lanes,
-                        self.reference,
-                        g_h,
-                        symbolSize,
-                        intervalCornerRadius,
-                        overlayWidth,
-                        referenceLineColor,
-                        referenceLineWidth,
-                        boundingLineColor,
-                        boundingLineWidth,
-                        onDrag
-                    );
             },
             safeDraw() {
                 this.ifExistsSvgThenRemove();

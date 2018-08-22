@@ -8,7 +8,7 @@ export default {
         return {
             timer: null,
             scale: null,
-            pause: true,
+            playing: false,
             val: null,
             reference: null,
             play: null,
