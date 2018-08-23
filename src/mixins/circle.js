@@ -2,11 +2,6 @@ import * as d3 from 'd3';
 import { debounce } from 'lodash';
 
 export default {
-    data() {
-        return {
-            observer: null
-        }
-    },
     props: {
         width: {
             type: String,
@@ -14,7 +9,7 @@ export default {
         },
         height: {
             type: String,
-            default: '400px'
+            default: '300px'
         },
         margin: {
             type: Object,
@@ -97,11 +92,9 @@ export default {
         }
     },
     mounted() {
-        this._handleResize = debounce((e) => {
-            if (this.onResize) this.onResize();
-        }, 500);
+        this.$nextTick(this.safeDraw);
 
-        this.$nextTick(() => this.safeDraw());
+        this._handleResize = debounce(this.onResize, 500);
 
         window.addEventListener('resize', this._handleResize);
     },

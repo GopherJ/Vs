@@ -16,7 +16,7 @@ export default {
         },
         height: {
             type: String,
-            default: '400px'
+            default: '300px'
         },
         margin: {
             type: Object,
@@ -98,15 +98,12 @@ export default {
         }
     },
     mounted() {
-        this.$nextTick(() => this.safeDraw());
+        this.$nextTick(this.safeDraw);
 
-        this.observer = new MutationObserver(_ => {
-            hideTip();
-        }).observe(this.$el, { childList: true, subtree: true });
+        this.observer = new MutationObserver(hideTip)
+            .observe(this.$el, { childList: true, subtree: true });
 
-        this._handleResize = debounce((e) => {
-            if (this.onResize) this.onResize();
-        }, 500);
+        this._handleResize = debounce(this.onResize, 500);
 
         window.addEventListener('resize', this._handleResize);
     },

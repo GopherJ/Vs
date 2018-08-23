@@ -8,7 +8,7 @@ export default {
         },
         height: {
             type: String,
-            default: '400px'
+            default: '300px'
         },
         data: {
             type: Array,
@@ -49,6 +49,6 @@ export default {
         }
     },
     mounted() {
-        this.$nextTick(() => this.safeDraw());
+        this.$nextTick(this.safeDraw);
     }
 };

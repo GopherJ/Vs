@@ -23,7 +23,7 @@ export default {
         },
         height: {
             type: String,
-            default: '400px'
+            default: '300px'
         },
         margin: {
             type: Object,
@@ -60,10 +60,6 @@ export default {
                 selection.node().getBBox().x,
                 selection.node().getBBox().y
             ];
-        },
-        setPause(n) {
-            if (isBoolean(n)) this.pause = n;
-            else this.pause = !this.pause;
         }
     },
     watch: {
@@ -106,22 +102,15 @@ export default {
                     this.safeDraw();
                 });
             }
-        },
-        pause(n) {
-            if (n) this.timer.stop();
-            if (!n) this.play();
         }
     },
     mounted() {
-        this.observer = new MutationObserver(_ => {
-            hideTip();
-        }).observe(this.$el, { childList: true, subtree: true });
+        this.$nextTick(this.safeDraw);
 
-        this._handleResize = debounce((e) => {
-            if (this.onResize) this.onResize();
-        }, 500);
+        this.observer = new MutationObserver(hideTip)
+            .observe(this.$el, { childList: true, subtree: true });
 
-        this.$nextTick(() => this.safeDraw());
+        this._handleResize = debounce(this.onResize, 500);
 
         window.addEventListener('resize', this._handleResize);
     },

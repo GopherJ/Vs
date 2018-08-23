@@ -3,11 +3,6 @@ import * as d3 from 'd3';
 import { debounce } from 'lodash';
 
 export default {
-    data() {
-        return {
-            observer: null
-        }
-    },
     props: {
         nodes: {
             type: Array,
@@ -29,7 +24,7 @@ export default {
         },
         height: {
             type: String,
-            default: '400px'
+            default: '300px'
         },
         nodeTitle: {
             type: Function,
@@ -101,11 +96,9 @@ export default {
         }
     },
     mounted() {
-        this.listener = debounce(() => {
-            if (this.onResize) this.onResize();
-        }, 500);
+        this.$nextTick(this.safeDraw);
 
-        this.$nextTick(() => this.safeDraw());
+        this.listener = debounce(this.onResize, 500);
 
         window.addEventListener('resize', this.listener);
     },
