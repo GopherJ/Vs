@@ -7,7 +7,6 @@ import { drawEntriesX } from '../../plugins/drawEntries';
  * @param xAxis
  * @param yScale
  * @param lanes
- * @param reference
  * @param g_h
  * @param symbolSize
  * @param intervalCornerRadius
@@ -23,7 +22,6 @@ const drawGen = (
     xAxis,
     yScale,
     lanes,
-    reference,
     g_h,
     symbolSize,
     intervalCornerRadius,
@@ -34,7 +32,7 @@ const drawGen = (
     boundingLineWidth,
     onDrag
 ) => {
-    return (g, xScale) => {
+    return (g, reference, xScale) => {
         axisXLane
             .call(xAxis.scale(xScale))
             .selectAll('line')
