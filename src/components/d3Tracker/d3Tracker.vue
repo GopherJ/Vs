@@ -280,7 +280,6 @@
                 };
 
                 g.call(drawFn, self.reference, self.scale);
-
             },
             safeDraw() {
                 this.ifExistsSvgThenRemove();

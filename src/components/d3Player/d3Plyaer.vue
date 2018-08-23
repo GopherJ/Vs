@@ -26,6 +26,7 @@
     import diagbox from '../../plugins/diagbox';
     import disableZoomOn from '../../plugins/disableZoomOn';
     import drawGen from './drawGen';
+    import { moveReferenceX } from '../../plugins/moveReference';
 
     export default {
         name: 'd3-player',
@@ -66,7 +67,7 @@
 
                         overlayWidth = 30,
 
-                        tickLen = 1000000,
+                        tickLen = 250,
 
                         playJump = false,
 
@@ -261,16 +262,12 @@
                     .attr('stroke-opacity', circleStrokeOpacity)
                     .attr('pointer-events', 'none');
 
-                const onTimeSliderHanderMoving = timeSliderHueActual => {
+                const onTimeSliderHandlerMoving = timeSliderHueActual => {
                     self.val = timeSliderInterpolate(timeSliderHueActual);
                     self.updateTimeLabel();
                 };
 
-                const onTimeSliderHandlerMoved = () => {
-                    if (self.val !== null) self.$emit('reference-updated', self.val);
-                };
-
-                const timeSliderHue = smoothMoveX(timeSliderHandler, timeSliderHueMin, timeSliderHueMax, onTimeSliderHanderMoving, onTimeSliderHandlerMoved);
+                const timeSliderHue = smoothMoveX(timeSliderHandler, timeSliderHueMin, timeSliderHueMax, onTimeSliderHandlerMoving);
 
                 const timeSliderHandlerOverlay = timeSliderLane
                     .append('rect')
@@ -314,17 +311,6 @@
                     .attr('fill', btnFontColor)
                     .attr('d', shape.triangle(c_h, c_h));
 
-                self.play = () => {
-                    if (dateTimeEnd.diff(self.reference) >= tickLen) {
-                        self.reference.add(tickLen, 'milliseconds');
-                    } else {
-                        self.reference = moment(dateTimeStart);
-                        self.timer.stop();
-                    }
-
-                    timeSliderHue(timeSliderInterpolateInvert(self.reference));
-                };
-
                 const onPlaying = () => {
                     const interval = Math.max(tickLen / this.speed, 16),
                         curVal = moment(self.val);
@@ -344,6 +330,7 @@
                             .duration(360)
                             .attr('d', shape.triangle(c_h, c_h));
 
+                        self.playing = false;
                         self.timer.stop();
                     }
 
@@ -354,6 +341,7 @@
                             .duration(360)
                             .attr('d', shape.pause(c_h, c_h));
 
+                        self.playing = true;
                         onPlaying();
                     }
                 };
@@ -485,7 +473,7 @@
                 const onSpeedSliderMoved = (_) => {
                     const interval = Math.max(tickLen / this.speed, 16);
 
-                    if (self.timer !== null) {
+                    if (self.timer !== null && self.playing) {
                         self.timer.stop();
                         self.timer = d3.interval(self.play, interval);
                     }
@@ -525,12 +513,15 @@
                     [w - right - __offset__, h - __offset__ - axisXControlLaneHeight - axisXControlLaneMarginTop]
                 ];
 
+                const onDrag = (n, o) => {
+
+                };
+
                 const drawFn = drawGen(
                     axisXLane,
                     xAxis,
                     yScale,
                     lanes,
-                    self.reference,
                     g_h,
                     symbolSize,
                     intervalCornerRadius,
@@ -538,10 +529,18 @@
                     referenceLineColor,
                     referenceLineWidth,
                     boundingLineColor,
-                    boundingLineWidth
+                    boundingLineWidth,
+                    onDrag
                 );
 
-                const brushed = ({ start, end }) => emit(self, 'range-updated', start, end);
+                const brushed = ({ start, end }) => {
+                    if (self.timer !== null && self.playing) {
+                        self.playing = false;
+                        self.timer.stop();
+                    }
+
+                    self.$emit('range-updated', start, end);
+                };
 
                 const zooming = () => {
                     self.scale = d3.event.transform.rescaleX(xScale);
@@ -549,7 +548,7 @@
                     svg
                         .call(brushX, brushExtent, self.scale, { brushed });
 
-                    g.call(drawFn, self.scale);
+                    g.call(drawFn, self.reference, self.scale);
                 };
 
                 svg
@@ -565,7 +564,31 @@
                     .attr('clip-path', `url(#${clipPathId})`)
                     .attr('transform', `translate(${left + __offset__}, ${top + __offset__})`);
 
-                g.call(drawFn, self.scale);
+                self.play = () => {
+                    if (dateTimeEnd.diff(self.reference) >= tickLen) {
+                        self.reference.add(tickLen, 'milliseconds');
+                    } else {
+                        playBtnIcon
+                            .attr('data-state', 'PAUSE')
+                            .transition()
+                            .duration(360)
+                            .attr('d', shape.triangle(c_h, c_h));
+
+                        self.playing = false;
+                        self.timer.stop();
+
+                        self.reference = moment(dateTimeStart);
+                    }
+
+                    const entries = getPassingEntries(lanes, self.val, tickLen);
+
+                    self.$emit('reference-updated', clampRange(dateTimeStart, dateTimeEnd, self.reference), entries);
+
+                    timeSliderHue(timeSliderInterpolateInvert(self.reference));
+                    g.call(moveReferenceX, self.scale, self.reference, overlayWidth);
+                };
+
+                g.call(drawFn, self.reference, self.scale);
             },
             updateTimeLabel() {
                 d3.select(this.$el)
