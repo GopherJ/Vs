@@ -35,9 +35,7 @@ export default {
         ifExistsSvgThenRemove() {
             const svgSelection = d3.select(this.$el).select('svg');
 
-            if (svgSelection.empty()) {
-                return;
-            }
+            if (svgSelection.empty()) return;
 
             svgSelection.remove();
         },
@@ -100,6 +98,8 @@ export default {
         }
     },
     mounted() {
+        this.$nextTick(() => this.safeDraw());
+
         this.observer = new MutationObserver(_ => {
             hideTip();
         }).observe(this.$el, { childList: true, subtree: true });
@@ -107,8 +107,6 @@ export default {
         this._handleResize = debounce((e) => {
             if (this.onResize) this.onResize();
         }, 500);
-
-        this.$nextTick(() => this.safeDraw());
 
         window.addEventListener('resize', this._handleResize);
     },
