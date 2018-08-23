@@ -185,7 +185,7 @@
                         [w - right - __offsetRight__, h - bottom - __offsetBottom__]
                     ];
 
-                    const brushed = ({ start, end }) => emit(this, 'range-update', start, end);
+                    const brushed = ({ start, end }) => emit(this, 'range-updated', start, end);
 
                     axisYLane
                         .call(responsiveAxisY, yAxis, yScale);
