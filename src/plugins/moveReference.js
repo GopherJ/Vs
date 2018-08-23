@@ -1,12 +1,14 @@
 /**
  *
  * @param g
- * @param x
+ * @param xScale
+ * @param reference
  * @param overlayWidth
  */
-const moveReferenceX = (g, x, overlayWidth) => {
+const moveReferenceX = (g, xScale, reference, overlayWidth) => {
     const line = g.select('.line--reference'),
-        overlay = g.select('.overlay');
+        overlay = g.select('.overlay'),
+        x = xScale(reference);
 
     overlay.attr('x', x - overlayWidth / 2);
 

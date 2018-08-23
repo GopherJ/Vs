@@ -51,8 +51,7 @@ const drawReferenceX = (g, x, h, overlayWidth, referenceLineColor, referenceLine
     };
 
     overlaySelection
-        .call(d3.drag()
-        .on('drag', onDrag));
+        .call(d3.drag().on('drag', onDrag));
 };
 
 export {
