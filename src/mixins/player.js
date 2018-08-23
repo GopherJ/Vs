@@ -1,6 +1,6 @@
 /* eslint-disable */
 import * as d3 from 'd3';
-import { debounce, isBoolean } from 'lodash';
+import { debounce, isBoolean, isFunction } from 'lodash';
 import { hideTip } from '../plugins/tooltip';
 
 export default {
@@ -107,8 +107,10 @@ export default {
     mounted() {
         this.$nextTick(this.safeDraw);
 
-        this.observer = new MutationObserver(hideTip)
-            .observe(this.$el, { childList: true, subtree: true });
+        if (isFunction(window.MutationObserver)) {
+            (this.observer = new MutationObserver(hideTip))
+                .observe(this.$el, {childList: true, subtree: true});
+        }
 
         this._handleResize = debounce(this.onResize, 500);
 
@@ -117,6 +119,6 @@ export default {
     beforeDestroy() {
         window.removeEventListener('resize', this._handleResize);
 
-        this.observer.disconnect();
+        (this.observer !== null) && this.observer.disconnect();
     }
 };

@@ -83,9 +83,9 @@ export default {
         }
     },
     mounted() {
-        this._handlerResize = debounce(this.onResize, 500);
-
         this.$nextTick(this.safeDraw);
+
+        this._handlerResize = debounce(this.onResize, 500);
 
         window.addEventListener('resize', this._handlerResize);
     },
