@@ -244,6 +244,8 @@
                     .data(__data__)
                     .enter()
                     .append('circle')
+                    .attr('class', d => hash(d.group))
+                    .attr('visibility', 'hidden')
                     .attr('r', circleRadius)
                     .attr('cx', d => xScale(d.key))
                     .attr('cy', d => yScale(d.value))
