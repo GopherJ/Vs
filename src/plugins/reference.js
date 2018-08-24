@@ -17,7 +17,7 @@ const drawReferenceLineX = (svg, g, g_w, g_h, xScale, data, stroke = '#777', str
 
     svg
         .on('mousemove', function () {
-            const [x] = d3.mouse(g.node()),
+            const [x, y] = d3.mouse(g.node()),
                 lineSelection  = g.select('.line--reference'),
                 circlesSelection = g.selectAll('circle');
 
@@ -35,13 +35,12 @@ const drawReferenceLineX = (svg, g, g_w, g_h, xScale, data, stroke = '#777', str
                     .attr('stroke-width', strokeWidth);
             }
 
-            if (x >= 0 && x <= g_w) {
+            if (x >= 0 && x <= g_w && y >= 0 && y <= g_h) {
                 lineSelection
                     .attr('visibility', 'visible');
             } else {
                 lineSelection
                     .attr('visibility', 'hidden');
-
                 circlesSelection
                     .attr('visibility', 'hidden');
 
