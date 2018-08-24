@@ -19,6 +19,7 @@
     import axisShow from '../../plugins/axisShow';
     import emit from '../../utils/emit';
     import { yRuler } from '../../plugins/ruler';
+    import { drawReferenceLineX } from '../../plugins/reference';
 
     export default {
         name: 'd3-line',
@@ -205,12 +206,12 @@
 
                 const g = svg
                     .append('g')
+                    .attr('clip-path', `url(#${clipPathId})`)
                     .attr('transform', `translate(${left + axisYLabelLaneWidth + axisYLaneWidth}, ${top + __offsetTop__})`);
 
                 g.append('path')
                     .datum(data)
                     .attr('d', lineGen)
-                    .attr('clip-path', `url(#${clipPathId})`)
                     .attr('fill', 'none')
                     .attr('stroke', stroke)
                     .attr('stroke-width', strokeWidth)
@@ -220,11 +221,11 @@
                     .data(data)
                     .enter()
                     .append('circle')
+                    .attr('visibility', 'hidden')
                     .attr('r', circleRadius)
                     .attr('cx', d => xScale(d.key))
                     .attr('cy', d => yScale(d.value))
                     .attr('fill', circleColor)
-                    .attr('clip-path', `url(#${clipPathId})`)
                     .on('mouseover', showTip(circleTitle))
                     .on('mouseout', hideTip);
 
@@ -236,6 +237,8 @@
                         emit(this, 'range-updated', start, end);
                     });
                 }
+
+                svg.call(drawReferenceLineX, g, g_w, g_h, xScale, data);
             },
             safeDraw() {
                 this.ifExistsSvgThenRemove();

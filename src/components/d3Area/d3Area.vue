@@ -14,6 +14,7 @@
     import axisShow from '../../plugins/axisShow';
     import { yRuler } from '../../plugins/ruler';
     import emit from '../../utils/emit';
+    import { drawReferenceLineX } from '../../plugins/reference';
 
     export default {
         name: 'd3-area',
@@ -78,8 +79,6 @@
                         .append('clipPath')
                         .attr('id', clipPathId)
                         .append('rect')
-                        .attr('x', 0)
-                        .attr('y', 0)
                         .attr('width', g_w)
                         .attr('height', g_h);
 
@@ -179,6 +178,7 @@
 
                     const g = svg
                         .append('g')
+                        .attr('clip-path', `url(#${clipPathId})`)
                         .attr('transform', `translate(${left + axisYLaneWidth + axisYLabelLaneWidth}, ${top + __offsetTop__})`);
 
                     const area = d3.area()
@@ -191,11 +191,12 @@
                         .append('path')
                         .datum(data)
                         .attr('d', area)
-                        .attr('clip-path', `url(#${clipPathId})`)
                         .attr('fill', fill)
                         .attr('fill-opacity', fillOpacity)
                         .attr('stroke', stroke)
                         .attr('stroke-opacity', strokeOpacity);
+
+                    svg.call(drawReferenceLineX, g, g_w, g_h, xScale, data);
             },
             safeDraw() {
                 this.ifExistsSvgThenRemove();
