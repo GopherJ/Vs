@@ -43,7 +43,7 @@
 
                 const hueMin = circleStrokeWidth / 2 + circleRadius,
                     hueMax = g_h - circleStrokeWidth / 2 - circleRadius,
-                    interpolate = hueActual => d3.interpolate(min, max)((hueActual - hueMin) / (hueMax - hueMin));
+                    interpolate = hueActual => d3.interpolate(max, min)((hueActual - hueMin) / (hueMax - hueMin));
 
                 const svg = d3.select(this.$el)
                     .append('svg')
@@ -80,7 +80,7 @@
 
                 const circle = g
                     .append('circle')
-                    .attr('cy', hueMin)
+                    .attr('cy', hueMax)
                     .attr('cx', g_w / 2)
                     .attr('r', circleRadius)
                     .attr('fill', circleFill)
