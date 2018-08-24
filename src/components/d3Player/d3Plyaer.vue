@@ -96,7 +96,7 @@
                         btnBorderLineColor = 'rgba(0, 0, 0, .125)',
                         btnBorderRadius = 2,
 
-                        btnFillColor = '#ccc',
+                        btnFillColor = '#f5f5f5',
 
                         btnFontSize = 14,
                         btnFontWeight = 400,
@@ -291,7 +291,6 @@
                ////                                play btn                                ////
                ////////////////////////////////////////////////////////////////////////////////
 
-
                 const playBtnLane = axisXControlLane
                     .append('g')
                     .attr('class', 'btn--play');
@@ -312,10 +311,11 @@
                     .attr('d', shape.triangle(c_h, c_h));
 
                 const onPlaying = () => {
-                    const interval = Math.max(tickLen / this.speed, 16),
+                    const interval = Math.round(tickLen / this.speed),
                         curVal = moment(self.val);
 
-                    if (self.reference.diff(curVal) !== 0) self.reference = curVal;
+                    if (self.reference.diff(curVal) !== 0)
+                        self.reference = curVal;
 
                     self.timer = d3.interval(self.play, interval);
                 };
@@ -394,6 +394,7 @@
 
                 speedBtnRect
                     .on('click', () => {
+                        axisXControlLane.raise();
                         const speedSliderLineSelection = axisXControlLane.select('.slider--speed'),
                             DISPLAY = speedSliderLineSelection.style('display');
 
@@ -412,8 +413,7 @@
                 ////                             speed slider                               ////
                 ////////////////////////////////////////////////////////////////////////////////
 
-                const speedSliderPaddingTop = 20,
-                    speedSliderPaddingBottom = 20,
+                const speedSliderPaddingTop = 20, speedSliderPaddingBottom = 20,
                     speedSliderHueMin = circleStrokeWidth / 2 + circleRadius + speedSliderPaddingTop,
                     speedSliderHueMax = speedSliderLaneHeight - circleStrokeWidth / 2 - circleRadius - speedSliderPaddingBottom,
                     speedSliderInterpolate = speedSliderHueActual => d3.interpolateRound(1, Math.floor(tickLen / 16))((speedSliderHueActual - speedSliderHueMin) / (speedSliderHueMax - speedSliderHueMin));
@@ -471,7 +471,7 @@
                 };
 
                 const onSpeedSliderMoved = (_) => {
-                    const interval = Math.max(tickLen / this.speed, 16);
+                    const interval = Math.round(tickLen / this.speed);
 
                     if (self.timer !== null && self.playing) {
                         self.timer.stop();
@@ -491,7 +491,7 @@
                     .attr('cursor', 'crosshair')
                     .call(d3.drag()
                         .on('start.interrupt', () => speedSliderTrackOverlay.interrupt())
-                        .on('start drag', () =>  speedSliderHue(d3.event.y))
+                        .on('start drag', () => speedSliderHue(d3.event.y))
                     );
 
                 speedSliderTrackOverlay
@@ -543,6 +543,8 @@
                 };
 
                 const zooming = () => {
+                    speedSliderLane.style('display', 'none');
+
                     self.scale = d3.event.transform.rescaleX(xScale);
 
                     svg

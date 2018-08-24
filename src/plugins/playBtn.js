@@ -6,10 +6,10 @@ import roundedRect from './roundedRect';
  *
  * @type {{PLAYING: *, PAUSE: *}}
  */
-const STATE = {
+const STATE = Object.freeze({
     PLAYING: 'PLAYING',
     PAUSE: 'PAUSE'
-};
+});
 
 /**
  *
