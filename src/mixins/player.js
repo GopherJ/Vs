@@ -9,7 +9,6 @@ export default {
             timer: null,
             scale: null,
             playing: false,
-            val: null,
             reference: null,
             play: null,
             speed: 1,
@@ -120,5 +119,7 @@ export default {
         window.removeEventListener('resize', this._handleResize);
 
         (this.observer !== null) && this.observer.disconnect();
+
+        if (this.timer !== null && this.playing) this.timer.stop();
     }
 };

@@ -19,7 +19,7 @@ const drawReferenceX = (g, x, h, overlayWidth, referenceLineColor, referenceLine
     if (!lineReferenceSelection.empty()) lineReferenceSelection.remove();
     if (!overlaySelection.empty()) overlaySelection.remove();
 
-    lineReferenceSelection = g
+    g
         .append('line')
         .attr('pointer-events', 'none')
         .attr('class', 'line--reference')
@@ -43,9 +43,6 @@ const drawReferenceX = (g, x, h, overlayWidth, referenceLineColor, referenceLine
     const onDrag = () => {
         const n = d3.event.x,
             o = +overlaySelection.attr('x') + overlayWidth / 2;
-
-        overlaySelection.attr('x', n - overlayWidth / 2);
-        lineReferenceSelection.attr('x1', n).attr('x2', n);
 
         if (isFunction(cb)) cb(n, o);
     };

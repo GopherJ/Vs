@@ -4,19 +4,16 @@
 
 <script>
     import * as d3 from 'd3';
-    import { isBoolean, isNull, cloneDeep } from 'lodash';
+    import { isBoolean, isNull, cloneDeep, throttle } from 'lodash';
     import uuid from 'uuid/v1';
     import moment from 'moment';
     import player from '../../mixins/player';
     import roundedRect from '../../plugins/roundedRect';
-    import emit from '../../utils/emit';
     import zoom from '../../plugins/zoom';
     import cursor from '../../plugins/cursor';
     import { brushX } from '../../plugins/brush';
-    import keybinding from '../../utils/keybinding';
     import { getTrackerLanes } from '../../utils/getTrackerLanes';
     import { selectPaddingInnerOuterY } from '../../utils/select';
-    import getNextEntry from '../../utils/getNextEntry';
     import getPassingEntries from '../../utils/getPassingEntries';
     import clampRange from '../../utils/clampRange';
     import roundLine from '../../plugins/roundLine';
@@ -24,9 +21,13 @@
     import { smoothMoveX, smoothMoveY } from '../../plugins/smoothMove';
     import { showTip, hideTip } from '../../plugins/tooltip';
     import diagbox from '../../plugins/diagbox';
-    import disableZoomOn from '../../plugins/disableZoomOn';
     import drawGen from './drawGen';
     import { moveReferenceX } from '../../plugins/moveReference';
+
+    const State = Object.freeze({
+        PLAYING: 'PLAYING',
+        PAUSE: 'PAUSE'
+    });
 
     export default {
         name: 'd3-player',
@@ -68,8 +69,6 @@
                         overlayWidth = 30,
 
                         tickLen = 250,
-
-                        playJump = false,
 
                         scaleExtent = [-Infinity, Infinity],
 
@@ -307,45 +306,43 @@
                 const playBtnIcon = playBtnLane
                     .append('path')
                     .attr('transform', `translate(${(playBtnWidth - c_h) / 2}, 0)`)
-                    .attr('data-state', 'PAUSE')
+                    .attr('data-state', State.PAUSE)
                     .attr('pointer-events', 'none')
                     .attr('fill', btnFontColor)
                     .attr('d', shape.triangle(c_h, c_h));
 
-                const onPlaying = () => {
-                    const interval = Math.round(tickLen / this.speed);
+                const switchToPause = () => {
+                    playBtnIcon
+                        .attr('data-state', State.PAUSE)
+                        .transition()
+                        .duration(360)
+                        .attr('d', shape.triangle(c_h, c_h));
 
-                    self.timer = d3.interval(self.play, interval);
+                    self.playing = false;
+                    self.timer.stop();
                 };
 
-                const onPlayBtnClicked = () => {
-                    const state = playBtnIcon.attr('data-state');
+                const switchToPlay = () => {
+                    playBtnIcon
+                        .attr('data-state', State.PLAYING)
+                        .transition()
+                        .duration(360)
+                        .attr('d', shape.pause(c_h, c_h));
 
-                    if (state === 'PLAYING') {
-                        playBtnIcon
-                            .attr('data-state', 'PAUSE')
-                            .transition()
-                            .duration(360)
-                            .attr('d', shape.triangle(c_h, c_h));
+                    self.timer = d3.interval(self.play, Math.round(tickLen / self.speed));
+                    self.playing = true;
+                };
 
-                        self.playing = false;
-                        self.timer.stop();
-                    }
-
-                    else {
-                        playBtnIcon
-                            .attr('data-state', 'PLAYING')
-                            .transition()
-                            .duration(360)
-                            .attr('d', shape.pause(c_h, c_h));
-
-                        self.playing = true;
-                        onPlaying();
-                    }
+                self.play = () => {
+                    timeSliderHue(timeSliderInterpolateInvert(
+                        dateTimeEnd.diff(self.reference) >= tickLen
+                            ? moment(self.reference).add(tickLen, 'milliseconds')
+                            : (switchToPause(), moment(dateTimeStart))
+                    ));
                 };
 
                 playBtnRect
-                    .on('click', onPlayBtnClicked);
+                    .on('click', () => (playBtnIcon.attr('data-state') === State.PLAYING ? switchToPause : switchToPlay)());
 
                 ////////////////////////////////////////////////////////////////////////////////
                 ////                                time label                              ////
@@ -469,7 +466,7 @@
                 };
 
                 const onSpeedSliderMoved = (_) => {
-                    const interval = Math.round(tickLen / this.speed);
+                    const interval = Math.round(tickLen / self.speed);
 
                     if (self.timer !== null && self.playing) {
                         self.timer.stop();
@@ -565,27 +562,6 @@
                     .attr('clip-path', `url(#${clipPathId})`)
                     .attr('transform', `translate(${left + __offset__}, ${top + __offset__})`);
 
-                self.play = () => {
-                    if (dateTimeEnd.diff(self.reference) >= tickLen) {
-                        self.reference.add(tickLen, 'milliseconds');
-                    }
-
-                    else {
-                        playBtnIcon
-                            .attr('data-state', 'PAUSE')
-                            .transition()
-                            .duration(360)
-                            .attr('d', shape.triangle(c_h, c_h));
-
-                        self.playing = false;
-                        self.timer.stop();
-
-                        self.reference = moment(dateTimeStart);
-                    }
-
-                    timeSliderHue(timeSliderInterpolateInvert(self.reference));
-                };
-
                 g.call(drawFn, self.reference, self.scale);
             },
             updateTimeLabel() {
@@ -605,7 +581,7 @@
             onResize() {
                 this.safeDraw();
             }
-        },
+        }
     }
 </script>
 
