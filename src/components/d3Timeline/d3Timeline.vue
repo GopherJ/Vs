@@ -26,14 +26,14 @@
                 zoom: null,
                 w: null,
                 svg: null,
-                transform: null
+                initScale: null
             }
         },
         mixins: [mixins],
         methods: {
              updateTimeRange(dateTimeStart, dateTimeEnd) {
-                const k = this.w / (this.scale(dateTimeEnd) - this.scale(dateTimeStart)) * (this.transform ? this.transform.k : 1);
-                const translateX = (this.transform ? this.transform.x : 0) - this.scale(dateTimeStart);
+                const k = this.w / (this.initScale(dateTimeEnd) - this.initScale(dateTimeStart));
+                const translateX = -this.initScale(dateTimeStart);
 
                 this.svg
                     .transition()
@@ -129,6 +129,7 @@
                     .domain([dateTimeStart, dateTimeEnd])
                     .range([0, g_w]);
                 self.scale = xScale;
+                self.initScale = xScale.copy();
 
                 const yScale = (i) => d3.scaleBand()
                     .range([groupHeight * (i + 1), groupHeight * i])
@@ -248,8 +249,6 @@
                         .call(brushX, brushExtent, self.scale, { brushed });
 
                     g.call(drawFn, self.scale);
-
-                    self.transform = d3.event.transform;
                 };
 
                 const zoomend = () => {
