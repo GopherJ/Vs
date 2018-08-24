@@ -58,7 +58,7 @@ function showTip(title, el) {
                 .html(isFunction(title) ? title(d) : title);
 
             const top = GetOffsetTop(tooltip, target),
-                 left = GetOffsetLeft(tooltip, target);
+                left = GetOffsetLeft(tooltip, target);
 
             tooltip
                 .style('top', `${top}px`)

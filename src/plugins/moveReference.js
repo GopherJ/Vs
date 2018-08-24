@@ -3,11 +3,11 @@
  * @param g
  * @param xScale
  * @param reference
- * @param overlayWidth
  */
-const moveReferenceX = (g, xScale, reference, overlayWidth) => {
+const moveReferenceX = (g, xScale, reference) => {
     const line = g.select('.line--reference'),
         overlay = g.select('.overlay'),
+        overlayWidth = +overlay.node().getBBox().width,
         x = xScale(reference);
 
     overlay.attr('x', x - overlayWidth / 2);

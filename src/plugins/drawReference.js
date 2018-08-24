@@ -47,7 +47,7 @@ const drawReferenceX = (g, x, h, overlayWidth, referenceLineColor, referenceLine
         overlaySelection.attr('x', n - overlayWidth / 2);
         lineReferenceSelection.attr('x1', n).attr('x2', n);
 
-        if (isFunction(ondrag)) cb(n, o);
+        if (isFunction(cb)) cb(n, o);
     };
 
     overlaySelection

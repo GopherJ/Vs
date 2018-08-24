@@ -263,7 +263,9 @@
                     .attr('pointer-events', 'none');
 
                 const onTimeSliderHandlerMoving = timeSliderHueActual => {
-                    self.val = timeSliderInterpolate(timeSliderHueActual);
+                    self.reference = moment(timeSliderInterpolate(timeSliderHueActual));
+                    g.call(moveReferenceX, self.scale, self.reference);
+
                     self.updateTimeLabel();
                 };
 
@@ -284,7 +286,7 @@
                     );
 
                 timeSliderHandlerOverlay
-                    .on('mouseover', () => showTip(self.val, timeSliderHandler.node())())
+                    .on('mouseover', () => showTip(self.reference, timeSliderHandler.node())())
                     .on('mouseout', hideTip);
 
                ////////////////////////////////////////////////////////////////////////////////
@@ -311,11 +313,7 @@
                     .attr('d', shape.triangle(c_h, c_h));
 
                 const onPlaying = () => {
-                    const interval = Math.round(tickLen / this.speed),
-                        curVal = moment(self.val);
-
-                    if (self.reference.diff(curVal) !== 0)
-                        self.reference = curVal;
+                    const interval = Math.round(tickLen / this.speed);
 
                     self.timer = d3.interval(self.play, interval);
                 };
@@ -513,8 +511,9 @@
                     [w - right - __offset__, h - __offset__ - axisXControlLaneHeight - axisXControlLaneMarginTop]
                 ];
 
-                const onDrag = (n, o) => {
-
+                const onDrag = n => {
+                    self.reference = self.scale.invert(n);
+                    timeSliderHue(timeSliderInterpolateInvert(self.reference));
                 };
 
                 const drawFn = drawGen(
@@ -569,7 +568,9 @@
                 self.play = () => {
                     if (dateTimeEnd.diff(self.reference) >= tickLen) {
                         self.reference.add(tickLen, 'milliseconds');
-                    } else {
+                    }
+
+                    else {
                         playBtnIcon
                             .attr('data-state', 'PAUSE')
                             .transition()
@@ -582,12 +583,7 @@
                         self.reference = moment(dateTimeStart);
                     }
 
-                    const entries = getPassingEntries(lanes, self.val, tickLen);
-
-                    self.$emit('reference-updated', clampRange(dateTimeStart, dateTimeEnd, self.reference), entries);
-
                     timeSliderHue(timeSliderInterpolateInvert(self.reference));
-                    g.call(moveReferenceX, self.scale, self.reference, overlayWidth);
                 };
 
                 g.call(drawFn, self.reference, self.scale);
@@ -600,7 +596,7 @@
             getTimeLabel() {
                 const FORMAT = 'YYYY-MM-DD HH:mm:ss.SSS';
 
-                return moment(this.val).format(FORMAT);
+                return moment(this.reference).format(FORMAT);
             },
             safeDraw() {
                 this.ifExistsSvgThenRemove();
