@@ -250,6 +250,7 @@
                     .attr('cx', d => xScale(d.key))
                     .attr('cy', d => yScale(d.value))
                     .attr('fill', circleColor)
+                    .attr('fill-opacity', d => groups.find(x => x.label === d.group).opacity)
                     .on('mouseover', showTip(groupAreaTitle))
                     .on('mouseout', hideTip);
 
