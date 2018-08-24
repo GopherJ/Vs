@@ -70,8 +70,8 @@
 
                     axisXLabel = null,
 
-                    axisXLabelFontSize = 12,
-                    axisXLabelFontWeight = 400,
+                    axisXLabelFontSize = 14,
+                    axisXLabelFontWeight = 600,
                     axisXLabelFontOpacity = 1,
                 } = this.options;
 

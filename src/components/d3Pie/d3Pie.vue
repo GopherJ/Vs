@@ -28,9 +28,9 @@
 
                         axisXLabel = null,
 
-                        axisLabelFontSize = 12,
-                        axisLabelFontWeight = 400,
-                        axisLabelFontOpacity = 0.5,
+                        axisLabelFontSize = 14,
+                        axisLabelFontWeight = 600,
+                        axisLabelFontOpacity = 1,
 
                         arcLabelFontSize = 9,
                         arcLabelFontWeight = 400,
