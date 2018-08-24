@@ -38,13 +38,14 @@ import {
     d3MultiLine,
     d3HorizontalBar,
     d3VerticalBar,
+    d3GroupedArea,
     d3Area,
     d3Circle,
 
     // Functional
-    d3Tracker,
-    d3Slider,
-    d3ProgressArc,
+    d3Player,
+    d3HorizontalSlider,
+    d3VerticalSlider,
 
     // Layout
     d3Sunburst,
@@ -79,7 +80,7 @@ This component is for showing simple scientific data. It accepts the type `Numbe
     :options="options"
     :margin="margin"
     width="100%"
-    height="400px">
+    height="300px">
 </d3-metric>
 ```
 
@@ -91,7 +92,7 @@ This component is for showing simple scientific data. It accepts the type `Numbe
 |`axisLabelFontSize`|`label font size`|`number`|`12`|
 |`axisLabelFontWeight`|`label font weight`|`number`|`400`|
 |`axisLabelFontOpacity`|`label font opacity`|`number ([0, 1])`|`0.5`|
-|`metricLabelColor`|`metric color`|`string (rgb, hex, rgba, hsl...)`|`black`|
+|`metricLabelColor`|`metric color`|`string (rgb, hex, rgba, hsl...)`|`#000000`|
 |`metricLabelFontSize`|`metric font size`|`number`|`120`|
 |`metricLabelFontWeight`|`metric font weight`|`number`|`900`|
 |`metricLabelFontOpacity`|`metric font opacity`|`number ([0, 1])`|`0.5`|
@@ -102,7 +103,7 @@ This component is for showing simple scientific data. It accepts the type `Numbe
 
 *###d3Circle*
 
-This component is for showing a simple percentage data. It accepts the type `Number` as data. The data must be in the range `[0, 1]`.
+This component is for showing simple percentage data. It accepts the type `Number` as data. The data must be in the range `[0, 1]`.
 
 ![d3Circle](./images/d3-circle.PNG)
 
@@ -114,7 +115,7 @@ This component is for showing a simple percentage data. It accepts the type `Num
     :options="options"
     :margin="margin"
     width="100%"
-    height="400px">
+    height="300px">
 </d3-circle>
 ```
 
@@ -150,7 +151,7 @@ in tooltip, `value` will be used to calculate the angle needed.
     :options="options"
     :margin="margin"
     width="100%"
-    height="400px">
+    height="300px">
 </d3-pie>
 ```
 `options`
@@ -163,9 +164,9 @@ in tooltip, `value` will be used to calculate the angle needed.
 |`arcTitle`|`tooltip`|`function`|`d => d.data.key + '<br>' + d.data.value`|
 |`arcLabel`|`label will be shown in arcs`|`string OR null`|`null`|
 |`axisXLabel`|`label of axis x`|`string OR null`|`null`|
-|`axisLabelFontSize`|`label font size`|`number`|`12`|
-|`axisLabelFontWeight`|` abel font weight`|`number`|`400`|
-|`axisLabelFontOpacity`|`label font opacity`|`number ([0, 1])`|`0.5`|
+|`axisLabelFontSize`|`label font size`|`number`|`14`|
+|`axisLabelFontWeight`|` abel font weight`|`number`|`600`|
+|`axisLabelFontOpacity`|`label font opacity`|`number ([0, 1])`|`1`|
 |`arcLabelFontSize`|`label font size of arcs`|`number`|`9`|
 |`arcLabelFontWeight`|` abel font weight of arcs`|`number`|`400`|
 |`arcLabelFontOpacity`|`label font opacity of arcs`|`number ([0, 1])`|`0.5`|
@@ -176,10 +177,10 @@ in tooltip, `value` will be used to calculate the angle needed.
 *###d3VerticalBar*
 
 This component is for showing scientific data in vertical bar chart. It takes an array of elements like `{key : 'String|Date|Number', value : 'Number'}`, `key` will be
-used in tooltip, value will be used to calculate the height needed. By default when every `key` is of type date, brush will be enabled. You can chose a new range
-by using the brush or by clicking a bar if `options.axisXTimeInterval` has been settled.
+used in tooltip, value will be used to calculate the height needed. By default when every `key` is of type `Date` or `Number`, brush will be enabled. You can choose a new range
+by using the brush or by clicking a bar if `options.axisXInterval` has been settled.
 
-![d3VerticalBar](./images/d3-vertical-bar.PNG)
+![d3VerticalBar](./images/d3VerticalBar.gif)
 
 
 `template`
@@ -191,7 +192,7 @@ by using the brush or by clicking a bar if `options.axisXTimeInterval` has been 
     :margin="margin"
     width="100%"
     @range-updated="(dateTimeStart, dateTimeEnd) => fetchDataWithCurrentInterval(dateTimeStart, dateTimeEnd)"
-    height="400px">
+    height="300px">
 </d3-vertical-bar>
 ```
 
@@ -211,18 +212,20 @@ by using the brush or by clicking a bar if `options.axisXTimeInterval` has been 
 |`axisFontOpacity`|`axis text font opacity`|`number ([0, 1])`|`0.5`|
 |`axisXLabel`|`label of axis x`|`string or null`|`null`|
 |`axisYLabel`|`label of axis y`|`string or null`|`null`|
-|`axisLabelFontSize`|`label font size`|`number`|`12`|
-|`axisLabelFontWeight`|`label font weight`|`number`|`400`|
-|`axisLabelFontOpacity`|`label font opacity`|`number`|`0.5`|
+|`axisLabelFontSize`|`label font size`|`number`|`14`|
+|`axisLabelFontWeight`|`label font weight`|`number`|`600`|
+|`axisLabelFontOpacity`|`label font opacity`|`number`|`1`|
 |`axisXLaneHeight`|`lane height of axis x`|`number`|`60`|
-|`axisYLaneWidth`|`lane width of axis y`|`number`|`60`|
-|`axisXTimeInterval`|`used when data is of type date_histogram, it will be used to decide the date format of axis x`|`number OR null`|`null`|
+|`axisYLaneWidth`|`lane width of axis y`|`number`|`35`|
+|`axisXInterval`|`used when data is of type date_histogram, it will be used to calculate the date format of axis x. (unit: ms)`|`number OR null`|`null`|
 |`isAxisPathShow`|`if the axis path will be shown`|`boolean`|`true`|
+|`isAxisTickShow`|`if the axis tick will be shown`|`boolean`|`true`|
 |`animationDuration`|`duration of animation`|`number`|`1000`|
 |`delay`|`delay of animation (milliseconds)`|`number`|`50`|
 |`axisYTickFormat`|`d3-format support`|`string`|`.2s`|
 |`negative`|`the axis y should start at 0 or not`|`boolean`|`false`|
 |`nice`|`the tick number of axis should be rounded or not`|`false`|
+|`yAxisRuler`|`if the ruler of the axis y should be enabled`|`true`|
 
 
 `events`
@@ -236,10 +239,10 @@ by using the brush or by clicking a bar if `options.axisXTimeInterval` has been 
 *###d3HorizontalBar*
 
 This component is for showing scientific data in horizontal bar chart. It takes an array of elements like `{key : 'String|Date|Number', value : 'Number'}`, `key` will be
-used in tooltip, value will be used to calculate the width needed. By default when every `key` is of type date, brush will be enabled. You can chose a new range
-by using the brush or by clicking a bar if `options.axisYTimeInterval` has been settled.
+used in tooltip, value will be used to calculate the width needed. By default when every `key` is of type `Date` or `Number`, brush will be enabled. You can chose a new range
+by using the brush or by clicking a bar if `options.axisYInterval` has been settled.
 
-![d3HorizontalBar](./images/d3-horizontal-bar.PNG)
+![d3HorizontalBar](./images/d3HorizontalBar.gif)
 
 `template`
 
@@ -250,7 +253,7 @@ by using the brush or by clicking a bar if `options.axisYTimeInterval` has been 
     :margin="margin"
     @range-updated="(dateTimeStart, dateTimeEnd) => fetchDataWithCurrentInterval(dateTimeStart, dateTimeEnd)"
     width="100%"
-    height="400px">
+    height="300px">
 </d3-horizontal-bar>
 ```
 
@@ -270,13 +273,14 @@ by using the brush or by clicking a bar if `options.axisYTimeInterval` has been 
 |`axisFontOpacity`|`axis text font opacity`|`number ([0, 1])`|`0.5`|
 |`axisXLabel`|`label of axis x`|`string or null`|`null`|
 |`axisYLabel`|`label of axis y`|`string or null`|`null`|
-|`axisLabelFontSize`|`label font size`|`number`|`12`|
-|`axisLabelFontWeight`|`label font weight`|`number`|`400`|
-|`axisLabelFontOpacity`|`label font opacity`|`number`|`0.5`|
-|`axisXLaneHeight`|`lane height of axis x`|`number`|`30`|
+|`axisLabelFontSize`|`label font size`|`number`|`14`|
+|`axisLabelFontWeight`|`label font weight`|`number`|`600`|
+|`axisLabelFontOpacity`|`label font opacity`|`number`|`1`|
+|`axisXLaneHeight`|`lane height of axis x`|`number`|`35`|
 |`axisYLaneWidth`|`lane width of axis y`|`number`|`120`|
-|`axisYTimeInterval`|`used when data is of type date_histogram, it will be used to decide the date format of axis y`|`number OR null`|`null`|
+|`axisYInterval`|`used when data is of type date_histogram, it will be used to calculate the date format of axis y. (unit: ms)`|`number OR null`|`null`|
 |`isAxisPathShow`|`if the axis path will be shown`|`boolean`|`true`|
+|`isAxisTickShow`|`if the axis tick will be shown`|`boolean`|`true`|
 |`animationDuration`|`duration of animation`|`number`|`1000`|
 |`delay`|`delay of animation (milliseconds)`|`number`|`50`|
 |`axisXTickFormat`|`d3-format support`|`string`|`.2s`|
@@ -295,10 +299,10 @@ by using the brush or by clicking a bar if `options.axisYTimeInterval` has been 
 *###d3Line*
 
 This component is for showing scientific data in line chart. It takes an array of elements like `{key : 'String|Date|Number', value : 'Number'}`, `key` will be
-used in tooltip, value will be used to calculate the width needed. By default when every `key` is of type date, brush will be enabled. You can chose a new range
+used in tooltip, value will be used to calculate the width needed. By default when every `key` is of type `Date` or `Number`, brush will be enabled. You can chose a new range
 by using the brush.
 
-![d3Line](./images/d3-line.PNG)
+![d3Line](./images/d3Line.gif)
 
 `template`
 
@@ -309,7 +313,7 @@ by using the brush.
     :margin="margin"
     @range-updated="(dateTimeStart, dateTimeEnd) => fetchDataWithCurrentInterval(dateTimeStart, dateTimeEnd)"
     width="100%"
-    height="400px">
+    height="300px">
 </d3-line>
 ```
 
@@ -329,16 +333,19 @@ by using the brush.
 |`circleRadius`|`emphasis circle radius`|`number`|`5`|
 |`circleColor`|`emphasis circle color`|`number`|`rgb(188, 82, 188)`|
 |`circleTitle`|`emphasis circle tooltip`|`function`|`d => d.value`|
-|`curve`|`curve algorithm`|`string`|`curveMonotoneX`|
+|`curve`|`curve algorithm`|`string`|`curveCardinal`|
 |`axisXLabel`|`label of axis x`|`string or null`|`null`|
 |`axisYLabel`|`label of axis y`|`string or null`|`null`|
-|`axisLabelFontSize`|`label font size`|`number`|`12`|
-|`axisLabelFontWeight`|`label font weight`|`number`|`400`|
-|`axisLabelFontOpacity`|`label font opacity`|`number`|`0.5`|
-|`axisXTimeInterval`|`used when data is of type date_histogram, it will be used to decide the date format of axis x`|`number OR null`|`null`|
+|`axisLabelFontSize`|`label font size`|`number`|`14`|
+|`axisLabelFontWeight`|`label font weight`|`number`|`600`|
+|`axisLabelFontOpacity`|`label font opacity`|`number`|`1`|
+|`axisXInterval`|`used when data is of type date_histogram, it will be used to decide the date format of axis x`|`number OR null`|`null`|
+|`isAxisPathShow`|`if the axis path will be shown`|`boolean`|`true`|
+|`isAxisTickShow`|`if the axis tick will be shown`|`boolean`|`true`|
 |`axisXTickFormat`|`d3-format support`|`string`|`.2s`|
 |`negative`|`the axis y should start at 0 or not`|`boolean`|`false`|
 |`nice`|`the tick number of axis should be rounded or not`|`false`|
+|`yAxisRuler`|`if the ruler of the axis y should be enabled`|`true`|
 
 
 `events`
@@ -352,7 +359,7 @@ by using the brush.
 
 This components is for show big date_histogram data, It takes an array of elements like `{key : 'Date', value : 'Number'}`.
 
-![d3Area](./images/d3-area.PNG)
+![d3Area](./images/d3Area.gif)
 
 `template`
 
@@ -363,7 +370,7 @@ This components is for show big date_histogram data, It takes an array of elemen
     :margin="margin"
     @range-updated="(dateTimeStart, dateTimeEnd) => fetchDataWithCurrentInterval(dateTimeStart, dateTimeEnd)"
     width="100%"
-    height="400px">
+    height="300px">
 </d3-area>
 ```
 
@@ -376,7 +383,7 @@ This components is for show big date_histogram data, It takes an array of elemen
 |`stroke`|`area path edge color`|`string (rgb, hex, rgba, hsl...)`|`rgb(188, 82, 188)`|
 |`strokeOpacity`|`area path edge color opacity`|`number`|`1`|
 |`areaTitle`|`tooltip`|`function`|`d => d.value`|
-|`axisXLaneHeight`|`lane height of the axis x`|`number`|`60`|
+|`axisXLaneHeight`|`lane height of the axis x`|`number`|`35`|
 |`axisYLaneWidth`|`lane width of the axis y`|`number`|`60`|
 |`axisFontSize`|`axis text font size`|`number`|`12`|
 |`axisFontWeight`|`axis text font weight`|`number`|`400`|
@@ -386,13 +393,15 @@ This components is for show big date_histogram data, It takes an array of elemen
 |`curve`|`curve algorithm`|`string`|`curveLinear`|
 |`axisXLabel`|`label of axis x`|`string or null`|`null`|
 |`axisYLabel`|`label of axis y`|`string or null`|`null`|
-|`axisLabelFontSize`|`label font size`|`number`|`12`|
-|`axisLabelFontWeight`|`label font weight`|`number`|`400`|
-|`axisLabelFontOpacity`|`label font opacity`|`number`|`0.5`|
+|`axisLabelFontSize`|`label font size`|`number`|`14`|
+|`axisLabelFontWeight`|`label font weight`|`number`|`600`|
+|`axisLabelFontOpacity`|`label font opacity`|`number`|`1`|
 |`axisXTickFormat`|`d3-format support`|`string`|`.2s`|
 |`negative`|`the axis y should start at 0 or not`|`boolean`|`false`|
 |`nice`|`the tick number of axis should be rounded or not`|`false`|
 |`isAxisPathShow`|`if the axis path will be shown`|`boolean`|`true`|
+|`isAxisTickShow`|`if the axis tick will be shown`|`boolean`|`true`|
+|`yAxisRuler`|`if the ruler of the axis y should be enabled`|`true`|
 
 
 
@@ -411,7 +420,7 @@ This component is for showing multiple lines together. It takes an array of elem
     :margin="margin"
     @range-updated="(dateTimeStart, dateTimeEnd) => fetchDataWithCurrentInterval(dateTimeStart, dateTimeEnd)"
     width="100%"
-    height="400px">
+    height="300px">
 </d3-multi-line>
 ```
 
@@ -431,19 +440,77 @@ This component is for showing multiple lines together. It takes an array of elem
 |`circleTitle`|`emphasis circle tooltip`|`function`|`d => d.value`|
 |`crossWidth`|`legend cross line edge width`|`number`|`2`|
 |`crossColor`|`legend cross line color`|`string (rgb, hex, rgba, hsl...)`|`white`|
-|`curve`|`curve algorithm`|`string`|`curveMonotoneX`|
+|`curve`|`curve algorithm`|`string`|`curveCardinal`|
 |`axisXLabel`|`label of axis x`|`string or null`|`null`|
 |`axisYLabel`|`label of axis y`|`string or null`|`null`|
-|`axisLabelFontSize`|`label font size`|`number`|`12`|
-|`axisLabelFontWeight`|`label font weight`|`number`|`400`|
-|`axisLabelFontOpacity`|`label font opacity`|`number`|`0.5`|
-|`axisXTimeInterval`|`used when data is of type date_histogram, it will be used to decide the date format of axis x`|`number OR null`|`null`|
+|`axisLabelFontSize`|`label font size`|`number`|`14`|
+|`axisLabelFontWeight`|`label font weight`|`number`|`600`|
+|`axisLabelFontOpacity`|`label font opacity`|`number`|`1`|
+|`axisXInterval`|`used when data is of type date_histogram, it will be used to decide the date format of axis x. (unit: ms)`|`number OR null`|`null`|
 |`axisXTickFormat`|`d3-format support`|`string`|`.2s`|
 |`negative`|`the axis y should start at 0 or not`|`boolean`|`false`|
 |`nice`|`the tick number of axis should be rounded or not`|`false`|
 |`isAxisPathShow`|`if the axis path will be shown`|`boolean`|`true`|
-|`axisXGroupLabelLaneHeight`|`group lane height`|`number`|`35`|
-|`axisXGroupLabelWidth`|`group legend width`|`number`|`15`|
+|`isAxisTickShow`|`if the axis tick will be shown`|`boolean`|`true`|
+|`yAxisRuler`|`if the ruler of the axis y should be enabled`|`true`|
+|`axisXGroupLabelLaneHeight`|`group lane height`|`number`|`20`|
+|`axisXGroupLabelFillColorOpacity`|`group legend internal color opacity`|`number`|`1`|
+|`axisXGroupLabelBorderColorOpacity`|`group legend edge color opacity`|`number`|`0.6`|
+|`axisXGroupLabelGap`|`group legend gap`|`number`|`10`|
+
+
+
+
+
+*###d3GroupedArea*
+
+This component is for showing multiple lines together. It takes an array of elements like `{group: 'string', key : 'String|Date|Number', value: 'Number'}`.
+
+![d3GroupedArea](./images/d3GroupedArea.gif)
+
+`template`
+
+```vue
+<d3-grouped-area
+    :data="data"
+    :options="options"
+    :margin="margin"
+    @range-updated="(dateTimeStart, dateTimeEnd) => fetchDataWithCurrentInterval(dateTimeStart, dateTimeEnd)"
+    width="100%"
+    height="300px">
+</d3-grouped-area>
+```
+
+`options`
+
+|key|description|type|default|
+|:---|:---|:---|:---|
+|`fill`|`area path internal color`|`string (rgb, hex, hsl...)`|`#6eadc1`|
+|`axisXLaneHeight`|`lane height of the axis x`|`number`|`35`|
+|`axisYLaneWidth`|`lane width of the axis y`|`number`|`60`|
+|`axisFontSize`|`axis text font size`|`number`|`12`|
+|`axisFontWeight`|`axis text font weight`|`number`|`400`|
+|`axisFontOpacity`|`axis text font opacity`|`number`|`1`|
+|`tickSize`|`tick height/width of axis`|`number`|`10`|
+|`tickPadding`|`tick padding`|`number`|`8`|
+|`circleRadius`|`emphasis circle radius`|`number`|`5`|
+|`groupedAreaTitle`|`emphasis circle tooltip`|`function`|`d => d.value`|
+|`crossWidth`|`legend cross line edge width`|`number`|`2`|
+|`crossColor`|`legend cross line color`|`string (rgb, hex, rgba, hsl...)`|`white`|
+|`curve`|`curve algorithm`|`string`|`curveLinear`|
+|`axisXLabel`|`label of axis x`|`string or null`|`null`|
+|`axisYLabel`|`label of axis y`|`string or null`|`null`|
+|`axisLabelFontSize`|`label font size`|`number`|`14`|
+|`axisLabelFontWeight`|`label font weight`|`number`|`600`|
+|`axisLabelFontOpacity`|`label font opacity`|`number`|`1`|
+|`axisXInterval`|`used when data is of type date_histogram, it will be used to decide the date format of axis x. (unit: ms)`|`number OR null`|`null`|
+|`axisXTickFormat`|`d3-format support`|`string`|`.2s`|
+|`negative`|`the axis y should start at 0 or not`|`boolean`|`false`|
+|`nice`|`the tick number of axis should be rounded or not`|`false`|
+|`isAxisPathShow`|`if the axis path will be shown`|`boolean`|`true`|
+|`isAxisTickShow`|`if the axis tick will be shown`|`boolean`|`true`|
+|`yAxisRuler`|`if the ruler of the axis y should be enabled`|`true`|
+|`axisXGroupLabelLaneHeight`|`group lane height`|`number`|`20`|
 |`axisXGroupLabelFillColorOpacity`|`group legend internal color opacity`|`number`|`1`|
 |`axisXGroupLabelBorderColorOpacity`|`group legend edge color opacity`|`number`|`0.6`|
 |`axisXGroupLabelGap`|`group legend gap`|`number`|`10`|
@@ -466,7 +533,7 @@ like:
 }
 ```
 
-![d3SankeyCircular](./images/d3-sankey-circular.PNG)
+![d3SankeyCircular](./images/d3SankeyCircular.gif)
 
 
 `template`
@@ -480,7 +547,7 @@ like:
     :linkTitle="linkTitle"
     @max-period-updated="(period) => yourMethod(period)"
     width="100%"
-    height="400px">
+    height="300px">
 </d3-sankey-circular>
 ```
 
@@ -511,8 +578,8 @@ Tooltip of link. Default to `d => ${d.source.name} → ${d.target.name}<br>${d.v
 |`axisXSelectBoxLabelFontWeight`|`select box label font weight`|`number`|`400`|
 |`axisXSelectBoxLabelFontOpacity`|`select box label font opacity`|`number`|`0.5`|
 |`axisXLabel`|`label of axis x`|`string OR null`|`null`|
-|`axisXLabelFontSize`|`label font size of axis x`|`number`|`12`|
-|`axisXLabelFontWeight`|`label font weight of axis x`|`number`|`400`|
+|`axisXLabelFontSize`|`label font size of axis x`|`number`|`14`|
+|`axisXLabelFontWeight`|`label font weight of axis x`|`number`|`600`|
 |`axisXLabelFontOpacity`|`label font opacity`|`number`|`1`|
 
 
@@ -524,7 +591,7 @@ Tooltip of link. Default to `d => ${d.source.name} → ${d.target.name}<br>${d.v
 
 This component is similar to `kibana timelion` with a interval select box. It accepts an array of elements like `{ key : 'Date', value: 'Number'}`.
 
-![d3Timelion](./images/d3-timelion.PNG)
+![d3Timelion](./images/d3Timelion.gif)
 
 `template`
 
@@ -534,7 +601,7 @@ This component is similar to `kibana timelion` with a interval select box. It ac
     :options="options"
     :margin="margin"
     width="100%"
-    height="400px"
+    height="300px"
     @range-updated="(dateTimeStart, dateTimeEnd) => fetchDataWithCurrentInterval(dateTimeStart, dateTimeEnd)"
     @interval-updated="interval => fetchDataWithInterval(interval)">
 </d3-timelion>
@@ -556,13 +623,14 @@ This component is similar to `kibana timelion` with a interval select box. It ac
 |`axisFontOpacity`|`axis text font opacity`|`number ([0, 1])`|`0.5`|
 |`axisXLabel`|`label of axis x`|`string or null`|`null`|
 |`axisYLabel`|`label of axis y`|`string or null`|`null`|
-|`axisLabelFontSize`|`label font size`|`number`|`12`|
-|`axisLabelFontWeight`|`label font weight`|`number`|`400`|
-|`axisLabelFontOpacity`|`label font opacity`|`number`|`0.5`|
+|`axisLabelFontSize`|`label font size`|`number`|`14`|
+|`axisLabelFontWeight`|`label font weight`|`number`|`600`|
+|`axisLabelFontOpacity`|`label font opacity`|`number`|`1`|
 |`axisXLaneHeight`|`lane height of axis x`|`number`|`60`|
 |`axisYLaneWidth`|`lane width of axis y`|`number`|`60`|
-|`axisXTimeInterval`|`used when data is of type date_histogram, it will be used to decide the date format of axis x`|`number OR null`|`null`|
+|`axisXInterval`|`used when data is of type date_histogram, it will be used to calculate the date format of axis x. (unit: ms)`|`number OR null`|`null`|
 |`isAxisPathShow`|`if the axis path will be shown`|`boolean`|`true`|
+|`isAxisTickShow`|`if the axis tick will be shown`|`boolean`|`true`|
 |`animationDuration`|`duration of animation`|`number`|`1000`|
 |`delay`|`delay of animation (milliseconds)`|`number`|`50`|
 |`axisYTickFormat`|`d3-format support`|`string`|`.2s`|
@@ -571,6 +639,7 @@ This component is similar to `kibana timelion` with a interval select box. It ac
 |`timeRangeLabelFontSize`|`time range label font size`|`number`|`12`|
 |`timeRangeLabelFontWeight`|`time range label font weight`|`number`|`400`|
 |`timeRangeLabelFontOpacity`|`time range label font opacity`|`number`|`0.5`|
+|`yAxisRuler`|`if the ruler of the axis y should be enabled`|`true`|
 
 `events`
 
@@ -585,7 +654,7 @@ This component is similar to `kibana timelion` with a interval select box. It ac
 
 This component is for showing time entries. We have two type entries in `d3Timeline`, they are `Point` and `Interval`. It takes an array of entries as data.
 
-![d3Timline](./images/d3-timeline.PNG)
+![d3Timline](./images/d3Timeline.gif)
 
 To specify an entry `Point`:
 
@@ -628,7 +697,7 @@ To specify an entry 'Interval':
     :options="options"
     :margin="margin"
     width="100%"
-    height="400px"
+    height="300px"
     @range-updated="(dateTimeStart, dateTimeEnd) => yourMethod(dateTimeStart, dateTimeEnd)">
 </d3-timeline>
 ```
@@ -650,9 +719,9 @@ To specify an entry 'Interval':
 |`axisFontWeight`|`axis text font weight`|`number`|`400`|
 |`axisFontOpacity`|`axis text font opacity`|`number ([0, 1])`|`0.5`|
 |`axisXLabel`|`label of axis x`|`string or null`|`null`|
-|`axisLabelFontSize`|`label font size`|`number`|`12`|
+|`axisLabelFontSize`|`label font size`|`number`|`14`|
 |`axisLabelFontWeight`|`label font weight`|`number`|`600`|
-|`axisLabelFontOpacity`|`label font opacity`|`number`|`0.5`|
+|`axisLabelFontOpacity`|`label font opacity`|`number`|`1`|
 |`backgroundColor`|`background color`|`string (rgb, hex, rgba, hsl...)`|`rgba(255, 255, 255, 0.125)`|
 |`borderRadius`|`border radius`|`number`|`0`|
 |`borderWidth`|`border width`|`number`|`2`|
@@ -661,6 +730,9 @@ To specify an entry 'Interval':
 |`boundingLineColor`|`bounding line color`|`string (rgb, hex, rgba, hesl...)`|`rgba(0, 0, 0, .125)`|
 |`currentTimeLineWidth`|`current time line width`|`number`|`2`|
 |`currentTimeLineColor`|`current time line color`|`string (rgb, hex, rgba, hsl...)`|`rgba(255, 56, 96, 1)`|
+|`liveTimer`|`if live timer reference line should be enabled`|`boolean`|`true`|
+|`liveTimerTick`|`live time reference line move interval`|`number (unit: ms)`|`250`|
+|`scaleExtent`|`the zoom range`|`Array`|`[0.5, Infinity]`|
 
 `events`
 
@@ -672,26 +744,25 @@ To specify an entry 'Interval':
 
 ## Functional
 
-*###d3Tracker*
+*###d3Player*
 
-This component is like `d3Timeline`. The difference is that `d3Tracker` has no support for group and we can hit the `space` key in keyboard to start
-playing. It will also trigger an event to tell us the dateTime of the cursor and the entries it is now passing.
+This component is like `d3Timeline`. The difference is that `d3Player` has no support for group and is designed to simulate trajectories and to replay trajectories,
+. It will also trigger an event to tell us the dateTime of the cursor and the entries it is now passing.
 
-![d3Tracker](./images/d3-tracker.PNG)
+![d3Player](./images/d3Player.gif)
 
 `template`
 
 ```vue
-<d3-tracker
+<d3-player
     :data="data"
     :options="options"
     :margin="margin"
     width="100%"
-    height="400px"
-    @play-end="yourMethod"
+    height="300px"
     @range-updated="(dateTimeStart, dateTimeEnd) => yourMethod(dateTimeStart, dateTimeEnd)"
     @reference-updated="(dateTimeRange, entries) => yourMethod(dateTimeRange, entries)">
-</d3-tracker>
+</d3-player>
 ```
 
 `options`
@@ -706,21 +777,15 @@ playing. It will also trigger an event to tell us the dateTime of the cursor and
 |`axisFontSize`|`axis text font size`|`number`|`12`|
 |`axisFontWeight`|`axis text font weight`|`number`|`400`|
 |`axisFontOpacity`|`axis text font opacity`|`number ([0, 1])`|`0.5`|
-|`axisXLabel`|`label of axis x`|`string or null`|`null`|
-|`axisLabelFontSize`|`label font size`|`number`|`12`|
-|`axisLabelFontWeight`|`label font weight`|`number`|`600`|
-|`axisLabelFontOpacity`|`label font opacity`|`number`|`0.5`|
 |`backgroundColor`|`background color`|`string (rgb, hex, rgba, hsl...)`|`rgba(255, 255, 255, 0.125)`|
 |`borderRadius`|`border radius`|`number`|`0`|
 |`borderWidth`|`border width`|`number`|`2`|
 |`borderColor`|`border color`|`string (rgb, hex, rgba, hsl...)`|`rgba(0, 0, 0, .125)`|
 |`boundingLineWidth`|`bounding line width`|`number`|`2`|
 |`boundingLineColor`|`bounding line color`|`string (rgb, hex, rgba, hesl...)`|`rgba(0, 0, 0, .125)`|
-|`referenceLineWidth`|`current time line width`|`number`|`4`|
-|`referenceLineColor`|`current time line color`|`string (rgb, hex, rgba, hsl...)`|`rgba(255, 56, 96, 1)`|
+|`referenceLineWidth`|`reference time line width`|`number`|`4`|
+|`referenceLineColor`|`reference time line color`|`string (rgb, hex, rgba, hsl...)`|`rgba(255, 56, 96, 1)`|
 |`overlayWidth`|`cursor overlay rectangle width`|`number`|`30`|
-|`playDuration`|`play should be done in the duration`|`10000`|
-|`playJump`|`play jump should be enabled or not`|`boolean`|`false`|
 
 `events`
 
@@ -730,25 +795,25 @@ playing. It will also trigger an event to tell us the dateTime of the cursor and
 |`range-updated`|`new range selected`|`(dateTimeStart, dateTimeEnd)`|
 
 
-*###d3Slider*
+*###d3HorizontalSlider*
 
 This component is make it more simple to choose a value in a range. This range can be a range of color, date or number. It takes a `min` and `max`
 as data.
 
-![d3Slider](./images/d3-slider.PNG)
+![d3HorizontalSlider](./images/d3HorizontalSlider.gif)
 
 `template`
 
 ```vue
-<d3-slider
-    v-model="data"
+<d3-horizontal-slider
     :min="min"
     :max="max"
     :margin="margin"
     :options="options"
+    @input="(val) => yourMethod(val)"
     width="100%"
     height="100%">
-</d3-slider>
+</d3-horizontal-slider>
 ```
 
 `options`
@@ -766,12 +831,47 @@ as data.
 |`circleStroke`|`circle handler edge color`|`string (rgb, hex, rgba, hsl...)`|`#000`|
 |`circleStrokeOpacity`|`circle handler edge color opacity`|`number`|`0.5`|
 |`circleStrokeWidth`|`circle handler edge width`|`number`|`1.25`|
-|`isAxisShow`|`if axis will be shown`|`boolean`|`false`|
-|`axisFontSize`|`axis text font size`|`number`|`12`|
-|`axisFontWeight`|`axis text font weight`|`number`|`400`|
-|`axisFontOpacity`|`axis text font opacity`|`number ([0, 1])`|`0.5`|
 
 
+
+
+
+*###d3VerticalSlider*
+
+This component is make it more simple to choose a value in a range. This range can be a range of color, date or number. It takes a `min` and `max`
+as data.
+
+![d3VerticalSlider](./images/d3VerticalSlider.gif)
+
+`template`
+
+```vue
+<d3-vertical-slider
+    :min="min"
+    :max="max"
+    :margin="margin"
+    :options="options"
+    @input="(val) => yourMethod(val)"
+    width="100%"
+    height="100%">
+</d3-vertical-slider>
+```
+
+`options`
+
+|key|description|type|default|
+|:---|:---|:---|:---|
+|`trackStroke`|`track edge color`|`string (rgb, hex, rgba, hsl...)`|`#000`|
+|`trackStrokeWidth`|`track edge width`|`number`|`10`|
+|`trackStrokeOpacity`|`track edge opacity`|`number`|`0.3`|
+|`trackRounded`|`track round or not`|`boolean`|`true`|
+|`trackInsetStroke`|`inset track edge color`|`string (rgb, hex, rgba, hsl...)`|`#ddd`|
+|`trackInsetStrokeOpacity`|`inset track edge color opacity`|`number`|`1`|
+|`trackInsetStrokeWidth`|`inset track edge width`|`number`|`8`|
+|`circleFill`|`circle handler internal color`|`string (rgb, hex, rgba, hsl...)`|`#fff`|
+|`circleStroke`|`circle handler edge color`|`string (rgb, hex, rgba, hsl...)`|`#000`|
+|`circleStrokeOpacity`|`circle handler edge color opacity`|`number`|`0.5`|
+|`circleStrokeWidth`|`circle handler edge width`|`number`|`1.25`|
 
 
 ## Layout
@@ -821,7 +921,7 @@ This component is for showing `tree` layout which is recursive. It takes an obje
     :options="options"
     :margin="margin"
     width="100%"
-    height="400px">
+    height="300px">
 </d3-tree>
 ```
 
@@ -889,7 +989,7 @@ This component is like `d3-tree` but with all leaf nodes are at the same height.
     :options="options"
     :margin="margin"
     width="100%"
-    height="400px">
+    height="300px">
 </d3-cluster>
 ```
 
@@ -926,7 +1026,7 @@ This component is for show `icicle horizontal` layout which is recursive. It tak
     :options="options"
     :margin="margin"
     width="100%"
-    height="400px">
+    height="300px">
 </d3-icicle-horizontal>
 ```
 
@@ -959,7 +1059,7 @@ This component is for show `icicle vertical` layout which is recursive. It takes
     :options="options"
     :margin="margin"
     width="100%"
-    height="400px">
+    height="300px">
 </d3-icicle-vertical>
 ```
 
@@ -1023,7 +1123,7 @@ This component is for showing `sunburst` layout. It takes an object of `Hierarch
     :options="options"
     :margin="margin"
     width="100%"
-    height="400px">
+    height="300px">
 </d3-sunburst>
 ```
 
@@ -1085,7 +1185,7 @@ This component is for showing `pack` layout. It takes an object of `Hierarchical
     :options="options"
     :margin="margin"
     width="100%"
-    height="400px">
+    height="300px">
 </d3-pack>
 ```
 
