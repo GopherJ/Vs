@@ -17,19 +17,26 @@
     import hash from '../../utils/hash';
     import { yRuler } from '../../plugins/ruler';
     import emit from '../../utils/emit';
+    import { drawReferenceLineX } from '../../plugins/reference';
+    import { showTip, hideTip } from '../../plugins/tooltip';
 
     export default {
         name: 'd3-grouped-area',
         mixins: [mixins],
         methods: {
             drawGroupedArea() {
-                const _data = cloneDeep(this.data),
+                const __data__ = cloneDeep(this.data),
                     { left = 0, right = 0, top = 0, bottom = 0 } = this.margin,
                     {
                         fill = '#6eadc1',
 
                         crossWidth = 2,
                         crossColor = '#fff',
+
+                        circleRadius = 5,
+                        circleColor = '#6eadc1',
+
+                        groupAreaTitle = d => `${d.key}<br>${d.group}<br>${d.value}`,
 
                         tickSize = 10,
                         tickPadding = 8,
@@ -77,8 +84,8 @@
                     [w, h] = this.getElWidthHeight(), __offsetRight__ = 10,
                     g_w =  w - left - right - axisYLaneWidth - axisYLabelLaneWidth - __offsetRight__,
                     g_h = h -top - bottom - axisXLaneHeight - axisXLabelLaneHeight - axisXGroupLabelLaneHeight,
-                    clipPathId = uuid(), isAxisXTime = isAxisTime(_data), ticks = selectTicksNumY(g_h),
-                    data = groupBySum(_data), groups = Object.keys(data).map(x => ({ label: x, opacity: data[x].opacity }));
+                    clipPathId = uuid(), isAxisXTime = isAxisTime(__data__), ticks = selectTicksNumY(g_h),
+                    data = groupBySum(__data__), groups = Object.keys(data).map(x => ({ label: x, opacity: data[x].opacity }));
 
                 if (![g_w, g_h].every(el => el > 0) || !isAxisXTime || !groups.length) return;
 
@@ -97,11 +104,11 @@
                     .attr('height', g_h);
 
                 const xScale = d3.scaleTime()
-                    .domain(d3.extent(_data, d => d.key))
+                    .domain(d3.extent(__data__, d => d.key))
                     .range([0, g_w]);
 
                 const yScale = d3.scaleLinear()
-                    .domain(negative ? d3.extent(_data, d => d.value) : [0, d3.max(_data, d => d.value)])
+                    .domain(negative ? d3.extent(__data__, d => d.value) : [0, d3.max(__data__, d => d.value)])
                     .range([g_h, 0]);
                 if (nice) yScale.nice();
 
@@ -212,6 +219,7 @@
 
                 const g = svg
                     .append('g')
+                    .attr('clip-path', `url(#${clipPathId})`)
                     .attr('transform', `translate(${left + axisYLaneWidth + axisYLabelLaneWidth}, ${top + axisXGroupLabelLaneHeight})`);
 
                 const area = d3.area()
@@ -227,11 +235,23 @@
                     .append('path')
                     .attr('d', d => area(data[d.label].data))
                     .attr('class', d => hash(d.label))
-                    .attr('clip-path', `url(#${clipPathId})`)
                     .attr('fill', fill)
                     .attr('fill-opacity', d => d.opacity)
                     .attr('stroke', fill)
                     .attr('stroke-opacity', d => d.opacity);
+
+                g.selectAll('circle')
+                    .data(__data__)
+                    .enter()
+                    .append('circle')
+                    .attr('r', circleRadius)
+                    .attr('cx', d => xScale(d.key))
+                    .attr('cy', d => yScale(d.value))
+                    .attr('fill', circleColor)
+                    .on('mouseover', showTip(groupAreaTitle))
+                    .on('mouseout', hideTip);
+
+                svg.call(drawReferenceLineX, g, g_w, g_h, xScale, __data__);
             },
             safeDraw() {
                 this.ifExistsSvgThenRemove();
@@ -247,7 +267,10 @@
 <style>
     @import url(../../css/index.css);
 
-    .d3-grouped-area path,
+    .d3-grouped-area path {
+        pointer-events: none;
+    }
+    
     .d3-grouped-area circle {
         cursor: pointer;
     }

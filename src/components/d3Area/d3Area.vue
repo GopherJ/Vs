@@ -231,7 +231,7 @@
     @import url(../../css/index.css);
 
     .d3-area path {
-        cursor: pointer;
+        pointer-events: none;
     }
 
     .d3-area text {
