@@ -15,6 +15,7 @@
     import { yRuler } from '../../plugins/ruler';
     import emit from '../../utils/emit';
     import { drawReferenceLineX } from '../../plugins/reference';
+    import { showTip, hideTip } from '../../plugins/tooltip';
 
     export default {
         name: 'd3-area',
@@ -28,6 +29,11 @@
                         stroke = '#6eadc1',
                         fillOpacity = 0.6,
                         strokeOpacity = 1,
+
+                        circleRadius = 5,
+                        circleColor = '#6eadc1',
+
+                        areaTitle = d => `${d.key}<br>${d.value}`,
 
                         tickSize = 10,
                         tickPadding = 8,
@@ -195,6 +201,18 @@
                         .attr('fill-opacity', fillOpacity)
                         .attr('stroke', stroke)
                         .attr('stroke-opacity', strokeOpacity);
+
+                   g.selectAll('circle')
+                        .data(data)
+                        .enter()
+                        .append('circle')
+                        .attr('visibility', 'hidden')
+                        .attr('r', circleRadius)
+                        .attr('cx', d => xScale(d.key))
+                        .attr('cy', d => yScale(d.value))
+                        .attr('fill', circleColor)
+                        .on('mouseover', showTip(areaTitle))
+                        .on('mouseout', hideTip);
 
                     svg.call(drawReferenceLineX, g, g_w, g_h, xScale, data);
             },
