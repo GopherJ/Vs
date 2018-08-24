@@ -262,8 +262,12 @@
                     .attr('pointer-events', 'none');
 
                 const onTimeSliderHandlerMoving = timeSliderHueActual => {
-                    self.reference = moment(timeSliderInterpolate(timeSliderHueActual));
-                    g.call(moveReferenceX, self.scale, self.reference);
+                    const Nd = moment(timeSliderInterpolate(timeSliderHueActual)),
+                        Od = moment(self.reference), tickLen = Nd.diff(Od), isLTR = Nd > Od;
+
+                    g.call(moveReferenceX, self.scale, self.reference = Nd);
+
+                    self.$emit('reference-updated', clampRange(dateTimeStart, dateTimeEnd, Nd), getPassingEntries(lanes, Nd, tickLen, isLTR));
 
                     self.updateTimeLabel();
                 };
@@ -509,8 +513,7 @@
                 ];
 
                 const onDrag = n => {
-                    self.reference = self.scale.invert(n);
-                    timeSliderHue(timeSliderInterpolateInvert(self.reference));
+                    timeSliderHue(timeSliderInterpolateInvert(self.scale.invert(n)));
                 };
 
                 const drawFn = drawGen(
