@@ -80,8 +80,8 @@ const moveY = (selection, y) => {
  * @return {hue}
  */
 const smoothMoveY = (selection, hueMin, hueMax, onMoving, onMoved) => {
-    let hueActual = hueMin,
-        hueTarget = hueMin,
+    let hueActual = hueMax,
+        hueTarget = hueMax,
         hueAlpha = 0.2,
         hueTimer = d3.timer(hueTween);
 

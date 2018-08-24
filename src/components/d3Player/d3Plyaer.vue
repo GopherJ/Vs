@@ -415,7 +415,7 @@
                 const speedSliderPaddingTop = 20, speedSliderPaddingBottom = 20,
                     speedSliderHueMin = circleStrokeWidth / 2 + circleRadius + speedSliderPaddingTop,
                     speedSliderHueMax = speedSliderLaneHeight - circleStrokeWidth / 2 - circleRadius - speedSliderPaddingBottom,
-                    speedSliderInterpolate = speedSliderHueActual => d3.interpolateRound(1, Math.floor(tickLen / 16))((speedSliderHueActual - speedSliderHueMin) / (speedSliderHueMax - speedSliderHueMin));
+                    speedSliderInterpolate = speedSliderHueActual => d3.interpolateRound(Math.floor(tickLen / 16), 1)((speedSliderHueActual - speedSliderHueMin) / (speedSliderHueMax - speedSliderHueMin));
 
                 const speedSliderLane = axisXControlLane
                     .append('g')
@@ -456,7 +456,7 @@
 
                 const speedSliderHandler = speedSliderLane
                     .append('circle')
-                    .attr('cy', speedSliderHueMin)
+                    .attr('cy', speedSliderHueMax)
                     .attr('cx', speedSliderLaneWidth / 2)
                     .attr('r', circleRadius)
                     .attr('fill', circleFill)
