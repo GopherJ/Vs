@@ -214,7 +214,7 @@
                         .on('mouseover', showTip(areaTitle))
                         .on('mouseout', hideTip);
 
-                    svg.call(drawReferenceLineX, g, g_w, g_h, xScale, data);
+                   svg.call(drawReferenceLineX, g, g_w, g_h, xScale, data);
             },
             safeDraw() {
                 this.ifExistsSvgThenRemove();
@@ -232,6 +232,10 @@
 
     .d3-area path {
         pointer-events: none;
+    }
+
+    .d3-area circle {
+        cursor: pointer;
     }
 
     .d3-area text {
