@@ -224,8 +224,8 @@ by using the brush or by clicking a bar if `options.axisXInterval` has been sett
 |`delay`|`delay of animation (milliseconds)`|`number`|`50`|
 |`axisYTickFormat`|`d3-format support`|`string`|`.2s`|
 |`negative`|`the axis y should start at 0 or not`|`boolean`|`false`|
-|`nice`|`the tick number of axis should be rounded or not`|`false`|
-|`yAxisRuler`|`if the ruler of the axis y should be enabled`|`true`|
+|`nice`|`the tick number of axis should be rounded or not`|`boolean`|`false`|
+|`yAxisRuler`|`if the ruler of the axis y should be enabled`|`boolean`|`true`|
 
 
 `events`
@@ -285,7 +285,7 @@ by using the brush or by clicking a bar if `options.axisYInterval` has been sett
 |`delay`|`delay of animation (milliseconds)`|`number`|`50`|
 |`axisXTickFormat`|`d3-format support`|`string`|`.2s`|
 |`negative`|`the axis y should start at 0 or not`|`boolean`|`false`|
-|`nice`|`the tick number of axis should be rounded or not`|`false`|
+|`nice`|`the tick number of axis should be rounded or not`|`boolean`|`false`|
 
 
 `events`
@@ -344,8 +344,8 @@ by using the brush.
 |`isAxisTickShow`|`if the axis tick will be shown`|`boolean`|`true`|
 |`axisXTickFormat`|`d3-format support`|`string`|`.2s`|
 |`negative`|`the axis y should start at 0 or not`|`boolean`|`false`|
-|`nice`|`the tick number of axis should be rounded or not`|`false`|
-|`yAxisRuler`|`if the ruler of the axis y should be enabled`|`true`|
+|`nice`|`the tick number of axis should be rounded or not`|`boolean`|`false`|
+|`yAxisRuler`|`if the ruler of the axis y should be enabled`|`boolean`|`true`|
 
 
 `events`
@@ -398,10 +398,10 @@ This components is for show big date_histogram data, It takes an array of elemen
 |`axisLabelFontOpacity`|`label font opacity`|`number`|`1`|
 |`axisXTickFormat`|`d3-format support`|`string`|`.2s`|
 |`negative`|`the axis y should start at 0 or not`|`boolean`|`false`|
-|`nice`|`the tick number of axis should be rounded or not`|`false`|
+|`nice`|`the tick number of axis should be rounded or not`|`boolean`|`false`|
 |`isAxisPathShow`|`if the axis path will be shown`|`boolean`|`true`|
 |`isAxisTickShow`|`if the axis tick will be shown`|`boolean`|`true`|
-|`yAxisRuler`|`if the ruler of the axis y should be enabled`|`true`|
+|`yAxisRuler`|`if the ruler of the axis y should be enabled`|`boolean`|`true`|
 
 
 
@@ -449,10 +449,10 @@ This component is for showing multiple lines together. It takes an array of elem
 |`axisXInterval`|`used when data is of type date_histogram, it will be used to decide the date format of axis x. (unit: ms)`|`number OR null`|`null`|
 |`axisXTickFormat`|`d3-format support`|`string`|`.2s`|
 |`negative`|`the axis y should start at 0 or not`|`boolean`|`false`|
-|`nice`|`the tick number of axis should be rounded or not`|`false`|
+|`nice`|`the tick number of axis should be rounded or not`|`boolean`|`false`|
 |`isAxisPathShow`|`if the axis path will be shown`|`boolean`|`true`|
 |`isAxisTickShow`|`if the axis tick will be shown`|`boolean`|`true`|
-|`yAxisRuler`|`if the ruler of the axis y should be enabled`|`true`|
+|`yAxisRuler`|`if the ruler of the axis y should be enabled`|`boolean`|`false`|
 |`axisXGroupLabelLaneHeight`|`group lane height`|`number`|`20`|
 |`axisXGroupLabelFillColorOpacity`|`group legend internal color opacity`|`number`|`1`|
 |`axisXGroupLabelBorderColorOpacity`|`group legend edge color opacity`|`number`|`0.6`|
@@ -506,10 +506,10 @@ This component is for showing multiple lines together. It takes an array of elem
 |`axisXInterval`|`used when data is of type date_histogram, it will be used to decide the date format of axis x. (unit: ms)`|`number OR null`|`null`|
 |`axisXTickFormat`|`d3-format support`|`string`|`.2s`|
 |`negative`|`the axis y should start at 0 or not`|`boolean`|`false`|
-|`nice`|`the tick number of axis should be rounded or not`|`false`|
+|`nice`|`the tick number of axis should be rounded or not`|`boolean`|`false`|
 |`isAxisPathShow`|`if the axis path will be shown`|`boolean`|`true`|
 |`isAxisTickShow`|`if the axis tick will be shown`|`boolean`|`true`|
-|`yAxisRuler`|`if the ruler of the axis y should be enabled`|`true`|
+|`yAxisRuler`|`if the ruler of the axis y should be enabled`|`boolean`|`true`|
 |`axisXGroupLabelLaneHeight`|`group lane height`|`number`|`20`|
 |`axisXGroupLabelFillColorOpacity`|`group legend internal color opacity`|`number`|`1`|
 |`axisXGroupLabelBorderColorOpacity`|`group legend edge color opacity`|`number`|`0.6`|
@@ -635,11 +635,11 @@ This component is similar to `kibana timelion` with a interval select box. It ac
 |`delay`|`delay of animation (milliseconds)`|`number`|`50`|
 |`axisYTickFormat`|`d3-format support`|`string`|`.2s`|
 |`negative`|`the axis y should start at 0 or not`|`boolean`|`false`|
-|`nice`|`the tick number of axis should be rounded or not`|`false`|
+|`nice`|`the tick number of axis should be rounded or not`|`boolean`|`false`|
 |`timeRangeLabelFontSize`|`time range label font size`|`number`|`12`|
 |`timeRangeLabelFontWeight`|`time range label font weight`|`number`|`400`|
 |`timeRangeLabelFontOpacity`|`time range label font opacity`|`number`|`0.5`|
-|`yAxisRuler`|`if the ruler of the axis y should be enabled`|`true`|
+|`yAxisRuler`|`if the ruler of the axis y should be enabled`|`boolean`|`true`|
 
 `events`
 
