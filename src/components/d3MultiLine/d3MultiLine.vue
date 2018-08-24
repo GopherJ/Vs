@@ -23,6 +23,7 @@
     import hash from '../../utils/hash';
     import legendGen from '../../plugins/legendGen';
     import { yRuler } from '../../plugins/ruler';
+    import { drawReferenceLineX } from '../../plugins/reference';
 
     export default {
         name: 'd3-multi-line',
@@ -35,7 +36,7 @@
                         strokeWidth = 2,
 
                         circleRadius = 5,
-                        circleTitle = d => `${d.value}`,
+                        circleTitle = d => `${d.key}<br>${d.group}<br>${d.value}`,
 
                         crossWidth = 2,
                         crossColor = '#fff',
@@ -250,16 +251,14 @@
                     .attr('height', g_h);
 
                 const g = svg.append('g')
-                    .attr('transform', `translate(${left + axisYLabelLaneWidth + axisYLaneWidth}, ${top + axisXGroupLabelLaneHeight})`)
-                    .attr('width', g_w)
-                    .attr('height', g_h);
+                    .attr('clip-path', `url(#${clipPathId})`)
+                    .attr('transform', `translate(${left + axisYLabelLaneWidth + axisYLaneWidth}, ${top + axisXGroupLabelLaneHeight})`);
 
                 g.selectAll('path')
                     .data(groups)
                     .enter()
                     .append('path')
                     .attr('class', d => hash(d))
-                    .attr('clip-path', `url(#${clipPathId})`)
                     .attr('d', d => lineGen(data[d]))
                     .attr('fill', 'none')
                     .attr('pointer-events', 'none')
@@ -271,7 +270,7 @@
                     .enter()
                     .append('circle')
                     .attr('class', d => hash(d.group))
-                    .attr('clip-path', `url(#${clipPathId})`)
+                    .attr('visibility', 'hidden')
                     .attr('cx', d => xScale(d.key))
                     .attr('cy', d => yScale(d.value))
                     .attr('r', circleRadius)
@@ -287,6 +286,8 @@
                         emit(this, 'range-updated', start, end);
                     });
                 }
+
+                svg.call(drawReferenceLineX, g, g_w, g_h, xScale, __data__);
             },
             safeDraw() {
                 this.ifExistsSvgThenRemove();
