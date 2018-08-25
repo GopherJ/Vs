@@ -279,6 +279,10 @@
                 }
             },
             safeDraw() {
+                if (this.timer !== null) {
+                    clearInterval(this.timer);
+                }
+
                 this.ifExistsSvgThenRemove();
                 this.drawTimeline();
             },
@@ -287,7 +291,9 @@
             }
         },
         beforeDestroy() {
-            clearInterval(this.timer);
+            if (this.timer !== null) {
+                clearInterval(this.timer);
+            }
         }
     }
 </script>

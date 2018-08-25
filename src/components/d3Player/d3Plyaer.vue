@@ -316,6 +316,8 @@
                     .attr('d', shape.triangle(c_h, c_h));
 
                 const switchToPause = () => {
+                    self.$emit('pause');
+
                     playBtnIcon
                         .attr('data-state', State.PAUSE)
                         .transition()
@@ -327,6 +329,8 @@
                 };
 
                 const switchToPlay = () => {
+                    self.$emit('play');
+
                     playBtnIcon
                         .attr('data-state', State.PLAYING)
                         .transition()
@@ -578,6 +582,11 @@
                 return moment(this.reference).format(FORMAT);
             },
             safeDraw() {
+                if (this.timer !== null && this.playing) {
+                    this.timer.stop();
+                    this.playing = false;
+                }
+
                 this.ifExistsSvgThenRemove();
                 this.drawPlayer();
             },
