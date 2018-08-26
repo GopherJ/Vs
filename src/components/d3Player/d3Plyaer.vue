@@ -33,6 +33,19 @@
         name: 'd3-player',
         mixins: [player],
         methods: {
+             updateTimeRange(dateTimeStart, dateTimeEnd) {
+                const k = this.w / (this.initScale(dateTimeEnd) - this.initScale(dateTimeStart));
+                const translateX = -this.initScale(dateTimeStart);
+
+                this.svg
+                    .transition()
+                    .duration(360)
+                    .call(this.zoom.transform, () => {
+                        return d3.zoomIdentity
+                            .scale(k)
+                            .translate(translateX, 0);
+                    });
+            },
             drawPlayer() {
 
                 ////////////////////////////////////////////////////////////////////////////////
@@ -121,6 +134,7 @@
                     [paddingInner, paddingOuter] = selectPaddingInnerOuterY(g_h),
                     clipPathId = uuid(), self = this;
                 self.reference = moment(dateTimeStart);
+                self.w = g_w;
 
                 if (![g_w, g_h].every(el => el > 0)) return;
 
@@ -132,6 +146,7 @@
                     .append('svg')
                     .attr('width', w)
                     .attr('height', h);
+                self.svg = svg;
 
                 ////////////////////////////////////////////////////////////////////////////////
                 ////                               clip path                                ////
@@ -151,6 +166,7 @@
                     .domain([dateTimeStart, dateTimeEnd])
                     .range([0, g_w]);
                 self.scale = xScale;
+                self.initScale = xScale.copy();
 
                 const yScale = d3.scaleBand()
                     .range([g_h, 0])
@@ -341,11 +357,15 @@
                     self.playing = true;
                 };
 
+                const end = () => {
+                    self.$emit('end');
+                };
+
                 self.play = () => {
                     timeSliderHue(timeSliderInterpolateInvert(
                         dateTimeEnd.diff(self.reference) >= tickLen
                             ? moment(self.reference).add(tickLen, 'milliseconds')
-                            : (switchToPause(), moment(dateTimeStart))
+                            : (switchToPause(), end(), moment(dateTimeStart))
                     ));
                 };
 
@@ -370,6 +390,7 @@
 
                 const timeLabelText = timeLabelLane
                     .append('text')
+                    .attr('pointer-events', 'none')
                     .attr('text-anchor', 'middle')
                     .attr('dy', '0.32em')
                     .attr('x', timeLabelWidth / 2)
@@ -378,6 +399,10 @@
                     .attr('font-size', btnFontSize)
                     .attr('font-weight', btnFontWeight)
                     .attr('fill', btnFontColor);
+
+                timeLabelRect.on('click', () => {
+                    self.updateTimeRange(dateTimeStart, dateTimeEnd);
+                });
 
                 ////////////////////////////////////////////////////////////////////////////////
                 ////                                speed btn                               ////
@@ -561,8 +586,8 @@
                     .call(cursor, axisXLane, [
                         [0, 0],
                         [g_w, axisXLaneHeight]
-                    ])
-                    .call(zoom, { zooming }, scaleExtent, zoomExtent);
+                    ]);
+                self.zoom = zoom(svg, { zooming }, scaleExtent, zoomExtent);
 
                 const g = svg
                     .append('g')

@@ -37,7 +37,7 @@
 
                 this.svg
                     .transition()
-                    .duration(750)
+                    .duration(360)
                     .call(this.zoom.transform, () => {
                         return d3.zoomIdentity
                             .scale(k)

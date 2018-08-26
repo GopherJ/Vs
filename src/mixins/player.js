@@ -12,6 +12,10 @@ export default {
             reference: null,
             play: null,
             speed: 1,
+            zoom: null,
+            initScale,
+            svg: null,
+            w: null,
             observer: null
         }
     },
