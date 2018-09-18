@@ -423,6 +423,7 @@
                 speedBtnRect
                     .on('click', () => {
                         axisXControlLane.raise();
+
                         const speedSliderLineSelection = axisXControlLane.select('.slider--speed'),
                             DISPLAY = speedSliderLineSelection.style('display');
 
