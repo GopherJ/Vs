@@ -14,6 +14,8 @@ const tooltip = (function (body) {
         return body
             .append('div')
             .attr('class', 'd3-tip')
+            .style('left', 0)
+            .style('top', 0)
             .style('position', 'absolute')
             .style('visibility', 'hidden');
     }
