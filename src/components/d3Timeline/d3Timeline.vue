@@ -386,4 +386,18 @@
         stroke-opacity: 1;
         cursor: pointer;
     }
+
+    .d3-timeline .entry--interval--warning {
+        fill: #ffdd57;;
+        stroke: #ffdd57;
+        stroke-opacity: 1;
+        cursor: pointer;
+    }
+
+    .d3-timeline .entry--point--warning {
+        fill: #ffdd57;;
+        stroke: #ffdd57;
+        stroke-opacity: 1;
+        cursor: pointer;
+    }
 </style>

@@ -114,11 +114,12 @@
                         btnFontWeight = 400,
                         btnFontColor = '#000',
 
-                        timeLabelWidth = 400,
+                        timeLabelWidthRatio = 0.28,
 
-                        playBtnWidth = 100,
+                        playBtnWidthRatio = 0.074,
 
-                        speedBtnWidth = 100,
+                        speedBtnWidthRatio = 0.074,
+
 
                         speedSliderLaneWidth = 40,
                         speedSliderLaneHeight = 200,
@@ -131,6 +132,9 @@
                     g_h = h - top - bottom - axisXLaneHeight - axisXControlLaneHeight - 2 * __offset__ - axisXControlLaneMarginTop,
                     c_w = w - left - right - btnBorderLineWidth,
                     c_h = axisXControlLaneHeight - btnBorderLineWidth,
+                    timeLabelWidth = c_w * timeLabelWidthRatio,
+                    playBtnWidth = c_w * playBtnWidthRatio,
+                    speedBtnWidth = c_w * speedBtnWidthRatio,
                     [paddingInner, paddingOuter] = selectPaddingInnerOuterY(g_h),
                     clipPathId = uuid(), self = this;
                 self.reference = moment(dateTimeStart);
