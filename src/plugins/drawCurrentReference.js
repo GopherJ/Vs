@@ -12,6 +12,9 @@ const drawCurrentReferenceX = (g, xScale, g_h, currentTimeLineColor, currentTime
 
     if (!referenceSelection.empty()) {
         referenceSelection
+            .raise();
+
+        referenceSelection
             .attr('x1', xScale(date))
             .attr('x2', xScale(date));
     } else {
@@ -24,6 +27,7 @@ const drawCurrentReferenceX = (g, xScale, g_h, currentTimeLineColor, currentTime
             .attr('stroke-width', currentTimeLineWidth)
             .attr('pointer-events', 'none');
     }
+
     // if (!referenceSelection.empty()) referenceSelection.remove();
     //
     // g.append('line')
