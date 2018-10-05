@@ -136,7 +136,7 @@
                     playBtnWidth = c_w * playBtnWidthRatio,
                     speedBtnWidth = c_w * speedBtnWidthRatio,
                     [paddingInner, paddingOuter] = selectPaddingInnerOuterY(g_h),
-                    clipPathId = uuid(), self = this;
+                    clipPathId = uuid(), self = this, isMobile = g_w < 620;
                 self.reference = moment(dateTimeStart);
                 self.w = g_w;
 
@@ -289,7 +289,7 @@
 
                     self.$emit('reference-updated', clampRange(dateTimeStart, dateTimeEnd, Nd), getPassingEntries(lanes, Nd, tickLen, isLTR));
 
-                    self.updateTimeLabel();
+                    self.updateTimeLabel(isMobile);
                 };
 
                 const timeSliderHue = smoothMoveX(timeSliderHandler, timeSliderHueMin, timeSliderHueMax, onTimeSliderHandlerMoving);
@@ -601,13 +601,15 @@
 
                 g.call(drawFn, self.reference, self.scale);
             },
-            updateTimeLabel() {
+            updateTimeLabel(isMobile) {
                 d3.select(this.$el)
                     .select('.label--time text')
-                    .text(() => this.getTimeLabel());
+                    .text(() => this.getTimeLabel(isMobile));
             },
-            getTimeLabel() {
-                const FORMAT = 'YYYY-MM-DD HH:mm:ss.SSS';
+            getTimeLabel(isMobile) {
+                const FORMAT = !isMobile
+                    ? 'YYYY-MM-DD HH:mm:ss.SSS'
+                    : 'LT';
 
                 return moment(this.reference).format(FORMAT);
             },
