@@ -96,7 +96,7 @@ export default {
         }
     },
     mounted() {
-        this.$nextTick(this.safeDraw);
+        setTimeout(this.safeDraw);
 
         this.listener = debounce(this.onResize, 500);
 

@@ -98,7 +98,7 @@ export default {
         }
     },
     mounted() {
-        this.$nextTick(this.safeDraw);
+        setTimeout(this.safeDraw);
 
         if (isFunction(window.MutationObserver)) {
             (this.observer = new MutationObserver(hideTip))

@@ -92,7 +92,7 @@ export default {
         }
     },
     mounted() {
-        this.$nextTick(this.safeDraw);
+        setTimeout(this.safeDraw);
 
         this._handleResize = debounce(this.onResize, 500);
 
