@@ -4,7 +4,6 @@ import d3Timelion from './components/d3Timelion';
 import d3Timeline from './components/d3Timeline';
 import d3Pie from './components/d3Pie';
 import d3Line from './components/d3Line';
-import d3ProgressArc from './components/d3ProgressArc';
 import d3Metric from './components/d3Metric';
 import d3Circle from './components/d3Circle';
 import d3MultiLine from './components/d3MultiLine';
@@ -43,7 +42,6 @@ const install = (Vue, options = {}) => {
     Vue.component(d3SankeyCircular.name, d3SankeyCircular);
     Vue.component(d3Timelion.name, d3Timelion);
     Vue.component(d3Timeline.name, d3Timeline);
-    Vue.component(d3ProgressArc.name, d3ProgressArc);
     Vue.component(d3Pie.name, d3Pie);
     Vue.component(d3Line.name, d3Line);
     Vue.component(d3Metric.name, d3Metric);
@@ -78,7 +76,6 @@ export {
     // local install
     d3SankeyCircular,
     d3Timelion,
-    d3ProgressArc,
     d3Timeline,
     d3Pie,
     d3Line,

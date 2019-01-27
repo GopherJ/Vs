@@ -5,14 +5,13 @@
 <script>
     import * as d3 from 'd3';
     import { isNull } from 'lodash';
-    import * as d3SankeyCircular from 'd3-sankey-circular';
     import pathArrows from './pathArrows';
     import emit from '../../utils/emit';
     import { showTip, hideTip } from '../../plugins/tooltip';
     import highlightNodes from '../../utils/highlightNodes';
     import mixins from '../../mixins/sankey';
-
-    Object.assign(d3, d3SankeyCircular);
+    import d3SankeyCircular from 'd3-sankey-circular';
+    import { sankeyJustify } from 'd3-sankey-circular';
 
     const tpl = `
             <option value="5000">5 seconds</option>
@@ -89,12 +88,12 @@
                 const nodeTitle = this.nodeTitle;
                 const linkTitle = this.linkTitle;
 
-                const sankey = d3.sankeyCircular()
+                const sankey = d3SankeyCircular()
                     .nodeWidth(nodeWidth)
                     .nodePaddingRatio(0.5)
                     .size([g_w, g_h])
                     .nodeId(d => d.name)
-                    .nodeAlign(d3.sankeyJustify)
+                    .nodeAlign(sankeyJustify)
                     .iterations(32)
                     .circularLinkGap(circularLinkGap);
 

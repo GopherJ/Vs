@@ -5,10 +5,8 @@
 <script>
     import * as d3 from 'd3';
     import { isNull } from 'lodash';
-    import cloud from 'd3-cloud';
     import mixins from '../../mixins';
-
-    Object.assign(d3, { cloud });
+    import d3Cloud from 'd3-cloud';
 
     export default {
         name: 'd3-word-cloud',
@@ -71,7 +69,7 @@
                     .scaleSequential(d3.interpolateCool)
                     .domain(d3.extent(data, d => d.size));
 
-                this.wordCloud = d3.cloud()
+                this.wordCloud = d3Cloud()
                     .size([g_w, g_h])
                     .words(data)
                     .padding(wordPadding)
