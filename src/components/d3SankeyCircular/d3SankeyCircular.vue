@@ -4,7 +4,7 @@
 
 <script>
     import * as d3 from 'd3';
-    import { isNull, cloneDeep, debounce } from 'lodash';
+    import { isNull } from 'lodash';
     import * as d3SankeyCircular from 'd3-sankey-circular';
     import pathArrows from './pathArrows';
     import emit from '../../utils/emit';
@@ -41,10 +41,10 @@
             drawSankey() {
                 if (!this.nodes.length || !this.links.length) return;
 
-                const data = cloneDeep({
-                    nodes: this.nodes,
-                    links: this.links,
-                });
+                const data = {
+                    nodes: [...this.nodes],
+                    links: [...this.links],
+                };
 
                 const {
                     nodeWidth = 20,

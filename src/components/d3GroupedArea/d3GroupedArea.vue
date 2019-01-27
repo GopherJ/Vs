@@ -4,7 +4,7 @@
 
 <script>
     import * as d3 from 'd3';
-    import { cloneDeep, isNull, isString, isUndefined } from 'lodash';
+    import { isNull, isString, isUndefined } from 'lodash';
     import uuid from 'uuid/v1';
     import mixins from '../../mixins';
     import { selectTicksNumY } from '../../utils/select';

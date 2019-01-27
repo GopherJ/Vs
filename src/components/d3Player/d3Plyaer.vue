@@ -4,7 +4,6 @@
 
 <script>
     import * as d3 from 'd3';
-    import { isBoolean, isNull, cloneDeep, throttle } from 'lodash';
     import uuid from 'uuid/v1';
     import moment from 'moment';
     import player from '../../mixins/player';

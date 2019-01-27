@@ -4,7 +4,7 @@
 
 <script>
     import * as d3 from 'd3';
-    import { isNull, isNumber, isUndefined, cloneDeep } from 'lodash';
+    import { isNull, isNumber, isUndefined } from 'lodash';
     import uuid from 'uuid/v1';
     import { brushX } from '../../plugins/brush';
     import mixins from '../../mixins';

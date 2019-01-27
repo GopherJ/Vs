@@ -4,7 +4,6 @@
 
 <script>
     import * as d3 from 'd3';
-    import { isNumber, isDate, isString } from 'lodash';
     import mixins from '../../mixins/slider';
     import roundLine from '../../plugins/roundLine';
     import { showTip, hideTip } from '../../plugins/tooltip';

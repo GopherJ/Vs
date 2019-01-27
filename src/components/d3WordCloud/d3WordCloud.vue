@@ -4,7 +4,7 @@
 
 <script>
     import * as d3 from 'd3';
-    import { cloneDeep, isNull } from 'lodash';
+    import { isNull } from 'lodash';
     import cloud from 'd3-cloud';
     import mixins from '../../mixins';
 

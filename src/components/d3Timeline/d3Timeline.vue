@@ -5,7 +5,7 @@
 <script>
     import * as d3 from 'd3';
     import uuid from 'uuid/v1';
-    import { isNull, cloneDeep } from 'lodash';
+    import { isNull } from 'lodash';
     import mixins from '../../mixins';
     import roundedRect from '../../plugins/roundedRect';
     import zoom from '../../plugins/zoom';

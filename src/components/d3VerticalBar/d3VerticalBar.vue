@@ -4,7 +4,7 @@
 
 <script>
     import * as d3 from 'd3';
-    import { isNull, isNumber, cloneDeep } from 'lodash';
+    import { isNull, isNumber } from 'lodash';
     import uuid from 'uuid/v1';
     import mixins from '../../mixins';
     import { showTip, hideTip } from '../../plugins/tooltip';
