@@ -52,7 +52,7 @@
                 ////                          initialisation                                ////
                 ////////////////////////////////////////////////////////////////////////////////
 
-                const { dateTimeStart, dateTimeEnd, lanes } = getTrackerLanes([...(this.data))],
+                const { dateTimeStart, dateTimeEnd, lanes } = getTrackerLanes([...(this.data)]),
                     {
                         intervalCornerRadius = 4,
 

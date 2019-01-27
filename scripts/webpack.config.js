@@ -38,7 +38,9 @@ config.resolve = {
         './images/layers-2x.png$': path.resolve(__dirname, '../node_modules/leaflet/dist/images/layers-2x.png'),
         './images/marker-icon.png$': path.resolve(__dirname, '../node_modules/leaflet/dist/images/marker-icon.png'),
         './images/marker-icon-2x.png$': path.resolve(__dirname, '../node_modules/leaflet/dist/images/marker-icon-2x.png'),
-        './images/marker-shadow.png$': path.resolve(__dirname, '../node_modules/leaflet/dist/images/marker-shadow.png')
+        './images/marker-shadow.png$': path.resolve(__dirname, '../node_modules/leaflet/dist/images/marker-shadow.png'),
+        './fullscreen.png$': path.resolve(__dirname, '../node_modules/leaflet-fullscreen/dist/fullscreen.png'),
+        './fullscreen@2x.png$': path.resolve(__dirname, '../node_modules/leaflet-fullscreen/dist/fullscreen@2x.png'),
     },
     enforceExtension: false
 };

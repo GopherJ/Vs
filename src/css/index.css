@@ -89,10 +89,10 @@ text {
     font-family: BlinkMacSystemFont, -apple-system, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, Helvetica, Arial, sans-serif;
 }
 
-.leaflet-control-fullscreen a {
+/*.leaflet-control-fullscreen a {
     background-color:#fff;
     background-image: url(../assets/fullscreen.png);
     background-repeat: no-repeat;
     background-size:26px 52px;
     background-position: 0px 0px;
-}
+}*/
