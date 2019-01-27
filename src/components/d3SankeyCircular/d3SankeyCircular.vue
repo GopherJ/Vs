@@ -140,10 +140,7 @@
                         .attr('height', __selectBoxLaneHeight__)
                         .append('xhtml:select')
                         .on('change', () => {
-                            const targetVal = d3.event.target.value,
-                                val = Number.parseInt(targetVal, 10);
-
-                            this.maxPeriod = val;
+                            this.maxPeriod = +d3.event.target.value;
                             emit(this, 'max-period-updated', this.maxPeriod);
                         })
                         .html(tpl)
