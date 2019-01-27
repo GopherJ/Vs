@@ -4,7 +4,7 @@
 
 <script>
     import * as d3 from 'd3';
-    import _ from 'lodash';
+    import { cloneDeep, isNull } from 'lodash';
     import mixins from '../../mixins/layout';
     import { showTip, hideTip } from '../../plugins/tooltip';
 
@@ -13,7 +13,7 @@
         mixins: [mixins],
         methods: {
             drawSunburst() {
-                const data = _.cloneDeep(this.data);
+                const data = cloneDeep(this.data);
 
                 const {
                     left = 0,
@@ -36,7 +36,7 @@
                     axisFontOpacity = 0.5
                 } = this.options,
                 {
-                    axisXLabelLaneHeight = _.isNull(axisXLabel) ? 0 : 30
+                    axisXLabelLaneHeight = isNull(axisXLabel) ? 0 : 30
                 } = this.options,
                 [w, h] = this.getElWidthHeight(),
                 g_w =  w - left - right,

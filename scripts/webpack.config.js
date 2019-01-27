@@ -1,5 +1,6 @@
 const path = require('path');
 const webpack = require('webpack');
+const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
 
 const config = module.exports = {
     plugins: []
@@ -21,7 +22,7 @@ config.output = {
     libraryTarget: 'umd',
 };
 
-config.externals = ['buefy', 'vuex', 'vue'];
+config.externals = ['vue'];
 // Resolver config
 config.resolve = {
     extensions: ['.js', '.vue', '.css', '.scss', '.ts'],
@@ -107,6 +108,9 @@ if (process.env.NODE_ENV === 'production') {
         compress: {warnings: false},
         sourceMap: true
     }));
+
+    // Bundle analyzer
+    config.plugins.push(new BundleAnalyzerPlugin());
 } else {
     config.devtool = '#eval-source-map';
 }

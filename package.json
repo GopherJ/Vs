@@ -1,6 +1,6 @@
 {
   "name": "d3-vs",
-  "version": "0.8.0",
+  "version": "0.8.1",
   "description": "d3 visualisation with vuejs",
   "main": "dist/Vs.min.js",
   "scripts": {
@@ -35,8 +35,6 @@
     "lodash": "^4.17.5",
     "moment": "^2.22.0",
     "murmurhash3js": "^3.0.1",
-    "simple-web-worker": "^1.2.0",
-    "spin.js": "^4.0.0",
     "uuid": "^3.3.2",
     "vue": "^2.5.13"
   },
@@ -60,6 +58,7 @@
     "vue-loader": "^11.1.4",
     "vue-style-loader": "^2.0.2",
     "vue-template-compiler": "^2.2.3",
-    "webpack": "^2.7.0"
+    "webpack": "^2.7.0",
+    "webpack-bundle-analyzer": "^3.0.3"
   }
 }
