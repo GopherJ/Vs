@@ -1,7 +1,7 @@
 const path = require('path');
 const webpack = require('webpack');
 const {BundleAnalyzerPlugin} = require('webpack-bundle-analyzer');
-const { VueLoaderPlugin } = require('vue-loader');
+const {VueLoaderPlugin} = require('vue-loader');
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 
 const config = module.exports = {
@@ -33,7 +33,12 @@ config.externals = ['vue'];
 config.resolve = {
     extensions: ['.js', '.vue', '.css', '.scss', '.ts'],
     alias: {
-        '~': path.resolve(__dirname, '../node_modules')
+        '~': path.resolve(__dirname, '../node_modules'),
+        './images/layers.png$': path.resolve(__dirname, '../node_modules/leaflet/dist/images/layers.png'),
+        './images/layers-2x.png$': path.resolve(__dirname, '../node_modules/leaflet/dist/images/layers-2x.png'),
+        './images/marker-icon.png$': path.resolve(__dirname, '../node_modules/leaflet/dist/images/marker-icon.png'),
+        './images/marker-icon-2x.png$': path.resolve(__dirname, '../node_modules/leaflet/dist/images/marker-icon-2x.png'),
+        './images/marker-shadow.png$': path.resolve(__dirname, '../node_modules/leaflet/dist/images/marker-shadow.png')
     },
     enforceExtension: false
 };
