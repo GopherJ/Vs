@@ -1,9 +1,15 @@
 const path = require('path');
 const webpack = require('webpack');
-const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
+const {BundleAnalyzerPlugin} = require('webpack-bundle-analyzer');
+const { VueLoaderPlugin } = require('vue-loader');
+const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 
 const config = module.exports = {
-    plugins: []
+    mode: "production",
+    plugins: [],
+    optimization: {
+        minimizer: [new UglifyJsPlugin()],
+    }
 };
 
 // Set context to root of project
@@ -43,10 +49,14 @@ config.module = {
             use: 'vue-loader'
         },
         {
-            test: /\.js$/,
-            use: 'babel-loader',
-            // important: exclude files in node_modules, otherwise it's going to be really slow!
-            exclude: /node_modules|vendor/
+            test: /\.m?js$/,
+            exclude: /(node_modules|bower_components)/,
+            use: {
+                loader: 'babel-loader',
+                options: {
+                    presets: ['@babel/preset-env']
+                }
+            },
         },
         {
             test: /\.(png|jpe?g|gif|svg)(\?.*)?$/,
@@ -65,8 +75,7 @@ config.module = {
                 options: {
                     plugins: (loader) => [
                         require('postcss-import')({root: loader.resourcePath}),
-                        require('autoprefixer')(), // browser compatibility
-                        require('cssnano')()  // compress css
+                        require('autoprefixer')(), require('cssnano')()
                     ]
                 }
             }]
@@ -79,38 +88,17 @@ config.module = {
                     singleton: true,
                 }
             }, {
-                loader: 'css-loader' // translates CSS into CommonJS
+                loader: 'css-loader'
             }, {
-                loader: 'sass-loader' // compiles Sass to CSS
+                loader: 'sass-loader'
             }]
         }
     ]
 };
 process.traceDeprecation = true;
-if (process.env.NODE_ENV === 'production') {
-    config.output.filename = 'Vs.min.js';
-    config.devtool = '#source-map';
 
-    // Pass build environment inside bundle
-    // This will strip comments in Vue code & hort-circuits all Vue.js warning code
-    config.plugins.push(new webpack.DefinePlugin({
-        'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'development')
-    }));
+config.output.filename = 'Vs.min.js';
+config.devtool = '#source-map';
 
-    // The UglifyJsPlugin will no longer put loaders into minimize mode, and the debug option has been deprecated.
-    config.plugins.push(new webpack.LoaderOptionsPlugin({
-        minimize: true,
-        debug: false
-    }));
-
-    // Minify with dead-code elimination
-    config.plugins.push(new webpack.optimize.UglifyJsPlugin({
-        compress: {warnings: false},
-        sourceMap: true
-    }));
-
-    // Bundle analyzer
-    config.plugins.push(new BundleAnalyzerPlugin());
-} else {
-    config.devtool = '#eval-source-map';
-}
+config.plugins.push(new BundleAnalyzerPlugin());
+config.plugins.push(new VueLoaderPlugin());

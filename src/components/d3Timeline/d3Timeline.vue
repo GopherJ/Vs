@@ -45,7 +45,7 @@
                     });
             },
             drawTimeline() {
-                const { dateTimeStart, dateTimeEnd, data, groups } = getTimelineGroups(cloneDeep(this.data)),
+                const { dateTimeStart, dateTimeEnd, data, groups } = getTimelineGroups([...(this.data))],
                       {
                         intervalCornerRadius = 4,
 

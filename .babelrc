@@ -1,9 +1,5 @@
 {
   "presets": [
-    [
-      "es2015"
-    ],
-    "stage-0"
-  ],
-  "plugins": ["dynamic-import-webpack"]
+    "@babel/preset-env"
+  ]
 }

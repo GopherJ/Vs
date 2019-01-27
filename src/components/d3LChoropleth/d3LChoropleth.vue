@@ -5,7 +5,7 @@
 <script>
     import L from 'leaflet';
     import LChoropleth from 'leaflet-choropleth';
-    import LIndoor from '../../lib/leaflet.indoor';
+    import LIndoor from '../../lib/leaflet-indoor';
     import LFullscreen from 'leaflet-fullscreen';
     import mixins from '../../mixins/geoJson';
 

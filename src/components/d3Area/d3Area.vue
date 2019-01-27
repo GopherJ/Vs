@@ -22,7 +22,7 @@
         mixins: [mixins],
         methods: {
             drawArea() {
-                const data = cloneDeep(this.data),
+                const data = [...(this.data)],
                     { left = 0, right = 0, top = 0, bottom = 0 } = this.margin,
                     {
                         fill = '#6eadc1',

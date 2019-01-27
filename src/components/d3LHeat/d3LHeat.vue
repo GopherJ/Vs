@@ -5,8 +5,8 @@
 <script>
     import L from 'leaflet';
     import LFullscreen from 'leaflet-fullscreen';
-    import LIndoor from '../../lib/leaflet.indoor';
-    import LHeat from '../../lib/leaflet.heat';
+    import LIndoor from '../../lib/leaflet-indoor';
+    import LHeat from '../../lib/leaflet-heat';
     import mixins from '../../mixins/coords';
 
     export default {

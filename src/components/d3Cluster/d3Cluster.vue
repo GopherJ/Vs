@@ -13,7 +13,7 @@
         mixins: [mixins],
         methods: {
             drawCluster() {
-                const data = cloneDeep(this.data);
+                const data = [...(this.data)];
 
                 const {
                     left = 0,

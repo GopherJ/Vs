@@ -21,7 +21,7 @@
         mixins: [mixins],
         methods: {
             drawWordCloud() {
-                const data = cloneDeep(this.data),
+                const data = [...(this.data)],
                     { left = 0, top = 0, right = 0, bottom = 0 } = this.margin,
                     {
                         axisXLabel = null,

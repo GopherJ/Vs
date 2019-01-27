@@ -23,7 +23,7 @@
         mixins: [mixins],
         methods: {
             drawVerticalBar() {
-                const data = cloneDeep(this.data),
+                const data = [...(this.data)],
                     {
                         fill = '#6eadc1',
                         stroke = '#6eadc1',

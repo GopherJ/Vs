@@ -30,7 +30,7 @@
         mixins: [mixins],
         methods: {
             drawMultiLine() {
-                const __data__ = cloneDeep(this.data),
+                const __data__ = [...(this.data)],
                     { left = 0, top = 0, right = 0, bottom = 0 } = this.margin,
                     {
                         strokeWidth = 2,

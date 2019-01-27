@@ -13,7 +13,7 @@
         mixins: [mixins],
         methods: {
             drawTree() {
-                const data = cloneDeep(this.data);
+                const data = [...(this.data)];
 
                 const {
                     left = 0,

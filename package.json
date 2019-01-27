@@ -4,7 +4,7 @@
   "description": "d3 visualisation with vuejs",
   "main": "dist/Vs.min.js",
   "scripts": {
-    "build": "cd scripts && ./build.sh"
+    "build": "cd scripts && node ./build.js"
   },
   "repository": {
     "type": "git",
@@ -39,26 +39,32 @@
     "vue": "^2.5.13"
   },
   "devDependencies": {
+    "@babel/core": "^7.2.2",
+    "@babel/preset-env": "^7.3.1",
     "autoprefixer": "^8.2.0",
     "babel-core": "^6.24.0",
-    "babel-loader": "^6.4.0",
+    "babel-loader": "^8.0.5",
     "babel-plugin-dynamic-import-webpack": "^1.0.2",
     "babel-preset-es2015": "^6.24.0",
     "babel-preset-stage-0": "^6.24.1",
+    "chalk": "^2.4.2",
     "css-loader": "^0.27.3",
     "cssnano": "^3.10.0",
     "file-loader": "^1.1.11",
     "node-sass": "^4.7.2",
+    "ora": "^3.0.0",
     "postcss-import": "^11.1.0",
     "postcss-loader": "^2.1.3",
+    "rimraf": "^2.6.3",
     "sass-loader": "^6.0.7",
     "style-loader": "^0.20.3",
-    "url-loader": "^1.0.1",
+    "uglifyjs-webpack-plugin": "^2.1.1",
+    "url-loader": "^1.1.2",
     "vue-html-loader": "~1.x",
-    "vue-loader": "^11.1.4",
+    "vue-loader": "^15.6.1",
     "vue-style-loader": "^2.0.2",
     "vue-template-compiler": "^2.2.3",
-    "webpack": "^2.7.0",
+    "webpack": "^4.29.0",
     "webpack-bundle-analyzer": "^3.0.3"
   }
 }
