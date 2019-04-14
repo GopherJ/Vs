@@ -13,7 +13,7 @@ export default {
             play: null,
             speed: 1,
             zoom: null,
-            initScale,
+            initScale: null,
             svg: null,
             w: null,
             observer: null
