@@ -4,7 +4,7 @@
 
 <script>
     import * as d3 from 'd3';
-    import { isBoolean, isNull, cloneDeep, throttle } from 'lodash';
+    import { isUndefined, isBoolean, isNull, cloneDeep, throttle } from 'lodash';
     import uuid from 'uuid/v1';
     import moment from 'moment';
     import player from '../../mixins/player';
@@ -139,6 +139,7 @@
                     clipPathId = uuid(), self = this, isMobile = g_w < 620;
                 self.reference = moment(dateTimeStart);
                 self.w = g_w;
+                self.breakpoint = undefined;
 
                 if (![g_w, g_h].every(el => el > 0)) return;
 
@@ -567,7 +568,7 @@
                 );
 
                 const brushed = ({ start, end }) => {
-                    if (self.timer !== null && self.playing) {
+                    if (!isNull(self.timer) && self.playing) {
                         self.playing = false;
                         self.timer.stop();
                     }
@@ -577,6 +578,17 @@
 
                 const zooming = () => {
                     speedSliderLane.style('display', 'none');
+
+                    if (
+                        (self.scale.invert(g_w) - self.scale.invert(0) > 157680000000)
+                    ) {
+                        if (isUndefined(self.breakpoint)) {
+                            self.breakpoint = d3.event.transform;
+                            return;
+                        } else if (self.breakpoint.k > d3.event.transform.k) {
+                            return;
+                        }
+                    }
 
                     self.scale = d3.event.transform.rescaleX(xScale);
 
@@ -614,7 +626,7 @@
                 return moment(this.reference).format(FORMAT);
             },
             safeDraw() {
-                if (this.timer !== null && this.playing) {
+                if (!isNull(this.timer) && this.playing) {
                     this.timer.stop();
                     this.playing = false;
                 }
