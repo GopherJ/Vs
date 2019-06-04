@@ -1,4 +1,5 @@
 /* eslint-disable */
+import * as d3 from 'd3';
 
 export default {
     props: {
@@ -47,6 +48,13 @@ export default {
                 });
             }
         }
+    },
+    activated() {
+        const svgSelection = d3.select(this.$el).select('svg');
+
+        if (svgSelection.empty()) {
+            window.dispatchEvent(new Event('resize'));
+        };
     },
     mounted() {
         setTimeout(this.safeDraw);

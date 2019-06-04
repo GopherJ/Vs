@@ -107,6 +107,13 @@ export default {
             }
         }
     },
+    activated() {
+        const svgSelection = d3.select(this.$el).select('svg');
+
+        if (svgSelection.empty()) {
+            this.$nextTick(this.safeDraw);
+        };
+    },
     mounted() {
         this.$nextTick(this.safeDraw);
 
