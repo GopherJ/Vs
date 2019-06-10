@@ -70,7 +70,7 @@
                     .attr('x', g_w / 2)
                     .attr('y', g_h / 2)
                     .attr('dy', '0.32em')
-                    .text(isNumber(data) ? d3.format(',')(data.toFixed(metricPrecision)).toString() : data)
+                    .text(isNumber(+data) ? d3.format(',')((+data).toFixed(metricPrecision)).toString() : data)
                     .attr('fill', metricLabelColor)
                     .attr('fill-opacity', metricLabelFontOpacity)
                     .attr('font-size', metricLabelFontSize)
