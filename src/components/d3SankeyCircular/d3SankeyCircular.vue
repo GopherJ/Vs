@@ -256,9 +256,11 @@
                     .call(arrows);
 
                 const [g_real_w, g_real_h] = this.getSelectionWidthHeight(g),
-                    [offsetX, offsetY] = this.getSelectionOffset(g);
+                    [offsetX, offsetY] = this.getSelectionOffset(g),
+                    translateX = (g_w - g_real_w) / 2,
+                    translateY = (g_h + __selectBoxLaneHeight__ - g_real_h) / 2 + __selectBoxLaneHeight__ - offsetY;
 
-                g.attr('transform', `translate(${(g_w - g_real_w) / 2 - offsetX}, ${(g_h - g_real_h) / 2 - offsetY + __selectBoxLaneHeight__})`);
+                g.attr('transform', `translate(${translateX}, ${translateY})`);
             },
             safeDraw() {
                 this.ifExistsSvgThenRemove();
