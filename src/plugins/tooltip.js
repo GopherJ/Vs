@@ -17,6 +17,7 @@ const tooltip = (function (body) {
             .style('left', 0)
             .style('top', 0)
             .style('position', 'absolute')
+            .style('display', 'none')
             .style('visibility', 'hidden');
     }
 })(d3.select('body'));
@@ -59,6 +60,10 @@ function showTip(title, el) {
             tooltip
                 .html(isFunction(title) ? title(d) : title);
 
+            tooltip
+                .style('display', 'block')
+                .style('visibility', 'hidden');
+
             const top = GetOffsetTop(tooltip, target),
                 left = GetOffsetLeft(tooltip, target);
 
@@ -81,6 +86,7 @@ function showTip(title, el) {
  */
 function hideTip() {
     tooltip
+        .style('display', 'none')
         .style('visibility', 'hidden');
 
     tooltip.node().classList.remove('show');
