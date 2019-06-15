@@ -1,5 +1,5 @@
 import * as d3 from 'd3';
-import { isNull, isFunction, } from 'lodash';
+import { isNull, isUndefined, isFunction, } from 'lodash';
 import { map } from '../utils/array';
 
 /*
@@ -97,7 +97,7 @@ function brushX(svg, extent, scale, { brushed, brushing }, data) {
 
     const brush = d3.brushX();
     const undefinedWrapper = (x, f, clean) => {
-        if (x !== undefined) {
+        if (!isUndefined(x)) {
             f(x);
             if (clean) brush.move(b, null);
         }
@@ -107,15 +107,19 @@ function brushX(svg, extent, scale, { brushed, brushing }, data) {
     brush
         .extent(extent);
 
-    if (isFunction(brushed)) {
-        brush.on('end', () => {
-            undefinedWrapper(brushInvertX(extent, scale, data), brushed, true);
-        });
-    }
+    brush.on('start', () => {
+        b.raise();
+    });
 
     if (isFunction(brushing)) {
         brush.on('brush', () => {
             undefinedWrapper(brushInvertX(extent, scale, data), brushing, false);
+        });
+    }
+
+    if (isFunction(brushed)) {
+        brush.on('end', () => {
+            undefinedWrapper(brushInvertX(extent, scale, data), brushed, true);
         });
     }
 
@@ -139,25 +143,28 @@ function brushY(svg, extent, scale, { brushed, brushing }, data) {
 
     const brush = d3.brushY();
     const undefinedWrapper = (x, f, clean) => {
-        if (x !== undefined) {
+        if (!isUndefined(x)) {
             f(x);
             if (clean) brush.move(b, null);
         }
     };
 
-
     brush
         .extent(extent);
 
-    if (isFunction(brushed)) {
-        brush.on('end', () => {
-            undefinedWrapper(brushInvertY(extent, scale, data), brushed, true);
-        });
-    }
+    brush.on('start', () => {
+        b.raise();
+    });
 
     if (isFunction(brushing)) {
         brush.on('brush', () => {
             undefinedWrapper(brushInvertY(extent, scale, data), brushing, false);
+        });
+    }
+
+    if (isFunction(brushed)) {
+        brush.on('end', () => {
+            undefinedWrapper(brushInvertY(extent, scale, data), brushed, true);
         });
     }
 
