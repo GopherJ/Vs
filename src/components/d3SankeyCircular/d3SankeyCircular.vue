@@ -110,7 +110,7 @@
 
                 const axisXLabelLane = svg
                     .append('g')
-                    //.attr('transform', `translate(0, ${__selectBoxLaneHeight__ + g_h})`);
+                    .attr('transform', `translate(0, ${__selectBoxLaneHeight__ + g_h})`);
 
                 const g = svg
                     .append('g')
