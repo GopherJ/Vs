@@ -12,6 +12,7 @@
     import highlightNodes from '../../utils/highlightNodes';
     import mixins from '../../mixins/sankey';
     import offset from 'document-offset';
+    import * as navigator from '../../utils/navigator';
 
     Object.assign(d3, d3SankeyCircular);
 
@@ -256,12 +257,20 @@
                     .attr('class', 'g-arrow')
                     .call(arrows);
 
-                const [g_real_w, g_real_h] = this.getSelectionWidthHeight(g),
-                    [offsetG, offsetSvg] = [offset(g.node()), offset(svg.node())],
-                    [offsetX, offsetY] = [offsetG.left - offsetSvg.left, offsetG.top - offsetSvg.top],
-                    [scaleX, scaleY] = [g_w / g_real_w, g_h / g_real_h];
+                if (navigator.isFirefox) {
+                    const [g_real_w, g_real_h] = this.getSelectionWidthHeight(g),
+                        [offsetG, offsetSvg] = [offset(g.node()), offset(svg.node())],
+                        [offsetX, offsetY] = [offsetG.left - offsetSvg.left, offsetG.top - offsetSvg.top],
+                        [scaleX, scaleY] = [g_w / g_real_w, g_h / g_real_h];
 
-                g.attr('transform', `scale(${scaleX}, ${scaleY}) translate(${-offsetX}, ${2 * __selectBoxLaneHeight__ - offsetY})`);
+                    g.attr('transform', `scale(${scaleX}, ${scaleY}) translate(${-offsetX}, ${2 * __selectBoxLaneHeight__ - offsetY})`);
+                } else {
+                    const [g_real_w, g_real_h] = this.getSelectionWidthHeight(g),
+                        [offsetX, offsetY] = this.getSelectionOffset(g),
+                        [translateX, translateY] = [(g_w - g_real_w) / 2 - offsetX, (g_h + __selectBoxLaneHeight__ - g_real_h) / 2 - offsetY];
+
+                    g.attr('transform', `translate(${translateX}, ${translateY})`);
+                }
             },
             safeDraw() {
                 this.ifExistsSvgThenRemove();
