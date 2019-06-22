@@ -321,6 +321,10 @@
         border: 2px solid #ccc;
     }
 
+    .d3-sankey-circular select:hover {
+        cursor: pointer;
+    }
+
     .d3-sankey-circular select:-moz-focusring {
         color: transparent;
         text-shadow: 0 0 0 #000;

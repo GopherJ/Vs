@@ -358,6 +358,10 @@
         border: 2px solid #ccc;
     }
 
+    .d3-timelion select:hover {
+        cursor: pointer;
+    }
+
     .d3-timelion select:-moz-focusring {
         color: transparent;
         text-shadow: 0 0 0 #000;
