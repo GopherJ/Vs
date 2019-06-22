@@ -13,8 +13,7 @@
         mixins: [mixins],
         methods: {
             drawPie() {
-                const data =  [...(this.data)],
-                    { left = 0, top = 0, right = 0, bottom = 0 } = this.margin,
+                const { left = 0, top = 0, right = 0, bottom = 0 } = this.margin,
                     {
                         innerRadius = 50,
                         cornerRadius = 0,
@@ -43,6 +42,7 @@
                     {
                         axisXLabelHeight = isNull(axisXLabel) ? 0 : 30,
                     } = this.options,
+                    data =  this.data,
                     [w, h] = this.getElWidthHeight(),
                     g_w = w - left - right,
                     g_h = h - top - bottom - axisXLabelHeight,
@@ -65,9 +65,9 @@
                     .append('g')
                     .attr('transform', `translate(${left}, ${top + g_h})`);
 
-                const interpolateWarm = d3.scaleSequential()
+                const interpolateCool = d3.scaleSequential()
                     .domain(d3.extent(data.map(d => isNumber(d.value) ? d.value : +d.value)))
-                    .interpolator(d3.interpolateWarm);
+                    .interpolator(d3.interpolateCool);
 
                 const pie = d3.pie()
                     .sort(null)
@@ -99,7 +99,7 @@
 
                         return t => pathGen(interpolate(t));
                     })
-                    .attr('fill', d =>  data.length > 1 ? interpolateWarm(isNumber(d.data.value) ? d.data.value : +d.data.value) : defaultColor);
+                    .attr('fill', d =>  data.length > 1 ? interpolateCool(isNumber(d.data.value) ? d.data.value : +d.data.value) : defaultColor);
 
                 paths
                     .on('mouseover', showTip(arcTitle))
