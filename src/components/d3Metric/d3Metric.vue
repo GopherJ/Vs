@@ -7,31 +7,31 @@
     import { isNull, isNumber } from 'lodash';
     import { showTip, hideTip } from '../../plugins/tooltip';
     import mixins from '../../mixins/metric';
+    import autoFontSize from '../../plugins/autoFontSize';
 
     export default {
         name: 'd3-metric',
         mixins: [mixins],
         methods: {
             drawMetric() {
-                const data = this.data,
-                    {
+                const {
                         axisXLabel = null,
                         axisLabelFontSize = 12,
                         axisLabelFontWeight = 400,
                         axisLabelFontOpacity = 0.5,
 
                         metricLabelColor = '#000000',
-                        metricLabelFontSize = 120,
                         metricLabelFontWeight = 900,
                         metricLabelFontOpacity = 0.5,
 
                         metricTitle = d => `${d}`,
 
-                        metricPrecision = 2
+                        metricPrecision = 2,
                     } = this.options,
                     {
                         axisXLabelLaneHeight = isNull(axisXLabel) ? 0 : 30
                     } = this.options,
+                    data = this.data,
                     [w, h] = this.getElWidthHeight(),
                     {left = 0, top = 0, right = 0, bottom = 0} = this.margin,
                     g_w = w - left - right,
@@ -73,8 +73,9 @@
                     .text(isNumber(+data) ? d3.format(',')((+data).toFixed(metricPrecision)).toString() : data)
                     .attr('fill', metricLabelColor)
                     .attr('fill-opacity', metricLabelFontOpacity)
-                    .attr('font-size', metricLabelFontSize)
+                    .style('font-size', '1px')
                     .attr('font-weight', metricLabelFontWeight)
+                    .call(autoFontSize(svg))
                     .on('mouseover', showTip(metricTitle))
                     .on('mouseout', hideTip);
             },
