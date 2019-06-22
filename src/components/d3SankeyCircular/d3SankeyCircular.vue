@@ -35,19 +35,13 @@
         name: 'd3-sankey-circular',
         data: () => {
             return {
-                maxPeriod: 30000
+                maxPeriod: 60000
             }
         },
         mixins: [mixins],
         methods: {
             drawSankey() {
                 if (!this.nodes.length || !this.links.length) return;
-
-                const data = cloneDeep({
-                    nodes: this.nodes,
-                    links: this.links,
-                });
-
                 const {
                     nodeWidth = 20,
                     nodeTextFontSize = 12,
@@ -64,6 +58,7 @@
                     arrowLength = 10,
                     arrowHeadSize = 4,
 
+                    isAxisXSelectBoxShow = false,
                     axisXSelectBoxLabel = 'Max interval among the same trajectory',
 
                     axisXSelectBoxLabelFontSize = 12,
@@ -75,18 +70,46 @@
                     axisXLabelFontSize = 14,
                     axisXLabelFontWeight = 600,
                     axisXLabelFontOpacity = 1,
-                } = this.options;
+
+                    defaultMaxPeriod = null,
+
+                    ignoreInactiveNodes = true
+                } = this.options,
+                data = cloneDeep({
+                    nodes: ignoreInactiveNodes
+                        ? Array.from(this.links.reduce((ite, cur) => { ite.add(cur.source).add(cur.target); return ite; }, new Set())).map(x => ({ name: x }))
+                        : this.nodes,
+                    links: this.links
+                });
+
 
                 const [w, h] = this.getElWidthHeight(),
                     {
                         axisXLabelLaneHeight = isNull(axisXLabel) ? 0 : 30,
                     } = this.options,
-                    __selectBoxLaneHeight__ = 40,
+                    __selectBoxLaneHeight__ = isAxisXSelectBoxShow ? 40 : 0,
                     g_w = w,
                     g_h = h - axisXLabelLaneHeight - __selectBoxLaneHeight__,
                     isMobile = g_w <= 560;
 
                 if (![g_w, g_h].every(el => el > 0)) return;
+
+                if (!isNull(defaultMaxPeriod)
+                    && [
+                        5000,
+                        10000,
+                        30000,
+                        60000,
+                        300000,
+                        900000,
+                        1800000,
+                        3600000,
+                        10800000,
+                        21600000,
+                        43200000,
+                        86400000
+                    ].includes(defaultMaxPeriod)
+                ) this.maxPeriod = defaultMaxPeriod;
 
                 const nodeTitle = this.nodeTitle;
                 const linkTitle = this.linkTitle;
@@ -117,40 +140,42 @@
                     .append('g')
                     .attr('transform', `translate(0, ${__selectBoxLaneHeight__})`);
 
-                const selectBoxLabel = axisXSelectBoxLane
-                    .append('text')
-                    .attr('text-anchor', 'middle')
-                    .attr('x', g_w / 2 - 75)
-                    .attr('y', __selectBoxLaneHeight__ / 2)
-                    .attr('dy', '0.32em')
-                    .text(axisXSelectBoxLabel)
-                    .attr('fill', '#000')
-                    .attr('font-size', axisXSelectBoxLabelFontSize)
-                    .attr('font-weight', axisXSelectBoxLabelFontWeight)
-                    .attr('fill-opacity', axisXSelectBoxLabelFontOpacity);
+                if (isAxisXSelectBoxShow) {
+                    const selectBoxLabel = axisXSelectBoxLane
+                        .append('text')
+                        .attr('text-anchor', 'middle')
+                        .attr('x', g_w / 2 - 75)
+                        .attr('y', __selectBoxLaneHeight__ / 2)
+                        .attr('dy', '0.32em')
+                        .text(axisXSelectBoxLabel)
+                        .attr('fill', '#000')
+                        .attr('font-size', axisXSelectBoxLabelFontSize)
+                        .attr('font-weight', axisXSelectBoxLabelFontWeight)
+                        .attr('fill-opacity', axisXSelectBoxLabelFontOpacity);
 
-                if (!isMobile) {
-                    const selectBoxLabelRect = selectBoxLabel.node().getBBox();
+                    if (!isMobile) {
+                        const selectBoxLabelRect = selectBoxLabel.node().getBBox();
 
-                    const foreignObject = axisXSelectBoxLane
-                        .append('foreignObject');
+                        const foreignObject = axisXSelectBoxLane
+                            .append('foreignObject');
 
-                    foreignObject
-                        .attr('transform', `translate(${selectBoxLabelRect.x + selectBoxLabelRect.width}, 0)`)
-                        .attr('width', g_w - selectBoxLabelRect.x - selectBoxLabelRect.width);
+                        foreignObject
+                            .attr('transform', `translate(${selectBoxLabelRect.x + selectBoxLabelRect.width}, 0)`)
+                            .attr('width', g_w - selectBoxLabelRect.x - selectBoxLabelRect.width);
 
-                    foreignObject
-                        .attr('height', __selectBoxLaneHeight__)
-                        .append('xhtml:select')
-                        .on('change', () => {
-                            const targetVal = d3.event.target.value,
-                                val = Number.parseInt(targetVal, 10);
+                        foreignObject
+                            .attr('height', __selectBoxLaneHeight__)
+                            .append('xhtml:select')
+                            .on('change', () => {
+                                const targetVal = d3.event.target.value,
+                                    val = Number.parseInt(targetVal, 10);
 
-                            this.maxPeriod = val;
-                            emit(this, 'max-period-updated', this.maxPeriod);
-                        })
-                        .html(tpl)
-                        .property('value', this.maxPeriod);
+                                this.maxPeriod = val;
+                                emit(this, 'max-period-updated', this.maxPeriod);
+                            })
+                            .html(tpl)
+                            .property('value', this.maxPeriod);
+                    }
                 }
 
                 axisXLabelLane.append('text')
