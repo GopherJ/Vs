@@ -4,7 +4,7 @@
 
 <script>
     import * as d3 from 'd3';
-    import { isNumber, cloneDeep, isNull } from 'lodash';
+    import { isNumber, isNull } from 'lodash';
     import uuid from 'uuid/v1';
     import mixins from '../../mixins';
     import { showTip, hideTip } from '../../plugins/tooltip';
@@ -23,7 +23,7 @@
         mixins: [mixins],
         methods: {
             drawVerticalBar() {
-                const data = cloneDeep(this.data),
+                const { left = 0, right = 0, top = 0, bottom = 0 } = this.margin,
                     {
                         fill = '#6eadc1',
                         stroke = '#6eadc1',
@@ -67,7 +67,7 @@
                         axisXLabelLaneHeight = isNull(axisXLabel) ? 0 : 35,
                         axisYLabelLaneWidth = isNull(axisYLabel) ? 0 : 60,
                     } = this.options,
-                    { left = 0, right = 0, top = 0, bottom = 0 } = this.margin,
+                    data = [...(this.data)],
                     __offsetRight__ = 10, __offsetBottom__ = 10,
                     [w, h] = this.getElWidthHeight(),
                     g_w = w - left - right - axisYLabelLaneWidth - axisYLaneWidth - __offsetRight__,

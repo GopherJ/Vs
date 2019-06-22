@@ -4,7 +4,7 @@
 
 <script>
     import * as d3 from 'd3';
-    import { cloneDeep, isNull, isString, isUndefined } from 'lodash';
+    import { isNull, isNumber, isString, isUndefined } from 'lodash';
     import uuid from 'uuid/v1';
     import mixins from '../../mixins';
     import { selectTicksNumY } from '../../utils/select';
@@ -22,8 +22,7 @@
         mixins: [mixins],
         methods: {
             drawArea() {
-                const data = cloneDeep(this.data),
-                    { left = 0, right = 0, top = 0, bottom = 0 } = this.margin,
+                const { left = 0, right = 0, top = 0, bottom = 0 } = this.margin,
                     {
                         fill = '#6eadc1',
                         stroke = '#6eadc1',
@@ -69,6 +68,7 @@
                         axisXLabelLaneHeight = isNull(axisXLabel) ? 0 : 35,
                         axisYLabelLaneWidth = isNull(axisYLabel) ? 0 : 60
                     } = this.options,
+                    data = [...(this.data)],
                     __offsetTop__ = 10, __offsetRight__ = 10, [w, h] = this.getElWidthHeight(),
                     g_w =  w - left - right - axisYLaneWidth - axisYLabelLaneWidth - __offsetRight__,
                     g_h = h -top - bottom - axisXLaneHeight - axisXLabelLaneHeight - __offsetTop__,
@@ -93,7 +93,7 @@
                         .range([0, g_w]);
 
                     const yScale = d3.scaleLinear()
-                        .domain(negative ? d3.extent(data, d => d.value) : [0, d3.max(data, d => d.value)])
+                        .domain(negative ? d3.extent(data, d => isNumber(d.value) ? d.value : +d.value) : [0, d3.max(data, d => isNumber(d.value) ? d.value : +d.value)])
                         .range([g_h, 0]);
                     if (nice) yScale.nice();
 
@@ -190,7 +190,7 @@
                     const area = d3.area()
                         .x(d => xScale(d.key))
                         .y0(yScale(0))
-                        .y1(d => yScale(d.value));
+                        .y1(d => yScale(isNumber(d.value) ? d.value : +d.value));
                     if (isString(curve) && !isUndefined(d3[curve])) area.curve(d3[curve]);
 
                     g
@@ -209,7 +209,7 @@
                         .attr('visibility', 'hidden')
                         .attr('r', circleRadius)
                         .attr('cx', d => xScale(d.key))
-                        .attr('cy', d => yScale(d.value))
+                        .attr('cy', d => yScale(isNumber(d.value) ? d.value : +d.value))
                         .attr('fill', circleColor)
                         .on('mouseover', showTip(areaTitle))
                         .on('mouseout', hideTip);
