@@ -37,12 +37,14 @@
 
                         animationDuration = 1000,
 
-                        defaultColor = 'rgb(175, 240, 91)'
+                        defaultColor = 'rgb(175, 240, 91)',
+
+                        sortOrder = 'asc'
                     } = this.options,
                     {
                         axisXLabelHeight = isNull(axisXLabel) ? 0 : 30,
                     } = this.options,
-                    data =  this.data,
+                    data =  [...(this.data)],
                     [w, h] = this.getElWidthHeight(),
                     g_w = w - left - right,
                     g_h = h - top - bottom - axisXLabelHeight,
@@ -70,7 +72,13 @@
                     .interpolator(d3.interpolateCool);
 
                 const pie = d3.pie()
-                    .sort(null)
+                    .sort((x, y) =>
+                        sortOrder === 'asc'
+                            ? d3.ascending(x.value, y.value)
+                            : sortOrder === 'desc'
+                            ? d3.descending(x.value, y.value)
+                            : null
+                    )
                     .value(d => isNumber(d.value) ? d.value : +d.value);
 
                 const pathGen = d3.arc()

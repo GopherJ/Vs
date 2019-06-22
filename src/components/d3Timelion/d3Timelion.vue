@@ -4,7 +4,7 @@
 
 <script>
     import * as d3 from 'd3';
-    import { isNull, isNumber, cloneDeep } from 'lodash';
+    import { isNull, isNumber } from 'lodash';
     import moment from 'moment';
     import uuid from 'uuid/v1';
     import mixins from '../../mixins';
@@ -46,8 +46,7 @@
                     .text(() => this.getTimeRangeLabel(start, end));
             },
             drawTimelion() {
-                const data = cloneDeep(this.data),
-                    { left = 0, top = 0, right = 0, bottom = 0 } = this.margin,
+                const { left = 0, top = 0, right = 0, bottom = 0 } = this.margin,
                     {
                         fill = '#6eadc1',
                         stroke = '#6eadc1',
@@ -97,6 +96,7 @@
                         axisXLabelLaneHeight = isNull(axisXLabel) ? 0 : 60,
                         axisYLabelLaneWidth = isNull(axisYLabel) ? 0 : 60,
                     } = this.options,
+                    data = [...(this.data)],
                     [w, h] = this.getElWidthHeight(), __timeRangeLabelLaneHeight__ = 40, __offsetRight__ = 10,
                     g_w = w - left - right - axisYLabelLaneWidth - axisYLaneWidth - __offsetRight__,
                     g_h = h - top - bottom - axisXLaneHeight - axisXLabelLaneHeight - __timeRangeLabelLaneHeight__,
