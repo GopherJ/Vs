@@ -213,7 +213,7 @@
                     .append('path')
                     .attr('class', 'link')
                     .attr('d', link => link.path)
-                    .attr('stroke-width', d => Math.max(1, d.width))
+                    .attr('stroke-width', d => Math.max(3, d.width))
                     .attr('stroke', link => (link.circular ? circularLinkColor : linkColor))
                     .attr('stroke-opacity', 0.7)
                     .on('mouseover', showTip(linkTitle))
