@@ -4,7 +4,7 @@
 
 <script>
     import * as d3 from 'd3';
-    import { cloneDeep, isNull, isNumber } from 'lodash';
+    import { isNull, isNumber } from 'lodash';
     import mixins from '../../mixins';
     import { showTip, hideTip } from '../../plugins/tooltip';
 
@@ -13,7 +13,7 @@
         mixins: [mixins],
         methods: {
             drawPie() {
-                const data =  cloneDeep(this.data),
+                const data =  [...(this.data)],
                     { left = 0, top = 0, right = 0, bottom = 0 } = this.margin,
                     {
                         innerRadius = 50,
@@ -66,12 +66,12 @@
                     .attr('transform', `translate(${left}, ${top + g_h})`);
 
                 const interpolateWarm = d3.scaleSequential()
-                    .domain(d3.extent(data.map(d => d.value)))
+                    .domain(d3.extent(data.map(d => isNumber(d.value) ? d.value : +d.value)))
                     .interpolator(d3.interpolateWarm);
 
                 const pie = d3.pie()
                     .sort(null)
-                    .value(d => d.value);
+                    .value(d => isNumber(d.value) ? d.value : +d.value);
 
                 const pathGen = d3.arc()
                     .innerRadius(innerRadius)
@@ -92,14 +92,14 @@
 
                 paths
                     .transition()
-                    .duration(_.isNumber(animationDuration) ? animationDuration : 0)
+                    .duration(isNumber(animationDuration) ? animationDuration : 0)
                     .attrTween('d', d => {
                         const startAngle = d.startAngle,
                              interpolate = d3.interpolate({endAngle: startAngle}, d);
 
                         return t => pathGen(interpolate(t));
                     })
-                    .attr('fill', d =>  data.length > 1 ? interpolateWarm(d.data.value) : defaultColor);
+                    .attr('fill', d =>  data.length > 1 ? interpolateWarm(isNumber(d.data.value) ? d.data.value : +d.data.value) : defaultColor);
 
                 paths
                     .on('mouseover', showTip(arcTitle))
