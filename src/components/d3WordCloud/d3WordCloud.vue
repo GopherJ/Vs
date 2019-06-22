@@ -97,7 +97,7 @@
                         .style('font-size', d => `${d.size}px`)
                         .attr('fill', d => textColor(d.size))
                         .style('font-family', wordFontFamily)
-                        .attr('transform', d => `translate(${[d.x, d.y]})rotate(${d.rotate})`)
+                        .attr('transform', d => `translate(${[d.x, d.y]}) rotate(${d.rotate})`)
                         .text(d => d.text);
                 }
             },
