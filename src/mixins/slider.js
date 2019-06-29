@@ -1,5 +1,6 @@
 import * as d3 from 'd3';
 import { isNumber, isDate, isString, debounce } from 'lodash';
+import { hideTip, isTipShowing } from '../plugins/tooltip';
 
 export default {
     data() {
@@ -98,5 +99,6 @@ export default {
     },
     beforeDestroy() {
         window.removeEventListener('resize', this._handlerResize);
+        if (isTipShowing()) hideTip();
     }
 };

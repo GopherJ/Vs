@@ -8,6 +8,7 @@
     import { showTip, hideTip } from '../../plugins/tooltip';
     import mixins from '../../mixins/metric';
     import autoFontSize from '../../plugins/autoFontSize';
+    import * as navigator from '../../utils/navigator';
 
     export default {
         name: 'd3-metric',
@@ -64,7 +65,7 @@
                     .attr('font-size', axisLabelFontSize)
                     .attr('font-weight', axisLabelFontWeight);
 
-                g.append('text')
+                const text = g.append('text')
                     .datum(data)
                     .attr('text-anchor', 'middle')
                     .attr('x', g_w / 2)
@@ -78,6 +79,8 @@
                     .call(autoFontSize(svg))
                     .on('mouseover', showTip(metricTitle))
                     .on('mouseout', hideTip);
+
+                if (navigator.isSafari) text.attr('dominant-baseline', 'middle');
             },
             safeDraw() {
                 this.ifExistsSvgThenRemove();

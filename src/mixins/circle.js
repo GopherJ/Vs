@@ -1,5 +1,6 @@
 import * as d3 from 'd3';
 import { debounce } from 'lodash';
+import { hideTip, isTipShowing } from '../plugins/tooltip';
 
 export default {
     props: {
@@ -107,5 +108,6 @@ export default {
     },
     beforeDestroy() {
         window.removeEventListener('resize', this._handleResize);
+        if (isTipShowing()) hideTip();
     }
 };

@@ -1,7 +1,7 @@
 /* eslint-disable */
 import * as d3 from 'd3';
 import { debounce, isBoolean, isFunction } from 'lodash';
-import { hideTip } from '../plugins/tooltip';
+import { hideTip, isTipShowing } from '../plugins/tooltip';
 
 export default {
     data() {
@@ -132,5 +132,7 @@ export default {
         (this.observer !== null) && this.observer.disconnect();
 
         if (this.timer !== null && this.playing) this.timer.stop();
+
+        if (isTipShowing()) hideTip();
     }
 };

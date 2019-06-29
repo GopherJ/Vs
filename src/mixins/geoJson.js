@@ -1,5 +1,6 @@
 /* eslint-disable */
 import * as d3 from 'd3';
+import { hideTip, isTipShowing } from '../plugins/tooltip';
 
 export default {
     props: {
@@ -58,5 +59,8 @@ export default {
     },
     mounted() {
         setTimeout(this.safeDraw);
+    },
+    beforeDestroy() {
+        if (isTipShowing()) hideTip();
     }
 };

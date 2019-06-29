@@ -92,7 +92,12 @@ function hideTip() {
     tooltip.node().classList.remove('show');
 }
 
+function isTipShowing() {
+    return tooltip.style('display') === 'block' && tooltip.style('visibility') === 'visible';
+}
+
 export {
     showTip,
-    hideTip
+    hideTip,
+    isTipShowing
 };
