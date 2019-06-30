@@ -77,11 +77,10 @@
                 } = this.options,
                 data = cloneDeep({
                     nodes: ignoreInactiveNodes
-                        ? Array.from(this.links.reduce((ite, cur) => { ite.add(cur.source).add(cur.target); return ite; }, new Set())).map(x => ({ name: x }))
-                        : this.nodes,
+                        ?   this.nodes.filter(x => this.links.findIndex(l => l.source === x.name || l.target === x.name) !== -1)
+                        :   this.nodes,
                     links: this.links
                 });
-
 
                 const [w, h] = this.getElWidthHeight(),
                     {
@@ -213,7 +212,7 @@
                     .append('path')
                     .attr('class', 'link')
                     .attr('d', link => link.path)
-                    .attr('stroke-width', d => Math.max(3, d.width))
+                    .attr('stroke-width', d => Math.max(1, d.width))
                     .attr('stroke', link => (link.circular ? circularLinkColor : linkColor))
                     .attr('stroke-opacity', 0.7)
                     .on('mouseover', showTip(linkTitle))
@@ -285,13 +284,13 @@
                 if (navigator.isFirefox) {
                     const [g_real_w, g_real_h] = this.getSelectionWidthHeight(g),
                         [offsetG, offsetSvg] = [offset(g.node()), offset(svg.node())],
-                        [offsetX, offsetY] = [offsetG.left - offsetSvg.left, offsetG.top - offsetSvg.top],
-                        [scaleX, scaleY] = [g_w / g_real_w, g_h / g_real_h];
+                        [offsetX, offsetY] = [offsetG.left - offsetSvg.left, offsetG.top - offsetSvg.top];
 
-                    g.attr('transform', `scale(${scaleX}, ${scaleY}) translate(${-offsetX}, ${2 * __selectBoxLaneHeight__ - offsetY})`);
+                    g.attr('transform', `translate(${-offsetX + (g_w - g_real_w) / 2}, ${2 * __selectBoxLaneHeight__ - offsetY + (g_h - g_real_h) / 2})`);
                 } else {
                     const [g_real_w, g_real_h] = this.getSelectionWidthHeight(g),
                         [offsetX, offsetY] = this.getSelectionOffset(g),
+                        [scaleX, scaleY] = [g_w / g_real_w, g_h / g_real_h],
                         [translateX, translateY] = [(g_w - g_real_w) / 2 - offsetX, (g_h + __selectBoxLaneHeight__ - g_real_h) / 2 - offsetY];
 
                     g.attr('transform', `translate(${translateX}, ${translateY})`);
