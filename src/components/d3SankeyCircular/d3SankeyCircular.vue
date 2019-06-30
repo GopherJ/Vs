@@ -71,8 +71,6 @@
                     axisXLabelFontWeight = 600,
                     axisXLabelFontOpacity = 1,
 
-                    defaultMaxPeriod = null,
-
                     ignoreInactiveNodes = true
                 } = this.options,
                 data = cloneDeep({
@@ -92,23 +90,6 @@
                     isMobile = g_w <= 560;
 
                 if (![g_w, g_h].every(el => el > 0)) return;
-
-                if (!isNull(defaultMaxPeriod)
-                    && [
-                        5000,
-                        10000,
-                        30000,
-                        60000,
-                        300000,
-                        900000,
-                        1800000,
-                        3600000,
-                        10800000,
-                        21600000,
-                        43200000,
-                        86400000
-                    ].includes(defaultMaxPeriod)
-                ) this.maxPeriod = defaultMaxPeriod;
 
                 const nodeTitle = this.nodeTitle;
                 const linkTitle = this.linkTitle;
