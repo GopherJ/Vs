@@ -5,7 +5,7 @@
     "main": "dist/Vs.min.js",
     "scripts": {
         "build": "cd scripts && ./build.sh",
-        "publish": "cd scripts && ./publish.sh"
+        "pub": "cd scripts && ./publish.sh"
     },
     "repository": {
         "type": "git",
