@@ -35,7 +35,7 @@
         name: 'd3-sankey-circular',
         data: () => {
             return {
-                maxPeriod: 60000
+                maxPeriod: 10800000
             }
         },
         mixins: [mixins],
