@@ -10,4 +10,4 @@ npm run build \
     && git tag v"$1" \
     && git push origin master \
     && git push origin v"$1" \
-    && npm publish $ROOT \
+    && npm publish $ROOT
