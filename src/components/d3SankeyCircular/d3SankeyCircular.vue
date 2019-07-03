@@ -244,7 +244,7 @@
                     .attr('x', d => (d.x0 + d.x1) / 2)
                     .attr('y', d => d.y0 - 12)
                     .attr('dy', '0.32em')
-                    .attr('text-anchor', 'middle')
+                    .attr('text-anchor', d => d.textAnchor ? d.textAnchor : 'middle')
                     .text(d => d.name)
                     .attr('font-size', nodeTextFontSize)
                     .attr('font-weight', nodeTextFontWeight)
