@@ -5,8 +5,6 @@
  * @license MIT
  * @preserve
  */
-import L from 'leaflet';
-
 import Marker from './marker';
 
 export default Marker;

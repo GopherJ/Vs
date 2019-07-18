@@ -4,10 +4,12 @@
 
 <script>
     import L from 'leaflet';
+    import '../../utils/leaflet-indoor';
     import LFullscreen from 'leaflet-fullscreen';
-    import LIndoor from '../../lib/leaflet.indoor';
     import LHeat from '../../lib/leaflet.heat';
     import mixins from '../../mixins/coords';
+
+console.log(LHeat)
 
     export default {
         name: 'd3-l-heat',
@@ -52,8 +54,11 @@
                 }).addTo(Map);
 
                 if (L.Util.isArray(indoorMaps) && indoorMaps.length > 0) {
-                    this._indoorLayer = L.indoorLayer(indoorMaps, {
-                        grayscale: false
+                    this._indoorLayer = new L.Indoor(indoorMaps, {
+                        grayscale: false,
+                        hide_zones: true,
+                        has_lock: false,
+                        has_bound_control: true,
                     }).addTo(Map);
                 }
 

@@ -1,6 +1,6 @@
 {
     "name": "d3-vs",
-    "version":"0.9.7",
+    "version": "0.9.7",
     "description": "d3 visualisation with vuejs",
     "main": "dist/Vs.min.js",
     "scripts": {
@@ -24,6 +24,7 @@
     ],
     "dependencies": {
         "@turf/centroid": "^6.0.2",
+        "@turf/turf": "^5.1.6",
         "d3": "^4.13.0",
         "d3-brush": "^1.0.4",
         "d3-cloud": "^1.2.5",

@@ -1,6 +1,7 @@
 import L from 'leaflet';
-import Circle from './circle'
-import LeafletPathDrag from '../Leaflet.Path.Drag';
+
+import './circle'
+import '../Leaflet.Path.Drag';
 
 L.LabeledMarker = L.FeatureGroup.extend({
 
@@ -165,18 +166,18 @@ L.LabeledMarker = L.FeatureGroup.extend({
       L.Util.extend({
         interactive: this.options.interactive
       },
-        LabeledMarker.prototype.options.markerOptions,
+        L.LabeledMarker.prototype.options.markerOptions,
         opts.markerOptions)
     ).on('drag',      this._onMarkerDrag,      this)
      .on('dragstart', this._onMarkerDragStart, this)
      .on('dragend',   this._onMarkerDragEnd,   this);
 
     this._anchor = new L.CircleMarker(this._latlng,
-      L.Util.extend({}, LabeledMarker.prototype.options.anchorOptions,
+      L.Util.extend({}, L.LabeledMarker.prototype.options.anchorOptions,
         opts.anchorOptions));
 
     this._line = new L.Polyline([this._latlng, this._marker.getLatLng()],
-      L.Util.extend({}, LabeledMarker.prototype.options.lineOptions,
+      L.Util.extend({}, L.LabeledMarker.prototype.options.lineOptions,
         opts.lineOptions));
   },
 

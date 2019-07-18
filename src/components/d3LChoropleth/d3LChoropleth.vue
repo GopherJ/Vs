@@ -4,10 +4,12 @@
 
 <script>
     import L from 'leaflet';
+    import '../../utils/leaflet-indoor';
     import LChoropleth from 'leaflet-choropleth';
-    import LIndoor from '../../lib/leaflet.indoor';
     import LFullscreen from 'leaflet-fullscreen';
     import mixins from '../../mixins/geoJson';
+
+console.log(LChoropleth, LFullscreen)
 
     export default {
         name: 'd3-l-choropleth',
@@ -57,8 +59,11 @@
                 }).addTo(Map);
 
                 if (L.Util.isArray(indoorMaps) && indoorMaps.length > 0) {
-                    this._indoorLayer = L.indoorLayer(indoorMaps, {
-                        grayscale: true
+                    this._indoorLayer = new L.Indoor(indoorMaps, {
+                        grayscale: true,
+                        hide_zones: true,
+                        has_lock: false,
+                        has_bound_control: true,
                     }).addTo(Map);
                 }
 

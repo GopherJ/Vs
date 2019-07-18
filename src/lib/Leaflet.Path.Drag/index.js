@@ -1,5 +1,3 @@
-import L from 'leaflet';
-
 import SVG from './SVG';
 import SVGVML from './SVG.VML';
 import Canvas from './Canvas';
