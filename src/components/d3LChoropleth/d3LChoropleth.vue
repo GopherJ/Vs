@@ -5,11 +5,10 @@
 <script>
     import L from 'leaflet';
     import '../../utils/leaflet-indoor';
-    import LChoropleth from 'leaflet-choropleth';
-    import LFullscreen from 'leaflet-fullscreen';
+    import 'leaflet-choropleth';
+    import 'leaflet-fullscreen';
     import mixins from '../../mixins/geoJson';
-
-console.log(LChoropleth, LFullscreen)
+    import { isPlainObject } from 'lodash';
 
     export default {
         name: 'd3-l-choropleth',
@@ -17,8 +16,10 @@ console.log(LChoropleth, LFullscreen)
             return {
                 _map: null,
                 _tileLayer: null,
-                _indoorLayer: null,
                 _choroplethLayer: null,
+                _indoorLayer: null,
+                indoorLayerMapUuid: null,
+                _indoorLayerUuidLevelMap: {},
                 _fullscreenControl: null,
                 _legend: null
             }
@@ -27,6 +28,7 @@ console.log(LChoropleth, LFullscreen)
         methods: {
             drawLChoropleth() {
                 const data = this.data,
+                    self = this,
                     indoorMaps = this.indoorMaps,
                     {
                         zoom = 18,
@@ -46,6 +48,11 @@ console.log(LChoropleth, LFullscreen)
                         fillOpacity = 0.8
                     } = this.options;
 
+                indoorMaps.forEach(indoorMap => {
+                    this._indoorLayerUuidLevelMap[indoorMap.uuid] = indoorMap.level; 
+                    this._indoorLayerUuidLevelMap[indoorMap.level] = indoorMap.uuid;
+                });
+
                 const container = document.createElement('div');
                 container.style.width = '100%';
                 container.style.height = '100%';
@@ -64,47 +71,54 @@ console.log(LChoropleth, LFullscreen)
                         hide_zones: true,
                         has_lock: false,
                         has_bound_control: true,
+
+                        onSetLevel() {
+                            self.indoorLayerMapUuid = this.getLevelMapUuid();
+                        }
                     }).addTo(Map);
+
+                    this.indoorLayerMapUuid = this._indoorLayer.getLevelMapUuid();
                 }
 
-                this._choroplethLayer = L.choropleth(data, {
-                    valueProperty,
-                    scale,
-                    steps,
-                    mode,
-                    style: {
-                        color,
-                        weight,
-                        fillOpacity
-                    },
-                    onEachFeature: function (feature, layer) {
-                        layer.bindPopup(`Zone: ${feature.properties.name}<br>Value: ${feature.properties.value.toFixed(2)}`);
-                    }
-                }).addTo(Map);
+                if (this.indoorLayerMapUuid !== null && data[this.indoorLayerMapUuid] !== undefined) {
+                    this._choroplethLayer = L.choropleth(data[this.indoorLayerMapUuid], {
+                        valueProperty,
+                        scale,
+                        steps,
+                        mode,
+                        style: {
+                            color,
+                            weight,
+                            fillOpacity
+                        },
+                        onEachFeature: function (feature, layer) {
+                            layer.bindPopup(`Zone: ${feature.properties.name}<br>Value: ${feature.properties.value.toFixed(2)}`);
+                        }
+                    }).addTo(Map);
 
-                const legend = this._legend = L.control({
-                    position: 'topright'
-                });
-
-                const self = this;
-                legend.onAdd = function (map) {
-                    const div = L.DomUtil.create('div', 'info legend');
-                    const limits = self._choroplethLayer.options.limits;
-                    const colors = self._choroplethLayer.options.colors;
-                    const labels = [];
-
-                    div.innerHTML = '<div class="labels"><div class="min">' + limits[0].toFixed(2) + '</div> \
-                        <div class="max">' + limits[limits.length - 1].toFixed(2) + '</div></div>';
-
-                    limits.forEach(function (limit, index) {
-                        labels.push('<li style="background-color: ' + colors[index] + '"></li>')
+                    const legend = this._legend = L.control({
+                        position: 'topright'
                     });
 
-                    div.innerHTML += '<ul>' + labels.join('') + '</ul>';
-                    return div
-                };
+                    legend.onAdd = function (map) {
+                        const div = L.DomUtil.create('div', 'info legend');
+                        const limits = self._choroplethLayer.options.limits;
+                        const colors = self._choroplethLayer.options.colors;
+                        const labels = [];
 
-                legend.addTo(Map);
+                        div.innerHTML = '<div class="labels"><div class="min">' + limits[0].toFixed(2) + '</div> \
+                            <div class="max">' + limits[limits.length - 1].toFixed(2) + '</div></div>';
+
+                        limits.forEach(function (limit, index) {
+                            labels.push('<li style="background-color: ' + colors[index] + '"></li>')
+                        });
+
+                        div.innerHTML += '<ul>' + labels.join('') + '</ul>';
+                        return div
+                    };
+
+                    legend.addTo(Map);
+                }
 
                 this._fullscreenControl = new L.Control.Fullscreen();
                 Map.addControl(this._fullscreenControl);
@@ -116,6 +130,8 @@ console.log(LChoropleth, LFullscreen)
 
                 this._choroplethLayer = null;
                 this._indoorLayer = null;
+                this.indoorLayerMapUuid = null;
+                this._indoorLayerUuidLevelMap = {};
                 this._fullscreenControl = null;
                 this._tileLayer = null;
                 this._legend = null;
@@ -123,6 +139,85 @@ console.log(LChoropleth, LFullscreen)
             safeDraw() {
                 this.reset();
                 this.drawLChoropleth();
+            }
+        },
+        watch: {
+            indoorLayerMapUuid: {
+                deep: false,
+                handler(n, o) {
+                    const self = this;
+                    const 
+                    {
+                        zoom = 18,
+                        center,
+                        url,
+                        attribution,
+                        maxZoom = 23,
+                        minZoom = 1,
+
+                        valueProperty = 'value',
+                        scale = ['white', 'red'],
+                        steps = 5,
+                        mode = 'q',
+
+                        color = '#fff',
+                        weight = 2,
+                        fillOpacity = 0.8
+                    } = this.options;
+
+                    if (o !== null
+                        && this._indoorLayer !== null
+                        && this._choroplethLayer !== null
+                        && this._map !== null
+                        && this._map.hasLayer(this._choroplethLayer)
+                        && isPlainObject(this.data[n])
+                        && this.data[n]['type'] === 'FeatureCollection'
+                        && Array.isArray(this.data[n]['features'])
+                    ) {
+                        this._map.removeLayer(this._choroplethLayer);
+                        if (this._legend._map !== null) {
+                            this._map.removeControl(this._legend);
+                        }
+
+                        this._choroplethLayer = L.choropleth(this.data[n], {
+                            valueProperty,
+                            scale,
+                            steps,
+                            mode,
+                            style: {
+                                color,
+                                weight,
+                                fillOpacity
+                            },
+                            onEachFeature: function (feature, layer) {
+                                layer.bindPopup(`Zone: ${feature.properties.name}<br>Value: ${feature.properties.value.toFixed(2)}`);
+                            }
+                        }).addTo(this._map);
+
+                        const legend = this._legend = L.control({
+                            position: 'topright'
+                        });
+
+                        legend.onAdd = function (map) {
+                            const div = L.DomUtil.create('div', 'info legend');
+                            const limits = self._choroplethLayer.options.limits;
+                            const colors = self._choroplethLayer.options.colors;
+                            const labels = [];
+
+                            div.innerHTML = '<div class="labels"><div class="min">' + limits[0].toFixed(2) + '</div> \
+                                <div class="max">' + limits[limits.length - 1].toFixed(2) + '</div></div>';
+
+                            limits.forEach(function (limit, index) {
+                                labels.push('<li style="background-color: ' + colors[index] + '"></li>')
+                            });
+
+                            div.innerHTML += '<ul>' + labels.join('') + '</ul>';
+                            return div
+                        };
+
+                        legend.addTo(this._map);
+                    }
+                }
             }
         }
     }

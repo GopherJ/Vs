@@ -48,7 +48,7 @@ export default {
                     this.safeDraw();
                 });
             }
-        }
+        },
     },
     activated() {
         const svgSelection = d3.select(this.$el).select('svg');

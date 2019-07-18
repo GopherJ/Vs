@@ -13,7 +13,7 @@ export default {
             default: '300px'
         },
         data: {
-            type: Array,
+            type: Object,
             required: true
         },
         indoorMaps: {
