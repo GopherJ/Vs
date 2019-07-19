@@ -4,8 +4,9 @@
 
 <script>
     import L from 'leaflet';
-    import '../../utils/leaflet-indoor';
     import 'leaflet-fullscreen';
+    import {isNull, isUndefined} from 'lodash';
+    import '../../utils/leaflet-indoor';
     import '../../lib/leaflet.heat';
     import mixins from '../../mixins/coords';
 
@@ -16,17 +17,16 @@
                 _map: null,
                 _tileLayer: null,
                 _indoorLayer: null,
-                indoorLayerMapUuid: null,
-                _indoorLayerUuidLevelMap: {},
                 _heatLayer: null,
-                _fullscreenControl: null
+                _fullscreenControl: null,
+                indoorLayerMapUuid: null,
             }
         },
         mixins: [mixins],
         methods: {
             drawLHeat() {
-                const data = this.data,
-                    self = this,
+                const self = this,
+                    data = this.data,
                     indoorMaps = this.indoorMaps,
                     {
                         zoom = 18,
@@ -42,13 +42,12 @@
                         max = 0.4
                     } = this.options;
 
-                indoorMaps.forEach(indoorMap => {
-                    this._indoorLayerUuidLevelMap[indoorMap.uuid] = indoorMap.level; 
-                    this._indoorLayerUuidLevelMap[indoorMap.level] = indoorMap.uuid;
-                });
+                if (isUndefined(center) || isUndefined(url) || isUndefined(attribution)) {
+                    return;
+                }
 
                 const container = document.createElement('div');
-                container.style.width = '100%';
+                container.style.width  = '100%';
                 container.style.height = '100%';
 
                 const Map = this._map = L.map(this.$el.appendChild(container)).setView(center, zoom);
@@ -59,7 +58,7 @@
                     minZoom
                 }).addTo(Map);
 
-                if (L.Util.isArray(indoorMaps) && indoorMaps.length > 0) {
+                if (Array.isArray(indoorMaps) && indoorMaps.length) {
                     this._indoorLayer = new L.Indoor(indoorMaps, {
                         grayscale: false,
                         hide_zones: true,
@@ -74,7 +73,7 @@
                     this.indoorLayerMapUuid = this._indoorLayer.getLevelMapUuid();
                 }
 
-                if (this.indoorLayerMapUuid !== null && Array.isArray(data[this.indoorLayerMapUuid])) {
+                if (!isNull(this.indoorLayerMapUuid) && Array.isArray(data[this.indoorLayerMapUuid])) {
                     this._heatLayer = L.heatLayer(data[this.indoorLayerMapUuid], {
                         minOpacity,
                         blur,
@@ -93,10 +92,9 @@
 
                 this._heatLayer = null;
                 this._indoorLayer = null;
-                this.indoorLayerMapUuid = null;
-                this._indoorLayerUuidLevelMap = {};
                 this._fullscreenControl = null;
                 this._tileLayer = null;
+                this.indoorLayerMapUuid = null;
             },
             safeDraw() {
                 this.reset();
@@ -107,34 +105,30 @@
             indoorLayerMapUuid: {
                 deep: false,
                 handler(n, o) {
-                    if (o !== null
-                        && this._indoorLayer !== null
-                        && this._heatLayer !== null
-                        && this._map !== null
-                        && this._map.hasLayer(this._heatLayer)
-                        && Array.isArray(this.data[n])
+                    if (!isNull(o)
+                        && !isNull(n)
+                        && !isNull(this._indoorLayer)
+                        && !isNull(this._map)
                     ) {
-                        this._map.removeLayer(this._heatLayer);
-                        const {
-                            zoom = 18,
-                            center,
-                            url,
-                            attribution,
-                            maxZoom = 23,
-                            minZoom = 1,
+                        if (!isNull(this._heatLayer) && this._map.hasLayer(this._heatLayer)) {
+                            this._map.removeLayer(this._heatLayer);
+                        }
 
-                            minOpacity= 0.05,
-                            radius = 8,
-                            blur = 15,
-                            max = 0.4
-                        } = this.options;
+                        if (Array.isArray(this.data[n]) && this.data[n].length) {
+                            const {
+                                minOpacity= 0.05,
+                                radius = 8,
+                                blur = 15,
+                                max = 0.4
+                            } = this.options;
 
-                        this._heatLayer = L.heatLayer(this.data[n], {
-                            minOpacity,
-                            blur,
-                            max,
-                            radius
-                        }).addTo(this._map);
+                            this._heatLayer = L.heatLayer(this.data[n], {
+                                minOpacity,
+                                blur,
+                                max,
+                                radius
+                            }).addTo(this._map);
+                        }
                     }
                 }
             }

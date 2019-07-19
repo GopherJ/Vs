@@ -4,11 +4,11 @@
 
 <script>
     import L from 'leaflet';
-    import '../../utils/leaflet-indoor';
     import 'leaflet-choropleth';
     import 'leaflet-fullscreen';
+    import { isPlainObject, isUndefined, isNull } from 'lodash';
     import mixins from '../../mixins/geoJson';
-    import { isPlainObject } from 'lodash';
+    import '../../utils/leaflet-indoor';
 
     export default {
         name: 'd3-l-choropleth',
@@ -18,17 +18,16 @@
                 _tileLayer: null,
                 _choroplethLayer: null,
                 _indoorLayer: null,
-                indoorLayerMapUuid: null,
-                _indoorLayerUuidLevelMap: {},
                 _fullscreenControl: null,
-                _legend: null
+                _legend: null,
+                indoorLayerMapUuid: null,
             }
         },
         mixins: [mixins],
         methods: {
             drawLChoropleth() {
-                const data = this.data,
-                    self = this,
+                const self = this,
+                    data = this.data,
                     indoorMaps = this.indoorMaps,
                     {
                         zoom = 18,
@@ -48,13 +47,12 @@
                         fillOpacity = 0.8
                     } = this.options;
 
-                indoorMaps.forEach(indoorMap => {
-                    this._indoorLayerUuidLevelMap[indoorMap.uuid] = indoorMap.level; 
-                    this._indoorLayerUuidLevelMap[indoorMap.level] = indoorMap.uuid;
-                });
+                if (isUndefined(center) || isUndefined(url) || isUndefined(attribution)) {
+                    return;
+                }
 
                 const container = document.createElement('div');
-                container.style.width = '100%';
+                container.style.width  = '100%';
                 container.style.height = '100%';
 
                 const Map = this._map = L.map(this.$el.appendChild(container)).setView(center, zoom);
@@ -65,7 +63,7 @@
                     minZoom
                 }).addTo(Map);
 
-                if (L.Util.isArray(indoorMaps) && indoorMaps.length > 0) {
+                if (Array.isArray(indoorMaps) && indoorMaps.length) {
                     this._indoorLayer = new L.Indoor(indoorMaps, {
                         grayscale: true,
                         hide_zones: true,
@@ -80,7 +78,12 @@
                     this.indoorLayerMapUuid = this._indoorLayer.getLevelMapUuid();
                 }
 
-                if (this.indoorLayerMapUuid !== null && data[this.indoorLayerMapUuid] !== undefined) {
+                if (!isNull(this.indoorLayerMapUuid)
+                    && isPlainObject(data[this.indoorLayerMapUuid])
+                    && data[this.indoorLayerMapUuid]['type'] === 'FeatureCollection'
+                    && Array.isArray(data[this.indoorLayerMapUuid]['features'])
+                    && data[this.indoorLayerMapUuid]['features'].length
+                ) {
                     this._choroplethLayer = L.choropleth(data[this.indoorLayerMapUuid], {
                         valueProperty,
                         scale,
@@ -130,11 +133,10 @@
 
                 this._choroplethLayer = null;
                 this._indoorLayer = null;
-                this.indoorLayerMapUuid = null;
-                this._indoorLayerUuidLevelMap = {};
                 this._fullscreenControl = null;
                 this._tileLayer = null;
                 this._legend = null;
+                this.indoorLayerMapUuid = null;
             },
             safeDraw() {
                 this.reset();
@@ -145,77 +147,74 @@
             indoorLayerMapUuid: {
                 deep: false,
                 handler(n, o) {
-                    const self = this;
-                    const 
-                    {
-                        zoom = 18,
-                        center,
-                        url,
-                        attribution,
-                        maxZoom = 23,
-                        minZoom = 1,
-
-                        valueProperty = 'value',
-                        scale = ['white', 'red'],
-                        steps = 5,
-                        mode = 'q',
-
-                        color = '#fff',
-                        weight = 2,
-                        fillOpacity = 0.8
-                    } = this.options;
-
-                    if (o !== null
-                        && this._indoorLayer !== null
-                        && this._choroplethLayer !== null
-                        && this._map !== null
-                        && this._map.hasLayer(this._choroplethLayer)
-                        && isPlainObject(this.data[n])
-                        && this.data[n]['type'] === 'FeatureCollection'
-                        && Array.isArray(this.data[n]['features'])
+                    if (!isNull(o)
+                        && !isNull(n)
+                        && !isNull(this._indoorLayer)
+                        && !isNull(this._map)
                     ) {
-                        this._map.removeLayer(this._choroplethLayer);
-                        if (this._legend._map !== null) {
+                        if (!isNull(this._choroplethLayer) && this._map.hasLayer(this._choroplethLayer)) {
+                            this._map.removeLayer(this._choroplethLayer);
+                        }
+
+                        if (!isNull(this._legend) && !isNull(this._legend._map)) {
                             this._map.removeControl(this._legend);
                         }
 
-                        this._choroplethLayer = L.choropleth(this.data[n], {
-                            valueProperty,
-                            scale,
-                            steps,
-                            mode,
-                            style: {
-                                color,
-                                weight,
-                                fillOpacity
-                            },
-                            onEachFeature: function (feature, layer) {
-                                layer.bindPopup(`Zone: ${feature.properties.name}<br>Value: ${feature.properties.value.toFixed(2)}`);
-                            }
-                        }).addTo(this._map);
+                        if (isPlainObject(this.data[n])
+                            && this.data[n]['type'] === 'FeatureCollection'
+                            && Array.isArray(this.data[n]['features'])
+                            && this.data[n]['features'].length
+                        ) {
+                            const self = this,
+                                {
+                                    valueProperty = 'value',
+                                    scale = ['white', 'red'],
+                                    steps = 5,
+                                    mode = 'q',
 
-                        const legend = this._legend = L.control({
-                            position: 'topright'
-                        });
+                                    color = '#fff',
+                                    weight = 2,
+                                    fillOpacity = 0.8
+                                } = this.options;
 
-                        legend.onAdd = function (map) {
-                            const div = L.DomUtil.create('div', 'info legend');
-                            const limits = self._choroplethLayer.options.limits;
-                            const colors = self._choroplethLayer.options.colors;
-                            const labels = [];
+                            this._choroplethLayer = L.choropleth(this.data[n], {
+                                valueProperty,
+                                scale,
+                                steps,
+                                mode,
+                                style: {
+                                    color,
+                                    weight,
+                                    fillOpacity
+                                },
+                                onEachFeature: function (feature, layer) {
+                                    layer.bindPopup(`Zone: ${feature.properties.name}<br>Value: ${feature.properties.value.toFixed(2)}`);
+                                }
+                            }).addTo(this._map);
 
-                            div.innerHTML = '<div class="labels"><div class="min">' + limits[0].toFixed(2) + '</div> \
-                                <div class="max">' + limits[limits.length - 1].toFixed(2) + '</div></div>';
-
-                            limits.forEach(function (limit, index) {
-                                labels.push('<li style="background-color: ' + colors[index] + '"></li>')
+                            const legend = this._legend = L.control({
+                                position: 'topright'
                             });
 
-                            div.innerHTML += '<ul>' + labels.join('') + '</ul>';
-                            return div
-                        };
+                            legend.onAdd = function (map) {
+                                const div = L.DomUtil.create('div', 'info legend');
+                                const limits = self._choroplethLayer.options.limits;
+                                const colors = self._choroplethLayer.options.colors;
+                                const labels = [];
 
-                        legend.addTo(this._map);
+                                div.innerHTML = '<div class="labels"><div class="min">' + limits[0].toFixed(2) + '</div> \
+                                    <div class="max">' + limits[limits.length - 1].toFixed(2) + '</div></div>';
+
+                                limits.forEach(function (limit, index) {
+                                    labels.push('<li style="background-color: ' + colors[index] + '"></li>')
+                                });
+
+                                div.innerHTML += '<ul>' + labels.join('') + '</ul>';
+                                return div
+                            };
+
+                            legend.addTo(this._map);
+                        }
                     }
                 }
             }
