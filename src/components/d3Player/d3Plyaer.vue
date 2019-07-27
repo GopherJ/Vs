@@ -139,7 +139,6 @@
                     clipPathId = uuid(), self = this, isMobile = g_w < 620;
                 self.reference = moment(dateTimeStart);
                 self.w = g_w;
-                self.breakpoint = undefined;
 
                 if (![g_w, g_h].every(el => el > 0)) return;
 
@@ -578,17 +577,6 @@
 
                 const zooming = () => {
                     speedSliderLane.style('display', 'none');
-
-                    if (
-                        (self.scale.invert(g_w) - self.scale.invert(0) > 157680000000)
-                    ) {
-                        if (isUndefined(self.breakpoint)) {
-                            self.breakpoint = d3.event.transform;
-                            return;
-                        } else if (self.breakpoint.k > d3.event.transform.k) {
-                            return;
-                        }
-                    }
 
                     self.scale = d3.event.transform.rescaleX(xScale);
 
