@@ -25,8 +25,8 @@
     import { moveReferenceX } from '../../plugins/moveReference';
 
     const State = Object.freeze({
-        PLAYING: 'PLAYING',
-        PAUSE: 'PAUSE'
+        PLAYING : 'PLAYING',
+        PAUSE   : 'PAUSE'
     });
 
     export default {
@@ -45,6 +45,9 @@
                             .scale(k)
                             .translate(translateX, 0);
                     });
+            },
+            updateReference(reference) {
+                this.timeSliderHue(this.timeSliderInterpolateInvert(reference));
             },
             drawPlayer() {
 
@@ -240,6 +243,7 @@
                     timeSliderHueMax = c_w - 3 * axisXControlLaneGap - 2 * btnBorderLineWidth - playBtnWidth - timeLabelWidth - speedBtnWidth - circleStrokeWidth / 2 - circleRadius,
                     timeSliderInterpolate = timeSliderHueActual => d3.interpolateDate(dateTimeStart, dateTimeEnd)((timeSliderHueActual - timeSliderHueMin) / (timeSliderHueMax - timeSliderHueMin)),
                     timeSliderInterpolateInvert = date => d3.interpolate(timeSliderHueMin, timeSliderHueMax)((date - dateTimeStart) / (dateTimeEnd - dateTimeStart));
+                self.timeSliderInterpolateInvert = timeSliderInterpolateInvert;
 
                 const timeSliderLane = axisXControlLane
                     .append('g')
@@ -292,7 +296,7 @@
                     self.updateTimeLabel(isMobile);
                 };
 
-                const timeSliderHue = smoothMoveX(timeSliderHandler, timeSliderHueMin, timeSliderHueMax, onTimeSliderHandlerMoving);
+                const timeSliderHue = self.timeSliderHue = smoothMoveX(timeSliderHandler, timeSliderHueMin, timeSliderHueMax, onTimeSliderHandlerMoving);
 
                 const timeSliderHandlerOverlay = timeSliderLane
                     .append('rect')
@@ -506,7 +510,7 @@
                 const onSpeedSliderMoved = (_) => {
                     const interval = Math.round(tickLen / self.speed);
 
-                    if (self.timer !== null && self.playing) {
+                    if (!isNull(self.timer) && self.playing) {
                         self.timer.stop();
                         self.timer = d3.interval(self.play, interval);
                     }
@@ -586,13 +590,19 @@
                     g.call(drawFn, self.reference, self.scale);
                 };
 
+                const zoomend = () => {
+                    const dateTimeStart = self.scale.invert(0), dateTimeEnd = self.scale.invert(self.w);
+
+                    self.$emit('view-updated', dateTimeStart, dateTimeEnd);
+                };
+
                 svg
                     .call(brushX, brushExtent, self.scale, { brushed })
                     .call(cursor, axisXLane, [
                         [0, 0],
                         [g_w, axisXLaneHeight]
                     ]);
-                self.zoom = zoom(svg, { zooming }, scaleExtent, zoomExtent);
+                self.zoom = zoom(svg, { zooming, zoomend }, scaleExtent, zoomExtent);
 
                 const g = svg
                     .append('g')

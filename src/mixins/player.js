@@ -1,6 +1,6 @@
 /* eslint-disable */
 import * as d3 from 'd3';
-import { debounce, isBoolean, isFunction } from 'lodash';
+import { debounce, isBoolean, isFunction, isNull } from 'lodash';
 import { hideTip, isTipShowing } from '../plugins/tooltip';
 
 export default {
@@ -16,7 +16,9 @@ export default {
             initScale: null,
             svg: null,
             w: null,
-            observer: null
+            observer: null,
+            timeSliderHue: null,
+            timeSliderInterpolateInvert: null
         }
     },
     props: {
@@ -118,8 +120,7 @@ export default {
         this.$nextTick(this.safeDraw);
 
         if (isFunction(window.MutationObserver)) {
-            (this.observer = new MutationObserver(hideTip))
-                .observe(this.$el, {childList: true, subtree: true});
+            (this.observer = new MutationObserver(hideTip)).observe(this.$el, {childList: true, subtree: true});
         }
 
         this._handleResize = debounce(this.onResize, 500);
@@ -129,10 +130,8 @@ export default {
     beforeDestroy() {
         window.removeEventListener('resize', this._handleResize);
 
-        (this.observer !== null) && this.observer.disconnect();
-
-        if (this.timer !== null && this.playing) this.timer.stop();
-
+        if (!isNull(this.observer)) this.observer.disconnect();
+        if (!isNull(this.timer) && this.playing) this.timer.stop();
         if (isTipShowing()) hideTip();
     }
 };
