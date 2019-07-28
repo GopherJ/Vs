@@ -577,6 +577,7 @@
                     }
 
                     self.$emit('range-updated', start, end);
+                    g.raise();
                 };
 
                 const zooming = () => {

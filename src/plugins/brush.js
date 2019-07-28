@@ -98,8 +98,8 @@ function brushX(svg, extent, scale, { brushed, brushing }, data) {
     const brush = d3.brushX();
     const undefinedWrapper = (x, f, clean) => {
         if (!isUndefined(x)) {
-            f(x);
             if (clean) brush.move(b, null);
+            f(x);
         }
     };
 
