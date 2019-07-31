@@ -701,12 +701,17 @@ L.Handler.PathTransform = L.Handler.extend({
             .fire('scalestart', { layer: this._path, scale: L.point(1, 1) });
 
         if (this._handleLine) {
-            this._handleLine.clearLayers();
-            this._map.removeLayer(this._handleLine);
+            this._handleLine.eachLayer(layer => {
+                this._handlersGroup.removeLayer(layer);
+                this._handleLine.removeLayer(layer);
+            });
         }
+
         if (this._rotationMarker) {
-            this._rotationMarker.clearLayers();
-            this._map.removeLayer(this._rotationMarker);
+            this._rotationMarker.eachLayer(layer => {
+                this._handlersGroup.removeLayer(layer);
+                this._rotationMarker.removeLayer(layer);
+            });
         }
 
         //this._handleLine = this._rotationMarker = null;
