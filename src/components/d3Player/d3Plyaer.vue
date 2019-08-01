@@ -86,7 +86,7 @@
 
                         tickLen = 250,
 
-                        scaleExtent = [0.00001, 100000],
+                        scaleExtent = [0.0001, 10000],
 
                         axisXControlLaneHeight = 40,
                         axisXControlLaneMarginTop = 10,
