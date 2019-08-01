@@ -86,7 +86,7 @@
 
                         tickLen = 250,
 
-                        scaleExtent = [-Infinity, Infinity],
+                        scaleExtent = [0.00001, 100000],
 
                         axisXControlLaneHeight = 40,
                         axisXControlLaneMarginTop = 10,
@@ -514,6 +514,8 @@
                         self.timer.stop();
                         self.timer = d3.interval(self.play, interval);
                     }
+
+                    showTip(self.speed, speedSliderHandler.node())();
                 };
 
                 const speedSliderHue = smoothMoveY(speedSliderHandler, speedSliderHueMin, speedSliderHueMax, onSpeedSliderMoving, onSpeedSliderMoved);
@@ -577,6 +579,7 @@
                     }
 
                     self.$emit('range-updated', start, end);
+
                     g.raise();
                 };
 
