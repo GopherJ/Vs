@@ -18,7 +18,9 @@ export default {
             w: null,
             observer: null,
             timeSliderHue: null,
-            timeSliderInterpolateInvert: null
+            timeSliderInterpolateInvert: null,
+            viewStart: null,
+            viewEnd: null
         }
     },
     props: {

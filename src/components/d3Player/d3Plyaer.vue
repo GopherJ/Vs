@@ -377,7 +377,7 @@
                     timeSliderHue(timeSliderInterpolateInvert(
                         dateTimeEnd.diff(self.reference) >= tickLen
                             ? moment(self.reference).add(tickLen, 'milliseconds')
-                            : (switchToPause(), end(), moment(dateTimeStart))
+                            : (switchToPause(), end(), self.updateTimeRange(dateTimeStart, dateTimeEnd), moment(dateTimeStart))
                     ));
                 };
 
@@ -599,7 +599,7 @@
                 const zoomend = () => {
                     const dateTimeStart = self.scale.invert(0), dateTimeEnd = self.scale.invert(self.w);
 
-                    self.$emit('view-updated', dateTimeStart, dateTimeEnd);
+                    self.$emit('view-updated', self.viewStart = dateTimeStart, self.viewEnd = dateTimeEnd);
                 };
 
                 svg
