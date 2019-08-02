@@ -514,8 +514,6 @@
                         self.timer.stop();
                         self.timer = d3.interval(self.play, interval);
                     }
-
-                    showTip(self.speed, speedSliderHandler.node())();
                 };
 
                 const speedSliderHue = smoothMoveY(speedSliderHandler, speedSliderHueMin, speedSliderHueMax, onSpeedSliderMoving, onSpeedSliderMoved);
