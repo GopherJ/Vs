@@ -112,6 +112,7 @@
                         btnBorderRadius = 2,
 
                         btnFillColor = '#f5f5f5',
+                        btnDisableColor = '#ccc',
 
                         btnFontSize = 14,
                         btnFontWeight = 400,
@@ -139,7 +140,7 @@
                     playBtnWidth = c_w * playBtnWidthRatio,
                     speedBtnWidth = c_w * speedBtnWidthRatio,
                     [paddingInner, paddingOuter] = selectPaddingInnerOuterY(g_h),
-                    clipPathId = uuid(), self = this, isMobile = g_w < 620;
+                    clipPathId = uuid(), self = this, isMobile = g_w < 620, isDisabled = dateTimeEnd.diff(dateTimeStart) <= tickLen;
                 self.reference = moment(dateTimeStart);
                 self.w = g_w;
 
@@ -326,7 +327,8 @@
 
                 const playBtnRect = playBtnLane
                     .append('path')
-                    .attr('fill', btnFillColor)
+                    .attr('fill', isDisabled ? btnDisableColor : btnFillColor)
+                    .classed('disabled', isDisabled)
                     .attr('stroke', btnBorderLineColor)
                     .attr('stroke-width', btnBorderLineWidth)
                     .attr('d', roundedRect(0, 0, playBtnWidth, axisXControlLaneHeight - btnBorderLineWidth, btnBorderRadius, true, true, true, true));
@@ -353,16 +355,18 @@
                 };
 
                 const switchToPlay = () => {
-                    self.$emit('play');
+                    if (!isDisabled) {
+                        self.$emit('play');
 
-                    playBtnIcon
-                        .attr('data-state', State.PLAYING)
-                        .transition()
-                        .duration(360)
-                        .attr('d', shape.pause(c_h, c_h));
+                        playBtnIcon
+                            .attr('data-state', State.PLAYING)
+                            .transition()
+                            .duration(360)
+                            .attr('d', shape.pause(c_h, c_h));
 
-                    self.timer = d3.interval(self.play, Math.round(tickLen / self.speed));
-                    self.playing = true;
+                        self.timer = d3.interval(self.play, Math.round(tickLen / self.speed));
+                        self.playing = true;
+                    }
                 };
 
                 const end = () => {
@@ -646,6 +650,10 @@
 
     .d3-player path {
         cursor: pointer;
+    }
+
+    .d3-player .btn--play path.disabled {
+        cursor: not-allowed;
     }
 
     .d3-player .axis.axis--x .domain {
