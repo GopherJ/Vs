@@ -55,7 +55,7 @@
                 ////                          initialisation                                ////
                 ////////////////////////////////////////////////////////////////////////////////
 
-                const { dateTimeStart, dateTimeEnd, lanes } = getTrackerLanes(cloneDeep(this.data)),
+                const { dateTimeStart, dateTimeEnd, lanes } = getTrackerLanes(this.data),
                     {
                         intervalCornerRadius = 4,
 
@@ -382,7 +382,14 @@
                 };
 
                 playBtnRect
-                    .on('click', () => (playBtnIcon.attr('data-state') === State.PLAYING ? switchToPause : switchToPlay)());
+                    .on('click', () => {
+                        const speedSliderLineSelection = axisXControlLane.select('.slider--speed'),
+                            DISPLAY = speedSliderLineSelection.style('display');
+
+                        if (DISPLAY !== 'none') speedSliderLineSelection.style('display', 'none');
+
+                        (playBtnIcon.attr('data-state') === State.PLAYING ? switchToPause : switchToPlay)();
+                    });
 
                 ////////////////////////////////////////////////////////////////////////////////
                 ////                                time label                              ////
@@ -521,6 +528,7 @@
                 };
 
                 const speedSliderHue = smoothMoveY(speedSliderHandler, speedSliderHueMin, speedSliderHueMax, onSpeedSliderMoving, onSpeedSliderMoved);
+                speedSliderHue(speedSliderHueMin);
 
                 const speedSliderTrackOverlay = speedSliderLane
                     .append('rect')
