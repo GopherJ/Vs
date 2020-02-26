@@ -20,7 +20,7 @@
                 _indoorLayer: null,
                 _fullscreenControl: null,
                 _legend: null,
-                indoorLayerMapUuid: null,
+                indoorLayerLevel: null,
             }
         },
         mixins: [mixins],
@@ -71,20 +71,20 @@
                         has_bound_control: true,
 
                         onSetLevel() {
-                            self.indoorLayerMapUuid = this.getLevelMapUuid();
+                            self.indoorLayerLevel = this.getLevel();
                         }
                     }).addTo(Map);
 
-                    this.indoorLayerMapUuid = this._indoorLayer.getLevelMapUuid();
+                    this.indoorLayerLevel = this._indoorLayer.getLevel();
                 }
 
-                if (!isNull(this.indoorLayerMapUuid)
-                    && isPlainObject(data[this.indoorLayerMapUuid])
-                    && data[this.indoorLayerMapUuid]['type'] === 'FeatureCollection'
-                    && Array.isArray(data[this.indoorLayerMapUuid]['features'])
-                    && data[this.indoorLayerMapUuid]['features'].length
+                if (!isNull(this.indoorLayerLevel)
+                    && isPlainObject(data[this.indoorLayerLevel])
+                    && data[this.indoorLayerLevel]['type'] === 'FeatureCollection'
+                    && Array.isArray(data[this.indoorLayerLevel]['features'])
+                    && data[this.indoorLayerLevel]['features'].length
                 ) {
-                    this._choroplethLayer = L.choropleth(data[this.indoorLayerMapUuid], {
+                    this._choroplethLayer = L.choropleth(data[this.indoorLayerLevel], {
                         valueProperty,
                         scale,
                         steps,
@@ -136,7 +136,7 @@
                 this._fullscreenControl = null;
                 this._tileLayer = null;
                 this._legend = null;
-                this.indoorLayerMapUuid = null;
+                this.indoorLayerLevel = null;
             },
             safeDraw() {
                 this.reset();
@@ -144,7 +144,7 @@
             }
         },
         watch: {
-            indoorLayerMapUuid: {
+            indoorLayerLevel: {
                 deep: false,
                 handler(n, o) {
                     if (!isNull(o)

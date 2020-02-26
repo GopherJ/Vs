@@ -7,7 +7,7 @@
     import 'leaflet-fullscreen';
     import {isNull, isUndefined} from 'lodash';
     import '../../utils/leaflet-indoor';
-    import '../../lib/leaflet.heat';
+    import '../../lib/Leaflet.Heat';
     import mixins from '../../mixins/coords';
 
     export default {
@@ -19,7 +19,7 @@
                 _indoorLayer: null,
                 _heatLayer: null,
                 _fullscreenControl: null,
-                indoorLayerMapUuid: null,
+                indoorLayerLevel: null,
             }
         },
         mixins: [mixins],
@@ -66,15 +66,15 @@
                         has_bound_control: true,
 
                         onSetLevel() {
-                            self.indoorLayerMapUuid = this.getLevelMapUuid();
+                            self.indoorLayerLevel = this.getLevel();
                         }
                     }).addTo(Map);
 
-                    this.indoorLayerMapUuid = this._indoorLayer.getLevelMapUuid();
+                    this.indoorLayerLevel = this._indoorLayer.getLevel();
                 }
 
-                if (!isNull(this.indoorLayerMapUuid) && Array.isArray(data[this.indoorLayerMapUuid])) {
-                    this._heatLayer = L.heatLayer(data[this.indoorLayerMapUuid], {
+                if (!isNull(this.indoorLayerLevel) && Array.isArray(data[this.indoorLayerLevel])) {
+                    this._heatLayer = L.heatLayer(data[this.indoorLayerLevel], {
                         minOpacity,
                         blur,
                         max,
@@ -94,7 +94,7 @@
                 this._indoorLayer = null;
                 this._fullscreenControl = null;
                 this._tileLayer = null;
-                this.indoorLayerMapUuid = null;
+                this.indoorLayerLevel = null;
             },
             safeDraw() {
                 this.reset();
@@ -102,7 +102,7 @@
             }
         },
         watch: {
-            indoorLayerMapUuid: {
+            indoorLayerLevel: {
                 deep: false,
                 handler(n, o) {
                     if (!isNull(o)

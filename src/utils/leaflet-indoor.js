@@ -1,5 +1,5 @@
 import L from 'leaflet';
-import '../lib/leaflet-labeled-circle';
+import '../lib/Leaflet.Labeled.Circle';
 import * as turf from '@turf/turf';
 
 /**
@@ -47,7 +47,7 @@ L.TileLayer.Grayscale = L.TileLayer.extend({
         options.crossOrigin = true;
         L.TileLayer.prototype.initialize.call(this, url, options);
 
-        this.on('tileload', function (e) {
+        this.on('tileload', function(e) {
             this._makeGrayscale(e.tile);
         });
     },
@@ -59,7 +59,9 @@ L.TileLayer.Grayscale = L.TileLayer.extend({
     },
 
     _makeGrayscale(img) {
-        if (img.getAttribute('data-grayscaled')) { return; }
+        if (img.getAttribute('data-grayscaled')) {
+            return;
+        }
 
         img.crossOrigin = '';
         const canvas = document.createElement('canvas');
@@ -79,7 +81,7 @@ L.TileLayer.Grayscale = L.TileLayer.extend({
     },
 });
 
-L.tileLayer.grayscale = function (url, options) {
+L.tileLayer.grayscale = function(url, options) {
     return new L.TileLayer.Grayscale(url, options);
 };
 
@@ -89,34 +91,33 @@ const rgbToHex = (r, g, b) => {
 
 L.GeoJSON.IndoorZone = L.GeoJSON.extend({
     initialize(feature, options) {
-        const DEFAULT =
-            {
-                onEachFeature(feature, layer) {
-                    if (feature.properties.tags.length == 0) {
-                        layer.bindPopup(`Name: ${feature.properties.name}<br/>Tags: none`);
-                    } else {
-                        layer.bindPopup(`Name: ${feature.properties.name}<br/>Tags: ${feature.properties.tags}`);
-                    }
-                },
-                style(feature) {
-                    let fill = '#ffffff';
+        const DEFAULT = {
+            onEachFeature(feature, layer) {
+                if (feature.properties.tags.length == 0) {
+                    layer.bindPopup(`Name: ${feature.properties.name}<br/>Tags: none`);
+                } else {
+                    layer.bindPopup(`Name: ${feature.properties.name}<br/>Tags: ${feature.properties.tags}`);
+                }
+            },
+            style(feature) {
+                let fill = '#ffffff';
 
-                    if (feature.properties.rgb_color != null) {
-                        try {
-                            fill = rgbToHex(...feature.properties.rgb_color.split(',').slice(0, 3));
-                        } catch (err) {
-                            console.error(err);
-                        }
+                if (feature.properties.rgb_color != null) {
+                    try {
+                        fill = rgbToHex(...feature.properties.rgb_color.split(',').slice(0, 3));
+                    } catch (err) {
+                        console.warn(err);
                     }
+                }
 
-                    return {
-                        fillColor: fill,
-                        weight: 1,
-                        color: '#ff7800',
-                        fillOpacity: 0.4,
-                    };
-                },
-            };
+                return {
+                    fillColor: fill,
+                    weight: 1,
+                    color: '#ff7800',
+                    fillOpacity: 0.4,
+                };
+            },
+        };
 
         L.Util.setOptions(this, L.Util.extend(options || {}, DEFAULT));
 
@@ -145,7 +146,10 @@ L.GeoJSON.IndoorZone = L.GeoJSON.extend({
         this._labeled_circle_marker = L.labeledCircleMarker(
             feature.geometry.coordinates.slice().reverse(),
             feature, {
-                markerOptions: { color: '#050', radius: 20, },
+                markerOptions: {
+                    color: '#050',
+                    radius: 15,
+                },
             },
         );
 
@@ -163,10 +167,10 @@ L.GeoJSON.IndoorZone = L.GeoJSON.extend({
     },
 
     updateLabelText(text) {
-        if (this.options.show_zone_counter === true
-            && this._labeled_circle_marker._map !== null
-            && this._labeled_circle_marker._marker !== null
-            && this._labeled_circle_marker._marker._textElement !== null
+        if (this.options.show_zone_counter === true &&
+            this._labeled_circle_marker._map !== null &&
+            this._labeled_circle_marker._marker !== null &&
+            this._labeled_circle_marker._marker._textElement !== null
         ) {
             this._labeled_circle_marker.setText(text);
         }
@@ -206,7 +210,7 @@ L.GeoJSON.IndoorZone = L.GeoJSON.extend({
     },
 });
 
-L.geoJson.indoor_zone = function (feature, options) {
+L.geoJson.indoor_zone = function(feature, options) {
     return new L.GeoJSON.IndoorZone(feature, options);
 };
 
@@ -274,8 +278,8 @@ L.LevelControl = L.Control.extend({
 
             levelBtn.appendChild(levelBtn.ownerDocument.createTextNode(originalLevel));
 
-            (function (level) {
-                levelBtn.onclick = function () {
+            (function(level) {
+                levelBtn.onclick = function() {
                     self.setLevel(level);
                 };
             }(level));
@@ -319,7 +323,7 @@ L.LevelControl = L.Control.extend({
     }
 });
 
-L.levelControl = function (options) {
+L.levelControl = function(options) {
     return new L.LevelControl(options);
 };
 
@@ -413,7 +417,7 @@ L.LockControl = L.Control.extend({
     },
 });
 
-L.lockControl = function (options) {
+L.lockControl = function(options) {
     return new L.LockControl(options);
 };
 
@@ -462,15 +466,14 @@ L.Indoor = L.Layer.extend({
         if ('onSetLevel' in this.options && isFunction(this.options['onSetLevel'])) {
             this._onSetLevel = this.options.onSetLevel;
         } else {
-            this._onSetLevel = function (level) {
-            };
+            this._onSetLevel = function(level) {};
         }
 
         if ('onEachFeature' in this.options && isFunction(this.options['onEachFeature'])) {
             var onEachFeature = this.options.onEachFeature;
         }
 
-        this.options.onEachFeature = function (feature, layer) {
+        this.options.onEachFeature = function(feature, layer) {
             if (onEachFeature) {
                 onEachFeature(feature, layer);
             }
@@ -521,7 +524,10 @@ L.Indoor = L.Layer.extend({
         if (this._zones[this._level]) {
             Object.values(this._zones[this._level]).forEach(layer => layer.addTo(map));
 
-            this._zoneControl = L.control.layers(null, this._zones[this._level], { collapsed: true, position: 'topright' });
+            this._zoneControl = L.control.layers(null, this._zones[this._level], {
+                collapsed: true,
+                position: 'topright'
+            });
             this._zoneControl.addTo(map);
         }
 
@@ -533,7 +539,7 @@ L.Indoor = L.Layer.extend({
 
         if (this.options['has_lock'] && this.options['has_lock'] === true) {
             this._lockControl = L.lockControl();
-            this._lockControl.on('lockchange', function () {
+            this._lockControl.on('lockchange', function() {
                 if (this._locked) {
                     self._map.dragging.disable();
                     self._map.touchZoom.disable();
@@ -557,9 +563,11 @@ L.Indoor = L.Layer.extend({
 
         if (this.options['has_bound_control'] && this.options['has_bound_control'] === true) {
             this._boundControl = L.boundControl();
-            this._boundControl.on('click', function () {
+            this._boundControl.on('click', function() {
                 if (self._bounds[self._level]) {
-                    map.fitBounds(self._bounds[self._level], { padding: [20, 20] });
+                    map.fitBounds(self._bounds[self._level], {
+                        padding: [20, 20]
+                    });
                 }
             });
 
@@ -570,7 +578,9 @@ L.Indoor = L.Layer.extend({
         this._layers[this._level].addTo(map);
 
         if (this._bounds[this._level]) {
-            map.fitBounds(this._bounds[this._level], { padding: [20, 20] });
+            map.fitBounds(this._bounds[this._level], {
+                padding: [20, 20]
+            });
         }
     },
 
@@ -611,10 +621,16 @@ L.Indoor = L.Layer.extend({
             return;
         };
 
-        let layers = this._layers, options = this.options, zones = this._zones, mapIds = this._mapIds, mapUuids = this._mapUuids;
+        let layers = this._layers,
+            options = this.options,
+            zones = this._zones,
+            mapIds = this._mapIds,
+            mapUuids = this._mapUuids;
 
         data.forEach((indoor_map) => {
             const map_level = indoor_map.level;
+            const map_uuid = indoor_map.uuid;
+
             if (!isLevel(map_level)) {
                 return;
             }
@@ -630,11 +646,15 @@ L.Indoor = L.Layer.extend({
             }
 
             if (!(map_level in mapIds)) {
-                mapIds[map_level] = indoor_map.id;
+                mapIds[map_level] = [indoor_map.id];
+            } else if (Array.isArray(mapIds[map_level])) {
+                mapIds[map_level].push(indoor_map.id);
             }
 
             if (!(map_level in mapUuids)) {
-                mapUuids[map_level] = indoor_map.uuid;
+                mapUuids[map_level] = [indoor_map.uuid];
+            } else if (Array.isArray(mapUuids[map_level])) {
+                mapUuids[map_level].push(indoor_map.uuid);
             }
 
             // Tiles Layer
@@ -657,16 +677,22 @@ L.Indoor = L.Layer.extend({
                 }
 
                 if (indoor_map['map_bounds']) {
-                    this._bounds[map_level] = indoor_map['map_bounds'];
+                    this._bounds[map_uuid] = L.latLngBounds(indoor_map['map_bounds']);
+
+                    if (!this._bounds[map_level]) {
+                        this._bounds[map_level] = L.latLngBounds(indoor_map['map_bounds']);
+                    } else {
+                        this._bounds[map_level] = this._bounds[map_level].extend(L.latLngBounds(indoor_map['map_bounds']));
+                    }
                 }
             }
 
             // Features
             // To hide
             if (
-                !isObject(indoor_map['map_features'])
-                || !L.Util.isArray(indoor_map['map_features']['features'])
-                || options.hide_zones === true
+                !isObject(indoor_map['map_features']) ||
+                !L.Util.isArray(indoor_map['map_features']['features']) ||
+                options.hide_zones === true
             ) {
                 return;
             }
@@ -694,14 +720,16 @@ L.Indoor = L.Layer.extend({
 
                 const splitFeatureIntoLevel = level => {
                     if (feature.geometry.type === 'Polygon' && feature.properties.type === 'map_zone') {
-                        let indoor_zone_layer = L.geoJson.indoor_zone(feature, { show_zone_counter: this.options.show_zone_counter });
+                        let indoor_zone_layer = L.geoJson.indoor_zone(feature, {
+                            show_zone_counter: this.options.show_zone_counter
+                        });
 
                         if (level in zones) {
                             const level_zone = zones[level];
 
                             if (L.Util.isArray(feature.properties.tags) && feature.properties.tags.length) {
                                 Array.from(new Set(feature.properties.tags)).forEach(tag => {
-                                    const name = `Zone -Tags: ${tag || 'none'}`;
+                                    const name = `Zone - Tags: ${tag || 'none'}`;
 
                                     if (name in level_zone) {
                                         level_zone[name].addLayer(indoor_zone_layer);
@@ -710,7 +738,7 @@ L.Indoor = L.Layer.extend({
                                     }
                                 });
                             } else {
-                                const name = 'Zone -Tags: none';
+                                const name = 'Zone - Tags: none';
 
                                 if (name in level_zone) {
                                     level_zone[name].addLayer(indoor_zone_layer);
@@ -723,12 +751,12 @@ L.Indoor = L.Layer.extend({
                                 zones[level] = {};
 
                                 Array.from(new Set(feature.properties.tags)).forEach(tag => {
-                                    const name = `Zone -Tags: ${tag || 'none'}`;
+                                    const name = `Zone - Tags: ${tag || 'none'}`;
 
                                     zones[level][name] = L.layerGroup().addLayer(indoor_zone_layer);
                                 });
                             } else {
-                                const name = 'Zone -Tags: none';
+                                const name = 'Zone - Tags: none';
 
                                 zones[level] = {
                                     [name]: L.layerGroup().addLayer(indoor_zone_layer)
@@ -786,13 +814,21 @@ L.Indoor = L.Layer.extend({
 
     getLevelCenter() {
         if (this._bounds[this._level]) {
-            return L.latLngBounds(this._bounds[this._level]).getCenter();
+            return this._bounds[this._level].getCenter();
         }
 
         return null;
     },
 
-    getLevelMapId() {
+    getMapCenter(map_uuid) {
+        if (map_uuid != undefined && this._bounds[map_uuid]) {
+            return this._bounds[map_uuid].getCenter();
+        }
+
+        return null;
+    },
+
+    getLevelMapIds() {
         if (this._mapIds[this._level]) {
             return this._mapIds[this._level];
         }
@@ -800,7 +836,7 @@ L.Indoor = L.Layer.extend({
         return null;
     },
 
-    getLevelMapUuid(level) {
+    getLevelMapUuids(level) {
         const _level = level || this._level;
         if (this._mapUuids[_level]) {
             return this._mapUuids[_level];
@@ -823,15 +859,13 @@ L.Indoor = L.Layer.extend({
 
     getZones() {
         return Object.keys(this._zones).reduce((ite, cur) => {
-            const map_uuid = this.getLevelMapUuid(cur);
-            if (map_uuid) {
-                const zones = this.getLevelZones(cur);
-                ite[map_uuid] = zones;
+            const zones = this.getLevelZones(cur);
+            ite[cur] = zones;
 
-                zones.forEach(zone => {
-                    ite[zone.getZoneId()] = zone;
-                });
-            }
+            zones.forEach(zone => {
+                ite[zone.getZoneId()] = zone;
+            });
+
             return ite;
         }, {});
     },
@@ -879,6 +913,10 @@ L.Indoor = L.Layer.extend({
 
         const oldLayer = this._layers[this._level];
         const layer = this._layers[level];
+        const event = {
+            oldLevel: this._level,
+            newLevel: level
+        };
 
         if (this._map !== null) {
             if (this._map.hasLayer(oldLayer)) {
@@ -890,7 +928,9 @@ L.Indoor = L.Layer.extend({
             }
 
             if (this._bounds[level]) {
-                this._map.fitBounds(this._bounds[level], { padding: [20, 20] });
+                this._map.fitBounds(this._bounds[level], {
+                    padding: [20, 20]
+                });
             }
 
             if (this._zoneControl !== null) {
@@ -914,17 +954,20 @@ L.Indoor = L.Layer.extend({
             if (this._zones[level]) {
                 Object.values(this._zones[level]).forEach(layer => layer.addTo(this._map));
 
-                this._zoneControl = L.control.layers(null, this._zones[level], { collapsed: true, position: 'topright' });
+                this._zoneControl = L.control.layers(null, this._zones[level], {
+                    collapsed: true,
+                    position: 'topright'
+                });
                 this._zoneControl.addTo(this._map);
             }
 
             this._level = level;
 
-            this._onSetLevel.call(this, level);
+            this._onSetLevel.call(this, event);
         }
     }
 });
 
-L.indoor = function (data, options) {
+L.indoor = function(data, options) {
     return new L.Indoor(data, options);
 };
