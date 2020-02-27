@@ -232,7 +232,7 @@ L.LevelControl = L.Control.extend({
 
     initialize(options) {
         L.setOptions(this, options);
-        this._map = null;
+
         this._buttons = {};
         this._level = this.options.level;
         this._levels = this.options.levels;
@@ -241,8 +241,6 @@ L.LevelControl = L.Control.extend({
     },
 
     onAdd(map) {
-        this._map = map;
-
         const div = L.DomUtil.create('div', 'leaflet-bar leaflet-control');
 
         div.style.font = "18px 'Lucida Console',Monaco,monospace";
@@ -290,8 +288,7 @@ L.LevelControl = L.Control.extend({
         return div;
     },
 
-    onRemove() {
-        this._map = null;
+    onRemove(map) {
     },
 
     _levelChange(e) {
@@ -336,12 +333,9 @@ L.BoundControl = L.Control.extend({
 
     initialize(options) {
         L.setOptions(this, options);
-
-        this._map = null;
     },
 
     onAdd(map) {
-        this._map = map;
         const self = this;
 
         const div = L.DomUtil.create('div', 'leaflet-bar leaflet-control leaflet-button-part');
@@ -356,8 +350,7 @@ L.BoundControl = L.Control.extend({
         return div;
     },
 
-    onRemove() {
-        this._map = null;
+    onRemove(map) {
     },
 });
 
@@ -376,7 +369,6 @@ L.LockControl = L.Control.extend({
     initialize(options) {
         L.setOptions(this, options);
 
-        this._map = null;
         this._locked = false;
         this._lockBtn = null;
         this._lockIcon = null;
@@ -385,7 +377,6 @@ L.LockControl = L.Control.extend({
     },
 
     onAdd(map) {
-        this._map = map;
         const self = this;
 
         const div = L.DomUtil.create('div', 'leaflet-bar leaflet-control leaflet-button-part');
@@ -413,7 +404,6 @@ L.LockControl = L.Control.extend({
     },
 
     onRemove() {
-        this._map = null;
     },
 });
 
@@ -446,8 +436,8 @@ L.Indoor = L.Layer.extend({
         L.setOptions(this, options);
 
         const layers = this._layers = {};
+
         this._bounds = {};
-        this._map = null;
         this._zones = {};
         this._mapIds = {};
         this._mapUuids = {};
@@ -508,7 +498,6 @@ L.Indoor = L.Layer.extend({
     },
 
     onAdd(map) {
-        this._map = map;
         const self = this;
 
         if (!isLevel(this._level) || !(this._level in this._layers)) {
@@ -541,18 +530,18 @@ L.Indoor = L.Layer.extend({
             this._lockControl = L.lockControl();
             this._lockControl.on('lockchange', function() {
                 if (this._locked) {
-                    self._map.dragging.disable();
-                    self._map.touchZoom.disable();
-                    self._map.doubleClickZoom.disable();
-                    self._map.scrollWheelZoom.disable();
+                    map.dragging.disable();
+                    map.touchZoom.disable();
+                    map.doubleClickZoom.disable();
+                    map.scrollWheelZoom.disable();
 
                     self.hideLevelZones();
                     self.hideZoneControl();
                 } else {
-                    self._map.dragging.enable();
-                    self._map.touchZoom.enable();
-                    self._map.doubleClickZoom.enable();
-                    self._map.scrollWheelZoom.enable();
+                    map.dragging.enable();
+                    map.touchZoom.enable();
+                    map.doubleClickZoom.enable();
+                    map.scrollWheelZoom.enable();
 
                     self.showLevelZones();
                     self.showZoneControl();
@@ -585,35 +574,33 @@ L.Indoor = L.Layer.extend({
     },
 
     onRemove(map) {
-        if (this._level in this._layers && this._map.hasLayer(this._layers[this._level])) {
-            this._map.removeLayer(this._layers[this._level]);
+        if (this._level in this._layers && map.hasLayer(this._layers[this._level])) {
+            map.removeLayer(this._layers[this._level]);
         }
 
         if (this._levelControl !== null) {
-            this._map.removeControl(this._levelControl);
+            map.removeControl(this._levelControl);
         }
 
         if (this._zoneControl !== null) {
-            this._map.removeControl(this._zoneControl);
+            map.removeControl(this._zoneControl);
         }
 
         if (this._lockControl !== null) {
-            this._map.removeControl(this._lockControl);
+            map.removeControl(this._lockControl);
         }
 
         if (this._boundControl !== null) {
-            this._map.removeControl(this._boundControl);
+            map.removeControl(this._boundControl);
         }
 
         if (this._zones[this._level]) {
             Object.values(this._zones[this._level]).forEach(layerGroup => {
-                if (this._map.hasLayer(layerGroup)) {
-                    this._map.removeLayer(layerGroup);
+                if (map.hasLayer(layerGroup)) {
+                    map.removeLayer(layerGroup);
                 }
             });
         }
-
-        this._map = null;
     },
 
     addData(data) {
