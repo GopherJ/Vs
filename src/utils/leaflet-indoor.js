@@ -807,6 +807,20 @@ L.Indoor = L.Layer.extend({
         return null;
     },
 
+    getLevelCenters() {
+        if (Array.isArray(this._mapUuids[this._level]) && this._mapUuids[this._level].length > 0) {
+            return this._mapUuids[this._level].reduce((ite, cur) => {
+                const center = this.getMapCenter(cur);
+                if (center !== null) {
+                    ite[cur] = center;
+                }
+                return ite;
+            }, {});
+        }
+
+        return null;
+    },
+
     getMapCenter(map_uuid) {
         if (map_uuid != undefined && this._bounds[map_uuid]) {
             return this._bounds[map_uuid].getCenter();
