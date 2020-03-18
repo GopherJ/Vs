@@ -290,7 +290,7 @@
                     const Nd = moment(timeSliderInterpolate(timeSliderHueActual)),
                         Od = moment(self.reference), tickLen = Nd.diff(Od), isLTR = Nd > Od;
 
-                    g.call(moveReferenceX, self.scale, self.reference = Nd);
+                    if (!isUndefined(self.g) && !isNull(self.g)) self.g.call(moveReferenceX, self.scale, self.reference = Nd);
 
                     self.$emit('reference-updated', clampRange(dateTimeStart, dateTimeEnd, Nd), getPassingEntries(lanes, Nd, tickLen, isLTR));
 
@@ -590,7 +590,7 @@
 
                     self.$emit('range-updated', start, end);
 
-                    g.raise();
+                    if (!isUndefined(self.g) && !isNull(self.g)) self.g.raise();
                 };
 
                 const zooming = () => {
@@ -598,10 +598,9 @@
 
                     self.scale = d3.event.transform.rescaleX(xScale);
 
-                    svg
-                        .call(brushX, brushExtent, self.scale, { brushed });
+                    if (!isUndefined(self.svg) && !isNull(self.svg)) self.svg.call(brushX, brushExtent, self.scale, { brushed });
 
-                    g.call(drawFn, self.reference, self.scale);
+                    if (!isUndefined(self.g) && !isNull(self.g)) self.g.call(drawFn, self.reference, self.scale);
                 };
 
                 const zoomend = () => {
@@ -622,6 +621,7 @@
                     .append('g')
                     .attr('clip-path', `url(#${clipPathId})`)
                     .attr('transform', `translate(${left + __offset__}, ${top + __offset__})`);
+                self.g = g;
 
                 g.call(drawFn, self.reference, self.scale);
             },

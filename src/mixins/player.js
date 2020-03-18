@@ -15,6 +15,7 @@ export default {
             zoom: null,
             initScale: null,
             svg: null,
+            g: null,
             w: null,
             observer: null,
             timeSliderHue: null,

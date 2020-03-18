@@ -1,6 +1,6 @@
-import * as d3 from 'd3';
-import { isNull, isUndefined, isFunction, } from 'lodash';
-import { map } from '../utils/array';
+import * as d3 from "d3";
+import { isNull, isUndefined, isFunction } from "lodash";
+import { map } from "../utils/array";
 
 /*
     ToDo: check if it's user-driven event
@@ -18,13 +18,16 @@ import { map } from '../utils/array';
 const brushInvertX = (extent, scale, data) => {
     if (isNull(d3.event.selection)) return;
 
-    const [xLeft, xRight] = map
-        .call(d3.event.selection, el => el - extent[0][0]);
+    const [xLeft, xRight] = map.call(
+        d3.event.selection,
+        el => el - extent[0][0]
+    );
 
-    if (isFunction(scale.invert)) return {
-        start: scale.invert(xLeft),
-        end: scale.invert(xRight)
-    };
+    if (isFunction(scale.invert))
+        return {
+            start: scale.invert(xLeft),
+            end: scale.invert(xRight)
+        };
 
     if (!isFunction(scale.bandwidth)) {
         const bisector = d3.bisector(d => d.key);
@@ -35,7 +38,7 @@ const brushInvertX = (extent, scale, data) => {
         };
     }
 
-    const bisecLeft  = d3.bisector(d => scale(d.key) + scale.bandwidth()).left;
+    const bisecLeft = d3.bisector(d => scale(d.key) + scale.bandwidth()).left;
     const bisecRight = d3.bisector(d => scale(d.key)).right;
 
     return {
@@ -54,16 +57,19 @@ const brushInvertX = (extent, scale, data) => {
 const brushInvertY = (extent, scale, data) => {
     if (isNull(d3.event.selection)) return;
 
-    const [yTop, yBottom] = map
-        .call(d3.event.selection, el => el - extent[0][1]);
+    const [yTop, yBottom] = map.call(
+        d3.event.selection,
+        el => el - extent[0][1]
+    );
 
-    if (isFunction(scale.invert)) return {
-        start: scale.invert(yTop),
-        end: scale.invert(yBottom)
-    };
+    if (isFunction(scale.invert))
+        return {
+            start: scale.invert(yTop),
+            end: scale.invert(yBottom)
+        };
 
     if (!isFunction(scale.bandwidth)) {
-        const bisector  = d3.bisector(d => d.key);
+        const bisector = d3.bisector(d => d.key);
 
         return {
             start: data[bisector.left(data, yTop)].key,
@@ -71,7 +77,7 @@ const brushInvertY = (extent, scale, data) => {
         };
     }
 
-    const bisecLeft  = d3.bisector(d => scale(d.key) + scale.bandwidth()).left;
+    const bisecLeft = d3.bisector(d => scale(d.key) + scale.bandwidth()).left;
     const bisecRight = d3.bisector(d => scale(d.key)).right;
 
     return {
@@ -90,10 +96,10 @@ const brushInvertY = (extent, scale, data) => {
  * @param brushing
  */
 function brushX(svg, extent, scale, { brushed, brushing }, data) {
-    const brushSelection = svg.select('.brush');
+    const brushSelection = svg.select(".brush");
     let b = !brushSelection.empty()
         ? brushSelection
-        : svg.append('g').attr('class', 'brush');
+        : svg.append("g").attr("class", "brush");
 
     const brush = d3.brushX();
     const undefinedWrapper = (x, f, clean) => {
@@ -103,22 +109,24 @@ function brushX(svg, extent, scale, { brushed, brushing }, data) {
         }
     };
 
+    brush.extent(extent);
 
-    brush
-        .extent(extent);
-
-    brush.on('start', () => {
+    brush.on("start", () => {
         b.raise();
     });
 
     if (isFunction(brushing)) {
-        brush.on('brush', () => {
-            undefinedWrapper(brushInvertX(extent, scale, data), brushing, false);
+        brush.on("brush", () => {
+            undefinedWrapper(
+                brushInvertX(extent, scale, data),
+                brushing,
+                false
+            );
         });
     }
 
     if (isFunction(brushed)) {
-        brush.on('end', () => {
+        brush.on("end", () => {
             undefinedWrapper(brushInvertX(extent, scale, data), brushed, true);
         });
     }
@@ -136,10 +144,10 @@ function brushX(svg, extent, scale, { brushed, brushing }, data) {
  * @param data
  */
 function brushY(svg, extent, scale, { brushed, brushing }, data) {
-    const brushSelection = svg.select('.brush');
+    const brushSelection = svg.select(".brush");
     let b = !brushSelection.empty()
         ? brushSelection
-        : svg.append('g').attr('class', 'brush');
+        : svg.append("g").attr("class", "brush");
 
     const brush = d3.brushY();
     const undefinedWrapper = (x, f, clean) => {
@@ -149,21 +157,24 @@ function brushY(svg, extent, scale, { brushed, brushing }, data) {
         }
     };
 
-    brush
-        .extent(extent);
+    brush.extent(extent);
 
-    brush.on('start', () => {
+    brush.on("start", () => {
         b.raise();
     });
 
     if (isFunction(brushing)) {
-        brush.on('brush', () => {
-            undefinedWrapper(brushInvertY(extent, scale, data), brushing, false);
+        brush.on("brush", () => {
+            undefinedWrapper(
+                brushInvertY(extent, scale, data),
+                brushing,
+                false
+            );
         });
     }
 
     if (isFunction(brushed)) {
-        brush.on('end', () => {
+        brush.on("end", () => {
             undefinedWrapper(brushInvertY(extent, scale, data), brushed, true);
         });
     }
@@ -171,7 +182,4 @@ function brushY(svg, extent, scale, { brushed, brushing }, data) {
     b.call(brush);
 }
 
-export {
-    brushX,
-    brushY
-};
+export { brushX, brushY };
