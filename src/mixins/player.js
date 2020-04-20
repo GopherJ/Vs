@@ -2,6 +2,7 @@
 import * as d3 from 'd3';
 import { debounce, isBoolean, isFunction, isNull } from 'lodash';
 import { hideTip, isTipShowing } from '../plugins/tooltip';
+import { bind, clear } from 'size-sensor';
 
 export default {
     data() {
@@ -21,7 +22,8 @@ export default {
             timeSliderHue: null,
             timeSliderInterpolateInvert: null,
             viewStart: null,
-            viewEnd: null
+            viewEnd: null,
+            unbind: null
         }
     },
     props: {
@@ -129,6 +131,8 @@ export default {
         this._handleResize = debounce(this.onResize, 500);
 
         window.addEventListener('resize', this._handleResize);
+
+        this.unbind = bind(this.$el, this._handleResize);
     },
     beforeDestroy() {
         window.removeEventListener('resize', this._handleResize);
@@ -136,5 +140,7 @@ export default {
         if (!isNull(this.observer)) this.observer.disconnect();
         if (!isNull(this.timer) && this.playing) this.timer.stop();
         if (isTipShowing()) hideTip();
+
+        if (!isNull(this.unbind) && isFunction(this.unbind)) this.unbind();
     }
 };
