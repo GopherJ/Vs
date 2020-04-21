@@ -165,3 +165,7 @@ node_modules
 .node_repl_history
 
 yarn.lock
+
+dist/*.map
+
+dist/*.js
