@@ -1,6 +1,6 @@
 # Vs
 
-Vue Visualisation Package using `d3.js` and `leaflet`. Package used in [Ubudu](http://www.ubudu.com). See also:
+Vue Visualisation Package using `d3.js` and `leaflet`. See also:
 
 - [LayoutGrid](https://github.com/GopherJ/LayoutGrid)  :  Creating a powerful dashboard using `Vs` and `vue-grid-layout`
 
