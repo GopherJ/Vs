@@ -168,4 +168,4 @@ yarn.lock
 
 dist/*.map
 
-dist/*.js
+dist/Vs.js
