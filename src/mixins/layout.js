@@ -18,8 +18,8 @@ export default {
             default: () => ({})
         },
         data: {
-            type: Object,
-            required: true
+            required: true,
+            validator: prop => prop === null || Object.prototype.toString.call(prop) === '[object Object]'
         },
         options: {
             type: Object,

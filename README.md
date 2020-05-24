@@ -997,7 +997,7 @@ This component is like `d3-tree` but with all leaf nodes are at the same height.
 
 |key|description|type|default|
 |:---|:---|:---|:---|
-|`nodeTitle`|`tooltip`|`function`|`d => d.data.key + '<br>' + 'd.data.value'`|
+|`nodeTitle`|`tooltip`|`function`|`d => d.data.name + '<br>' + 'd.data.value'`|
 |`nodeFill`|`tree node internal color`|`string (rgb, hex, rgba, hsl...)`|`#6eadc1`|
 |`nodeStroke`|`tree node edge color`|`string (rgb, hex, rgba, hsl...)`|`#6eadc1`|
 |`nodeFillOpacity`|`tree node internal color opacity`|`number`|`0.6`|
