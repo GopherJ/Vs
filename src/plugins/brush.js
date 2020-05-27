@@ -91,9 +91,9 @@ const brushInvertY = (extent, scale, data) => {
  * @param svg
  * @param extent
  * @param scale
- * @param data
  * @param brushed
  * @param brushing
+ * @param data
  */
 function brushX(svg, extent, scale, { brushed, brushing }, data) {
     const brushSelection = svg.select(".brush");
@@ -115,21 +115,21 @@ function brushX(svg, extent, scale, { brushed, brushing }, data) {
         b.raise();
     });
 
-    if (isFunction(brushing)) {
-        brush.on("brush", () => {
+    brush.on("brush", () => {
+        if (isFunction(brushing)) {
             undefinedWrapper(
                 brushInvertX(extent, scale, data),
                 brushing,
                 false
             );
-        });
-    }
+        }
+    });
 
-    if (isFunction(brushed)) {
-        brush.on("end", () => {
+    brush.on("end", () => {
+        if (isFunction(brushed)) {
             undefinedWrapper(brushInvertX(extent, scale, data), brushed, true);
-        });
-    }
+        }
+    });
 
     b.call(brush);
 }
@@ -163,21 +163,21 @@ function brushY(svg, extent, scale, { brushed, brushing }, data) {
         b.raise();
     });
 
-    if (isFunction(brushing)) {
-        brush.on("brush", () => {
+    brush.on("brush", () => {
+        if (isFunction(brushing)) {
             undefinedWrapper(
                 brushInvertY(extent, scale, data),
                 brushing,
                 false
             );
-        });
-    }
+        }
+    });
 
-    if (isFunction(brushed)) {
-        brush.on("end", () => {
+    brush.on("end", () => {
+        if (isFunction(brushed)) {
             undefinedWrapper(brushInvertY(extent, scale, data), brushed, true);
-        });
-    }
+        }
+    });
 
     b.call(brush);
 }
