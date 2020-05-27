@@ -40,7 +40,8 @@
                         radius = 8,
                         blur = 15,
                         max = 0.4
-                    } = this.options;
+                    } = this.options,
+                    isMultipleLevel = !Array.isArray(data);
 
                 if (isUndefined(center) || isUndefined(url) || isUndefined(attribution)) {
                     return;
@@ -73,7 +74,14 @@
                     this.indoorLayerLevel = this._indoorLayer.getLevel();
                 }
 
-                if (!isNull(this.indoorLayerLevel) && Array.isArray(data[this.indoorLayerLevel])) {
+                if (!isMultipleLevel) {
+                    this._heatLayer = L.heatLayer(data, {
+                        minOpacity,
+                        blur,
+                        max,
+                        radius
+                    }).addTo(Map);
+                } else if (!isNull(this.indoorLayerLevel) && Array.isArray(data[this.indoorLayerLevel])) {
                     this._heatLayer = L.heatLayer(data[this.indoorLayerLevel], {
                         minOpacity,
                         blur,
@@ -105,7 +113,8 @@
             indoorLayerLevel: {
                 deep: false,
                 handler(n, o) {
-                    if (!isNull(o)
+                    if (isMultipleLevel
+                        && !isNull(o)
                         && !isNull(n)
                         && !isNull(this._indoorLayer)
                         && !isNull(this._map)

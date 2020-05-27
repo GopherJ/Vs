@@ -13,8 +13,8 @@ export default {
             default: '300px'
         },
         data: {
-            type: Object,
-            required: true
+            required: true,
+            validator: (prop) => Object.prototype.toString.call(prop) === '[object Object]' || Object.prototype.toString.call(prop) === '[object Array]'
         },
         indoorMaps: {
             type: Array
