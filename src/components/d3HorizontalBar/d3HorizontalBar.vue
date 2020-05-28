@@ -76,7 +76,7 @@
                     axisYTickFormat = value => isAxisYTime ? tickFormat(value, axisYInterval) : value,
                     ticks = selectTicksNumX(g_w), [paddingInner, paddingOuter] = selectPaddingInnerOuterY(g_h);
 
-                if (![g_w, g_h].every(el => el > 0)) return;
+                if (!data.length || ![g_w, g_h].every(el => el > 0)) return;
 
                 const xScale = d3.scaleLinear()
                     .range([0, g_w])

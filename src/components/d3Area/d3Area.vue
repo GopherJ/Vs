@@ -74,7 +74,7 @@
                     g_h = h -top - bottom - axisXLaneHeight - axisXLabelLaneHeight - __offsetTop__,
                     clipPathId = uuid(), isAxisXTime = isAxisTime(data), ticks = selectTicksNumY(g_h);
 
-                    if (![g_w, g_h].every(el => el > 0) || !isAxisXTime) return;
+                    if (!data.length || ![g_w, g_h].every(el => el > 0) || !isAxisXTime) return;
 
                     const svg = d3.select(this.$el)
                         .append('svg')

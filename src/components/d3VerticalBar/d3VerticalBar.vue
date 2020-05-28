@@ -78,7 +78,7 @@
                     axisXTickFormat = value => isAxisXTime ? tickFormat(value, axisXInterval) : value,
                     ticks = selectTicksNumY(g_h), [paddingInner, paddingOuter] = selectPaddingInnerOuterX(g_w);
 
-                if (![g_w, g_h].every(el => el > 0)) return;
+                if (!data.length || ![g_w, g_h].every(el => el > 0)) return;
 
                 const svg = d3.select(this.$el)
                     .append('svg')

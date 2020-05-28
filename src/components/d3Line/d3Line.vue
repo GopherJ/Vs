@@ -80,6 +80,8 @@
                     axisXTickFormat = value => isAxisXTime ? tickFormat(value, axisXInterval) : value,
                     ticks = selectTicksNumY(g_h);
 
+                if (!data.length || ![g_w, g_h].every(el => el > 0)) return;
+
                 const xScale = d3.scalePoint()
                     .domain(data.map(d => d.key))
                     .range([0, g_w]);
