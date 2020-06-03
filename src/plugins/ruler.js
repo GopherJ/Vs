@@ -1,4 +1,4 @@
-import * as d3 from 'd3';
+import * as d3 from "d3";
 
 /**
  *
@@ -23,20 +23,20 @@ const yRuler = (axisYLane, yScale, g_w, tickFormat, ticks, tickSize, tickPadding
         .call(ruler);
 
     axisYLane
-        .select('.domain')
+        .select(".domain")
         .remove();
 
     axisYLane
-        .select('.tick:first-of-type line')
+        .select(".tick:first-of-type line")
         .remove();
 
     axisYLane
-        .selectAll('.tick:not(:first-of-type) line')
-        .attr('stroke', '#777')
-        .attr('stroke-dasharray', '2,2');
+        .selectAll(".tick:not(:first-of-type) line")
+        .attr("stroke", "#777")
+        .attr("stroke-dasharray", "2,2");
 
     axisYLane
-        .selectAll('.tick text').attr('x', -(tickSize + tickPadding));
+        .selectAll(".tick text").attr("x", -(tickSize + tickPadding));
 };
 
 export {

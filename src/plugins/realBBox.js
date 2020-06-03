@@ -7,7 +7,7 @@
  */
 const realBBox = g => {
     const rect = g.node().getBBox(),
-        t = g.attr('transform'),
+        t = g.attr("transform"),
         [tx, ty] = t !== null
             ? t.split(/\(|\)|\,/).slice(1, 3).map(x => parseFloat(x))
             : [0, 0];

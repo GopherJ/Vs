@@ -2,6 +2,20 @@ import * as d3 from "d3";
 import { isNull, isUndefined, isFunction } from "lodash";
 import { map } from "../utils/array";
 
+d3.selection.prototype.moveToFront = function() {
+    return this.each(function(){
+        this.parentNode.appendChild(this);
+    });
+};
+d3.selection.prototype.moveToBack = function() {
+    return this.each(function() {
+        var firstChild = this.parentNode.firstChild;
+        if (firstChild) {
+            this.parentNode.insertBefore(this, firstChild);
+        }
+    });
+};
+
 /*
     ToDo: check if it's user-driven event
 
@@ -112,7 +126,7 @@ function brushX(svg, extent, scale, { brushed, brushing }, data) {
     brush.extent(extent);
 
     brush.on("start", () => {
-        b.raise();
+        b.moveToFront();
     });
 
     brush.on("brush", () => {
@@ -129,6 +143,7 @@ function brushX(svg, extent, scale, { brushed, brushing }, data) {
         if (isFunction(brushed)) {
             undefinedWrapper(brushInvertX(extent, scale, data), brushed, true);
         }
+        b.moveToBack();
     });
 
     b.call(brush);
@@ -160,7 +175,7 @@ function brushY(svg, extent, scale, { brushed, brushing }, data) {
     brush.extent(extent);
 
     brush.on("start", () => {
-        b.raise();
+        b.moveToFront();
     });
 
     brush.on("brush", () => {
@@ -177,6 +192,7 @@ function brushY(svg, extent, scale, { brushed, brushing }, data) {
         if (isFunction(brushed)) {
             undefinedWrapper(brushInvertY(extent, scale, data), brushed, true);
         }
+        b.moveToBack();
     });
 
     b.call(brush);

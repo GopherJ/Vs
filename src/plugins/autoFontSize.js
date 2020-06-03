@@ -4,6 +4,6 @@ export default function autoFontSize(containerSelection) {
             cbbox = containerSelection.node().getBoundingClientRect(),
             scale = Math.min(cbbox.width / bbox.width, cbbox.height / bbox.height);
 
-        textSelection.style('font-size', `${scale}px`);
+        textSelection.style("font-size", `${scale}px`);
     };
 }

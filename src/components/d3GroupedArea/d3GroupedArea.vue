@@ -75,7 +75,9 @@
 
                         curve =  'curveLinear',
 
-                        yAxisRuler = true
+                        yAxisRuler = true,
+
+                        hasBrush
                     } = this.options,
                     {
                         axisXLabelLaneHeight = isNull(axisXLabel) ? 0 : 35,
@@ -207,15 +209,17 @@
                     .attr('font-weight', axisLabelFontWeight)
                     .attr('fill-opacity', axisLabelFontOpacity);
 
-                const extent = [
-                    [left + axisYLabelLaneWidth + axisYLaneWidth, top + axisXGroupLabelLaneHeight],
-                    [w - right - __offsetRight__, h - axisXLaneHeight - axisXLabelLaneHeight]
-                ];
+                if (hasBrush) {
+                    const extent = [
+                        [left + axisYLabelLaneWidth + axisYLaneWidth, top + axisXGroupLabelLaneHeight],
+                        [w - right - __offsetRight__, h - axisXLaneHeight - axisXLabelLaneHeight]
+                    ];
 
-                const brushed = ({ start, end }) => emit(this, 'range-updated', start, end);
+                    const brushed = ({ start, end }) => emit(this, 'range-updated', start, end);
 
-                svg
-                    .call(brushX, extent, xScale, { brushed });
+                    svg
+                        .call(brushX, extent, xScale, { brushed });
+                }
 
                 const g = svg
                     .append('g')
@@ -273,7 +277,7 @@
     .d3-grouped-area path {
         pointer-events: none;
     }
-    
+
     .d3-grouped-area circle {
         cursor: pointer;
     }

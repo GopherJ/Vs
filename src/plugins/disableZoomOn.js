@@ -1,4 +1,4 @@
-import * as d3 from 'd3';
+import * as d3 from "d3";
 
 /**
  *
@@ -6,7 +6,7 @@ import * as d3 from 'd3';
  * @param extent
  */
 const disableZoomOn = (svg, extent) => {
-    svg.on('mousedown', () => {
+    svg.on("mousedown", () => {
         const [cx, cy] = d3.mouse(svg.node()),
             [[x0, y0], [x1, y1]] = extent;
 

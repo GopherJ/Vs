@@ -1,4 +1,4 @@
-import * as d3 from 'd3';
+import * as d3 from "d3";
 
 
 /**
@@ -17,19 +17,19 @@ function wrap(texts, width) {
             line = [],
             lineNumber = 0,
             lineHeight = 1.1,
-            y = text.attr('y'),
-            dy = parseFloat(text.attr('dy')),
-            tspan = text.text(null).append('tspan').attr('x', 0).attr('y', y).attr('dy', dy + 'em');
+            y = text.attr("y"),
+            dy = parseFloat(text.attr("dy")),
+            tspan = text.text(null).append("tspan").attr("x", 0).attr("y", y).attr("dy", dy + "em");
 
-        while (word = words.pop()) {
+        while ((word = words.pop())) {
             line.push(word);
-            tspan.text(line.join(' '));
+            tspan.text(line.join(" "));
 
             if (tspan.node().getComputedTextLength() > width) {
                 line.pop();
-                tspan.text(line.join(' '));
+                tspan.text(line.join(" "));
                 line = [word];
-                tspan = text.append('tspan').attr('x', 0).attr('y', y).attr('dy', ++lineNumber * lineHeight + dy + 'em').text(word);
+                tspan = text.append("tspan").attr("x", 0).attr("y", y).attr("dy", ++lineNumber * lineHeight + dy + "em").text(word);
             }
         }
     });

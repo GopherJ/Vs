@@ -64,6 +64,8 @@
 
                         nice = true,
 
+                        hasBrush = true,
+
                         yAxisRuler = true
                     } = this.options,
                     {
@@ -178,18 +180,20 @@
                     .attr('font-weight', axisLabelFontWeight);
 
                 if (isAxisXTime || isAxisXNumber) {
-                    const extent = [
-                        [left + axisYLaneWidth + axisYLabelLaneWidth, top + __offsetTop__],
-                        [w - right - __offsetRight__, h - axisXLaneHeight - axisXLabelLaneHeight]
-                    ];
-
-                    const brushed = ({ start, end }) => emit(this, 'range-updated', start, end);
-
                     axisXLane
                         .call(responsiveAxisX, xAxis, xScale);
 
-                    svg
-                        .call(brushX, extent, xScale, { brushed }, data);
+                    if (hasBrush) {
+                        const extent = [
+                            [left + axisYLaneWidth + axisYLabelLaneWidth, top + __offsetTop__],
+                            [w - right - __offsetRight__, h - axisXLaneHeight - axisXLabelLaneHeight]
+                        ];
+
+                        const brushed = ({ start, end }) => emit(this, 'range-updated', start, end);
+
+                        svg
+                            .call(brushX, extent, xScale, { brushed }, data);
+                    }
                 }
 
                 const g = svg

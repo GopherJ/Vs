@@ -1,7 +1,7 @@
-import * as d3 from 'd3';
-import { isFunction } from 'lodash';
-import { isExtent, isSimpleExtent } from '../utils/array';
-import disableZoomOn from './disableZoomOn';
+import * as d3 from "d3";
+import { isFunction } from "lodash";
+import { isExtent, isSimpleExtent } from "../utils/array";
+import disableZoomOn from "./disableZoomOn";
 
 /**
  *
@@ -18,12 +18,12 @@ function zoom(svg, { zooming, zoomend, zoomstart }, scaleExtent, extent) {
     if (isSimpleExtent(scaleExtent)) zoom.scaleExtent(scaleExtent);
     if (isExtent(extent)) svg.call(disableZoomOn, extent);
 
-    if (isFunction(zooming))   zoom.on('zoom', zooming);
-    if (isFunction(zoomend))   zoom.on('end', zoomend);
-    if (isFunction(zoomstart)) zoom.on('start', zoomstart);
+    if (isFunction(zooming))   zoom.on("zoom", zooming);
+    if (isFunction(zoomend))   zoom.on("end", zoomend);
+    if (isFunction(zoomstart)) zoom.on("start", zoomstart);
 
     svg.call(zoom);
-    svg.on('dblclick.zoom', null);
+    svg.on("dblclick.zoom", null);
 
     return zoom;
 }

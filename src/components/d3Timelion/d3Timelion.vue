@@ -90,7 +90,9 @@
 
                         nice = true,
 
-                        yAxisRuler = true
+                        yAxisRuler = true,
+
+                        hasBrush
                     } = this.options,
                     {
                         axisXLabelLaneHeight = isNull(axisXLabel) ? 0 : 60,
@@ -251,15 +253,17 @@
                         .property('value', this.interval);
                 }
 
-                const extent = [
-                    [left + axisYLabelLaneWidth + axisYLaneWidth, top + __timeRangeLabelLaneHeight__],
-                    [w - right - __offsetRight__, g_h + top + __timeRangeLabelLaneHeight__]
-                ];
+                if (hasBrush) {
+                    const extent = [
+                        [left + axisYLabelLaneWidth + axisYLaneWidth, top + __timeRangeLabelLaneHeight__],
+                        [w - right - __offsetRight__, g_h + top + __timeRangeLabelLaneHeight__]
+                    ];
 
-                const brushed = ({ start, end }) => emit(this, 'range-updated', start, end);
-                const brushing = this.updateTimeRangeLabel;
+                    const brushed = ({ start, end }) => emit(this, 'range-updated', start, end);
+                    const brushing = this.updateTimeRangeLabel;
 
-                svg.call(brushX, extent, xScale, { brushed, brushing }, data);
+                    svg.call(brushX, extent, xScale, { brushed, brushing }, data);
+                }
 
                 const g = svg
                     .append('g')

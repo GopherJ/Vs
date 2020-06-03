@@ -66,7 +66,9 @@
 
                         nice = false,
 
-                        yAxisRuler = true
+                        yAxisRuler = true,
+
+                        hasBrush = true
                     } = this.options,
                     {
                         axisXLabelLaneHeight = isNull(axisXLabel) ? 0 : 60,
@@ -178,18 +180,20 @@
                     .attr('fill-opacity', axisLabelFontOpacity);
 
                 if (isAxisXTime || isAxisXNumber) {
-                    const extent = [
-                        [left + axisYLaneWidth + axisYLabelLaneWidth, top + __offsetTop__],
-                        [w - right - __offsetRight__, h - axisXLaneHeight - axisXLabelLaneHeight]
-                    ];
-
-                    const brushed = ({ start, end }) => emit(this, 'range-updated', start, end);
-
                     axisXLane
                         .call(responsiveAxisX, xAxis, xScale);
 
-                    svg
-                        .call(brushX, extent, xScale, { brushed }, data);
+                    if (hasBrush) {
+                        const extent = [
+                            [left + axisYLaneWidth + axisYLabelLaneWidth, top + __offsetTop__],
+                            [w - right - __offsetRight__, h - axisXLaneHeight - axisXLabelLaneHeight]
+                        ];
+
+                        const brushed = ({ start, end }) => emit(this, 'range-updated', start, end);
+
+                        svg
+                            .call(brushX, extent, xScale, { brushed }, data);
+                    }
                 }
 
                 axisXLane
@@ -240,7 +244,9 @@
                     });
                 }
 
-                svg.call(drawReferenceLineX, g, g_w, g_h, xScale, data);
+                if (data.length > 1) {
+                    svg.call(drawReferenceLineX, g, g_w, g_h, xScale, data);
+                }
             },
             safeDraw() {
                 this.ifExistsSvgThenRemove();

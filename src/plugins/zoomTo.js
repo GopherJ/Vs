@@ -1,4 +1,4 @@
-import * as d3 from 'd3';
+import * as d3 from "d3";
 
 /**
  *
@@ -8,9 +8,9 @@ import * as d3 from 'd3';
  * @return {Function}
  */
 const zoomToXK = (svg, g_w, zoom) => {
-   return function (xScale, dateTimeStart, dateTimeEnd) {
+    return function(xScale, dateTimeStart, dateTimeEnd) {
         const k = g_w / (xScale(dateTimeEnd) - xScale(dateTimeStart));
-        const translateX = -xScale(dateTimeStart) ;
+        const translateX = -xScale(dateTimeStart);
 
         svg
             .transition()
@@ -20,7 +20,7 @@ const zoomToXK = (svg, g_w, zoom) => {
                     .scale(k)
                     .translate(translateX, 0);
             });
-   }
+    };
 };
 
 export {

@@ -9,7 +9,7 @@ function roundLine(line, rounded) {
     if (!rounded) return;
 
     line
-        .attr('stroke-linecap', 'round');
+        .attr("stroke-linecap", "round");
 }
 
 export default roundLine;

@@ -1,4 +1,3 @@
-
 /**
  *
  * @param {d3.Selection} axisLane
@@ -6,8 +5,8 @@
  */
 const lastTickTextAnchorEnd = (axisLane) => {
     axisLane
-        .select('.tick:last-child text')
-        .attr('text-anchor', 'end');
+        .select(".tick:last-child text")
+        .attr("text-anchor", "end");
 };
 
 /**
@@ -17,11 +16,11 @@ const lastTickTextAnchorEnd = (axisLane) => {
  */
 const firstTickTextAnchorStart = (axisLane) => {
     axisLane
-        .select('.tick:first-of-type text')
-        .attr('text-anchor', 'start');
+        .select(".tick:first-of-type text")
+        .attr("text-anchor", "start");
 };
 
 export {
     firstTickTextAnchorStart,
     lastTickTextAnchorEnd
-}
+};
