@@ -130,6 +130,7 @@
                     .attr('y', d => d.y)
                     .attr('dy', '0.32em')
                     .text(nodeLabel)
+                    .attr('pointer-events', 'none')
                     .attr('fill', nodeLabelColor)
                     .attr('font-size', nodeLabelFontSize)
                     .attr('font-weight', nodeLabelFontWeight)
