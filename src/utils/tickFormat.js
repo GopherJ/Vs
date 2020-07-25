@@ -8,14 +8,14 @@ import INTERVAL from "./interval";
  * @type {Readonly<{Millisecond: string, Second: string, Minute: string, Hour: string, Week: string, Day: string, Month: string, Year: string}>}
  */
 const MAP = Object.freeze({
-    "Millisecond": "%H:%M:%S.%L",
-    "Second": "%H:%M:%S",
-    "Minute": "%H:%M",
-    "Hour": "%Y-%m-%d %H:%M",
-    "Week": "%Y-%m-%d",
-    "Day": "%Y-%m-%d",
-    "Month": "%Y-%m-%d",
-    "Year": "%Y"
+    Millisecond: "%H:%M:%S.%L",
+    Second: "%H:%M:%S",
+    Minute: "%H:%M",
+    Hour: "%m-%d %H:%M",
+    Week: "%m-%d",
+    Day: "%m-%d",
+    Month: "%m-%d",
+    Year: "%Y",
 });
 
 /**
