@@ -1,7 +1,7 @@
 /* eslint-disable */
-import * as d3 from 'd3';
-import { debounce } from 'lodash';
-import { hideTip, isTipShowing } from '../plugins/tooltip';
+import * as d3 from "d3"
+import { debounce } from "lodash"
+import { hideTip, isTipShowing } from "../plugins/tooltip"
 
 export default {
     props: {
@@ -21,11 +21,11 @@ export default {
         },
         width: {
             type: String,
-            default: '100%'
+            default: "100%",
         },
         height: {
             type: String,
-            default: '300px'
+            default: "300px",
         },
         nodeTitle: {
             type: Function,
@@ -34,84 +34,84 @@ export default {
         linkTitle: {
             type: Function,
             default: d => `${d.source.name} → ${d.target.name}<br>${d.value}`,
-        }
+        },
     },
     methods: {
         ifExistsSvgThenRemove() {
-            const svgSelection = d3.select(this.$el).select('svg');
+            const svgSelection = d3.select(this.$el).select("svg")
 
-            if (svgSelection.empty()) return;
+            if (svgSelection.empty()) return
 
-            svgSelection.remove();
+            svgSelection.remove()
         },
         getElWidthHeight() {
-            return [this.$el.clientWidth, this.$el.clientHeight];
+            return [this.$el.clientWidth, this.$el.clientHeight]
         },
         getSelectionWidthHeight(selection) {
             return [
                 selection.node().getBoundingClientRect().width,
-                selection.node().getBoundingClientRect().height
-            ];
+                selection.node().getBoundingClientRect().height,
+            ]
         },
         getSelectionOffset(selection) {
-            return [
-                selection.node().getBBox().x,
-                selection.node().getBBox().y
-            ];
-        }
+            return [selection.node().getBBox().x, selection.node().getBBox().y]
+        },
     },
     watch: {
         nodes: {
             deep: true,
             handler(n, o) {
                 this.$nextTick(() => {
-                    this.safeDraw();
-                });
-            }
+                    this.safeDraw()
+                })
+            },
         },
         links: {
             deep: true,
             handler(n, o) {
                 this.$nextTick(() => {
-                    this.safeDraw();
-                });
-            }
+                    this.safeDraw()
+                })
+            },
         },
         options: {
             deep: true,
             handler(n, o) {
                 this.$nextTick(() => {
-                    this.safeDraw();
-                });
-            }
+                    this.safeDraw()
+                })
+            },
         },
         width(n) {
             this.$nextTick(() => {
-                this.safeDraw();
-            });
+                this.safeDraw()
+            })
         },
         height(n) {
             this.$nextTick(() => {
-                this.safeDraw();
-            });
-        }
+                this.safeDraw()
+            })
+        },
     },
     activated() {
-        const svgSelection = d3.select(this.$el).select('svg');
+        const svgSelection = d3.select(this.$el).select("svg")
 
         if (svgSelection.empty()) {
-            window.dispatchEvent(new Event('resize'));
-        };
+            window.dispatchEvent(new Event("resize"))
+        }
+    },
+    deactivated() {
+        if (isTipShowing()) hideTip()
     },
     mounted() {
-        setTimeout(this.safeDraw);
+        setTimeout(this.safeDraw)
 
-        this.listener = debounce(this.onResize, 500);
+        this.listener = debounce(this.onResize, 500)
 
-        window.addEventListener('resize', this.listener);
+        window.addEventListener("resize", this.listener)
     },
     beforeDestroy() {
-        window.removeEventListener('resize', this.listener);
-        if (isTipShowing()) hideTip();
-    }
-};
+        window.removeEventListener("resize", this.listener)
+        if (isTipShowing()) hideTip()
+    },
+}

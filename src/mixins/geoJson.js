@@ -1,66 +1,69 @@
 /* eslint-disable */
-import * as d3 from 'd3';
-import { hideTip, isTipShowing } from '../plugins/tooltip';
+import * as d3 from "d3"
+import { hideTip, isTipShowing } from "../plugins/tooltip"
 
 export default {
     props: {
         width: {
             type: String,
-            default: '100%'
+            default: "100%",
         },
         height: {
             type: String,
-            default: '300px'
+            default: "300px",
         },
         data: {
             type: Object,
-            required: true
+            required: true,
         },
         indoorMaps: {
-            type: Array
+            type: Array,
         },
         options: {
             type: Object,
-            default: () => ({})
-        }
+            default: () => ({}),
+        },
     },
     watch: {
         data: {
             deep: true,
             handler(n) {
                 this.$nextTick(() => {
-                    this.safeDraw();
-                });
-            }
+                    this.safeDraw()
+                })
+            },
         },
         indoorMaps: {
             deep: true,
             handler(n) {
                 this.$nextTick(() => {
-                    this.safeDraw();
-                });
-            }
+                    this.safeDraw()
+                })
+            },
         },
         options: {
             deep: true,
             handler(n) {
                 this.$nextTick(() => {
-                    this.safeDraw();
-                });
-            }
+                    this.safeDraw()
+                })
+            },
         },
     },
     activated() {
-        const svgSelection = d3.select(this.$el).select('svg');
+        const svgSelection = d3.select(this.$el).select("svg")
 
         if (svgSelection.empty()) {
-            window.dispatchEvent(new Event('resize'));
-        };
+            window.dispatchEvent(new Event("resize"))
+        }
+    },
+    deactivated() {
+        if (isTipShowing()) hideTip()
     },
     mounted() {
-        setTimeout(this.safeDraw);
+        setTimeout(this.safeDraw)
     },
     beforeDestroy() {
-        if (isTipShowing()) hideTip();
-    }
-};
+        if (isTipShowing()) hideTip()
+    },
+}

@@ -1,111 +1,113 @@
 /* eslint-disable */
-import * as d3 from 'd3';
-import { debounce } from 'lodash';
-import { hideTip, isTipShowing } from '../plugins/tooltip';
+import * as d3 from "d3"
+import { debounce } from "lodash"
+import { hideTip, isTipShowing } from "../plugins/tooltip"
 
 export default {
     props: {
         width: {
             type: String,
-            default: '100%'
+            default: "100%",
         },
         height: {
             type: String,
-            default: '300px'
+            default: "300px",
         },
         margin: {
             type: Object,
-            default: () => ({})
+            default: () => ({}),
         },
         data: {
             required: true,
-            validator: prop => prop === null || Object.prototype.toString.call(prop) === '[object Object]'
+            validator: prop =>
+                prop === null ||
+                Object.prototype.toString.call(prop) === "[object Object]",
         },
         options: {
             type: Object,
-            default: () => ({})
-        }
+            default: () => ({}),
+        },
     },
     methods: {
         ifExistsSvgThenRemove() {
-            const svgSelection = d3.select(this.$el).select('svg');
+            const svgSelection = d3.select(this.$el).select("svg")
 
-            if (svgSelection.empty()) return;
+            if (svgSelection.empty()) return
 
-            svgSelection.remove();
+            svgSelection.remove()
         },
         getElWidthHeight() {
-            return [this.$el.clientWidth, this.$el.clientHeight];
+            return [this.$el.clientWidth, this.$el.clientHeight]
         },
         getSelectionWidthHeight(selection) {
             return [
                 selection.node().getBBox().width,
-                selection.node().getBBox().height
-            ];
+                selection.node().getBBox().height,
+            ]
         },
         getSelectionOffset(selection) {
-            return [
-                selection.node().getBBox().x,
-                selection.node().getBBox().y
-            ];
-        }
+            return [selection.node().getBBox().x, selection.node().getBBox().y]
+        },
     },
     watch: {
         width: {
             deep: false,
             handler(n) {
                 this.$nextTick(() => {
-                    this.safeDraw();
-                });
-            }
+                    this.safeDraw()
+                })
+            },
         },
         height: {
             deep: false,
             handler(n) {
                 this.$nextTick(() => {
-                    this.safeDraw();
-                });
-            }
+                    this.safeDraw()
+                })
+            },
         },
         margin: {
             deep: true,
             handler(n) {
                 this.$nextTick(() => {
-                    this.safeDraw();
-                });
-            }
+                    this.safeDraw()
+                })
+            },
         },
         data: {
             deep: true,
             handler(n) {
                 this.$nextTick(() => {
-                    this.safeDraw();
-                });
-            }
+                    this.safeDraw()
+                })
+            },
         },
         options: {
             deep: true,
             handler(n) {
                 this.$nextTick(() => {
-                    this.safeDraw();
-                });
-            }
-        }
+                    this.safeDraw()
+                })
+            },
+        },
     },
     activated() {
-        const svgSelection = d3.select(this.$el).select('svg');
+        const svgSelection = d3.select(this.$el).select("svg")
 
-        window.dispatchEvent(new Event('resize'));
+        window.dispatchEvent(new Event("resize"))
+    },
+    deactivated() {
+        if (isTipShowing()) hideTip()
     },
     mounted() {
-        setTimeout(this.safeDraw);
+        setTimeout(this.safeDraw)
 
-        this._handleResize = debounce(this.onResize, 500);
+        this._handleResize = debounce(this.onResize, 500)
 
-        window.addEventListener('resize', this._handleResize);
+        window.addEventListener("resize", this._handleResize)
     },
     beforeDestroy() {
-        window.removeEventListener('resize', this._handleResize);
-        if (isTipShowing()) hideTip();
-    }
-};
+        window.removeEventListener("resize", this._handleResize)
+        if (isTipShowing()) hideTip()
+    },
+}
