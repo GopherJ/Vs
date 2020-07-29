@@ -28,34 +28,34 @@ const MAP = Object.freeze({
  */
 const tickFormat = (key, interval) => {
     if (interval >= INTERVAL.Year) {
-        return d3.utcFormat(MAP.Year)(key);
+        return d3.timeFormat(MAP.Year)(key);
     }
 
     if (interval >= INTERVAL.Month) {
-        return d3.utcFormat(MAP.Month)(key);
+        return d3.timeFormat(MAP.Month)(key);
     }
 
     if (interval >= INTERVAL.Week) {
-        return d3.utcFormat(MAP.Week)(key);
+        return d3.timeFormat(MAP.Week)(key);
     }
 
     if (interval >= INTERVAL.Day) {
-        return d3.utcFormat(MAP.Day)(key);
+        return d3.timeFormat(MAP.Day)(key);
     }
 
     if (interval >= INTERVAL.Hour) {
-        return d3.utcFormat(MAP.Hour)(key);
+        return d3.timeFormat(MAP.Hour)(key);
     }
 
     if (interval >= INTERVAL.Minute) {
-        return d3.utcFormat(MAP.Minute)(key);
+        return d3.timeFormat(MAP.Minute)(key);
     }
 
     if (interval >= INTERVAL.Second) {
-        return d3.utcFormat(MAP.Second)(key);
+        return d3.timeFormat(MAP.Second)(key);
     }
 
-    return d3.utcFormat(MAP.Hour)(key);
+    return d3.timeFormat(MAP.Hour)(key);
 };
 
 export default tickFormat;
