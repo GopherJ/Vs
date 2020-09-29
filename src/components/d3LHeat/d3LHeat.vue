@@ -36,6 +36,10 @@
                         maxZoom = 23,
                         minZoom = 1,
 
+                        id = "mapbox/light-v10",
+
+                        accessToken = "",
+
                         minOpacity= 0.05,
                         radius = 8,
                         blur = 15,
@@ -56,7 +60,9 @@
                 this._tileLayer = L.tileLayer(url, {
                     attribution,
                     maxZoom,
-                    minZoom
+                    minZoom,
+                    id,
+                    accessToken
                 }).addTo(Map);
 
                 if (Array.isArray(indoorMaps) && indoorMaps.length) {
