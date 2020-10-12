@@ -104,5 +104,4 @@ export {
     d3ICicleHorizontal,
     d3LChoropleth,
     d3LHeat,
-    L,
 }

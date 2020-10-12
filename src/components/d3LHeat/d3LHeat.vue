@@ -119,6 +119,7 @@
             indoorLayerLevel: {
                 deep: false,
                 handler(n, o) {
+                    const isMultipleLevel = !Array.isArray(this.data);
                     if (isMultipleLevel
                         && !isNull(o)
                         && !isNull(n)
