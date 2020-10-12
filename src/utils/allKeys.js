@@ -5,6 +5,6 @@
  * @param {Array} data
  * @return {Array}
  */
-const GetAllKeys = (data) => [...new Set(data.map(d => d.key))];
+const GetAllKeys = data => [...new Set(data.map(d => d.key))];
 
 export default GetAllKeys;

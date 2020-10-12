@@ -6,12 +6,17 @@ const URL = window.URL || window.webkitURL;
  * @return {Blob}
  */
 const blobWorker = task => {
-    return new Blob([`
+    return new Blob(
+        [
+            `
         self.onmessage = event => {
-            const args = event.data.args; 
+            const args = event.data.args;
             self.postMessage((${task}).apply(null, args));
-        } 
-    `], { type: 'application/javascript' });
+        }
+    `,
+        ],
+        { type: "application/javascript" }
+    );
 };
 
 /**
@@ -24,7 +29,7 @@ function TinyWorker(task) {
     this.worker = new Worker(this.objectURL);
 }
 
-TinyWorker.prototype.update = function (task) {
+TinyWorker.prototype.update = function(task) {
     URL.revokeObjectURL(this.objectURL);
 
     this.objectURL = URL.createObjectURL(blobWorker(task));
@@ -33,7 +38,7 @@ TinyWorker.prototype.update = function (task) {
     return this;
 };
 
-TinyWorker.prototype.run = function (args = []) {
+TinyWorker.prototype.run = function(args = []) {
     return new Promise((resolve, reject) => {
         this.worker.onmessage = event => {
             return resolve(event.data);
@@ -47,16 +52,10 @@ TinyWorker.prototype.run = function (args = []) {
     });
 };
 
-TinyWorker.prototype.destroy = function () {
+TinyWorker.prototype.destroy = function() {
     URL.revokeObjectURL(this.objectURL);
 
     this.worker.terminate();
 };
 
-
 export default TinyWorker;
-
-
-
-
-
