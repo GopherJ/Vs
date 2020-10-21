@@ -6,7 +6,7 @@
     import L from 'leaflet';
     import 'leaflet-fullscreen';
     import {isNull, isUndefined} from 'lodash';
-    import '../../utils/leaflet-indoor';
+    import 'l-indoor-map'
     import '../../lib/Leaflet.Heat';
     import mixins from '../../mixins/coords';
 

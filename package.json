@@ -23,8 +23,6 @@
         "d3"
     ],
     "dependencies": {
-        "@turf/centroid": "^6.0.2",
-        "@turf/turf": "^5.1.6",
         "d3": "^4.13.0",
         "d3-brush": "1.0.4",
         "d3-cloud": "^1.2.5",
@@ -34,6 +32,8 @@
         "leaflet": "^1.6.0",
         "leaflet-choropleth": "^1.1.4",
         "leaflet-fullscreen": "^1.0.2",
+        "leaflet.markercluster": "^1.4.1",
+        "l-indoor-map": "https://github.com/GopherJ/LIndoorMap",
         "lodash": "^4.17.5",
         "moment": "^2.22.0",
         "murmurhash3js": "^3.0.1",

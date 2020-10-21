@@ -27,10 +27,6 @@ import d3LChoropleth from "./components/d3LChoropleth"
 import d3LHeat from "./components/d3LHeat"
 
 import L from "leaflet"
-import "leaflet-fullscreen"
-import "leaflet-choropleth"
-import "./utils/leaflet-indoor"
-import "./lib/Leaflet.Heat"
 L.Icon.Default.imagePath = "."
 
 L.Icon.Default.mergeOptions({

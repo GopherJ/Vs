@@ -1,5 +1,6 @@
 @import url('../../node_modules/leaflet-fullscreen/dist/leaflet.fullscreen.css');
-
+@import "../../node_modules/leaflet.markercluster/dist/MarkerCluster.css";
+@import "../../node_modules/leaflet.markercluster/dist/MarkerCluster.Default.css";
 @import url('../../node_modules/leaflet/dist/leaflet.css');
 
 @keyframes show {
