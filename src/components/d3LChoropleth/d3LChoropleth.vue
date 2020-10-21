@@ -8,7 +8,7 @@
     import 'leaflet-fullscreen';
     import { isPlainObject, isUndefined, isNull } from 'lodash';
     import mixins from '../../mixins/geoJson';
-    import 'l-indoor-map';
+    import '../../utils/leaflet-indoor';
 
     export default {
         name: 'd3-l-choropleth',
