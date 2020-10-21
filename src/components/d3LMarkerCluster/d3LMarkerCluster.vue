@@ -48,15 +48,14 @@
 
                         animateAddingMarkers = false,
                         disableClusteringAtZoom = false,
-                        maxClusterRadius = 80,
+                        maxClusterRadius = 40,
                         polygonOptions = {},
                         singleMarkerMode = false,
-                        spiderLegPolylineOptions = { weight: 1.5, color: '#222', opacity: 0.5 },
+                        spiderLegPolylineOptions = { weight: 1.5, color: "#222", opacity: 0.5 },
                         spiderfyDistanceMultiplier = 1,
                         clusterPane = L.Marker.prototype.options.pane,
-                        iconCreateFunction = undefined,
-                        spiderfyShapePositions = undefined,
-
+                        iconCreateFunction = null,
+                        spiderfyShapePositions = null,
                         chunkedLoading = false,
                         chunkInterval = 200,
                         chunkDelay = 50,
@@ -122,12 +121,14 @@
                     this.indoorLayerLevel = this._indoorLayer.getLevel();
                 }
 
-                this._markerClusterLayer = L.markerClusterGroup(markerClusterGroupOptions).addTo(Map);
+                this._markerClusterLayer = L.markerClusterGroup(markerClusterGroupOptions);
                 if (!isMultipleLevel) {
                     this._markerClusterLayer.addLayers(data.map((x) => L.marker(x)));
                 } else if (!isNull(this.indoorLayerLevel) && Array.isArray(data[this.indoorLayerLevel])) {
                     this._markerClusterLayer.addLayers(data[this.indoorLayerLevel].map((x) => L.marker(x)))
                 }
+
+                this._markerClusterLayer.addTo(Map);
 
                 this._fullscreenControl = new L.Control.Fullscreen();
                 Map.addControl(this._fullscreenControl);
@@ -173,14 +174,14 @@
 
                                 animateAddingMarkers = false,
                                 disableClusteringAtZoom = false,
-                                maxClusterRadius = 80,
+                                maxClusterRadius = 40,
                                 polygonOptions = {},
                                 singleMarkerMode = false,
                                 spiderLegPolylineOptions = { weight: 1.5, color: '#222', opacity: 0.5 },
                                 spiderfyDistanceMultiplier = 1,
                                 clusterPane = L.Marker.prototype.options.pane,
-                                iconCreateFunction = undefined,
-                                spiderfyShapePositions = undefined,
+                                iconCreateFunction = null,
+                                spiderfyShapePositions = null,
 
                                 chunkedLoading = true,
                                 chunkInterval = 200,
@@ -213,8 +214,9 @@
                                 markerClusterGroupOptions["spiderfyShapePositions"] = spiderfyShapePositions;
                             }
 
-                            this._markerClusterLayer = L.markerClusterGroup(markerClusterGroupOptions).addTo(Map);
+                            this._markerClusterLayer = L.markerClusterGroup(markerClusterGroupOptions);
                             this._markerClusterLayer.addLayers(this.data[n].map((x) => L.marker(x)));
+                            this._markerClusterLayer.addTo(Map);
                         }
                     }
                 }

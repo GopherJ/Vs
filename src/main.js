@@ -28,7 +28,7 @@ import d3LHeat from "./components/d3LHeat"
 import d3LMarkerCluster from "./components/d3LMarkerCluster"
 
 import L from "leaflet"
-L.Icon.Default.imagePath = "."
+delete L.Icon.Default.prototype._getIconUrl
 
 L.Icon.Default.mergeOptions({
     iconRetinaUrl: require("leaflet/dist/images/marker-icon-2x.png"),
